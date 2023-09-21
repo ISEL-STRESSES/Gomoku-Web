@@ -21,6 +21,8 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.springframework:spring-web:6.0.12")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     runtimeOnly("org.postgresql:postgresql")
