@@ -1,4 +1,6 @@
-package model.board
+package gomoku.server.domain.game.board
+
+import gomoku.server.domain.game.InvalidBoardException
 
 data class Board(
     val grid: Map<Position, Color>
@@ -13,17 +15,19 @@ fun Board.at(position: Position) =
     grid[position]
 
 
-fun SerializedMoves.toBoard(): Board {
+fun SerializedMoves.toBoard(): Result<Board> {
     val finalGrid = this.foldIndexed(mapOf<Position, Color>()) { index, grid, position ->
         val existing = grid[position]
-        if (existing != null) TODO("What if serialized moves is wrongly set? set game to corrupt?")
+        if (existing != null) return Result.failure(InvalidBoardException())
 
         val color = index.toColor()
 
         grid + (position to color)
     }
 
-    return Board(
-        grid = finalGrid,
+    return Result.success(
+        Board(
+            grid = finalGrid,
+        )
     )
 }
