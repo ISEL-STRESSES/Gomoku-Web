@@ -1,7 +1,7 @@
 package gomoku.server.domain
 
 data class Author(
-    val id: Int,
+    val studentID: Int,
     val name: String,
     val email: String,
 )

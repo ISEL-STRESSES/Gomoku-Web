@@ -17,19 +17,19 @@ class HomeController {
 
     private val authors = listOf(
         Author(
-            id = 48335,
+            studentID = 48335,
             name = "Rodrigo Correia",
             email = "A48335@alunos.isel.pt",
 
             ),
         Author(
-            id = 48281,
+            studentID = 48281,
             name = "Adolfo Morgado",
             email = "A48281@alunos.isel.pt",
 
             ),
         Author(
-            id = 48253,
+            studentID = 48253,
             name = "Carlos Pereira",
             email = "A48253@alunos.isel.pt",
 

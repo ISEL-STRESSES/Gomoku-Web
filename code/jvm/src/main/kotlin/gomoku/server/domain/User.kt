@@ -11,8 +11,8 @@ data class User(
     ) {
 
     init {
-        check(isNameValid(username)) { "User name has invalid size!" }
-        check(isEmailValid(email)) { "User email has invalid size!" }
+        check(isNameValid(username)) { "User name is invalid!" }
+        check(isEmailValid(email)) { "User email is invalid!" }
     }
 
     companion object {
