@@ -8,4 +8,4 @@ class NotYourTurnException : GomokuException()
 class IllegalMoveException : GomokuException()
 class OutOfBoundsException : GomokuException()
 class GameAlreadyOverException : GomokuException()
-class CarlosFezEstaParteDoCodigoException : GomokuException()
+
