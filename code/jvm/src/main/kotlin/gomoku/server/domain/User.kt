@@ -5,7 +5,6 @@ data class User(
     val uuid: Int,
     val username: String,
     val email: String,
-    val hashedPassword: String,
     val playCount: Int = 0,
     val elo: Int = 0,
 

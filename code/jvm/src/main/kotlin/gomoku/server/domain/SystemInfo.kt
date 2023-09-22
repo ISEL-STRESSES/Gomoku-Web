@@ -1,10 +1,9 @@
 package gomoku.server.domain
 
 data class Author(
+    val id: Int,
     val name: String,
     val email: String,
-    val gitHub: String,
-    val id: Int
 )
 
 data class ServerInfo(

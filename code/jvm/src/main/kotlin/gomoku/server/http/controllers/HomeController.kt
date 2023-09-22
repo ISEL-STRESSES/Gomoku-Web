@@ -15,31 +15,29 @@ class HomeController {
         return ResponseEntity.ok(serverInfo)
     }
 
-    companion object {
-        private val authors = listOf(
-            Author(
-                name = "Rodrigo Correia",
-                email = "A48335@alunos.isel.pt",
-                gitHub = "github.com/rodrigohcorreia",
-                id = 48335
-                ),
-            Author(
-                name = "Adolfo Morgado",
-                email = "A48281@alunos.isel.pt",
-                gitHub = "github.com/admorgado",
-                id = 48281
-            ),
-            Author(
-                name = "Carlos Pereira",
-                email = "A48253@alunos.isel.pt",
-                gitHub = "github.com/Sideghost",
-                id = 48253
-            )
-        )
+    private val authors = listOf(
+        Author(
+            id = 48335,
+            name = "Rodrigo Correia",
+            email = "A48335@alunos.isel.pt",
 
-        private val serverInfo = ServerInfo(
-            version = "0.0.1",
-            authors = authors
-        )
-    }
+            ),
+        Author(
+            id = 48281,
+            name = "Adolfo Morgado",
+            email = "A48281@alunos.isel.pt",
+
+            ),
+        Author(
+            id = 48253,
+            name = "Carlos Pereira",
+            email = "A48253@alunos.isel.pt",
+
+            )
+    )
+
+    private val serverInfo = ServerInfo(
+        version = "0.0.1",
+        authors = authors
+    )
 }
