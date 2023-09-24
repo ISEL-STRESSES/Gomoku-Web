@@ -3,7 +3,7 @@ package gomoku.server.domain.game
 import gomoku.server.domain.game.board.*
 import kotlin.random.Random
 
-sealed class Game (
+sealed class Game(
     val gameID: Int,
     val hostID: Int,
     val rules: Rules,
@@ -12,7 +12,7 @@ sealed class Game (
 /**
  * Represents an open game that can be joined by a guest.
  */
-class OpenGame (
+class OpenGame(
     gameID: Int,
     hostID: Int,
     rules: Rules = defaultRules,
@@ -46,7 +46,7 @@ fun OpenGame.join(guestID : Int): Result<OngoingGame> {
 }
 
 fun Game.getColorFromPlayerID(playerID: Int): Color? {
-    return when(this) {
+    return when (this) {
         is OpenGame -> null
         is OngoingGame -> {
             if (playerID == hostID) {
@@ -82,7 +82,7 @@ fun OngoingGame.play(playerID: Int, position: Position): Result<Game> {
 
     // TODO: is the playing move a winning move?
 
-    val newMoves = moves + position;
+    val newMoves = moves + position
 
     val newGame = OngoingGame(
         gameID = gameID,
