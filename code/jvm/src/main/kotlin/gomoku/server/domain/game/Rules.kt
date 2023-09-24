@@ -1,6 +1,6 @@
-package model
+package gomoku.server.domain.game
 
-import model.board.Position
+import gomoku.server.domain.game.board.Position
 
 enum class BoardSize(private val max: Int) {
     X15(15),

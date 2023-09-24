@@ -9,15 +9,6 @@ import org.springframework.stereotype.Repository
 @Repository
 class JdbcUserRepository(@Autowired private val jdbcTemplate: JdbcTemplate) : UserRepository {
 
-    override fun existsUserWithUsername(username: String): Boolean {
-        val count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM users WHERE username = ?",
-            Int::class.java,
-            username
-        )
-        return count > 0
-    }
-
     override fun findUserById(uuid: Int): UserDetailOutputDTO? {
         return jdbcTemplate.queryForObject(
             "SELECT uuid, username, play_count, elo FROM users WHERE uuid = ?",
@@ -46,6 +37,16 @@ class JdbcUserRepository(@Autowired private val jdbcTemplate: JdbcTemplate) : Us
     override fun save(username: String): Int {
 
         val key = GeneratedKeyHolder()
+
+        jdbcTemplate.query(
+            "SELECT uuid FROM users WHERE username = ?",
+            { rs ->
+                if (rs.next()) {
+                    throw IllegalArgumentException("Username is already taken")
+                }
+            },
+            username
+        )
 
         jdbcTemplate.update({ connection ->
             val stm = connection.prepareStatement(

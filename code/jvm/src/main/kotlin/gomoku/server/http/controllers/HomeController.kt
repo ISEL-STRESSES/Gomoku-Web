@@ -1,6 +1,6 @@
 package gomoku.server.http.controllers
 
-import URIs
+import gomoku.server.http.URIs
 import gomoku.server.domain.Author
 import gomoku.server.domain.ServerInfo
 import jakarta.servlet.http.HttpServletRequest

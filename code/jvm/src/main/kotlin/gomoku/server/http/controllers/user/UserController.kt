@@ -1,6 +1,6 @@
 package gomoku.server.http.controllers.user
 
-import URIs
+import gomoku.server.http.URIs
 import gomoku.server.http.controllers.user.models.get.GetUserOutputModel
 import gomoku.server.http.controllers.user.models.get.GetUsersOutputModel
 import gomoku.server.http.controllers.user.models.login.UserLoginInputModel
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.*
 class UserController(private val service: UserService) {
 
     @GetMapping(URIs.Users.ROOT)
-    fun getUsers(
+    fun getRanking(
         @RequestParam offset: Int = 0,
         @RequestParam limit: Int = 10
     ): ResponseEntity<GetUsersOutputModel> {
-        val users = service.getUsers(offset, limit)
+        val users = service.getRanking(offset, limit)
         return ResponseEntity.ok(GetUsersOutputModel(users))
     }
 
@@ -37,7 +37,6 @@ class UserController(private val service: UserService) {
         @Valid @RequestBody userInput: UserRegisterInputModel
     ): ResponseEntity<UserRegisterOutputModel> {
         val registerOutputDTO = service.registerUser(userInput.toUserRegisterInputDTO())
-
         return ResponseEntity.ok(UserRegisterOutputModel(registerOutputDTO))
     }
 

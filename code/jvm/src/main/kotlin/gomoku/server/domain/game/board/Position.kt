@@ -1,4 +1,4 @@
-package model.board
+package gomoku.server.domain.game.board
 
 /**
  * Represents a data point

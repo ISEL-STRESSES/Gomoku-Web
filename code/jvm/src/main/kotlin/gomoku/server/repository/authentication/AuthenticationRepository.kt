@@ -1,10 +1,13 @@
 package gomoku.server.repository.authentication
 
+import gomoku.server.domain.user.Password
+import gomoku.server.domain.user.Token
+
 interface AuthenticationRepository {
-    fun getToken(uuid: Int): String?
-    fun getPassword(uuid: Int): String?
-    fun getUserID(token: String): Int?
-    fun save(uuid: Int, token: String, password: String)
-    fun setToken(uuid: Int, token: String)
-    fun setPassword(uuid: Int, password: String)
+    fun getToken(uuid: Int): Token?
+    fun getPassword(uuid: Int): Password?
+    fun getUserID(token: Token): Int?
+    fun save(uuid: Int, token: Token, password: Password)
+    fun setToken(uuid: Int, token: Token)
+    fun setPassword(uuid: Int, password: Password)
 }

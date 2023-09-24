@@ -1,4 +1,4 @@
-package model.board
+package gomoku.server.domain.game.board
 
 data class Board(
     val grid: Map<Position, Color>

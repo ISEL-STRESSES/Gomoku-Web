@@ -1,3 +1,5 @@
+package gomoku.server.http
+
 import org.springframework.web.util.UriTemplate
 import java.net.URI
 

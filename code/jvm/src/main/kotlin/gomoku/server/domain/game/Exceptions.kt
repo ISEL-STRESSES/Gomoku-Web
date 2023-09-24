@@ -1,4 +1,4 @@
-package model
+package gomoku.server.domain.game
 
 sealed class GomokuException : Exception()
 class THIS_AINT_YO_GAME_Exception : GomokuException()

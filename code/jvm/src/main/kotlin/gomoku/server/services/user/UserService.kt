@@ -1,5 +1,7 @@
 package gomoku.server.services.user
 
+import gomoku.server.domain.user.Password
+import gomoku.server.domain.user.Token
 import gomoku.server.repository.authentication.AuthenticationRepository
 import gomoku.server.repository.user.UserRepository
 import gomoku.server.services.user.dtos.get.GetUserOutputDTO
@@ -8,17 +10,15 @@ import gomoku.server.services.user.dtos.login.UserLoginInputDTO
 import gomoku.server.services.user.dtos.login.UserLoginOutputDTO
 import gomoku.server.services.user.dtos.register.UserRegisterInputDTO
 import gomoku.server.services.user.dtos.register.UserRegisterOutputDTO
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val authenticationRepository: AuthenticationRepository
+    private val authenticationRepository: AuthenticationRepository,
+    private val passwordEncoder: PasswordEncoder
 ) {
-
-    private val passwordEncoder = BCryptPasswordEncoder()
-
     fun registerUser(registerInputDTO: UserRegisterInputDTO): UserRegisterOutputDTO {
         // Hash the password
         val hashedPassword = passwordEncoder.encode(registerInputDTO.password)
@@ -27,11 +27,8 @@ class UserService(
         val token = generateTokenForUser(registerInputDTO.username)
         val hashedToken = "" //hash token
 
-        if (userRepository.existsUserWithUsername(registerInputDTO.username)) {
-            throw IllegalArgumentException("Username is already taken")
-        }
         val uuid = userRepository.save(registerInputDTO.username)
-        authenticationRepository.save(uuid, hashedPassword, hashedToken)
+        authenticationRepository.save(uuid, Token(hashedToken), Password(hashedPassword))
 
         return UserRegisterOutputDTO(token)
     }
@@ -45,19 +42,17 @@ class UserService(
         val encodedPassword = authenticationRepository.getPassword(user.uuid)
             ?: throw IllegalArgumentException("Invalid credentials")
 
-        if (passwordEncoder.matches(loginInputDTO.password, encodedPassword)) {
+        if (passwordEncoder.matches(loginInputDTO.password, encodedPassword.encodedPassword)) {
             //TODO: Generate and encode token
             val token = generateTokenForUser(user.username)
             val hashedToken = "" //hash token
-            authenticationRepository.setToken(user.uuid, hashedToken)
+            authenticationRepository.setToken(user.uuid, Token(hashedToken))
             return UserLoginOutputDTO(token)
         } else {
             throw IllegalArgumentException("Invalid credentials")
         }
     }
-
-    //TODO: Make this not hardcoded
-    fun getUsers(offset: Int = 0, limit: Int = 10): GetUsersOutputDTO {
+    fun getRanking(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): GetUsersOutputDTO {
 
         val users = userRepository.findUsers(offset, limit)
 
@@ -80,5 +75,10 @@ class UserService(
     private fun generateTokenForUser(username: String): String {
         //TODO: Use JWT to generate token
         return "$username-token"
+    }
+
+    companion object {
+        const val DEFAULT_OFFSET = 0
+        const val DEFAULT_LIMIT = 10
     }
 }

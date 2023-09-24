@@ -1,6 +1,6 @@
-package model
+package gomoku.server.domain.game
 
-import model.board.*
+import gomoku.server.domain.game.board.*
 import kotlin.random.Random
 
 sealed class Game(
