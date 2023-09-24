@@ -1,13 +1,12 @@
-package gomoku.server.http.controllers.user.models.register
+package gomoku.server.http.controllers.user.models.login
 
 import gomoku.server.domain.user.User
-import gomoku.server.services.user.dtos.register.UserRegisterInputDTO
+import gomoku.server.services.user.dtos.login.UserLoginInputDTO
 import gomoku.server.validation.SafePassword
-import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
-data class UserRegisterInputModel(
+data class UserLoginInputModel(
 
     @NotBlank
     @get:Size(
@@ -16,13 +15,10 @@ data class UserRegisterInputModel(
     )
     val username: String,
 
-    @field:Email
-    val email: String,
-
     @SafePassword
     val password: String
 ) {
-    fun toUserRegisterInputDTO() = UserRegisterInputDTO(
+    fun toUserLoginInputDTO() = UserLoginInputDTO(
         username = username,
         password = password
     )

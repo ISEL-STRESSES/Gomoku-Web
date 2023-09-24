@@ -3,7 +3,7 @@ import java.net.URI
 
 object URIs {
 
-    const val HOME="/"
+    const val HOME = "/"
 
     fun home() = URI(HOME)
 
@@ -11,11 +11,13 @@ object URIs {
         const val ROOT = "/users"
         const val BY_ID = "$ROOT/{id}"
         const val LOGIN = "$ROOT/login"
-        const val REGISTER= "$ROOT/register"
+        const val REGISTER = "$ROOT/register"
+        const val LOGOUT = "$ROOT/logout"
 
         fun userByID(id: Int) = UriTemplate(BY_ID).expand(id)
         fun login() = URI(LOGIN)
         fun register() = URI(REGISTER)
+
     }
 
     object Games {

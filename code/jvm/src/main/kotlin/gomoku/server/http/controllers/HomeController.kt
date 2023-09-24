@@ -1,5 +1,6 @@
 package gomoku.server.http.controllers
 
+import URIs
 import gomoku.server.domain.Author
 import gomoku.server.domain.ServerInfo
 import jakarta.servlet.http.HttpServletRequest
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 class HomeController {
 
     @GetMapping(URIs.HOME)
-    fun getHome(request: HttpServletRequest) : ResponseEntity<ServerInfo> {
+    fun getHome(request: HttpServletRequest): ResponseEntity<ServerInfo> {
         return ResponseEntity.ok(serverInfo)
     }
 
