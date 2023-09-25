@@ -13,9 +13,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-class UserController(private val service: UserService) {
+@RequestMapping(URIs.Users.ROOT)
+class UserController(
+    private val service: UserService
+) {
 
-    @GetMapping(URIs.Users.ROOT)
+    @GetMapping(URIs.Users.RANKING)
     fun getRanking(
         @RequestParam offset: Int = 0,
         @RequestParam limit: Int = 10
@@ -30,30 +33,6 @@ class UserController(private val service: UserService) {
     ): ResponseEntity<GetUserOutputModel> {
         val user = service.getUser(id)
         return ResponseEntity.ok(GetUserOutputModel(user))
-    }
-
-    @PostMapping(URIs.Users.REGISTER)
-    fun registerUser(
-        @Valid @RequestBody userInput: UserRegisterInputModel
-    ): ResponseEntity<UserRegisterOutputModel> {
-        val registerOutputDTO = service.registerUser(userInput.toUserRegisterInputDTO())
-        return ResponseEntity.ok(UserRegisterOutputModel(registerOutputDTO))
-    }
-
-    @PostMapping(URIs.Users.LOGIN)
-    fun loginUser(
-        @Valid @RequestBody userInput: UserLoginInputModel
-    ): ResponseEntity<UserLoginOutputModel> {
-        val loginOutputDTO = service.loginUser(userInput.toUserLoginInputDTO())
-        return ResponseEntity.ok(UserLoginOutputModel(loginOutputDTO))
-    }
-
-    @PostMapping(URIs.Users.LOGOUT)
-    fun logoutUser(
-        @RequestHeader("Authorization") token: String
-    ): ResponseEntity<Unit> {
-        service.logoutUser(token)
-        return ResponseEntity.ok().build()
     }
 
 }

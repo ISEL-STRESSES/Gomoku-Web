@@ -5,6 +5,6 @@ import gomoku.server.services.user.dtos.get.UserDetailOutputDTO
 interface UserRepository {
     fun findUserById(uuid: Int): UserDetailOutputDTO?
     fun findUserByUsername(username: String): UserDetailOutputDTO?
-    fun findUsers(offset: Int, limit: Int): List<UserDetailOutputDTO>
+    fun getRanking(offset: Int, limit: Int): List<UserDetailOutputDTO>
     fun save(username: String): Int
 }

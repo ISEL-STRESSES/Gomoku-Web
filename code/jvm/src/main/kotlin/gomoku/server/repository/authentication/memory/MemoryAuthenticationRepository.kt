@@ -1,11 +1,13 @@
-package gomoku.server.repository.authentication
+package gomoku.server.repository.authentication.memory
 
 import gomoku.server.domain.user.Password
 import gomoku.server.domain.user.Token
-import org.springframework.stereotype.Repository
+import gomoku.server.repository.authentication.AuthenticationRepository
+import gomoku.server.repository.memory.MemoryDataSource
 
-@Repository
-class JDBCAuthenticationRepository : AuthenticationRepository {
+class MemoryAuthenticationRepository(
+    dataSource: MemoryDataSource
+): AuthenticationRepository {
     override fun getToken(uuid: Int): Token? {
         TODO("Not yet implemented")
     }
@@ -29,4 +31,5 @@ class JDBCAuthenticationRepository : AuthenticationRepository {
     override fun setPassword(uuid: Int, password: Password) {
         TODO("Not yet implemented")
     }
+
 }

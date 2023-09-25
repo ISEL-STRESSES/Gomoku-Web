@@ -1,5 +1,7 @@
-package gomoku.server.repository.user
+package gomoku.server.repository.user.jdbi
 
+import gomoku.server.repository.user.UserRepository
+import gomoku.server.repository.user.UserRowMapper
 import gomoku.server.services.user.dtos.get.UserDetailOutputDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
@@ -25,7 +27,7 @@ class JdbcUserRepository(@Autowired private val jdbcTemplate: JdbcTemplate) : Us
         )
     }
 
-    override fun findUsers(offset: Int, limit: Int): List<UserDetailOutputDTO> {
+    override fun getRanking(offset: Int, limit: Int): List<UserDetailOutputDTO> {
         return jdbcTemplate.query(
             "SELECT uuid, username, play_count, elo FROM users LIMIT ? OFFSET ?",
             UserRowMapper(),
@@ -38,6 +40,7 @@ class JdbcUserRepository(@Autowired private val jdbcTemplate: JdbcTemplate) : Us
 
         val key = GeneratedKeyHolder()
 
+        // TODO: process the eventual exception this will throw
         jdbcTemplate.query(
             "SELECT uuid FROM users WHERE username = ?",
             { rs ->

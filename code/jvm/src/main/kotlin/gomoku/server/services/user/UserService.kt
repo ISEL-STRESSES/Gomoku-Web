@@ -2,8 +2,7 @@ package gomoku.server.services.user
 
 import gomoku.server.domain.user.Password
 import gomoku.server.domain.user.Token
-import gomoku.server.repository.authentication.AuthenticationRepository
-import gomoku.server.repository.user.UserRepository
+import gomoku.server.repository.TransactionManager
 import gomoku.server.services.user.dtos.get.GetUserOutputDTO
 import gomoku.server.services.user.dtos.get.GetUsersOutputDTO
 import gomoku.server.services.user.dtos.login.UserLoginInputDTO
@@ -15,8 +14,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserService(
-    private val userRepository: UserRepository,
-    private val authenticationRepository: AuthenticationRepository,
+    private val transactionManager: TransactionManager,
     private val passwordEncoder: PasswordEncoder
 ) {
     fun registerUser(registerInputDTO: UserRegisterInputDTO): UserRegisterOutputDTO {
@@ -27,8 +25,11 @@ class UserService(
         val token = generateTokenForUser(registerInputDTO.username)
         val hashedToken = "" //hash token
 
-        val uuid = userRepository.save(registerInputDTO.username)
-        authenticationRepository.save(uuid, Token(hashedToken), Password(hashedPassword))
+        transactionManager.run {
+            val uuid = it.userRepository.save(registerInputDTO.username)
+            it.authenticationRepository.save(uuid, Token(hashedToken), Password(hashedPassword))
+
+        }
 
         return UserRegisterOutputDTO(token)
     }
@@ -36,35 +37,41 @@ class UserService(
     fun loginUser(loginInputDTO: UserLoginInputDTO): UserLoginOutputDTO {
         // Fetch user's hashed password from database
 
-        val user = userRepository.findUserByUsername(loginInputDTO.username)
-            ?: throw IllegalArgumentException("Invalid credentials")
+        return transactionManager.run {
+            val user = it.userRepository.findUserByUsername(loginInputDTO.username)
+                ?: throw IllegalArgumentException("Invalid credentials")
 
-        val encodedPassword = authenticationRepository.getPassword(user.uuid)
-            ?: throw IllegalArgumentException("Invalid credentials")
+            val encodedPassword = it.authenticationRepository.getPassword(user.uuid)
+                ?: throw IllegalArgumentException("Invalid credentials")
 
-        if (passwordEncoder.matches(loginInputDTO.password, encodedPassword.encodedPassword)) {
-            //TODO: Generate and encode token
-            val token = generateTokenForUser(user.username)
-            val hashedToken = "" //hash token
-            authenticationRepository.setToken(user.uuid, Token(hashedToken))
-            return UserLoginOutputDTO(token)
-        } else {
-            throw IllegalArgumentException("Invalid credentials")
+            if (passwordEncoder.matches(loginInputDTO.password, encodedPassword.encodedPassword)) {
+                //TODO: Generate and encode token
+                val token = generateTokenForUser(user.username)
+                val hashedToken = "" //hash token
+                it.authenticationRepository.setToken(user.uuid, Token(hashedToken))
+                UserLoginOutputDTO(token)
+            } else {
+                throw IllegalArgumentException("Invalid credentials")
+            }
         }
     }
     fun getRanking(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): GetUsersOutputDTO {
 
-        val users = userRepository.findUsers(offset, limit)
-
-        return GetUsersOutputDTO(users)
+        return transactionManager.run {
+            val users = it.userRepository.getRanking(offset, limit)
+            GetUsersOutputDTO(users)
+        }
     }
 
     fun getUser(uuid: Int): GetUserOutputDTO {
-        // Fetch user by ID
-        val user = userRepository.findUserById(uuid)
-            ?: throw IllegalArgumentException("User not found") //TODO: use NotFoundException
+        val user = transactionManager.run {
+            // Fetch user by ID
+            it.userRepository.findUserById(uuid)
+                ?: throw IllegalArgumentException("User not found") //TODO: use NotFoundException
 
+        }
         return GetUserOutputDTO(user)
+
     }
 
     fun logoutUser(token: String) {
