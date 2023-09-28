@@ -1,6 +1,6 @@
 package gomoku.server.domain.user
 
-data class User(
+data class UserDetails(
     val uuid: Int,
     val username: String,
     val playCount: Int = 0,

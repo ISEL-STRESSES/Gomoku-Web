@@ -27,7 +27,7 @@ class JdbcUserRepository(@Autowired private val jdbcTemplate: JdbcTemplate) : Us
         )
     }
 
-    override fun getRanking(offset: Int, limit: Int): List<UserDetailOutputDTO> {
+    override fun getRankingList(offset: Int, limit: Int): List<UserDetailOutputDTO> {
         return jdbcTemplate.query(
             "SELECT uuid, username, play_count, elo FROM users LIMIT ? OFFSET ?",
             UserRowMapper(),

@@ -1,6 +1,6 @@
 package gomoku.server.http.controllers.user.models.register
 
-import gomoku.server.domain.user.User
+import gomoku.server.domain.user.UserDetails
 import gomoku.server.services.user.dtos.register.UserRegisterInputDTO
 import gomoku.server.validation.SafePassword
 import jakarta.validation.constraints.Email
@@ -11,8 +11,8 @@ data class UserRegisterInputModel(
 
     @NotBlank
     @get:Size(
-        min = User.MIN_NAME_SIZE,
-        max = User.MAX_NAME_SIZE
+        min = UserDetails.MIN_NAME_SIZE,
+        max = UserDetails.MAX_NAME_SIZE
     )
     val username: String,
 

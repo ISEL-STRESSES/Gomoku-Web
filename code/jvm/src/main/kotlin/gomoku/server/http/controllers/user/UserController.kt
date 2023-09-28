@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*
 class UserController(
     private val service: UserService
 ) {
-
     @GetMapping(URIs.Users.RANKING)
     fun getRanking(
         @RequestParam offset: Int = 0,

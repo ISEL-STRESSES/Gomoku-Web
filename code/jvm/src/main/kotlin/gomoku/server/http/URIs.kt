@@ -6,6 +6,9 @@ import java.net.URI
 object URIs {
 
     const val HOME = "/"
+    const val LOGIN = "/login"
+    const val REGISTER = "/register"
+    const val LOGOUT = "/logout"
 
     fun home() = URI(HOME)
 
@@ -13,9 +16,6 @@ object URIs {
         const val ROOT = "/users"
         const val HUB = "/"
         const val BY_ID = "/{id}"
-        const val LOGIN = "/login"
-        const val REGISTER = "/register"
-        const val LOGOUT = "/logout"
         const val RANKING = "/ranking"
 
         fun userByID(id: Int) = UriTemplate(BY_ID).expand(id)

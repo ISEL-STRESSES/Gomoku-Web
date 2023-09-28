@@ -15,7 +15,7 @@ class MemoryUserRepository(
         TODO("Not yet implemented")
     }
 
-    override fun getRanking(offset: Int, limit: Int): List<UserDetailOutputDTO> {
+    override fun getRankingList(offset: Int, limit: Int): List<UserDetailOutputDTO> {
         TODO("Not yet implemented")
     }
 

@@ -58,7 +58,7 @@ class UserService(
     fun getRanking(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): GetUsersOutputDTO {
 
         return transactionManager.run {
-            val users = it.userRepository.getRanking(offset, limit)
+            val users = it.userRepository.getRankingList(offset, limit)
             GetUsersOutputDTO(users)
         }
     }
