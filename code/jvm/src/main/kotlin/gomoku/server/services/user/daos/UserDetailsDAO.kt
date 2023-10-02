@@ -5,5 +5,5 @@ class UserDetailsDAO(
     username: String,
     val gamesPlayed: Int,
     val elo: Int,
-    val password: String,
-): UserDAO(id, username)
+    val password: String
+) : UserDAO(id, username)
