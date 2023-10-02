@@ -3,10 +3,11 @@ package gomoku.server.repository.authentication
 import gomoku.server.domain.user.Password
 import gomoku.server.domain.user.Token
 import org.jdbi.v3.core.Handle
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Repository
 
 @Repository
-class JDBIAuthenticationRepository(private val handle: Handle) : AuthenticationRepository {
+class JDBIAuthenticationRepository(@Autowired private val handle: Handle) : AuthenticationRepository {
     override fun getToken(uuid: Int): Token? =
         handle.createQuery("SELECT encoded_token FROM token WHERE user_id = :uuid")
             .bind("uuid", uuid)

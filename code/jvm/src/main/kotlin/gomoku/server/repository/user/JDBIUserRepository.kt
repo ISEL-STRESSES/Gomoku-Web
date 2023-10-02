@@ -3,10 +3,11 @@ package gomoku.server.repository.user
 import gomoku.server.services.user.daos.UserDAO
 import gomoku.server.services.user.daos.UserDetailsDAO
 import org.jdbi.v3.core.Handle
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Repository
 
 @Repository
-class JDBIUserRepository(private val handle: Handle) : UserRepository {
+class JDBIUserRepository(@Autowired private val handle: Handle) : UserRepository {
 
     override fun findUserById(uuid: Int): UserDAO? =
         handle.createQuery("SELECT * FROM users WHERE uuid = :uuid")
