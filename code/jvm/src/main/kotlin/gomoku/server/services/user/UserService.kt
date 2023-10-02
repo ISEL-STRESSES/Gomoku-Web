@@ -23,12 +23,12 @@ class UserService(
         // Hash the password
         val hashedPassword = passwordEncoder.encode(registerInputDTO.password)
 
-        //TODO Generate and hash token in proper way
+        // TODO Generate and hash token in proper way
         val token = generateTokenForUser(registerInputDTO.username)
-        val hashedToken = "" //hash token
+        val hashedToken = "" // hash token
 
-        val uuid = userRepository.save(registerInputDTO.username)
-        authenticationRepository.save(uuid, Token(hashedToken), Password(hashedPassword))
+        val uuid = userRepository.saveUser(registerInputDTO.username)
+        authenticationRepository.saveKeys(uuid, Token(hashedToken), Password(hashedPassword))
 
         return UserRegisterOutputDTO(token)
     }
@@ -43,9 +43,9 @@ class UserService(
             ?: throw IllegalArgumentException("Invalid credentials")
 
         if (passwordEncoder.matches(loginInputDTO.password, encodedPassword.encodedPassword)) {
-            //TODO: Generate and encode token
+            // TODO: Generate and encode token
             val token = generateTokenForUser(user.username)
-            val hashedToken = "" //hash token
+            val hashedToken = "" // hash token
             authenticationRepository.setToken(user.uuid, Token(hashedToken))
             return UserLoginOutputDTO(token)
         } else {
@@ -53,7 +53,6 @@ class UserService(
         }
     }
     fun getRanking(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): GetUsersOutputDTO {
-
         val users = userRepository.findUsers(offset, limit)
 
         return GetUsersOutputDTO(users)
@@ -62,18 +61,18 @@ class UserService(
     fun getUser(uuid: Int): GetUserOutputDTO {
         // Fetch user by ID
         val user = userRepository.findUserById(uuid)
-            ?: throw IllegalArgumentException("User not found") //TODO: use NotFoundException
+            ?: throw IllegalArgumentException("User not found") // TODO: use NotFoundException
 
         return GetUserOutputDTO(user)
     }
 
     fun logoutUser(token: String) {
         TODO()
-        //invalidate token
+        // invalidate token
     }
 
     private fun generateTokenForUser(username: String): String {
-        //TODO: Use JWT to generate token
+        // TODO: Use JWT to generate token
         return "$username-token"
     }
 

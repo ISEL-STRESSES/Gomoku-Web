@@ -18,7 +18,7 @@ class BoardTests {
             Position(0, 0),
             Position(1, 0),
             Position(2, 0),
-            Position(3, 0),
+            Position(3, 0)
         )
 
         val board = positions.toBoard().getOrThrow()
@@ -32,7 +32,7 @@ class BoardTests {
     fun `Build Invalid board with repeated moves`() {
         val positions = listOf(
             Position(0, 0),
-            Position(0, 0),
+            Position(0, 0)
         )
 
         assertThrows<InvalidBoardException> {

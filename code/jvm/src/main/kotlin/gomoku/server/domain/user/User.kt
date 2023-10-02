@@ -4,7 +4,7 @@ data class User(
     val uuid: Int,
     val username: String,
     val playCount: Int = 0,
-    val elo: Int = 0,
+    val elo: Int = 0
 ) {
 
     init {
@@ -25,6 +25,5 @@ data class User(
         fun isNameValid(name: String): Boolean {
             return UserNameRegex.matches(name)
         }
-
     }
 }

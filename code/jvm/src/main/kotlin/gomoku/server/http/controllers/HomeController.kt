@@ -1,8 +1,8 @@
 package gomoku.server.http.controllers
 
-import gomoku.server.http.URIs
 import gomoku.server.domain.Author
 import gomoku.server.domain.ServerInfo
+import gomoku.server.http.URIs
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,21 +20,21 @@ class HomeController {
         Author(
             studentID = 48335,
             name = "Rodrigo Correia",
-            email = "A48335@alunos.isel.pt",
+            email = "A48335@alunos.isel.pt"
 
-            ),
+        ),
         Author(
             studentID = 48281,
             name = "Adolfo Morgado",
-            email = "A48281@alunos.isel.pt",
+            email = "A48281@alunos.isel.pt"
 
-            ),
+        ),
         Author(
             studentID = 48253,
             name = "Carlos Pereira",
-            email = "A48253@alunos.isel.pt",
+            email = "A48253@alunos.isel.pt"
 
-            )
+        )
     )
 
     private val serverInfo = ServerInfo(

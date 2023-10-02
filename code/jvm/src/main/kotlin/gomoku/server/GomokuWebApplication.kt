@@ -6,13 +6,11 @@ import org.springframework.context.annotation.Bean
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @SpringBootApplication
-class GomokuWebApplication{
+class GomokuWebApplication {
     @Bean
     fun passwordEncoder() = BCryptPasswordEncoder()
 }
 
 fun main(args: Array<String>) {
-
     runApplication<GomokuWebApplication>(*args)
-
 }

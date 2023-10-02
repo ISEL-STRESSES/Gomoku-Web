@@ -7,7 +7,6 @@ import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
 import kotlin.reflect.KClass
 
-
 @MustBeDocumented
 @Constraint(validatedBy = [SafePasswordValidator::class])
 @Target(AnnotationTarget.FIELD, AnnotationTarget.PROPERTY_GETTER)
