@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.3"
     kotlin("jvm") version "1.8.22"
     kotlin("plugin.spring") version "1.8.22"
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.0"
 }
 
 group = "gomoku"
@@ -20,10 +21,11 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -37,6 +39,11 @@ dependencies {
 
     // To use Kotlin specific date and time functions
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    // To use WebTestClient on tests
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
+    testImplementation(kotlin("test"))
 }
 
 tasks.withType<KotlinCompile> {
@@ -48,4 +55,28 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+/**
+ * DB related tasks
+ * - To run `psql` inside the container, do
+ *      docker exec -ti db-tests psql -d db -U dbuser -W
+ *   and provide it with the same password as define on `tests/Dockerfile-db-test`
+ */
+task<Exec>("dbTestsUp") {
+    commandLine("docker-compose", "up", "-d", "--build", "--force-recreate", "db-tests")
+}
+
+task<Exec>("dbTestsWait") {
+    commandLine("docker", "exec", "db-tests", "/app/bin/wait-for-postgres.sh", "localhost")
+    dependsOn("dbTestsUp")
+}
+
+task<Exec>("dbTestsDown") {
+    commandLine("docker-compose", "down")
+}
+
+tasks.named("check") {
+    dependsOn("dbTestsWait")
+    finalizedBy("dbTestsDown")
 }
