@@ -12,4 +12,7 @@ data class Token(val encodedToken: String) {
         check(encodedToken.isNotBlank()) { "Encoded Token is empty!" }
     }
 
+    companion object {
+        const val DEFAULT_TTL = 3600
+    }
 }
