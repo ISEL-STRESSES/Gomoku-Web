@@ -24,9 +24,9 @@ class HomeController {
 
         ),
         Author(
-            studentID = 48281,
-            name = "Adolfo Morgado",
-            email = "A48281@alunos.isel.pt"
+            studentID = 48331,
+            name = "André Matos",
+            email = "A48331@alunos.isel.pt"
 
         ),
         Author(
