@@ -1,20 +1,15 @@
-create table if not exists "user" (
+create table if not exists "users" (
     uuid serial primary key,
     username varchar(255) not null,
+    encoded_password varchar(255) not null,
+    elo int not null default 0,
+    games_played int not null default 0,
 
     unique(username)
 );
 
-create table if not exists "password" (
-    user_id int not null primary key,
-    encoded_password varchar(255) not null,
-    method varchar(255) not null,
-
-    constraint fk_user foreign key(user_id) references "user"(uuid)
-);
-
-create table if not exists "token" (
-    user_id int not null primary key,
+create table if not exists "tokens" (
+    user_id int primary key,
     encoded_token varchar(255) not null,
     create_date timestamp not null,
     last_used timestamp not null,
@@ -26,24 +21,16 @@ create table if not exists "token" (
     check (create_date + ttl > last_used)
 );
 
-create table if not exists "stats" (
-    user_id int not null primary key,
-    elo int not null default 0,
-    games_played int not null default 0,
-
-    constraint fk_user foreign key(user_id) references "user"(uuid)
-);
-
-create table if not exists "match" (
-    match_id int not null primary key,
+create table if not exists "matches" (
+    match_id int primary key,
     host_id int not null,
 
     unique (match_id, host_id),
     constraint fk_user foreign key(host_id) references "user"(uuid)
 );
 
-create table if not exists "ongoing_match" (
-    match_id int not null primary key,
+create table if not exists "ongoing_matches" (
+    match_id int primary key,
     match_host_id int not null,
     guest_id int not null,
     moves text[],
@@ -53,8 +40,8 @@ create table if not exists "ongoing_match" (
     constraint host_different_than_guess check (match_host_id <> guest_id)
 );
 
-create table if not exists "finished_match" (
-    match_id int not null primary key,
+create table if not exists "finished_matches" (
+    match_id int primary key,
     moves text[] not null,
     winner int not null,
 
