@@ -6,8 +6,9 @@ import gomoku.server.http.controllers.models.user.InputModels.UserLoginInputMode
 import gomoku.server.http.controllers.models.user.InputModels.UserRegisterInputModel
 import gomoku.server.http.controllers.models.user.OutputModels.GetUserOutputModel
 import gomoku.server.http.controllers.models.user.OutputModels.GetUsersOutputModel
-import gomoku.server.http.controllers.models.user.OutputModels.UserLoginOutputModel
-import gomoku.server.http.controllers.models.user.OutputModels.UserRegisterOutputModel
+import gomoku.server.http.controllers.models.user.OutputModels.UserTokenCreateOutputModel
+import gomoku.server.services.errors.TokenCreationError
+import gomoku.server.services.errors.UserCreationError
 import gomoku.server.services.user.UserService
 import gomoku.utils.Failure
 import gomoku.utils.Success
@@ -36,9 +37,11 @@ class UserController(private val service: UserService) {
     @GetMapping(URIs.Users.GET_BY_ID)
     fun getById(
         @PathVariable id: Int
-    ): ResponseEntity<GetUserOutputModel> {
-        val user = service.getUserByToken(id)
-        return ResponseEntity.ok(GetUserOutputModel(user))
+    ): ResponseEntity<*> {
+        val user = service.getUserById(id)
+        return user?.run {
+            ResponseEntity.ok(GetUserOutputModel(this))
+        } ?: Problem.response(404, Problem.userNotFound)
     }
 
     @PostMapping(URIs.Users.CREATE)
@@ -65,16 +68,21 @@ class UserController(private val service: UserService) {
     fun token(
         @Valid @RequestBody
         userInput: UserLoginInputModel
-    ): ResponseEntity<UserLoginOutputModel> {
-        val loginOutputData = service.loginUser(username = userInput.username, password = userInput.password)
-        return ResponseEntity.ok(loginOutputData)
+    ): ResponseEntity<*> {
+        val res = service.createToken(username = userInput.username, password = userInput.password)
+        return when (res) {
+            is Success -> ResponseEntity.status(200)
+                .body(UserTokenCreateOutputModel(res.value.tokenValue))
+            is Failure -> when(res.value){
+                TokenCreationError.UserOrPasswordInvalid -> Problem.response(400, Problem.userOrPasswordAreInvalid)
+            }
+        }
     }
 
     @PostMapping(URIs.Users.LOGOUT)
     fun logout(
         @RequestHeader("Authorization") token: String
-    ): ResponseEntity<Unit> {
+    ) {
         service.revokeToken(token)
-        return ResponseEntity.ok().build()
     }
 }

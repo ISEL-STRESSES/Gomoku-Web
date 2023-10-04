@@ -12,14 +12,14 @@ object URIs {
     object Users {
         const val ROOT = "/"
         const val GET_BY_ID = "/{id}"
-        const val LOGIN = "login"
-        const val REGISTER = "/register"
+        const val TOKEN = "/token"
+        const val CREATE = "/create"
         const val LOGOUT = "/logout"
         const val RANKING = "/ranking"
 
         fun getByID(id: Int) = UriTemplate(GET_BY_ID).expand(id)
-        fun login() = URI(LOGIN)
-        fun register() = URI(REGISTER)
+        fun token() = URI(LOGIN)
+        fun create() = URI(CREATE)
     }
 
     object Games {
