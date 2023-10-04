@@ -15,6 +15,3 @@ fun SerializedMoves.getMoves(color: Color) = when (color) {
 
 fun SerializedMoves.getBlackMoves() = this.filterIndexed { index, _ -> index % 2 == 0 }
 fun SerializedMoves.getWhiteMoves() = this.filterIndexed { index, _ -> index % 2 == 1 }
-
-
-

@@ -1,12 +1,12 @@
 package gomoku.server.repository.user
 
-import gomoku.server.services.user.dtos.get.UserDetailOutputDTO
+import gomoku.server.domain.user.UserExternalInfo
 import org.springframework.jdbc.core.RowMapper
 import java.sql.ResultSet
 
-class UserRowMapper : RowMapper<UserDetailOutputDTO> {
-    override fun mapRow(rs: ResultSet, rowNum: Int): UserDetailOutputDTO {
-        return UserDetailOutputDTO(
+class UserRowMapper : RowMapper<UserExternalInfo> {
+    override fun mapRow(rs: ResultSet, rowNum: Int): UserExternalInfo {
+        return UserExternalInfo(
             uuid = rs.getInt("uuid"),
             username = rs.getString("username"),
             playCount = rs.getInt("play_count"),

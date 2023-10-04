@@ -1,15 +1,13 @@
 package gomoku.server.domain.user
 
+import kotlinx.datetime.Instant
+
 /**
  * Represents an encoded token
  */
-data class Token(val encodedToken: String) {
-
-    /**
-     * Checks if the token is valid
-     */
-    init {
-        check(encodedToken.isNotBlank()) { "Encoded Token is empty!" }
-    }
-
-}
+data class Token(
+    val tokenValidationInfo: TokenValidationInfo,
+    val userId: Int,
+    val createdAt: Instant,
+    val lastUsedAt: Instant,
+)

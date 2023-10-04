@@ -1,80 +1,101 @@
 package gomoku.server.services.user
 
-import gomoku.server.domain.user.Password
 import gomoku.server.domain.user.Token
-import gomoku.server.repository.authentication.AuthenticationRepository
-import gomoku.server.repository.user.UserRepository
-import gomoku.server.services.user.dtos.get.GetUserOutputDTO
-import gomoku.server.services.user.dtos.get.GetUsersOutputDTO
-import gomoku.server.services.user.dtos.login.UserLoginInputDTO
-import gomoku.server.services.user.dtos.login.UserLoginOutputDTO
-import gomoku.server.services.user.dtos.register.UserRegisterInputDTO
-import gomoku.server.services.user.dtos.register.UserRegisterOutputDTO
-import org.springframework.security.crypto.password.PasswordEncoder
+import gomoku.server.domain.user.User
+import gomoku.server.domain.user.UserExternalInfo
+import gomoku.server.domain.user.UsersDomain
+import gomoku.server.repository.TransactionManager
+import gomoku.server.services.errors.TokenCreationError
+import gomoku.server.services.errors.UserCreationError
+import gomoku.utils.failure
+import gomoku.utils.success
+import kotlinx.datetime.Clock
 import org.springframework.stereotype.Service
+
 
 @Service
 class UserService(
-    private val userRepository: UserRepository,
-    private val authenticationRepository: AuthenticationRepository,
-    private val passwordEncoder: PasswordEncoder
+    private val transactionManager: TransactionManager,
+    private val usersDomain: UsersDomain,
+    private val clock: Clock
 ) {
-    fun registerUser(registerInputDTO: UserRegisterInputDTO): UserRegisterOutputDTO {
+    fun createUser(username: String, password: String): UserCreationResult {
+        // Validate username
+        if (!usersDomain.isUsernameValid(username)) {
+            return failure(UserCreationError.InvalidUsername)
+        }
+        // Validate password
+        if (!usersDomain.isSafePassword(password)) {
+            return failure(UserCreationError.InvalidPassword)
+        }
         // Hash the password
-        val hashedPassword = passwordEncoder.encode(registerInputDTO.password)
+        val passwordValidationInfo = usersDomain.createPasswordValidationInfo(password)
 
-        //TODO Generate and hash token in proper way
-        val token = generateTokenForUser(registerInputDTO.username)
-        val hashedToken = "" //hash token
-
-        val uuid = userRepository.save(registerInputDTO.username)
-        authenticationRepository.save(uuid, Token(hashedToken), Password(hashedPassword))
-
-        return UserRegisterOutputDTO(token)
-    }
-
-    fun loginUser(loginInputDTO: UserLoginInputDTO): UserLoginOutputDTO {
-        // Fetch user's hashed password from database
-
-        val user = userRepository.findUserByUsername(loginInputDTO.username)
-            ?: throw IllegalArgumentException("Invalid credentials")
-
-        val encodedPassword = authenticationRepository.getPassword(user.uuid)
-            ?: throw IllegalArgumentException("Invalid credentials")
-
-        if (passwordEncoder.matches(loginInputDTO.password, encodedPassword.encodedPassword)) {
-            //TODO: Generate and encode token
-            val token = generateTokenForUser(user.username)
-            val hashedToken = "" //hash token
-            authenticationRepository.setToken(user.uuid, Token(hashedToken))
-            return UserLoginOutputDTO(token)
-        } else {
-            throw IllegalArgumentException("Invalid credentials")
+        return transactionManager.run {
+            val usersRepository = it.usersRepository
+            if (usersRepository.isUserStoredByUsername(username)) {
+                failure(UserCreationError.UsernameAlreadyExists)
+            } else {
+                val uuid = usersRepository.storeUser(username, passwordValidationInfo)
+                success(uuid)
+            }
         }
     }
-    fun getRanking(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): GetUsersOutputDTO {
 
-        val users = userRepository.findUsers(offset, limit)
+    fun createToken(username: String, password: String): TokenCreationResult {
+        if (username.isBlank() || password.isBlank()) {
+            return failure(TokenCreationError.UserOrPasswordInvalid)
+        }
+        return transactionManager.run {
+            val usersRepository = it.usersRepository
+            val user = usersRepository.getUserByUsername(username)
+                ?: return@run failure(TokenCreationError.UserOrPasswordInvalid)
+            if (!usersDomain.validatePassword(password, user.passwordValidationInfo)) {
+                failure(TokenCreationError.UserOrPasswordInvalid)
+            }
+            val tokenValue = usersDomain.generateTokenValue()
+            val now = clock.now()
+            val token = Token(
+                tokenValidationInfo = usersDomain.createTokenValidationInfo(tokenValue),
+                userId = user.uuid,
+                createdAt = now,
+                lastUsedAt = now
+            )
+            usersRepository.createToken(token, usersDomain.maxNumberOfTokensPerUser)
+            success(TokenExternalInfo(tokenValue, usersDomain.getTokenExpiration(token)))
+        }
 
-        return GetUsersOutputDTO(users)
     }
 
-    fun getUser(uuid: Int): GetUserOutputDTO {
-        // Fetch user by ID
-        val user = userRepository.findUserById(uuid)
-            ?: throw IllegalArgumentException("User not found") //TODO: use NotFoundException
 
-        return GetUserOutputDTO(user)
+    fun getUsersData(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserExternalInfo> {
+
+        val users = transactionManager.run {
+            val usersRepository = it.usersRepository
+            usersRepository.findUsersExternalInfo(offset, limit)
+        }
+        return users
     }
 
-    fun logoutUser(token: String) {
-        TODO()
-        //invalidate token
+    fun getUserByToken(token: String): User? {
+        if (!usersDomain.canBeToken(token)) {
+            return null
+        }
+        return transactionManager.run {
+            val usersRepository = it.usersRepository
+            val tokenValidationInfo = usersDomain.createTokenValidationInfo(token)
+            val userAndToken = usersRepository.getTokenByTokenValidationInfo(tokenValidationInfo)
+            if (userAndToken != null && usersDomain.isTokenTimeValid(clock, userAndToken.second)) {
+                usersRepository.updateTokenLastUsed(userAndToken.second, clock.now())
+                userAndToken.first
+            } else {
+                null
+            }
+        }
     }
 
-    private fun generateTokenForUser(username: String): String {
-        //TODO: Use JWT to generate token
-        return "$username-token"
+    fun revokeToken(token: String) {
+
     }
 
     companion object {

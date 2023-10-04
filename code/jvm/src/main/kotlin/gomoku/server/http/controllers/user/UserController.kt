@@ -1,34 +1,34 @@
 package gomoku.server.http.controllers.user
 
 import gomoku.server.http.URIs
-import gomoku.server.http.controllers.user.models.get.GetUserOutputModel
-import gomoku.server.http.controllers.user.models.get.GetUsersOutputModel
-import gomoku.server.http.controllers.user.models.login.UserLoginInputModel
-import gomoku.server.http.controllers.user.models.login.UserLoginOutputModel
-import gomoku.server.http.controllers.user.models.register.UserRegisterInputModel
-import gomoku.server.http.controllers.user.models.register.UserRegisterOutputModel
+import gomoku.server.http.controllers.models.user.OutputModels.GetUserOutputModel
+import gomoku.server.http.controllers.models.user.OutputModels.GetUsersOutputModel
+import gomoku.server.http.controllers.models.user.InputModels.UserLoginInputModel
+import gomoku.server.http.controllers.models.user.OutputModels.UserLoginOutputModel
+import gomoku.server.http.controllers.models.user.InputModels.UserRegisterInputModel
+import gomoku.server.http.controllers.models.user.OutputModels.UserRegisterOutputModel
 import gomoku.server.services.user.UserService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-@RestController
+@RestController(URIs.Users.ROOT)
 class UserController(private val service: UserService) {
 
-    @GetMapping(URIs.Users.ROOT)
-    fun getRanking(
+    @GetMapping(URIs.Users.RANKING)
+    fun ranking(
         @RequestParam offset: Int = 0,
         @RequestParam limit: Int = 10
     ): ResponseEntity<GetUsersOutputModel> {
-        val users = service.getRanking(offset, limit)
+        val users = service.getUsersData(offset, limit)
         return ResponseEntity.ok(GetUsersOutputModel(users))
     }
 
-    @GetMapping(URIs.Users.BY_ID)
-    fun getUser(
+    @GetMapping(URIs.Users.GET_BY_ID)
+    fun getById(
         @PathVariable id: Int
     ): ResponseEntity<GetUserOutputModel> {
-        val user = service.getUser(id)
+        val user = service.getUserByToken(id)
         return ResponseEntity.ok(GetUserOutputModel(user))
     }
 
@@ -36,23 +36,24 @@ class UserController(private val service: UserService) {
     fun registerUser(
         @Valid @RequestBody userInput: UserRegisterInputModel
     ): ResponseEntity<UserRegisterOutputModel> {
-        val registerOutputDTO = service.registerUser(userInput.toUserRegisterInputDTO())
-        return ResponseEntity.ok(UserRegisterOutputModel(registerOutputDTO))
+        val registerOutputData = service.createUser(username = userInput.username, password = userInput.password)
+
+        return ResponseEntity.ok(UserRegisterOutputModel(token = registerOutputData))
     }
 
     @PostMapping(URIs.Users.LOGIN)
     fun loginUser(
         @Valid @RequestBody userInput: UserLoginInputModel
     ): ResponseEntity<UserLoginOutputModel> {
-        val loginOutputDTO = service.loginUser(userInput.toUserLoginInputDTO())
-        return ResponseEntity.ok(UserLoginOutputModel(loginOutputDTO))
+        val loginOutputData = service.loginUser(username = userInput.username, password = userInput.password)
+        return ResponseEntity.ok(loginOutputData)
     }
 
     @PostMapping(URIs.Users.LOGOUT)
     fun logoutUser(
         @RequestHeader("Authorization") token: String
     ): ResponseEntity<Unit> {
-        service.logoutUser(token)
+        service.revokeToken(token)
         return ResponseEntity.ok().build()
     }
 

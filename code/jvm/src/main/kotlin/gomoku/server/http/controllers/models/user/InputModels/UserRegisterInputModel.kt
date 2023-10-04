@@ -1,7 +1,6 @@
-package gomoku.server.http.controllers.user.models.register
+package gomoku.server.http.controllers.models.user.InputModels
 
 import gomoku.server.domain.user.User
-import gomoku.server.services.user.dtos.register.UserRegisterInputDTO
 import gomoku.server.validation.SafePassword
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
@@ -21,9 +20,4 @@ data class UserRegisterInputModel(
 
     @SafePassword
     val password: String
-) {
-    fun toUserRegisterInputDTO() = UserRegisterInputDTO(
-        username = username,
-        password = password
-    )
-}
+)

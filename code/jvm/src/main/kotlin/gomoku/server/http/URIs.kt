@@ -10,13 +10,14 @@ object URIs {
     fun home() = URI(HOME)
 
     object Users {
-        const val ROOT = "/users"
-        const val BY_ID = "$ROOT/{id}"
-        const val LOGIN = "$ROOT/login"
-        const val REGISTER = "$ROOT/register"
-        const val LOGOUT = "$ROOT/logout"
+        const val ROOT = "/"
+        const val GET_BY_ID = "/{id}"
+        const val LOGIN = "login"
+        const val REGISTER = "/register"
+        const val LOGOUT = "/logout"
+        const val RANKING = "/ranking"
 
-        fun userByID(id: Int) = UriTemplate(BY_ID).expand(id)
+        fun getByID(id: Int) = UriTemplate(GET_BY_ID).expand(id)
         fun login() = URI(LOGIN)
         fun register() = URI(REGISTER)
 
