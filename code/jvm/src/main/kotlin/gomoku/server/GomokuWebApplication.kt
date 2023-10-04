@@ -7,6 +7,8 @@ import gomoku.server.domain.user.UserDomainConfig
 import gomoku.server.http.pipeline.AuthenticatedUserArgumentResolver
 import gomoku.server.http.pipeline.AuthenticationInterceptor
 import kotlinx.datetime.Clock
+import org.jdbi.v3.core.Jdbi
+import org.postgresql.ds.PGSimpleDataSource
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -16,8 +18,6 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import kotlin.time.Duration.Companion.hours
-import org.jdbi.v3.core.Jdbi
-import org.postgresql.ds.PGSimpleDataSource
 
 @SpringBootApplication
 class GomokuWebApplication {
@@ -27,6 +27,7 @@ class GomokuWebApplication {
             setURL(Environment.getDbUrl())
         }
     )
+
     @Bean
     fun passwordEncoder() = BCryptPasswordEncoder()
 
@@ -41,7 +42,7 @@ class GomokuWebApplication {
         tokenSizeInBytes = 256 / 8,
         tokenTtl = 24.hours,
         tokenRollingTtl = 1.hours,
-        maxTokensPerUser = 3,
+        maxTokensPerUser = 3
     )
 
     @Bean
@@ -51,26 +52,26 @@ class GomokuWebApplication {
             Author(
                 studentID = 48335,
                 name = "Rodrigo Correia",
-                email = "A48335@alunos.isel.pt",
+                email = "A48335@alunos.isel.pt"
             ),
             Author(
                 studentID = 48331,
                 name = "André Matos",
-                email = "A48331@alunos.isel.pt",
+                email = "A48331@alunos.isel.pt"
             ),
             Author(
                 studentID = 48253,
                 name = "Carlos Pereira",
-                email = "A48253@alunos.isel.pt",
-            ),
-        ),
+                email = "A48253@alunos.isel.pt"
+            )
+        )
     )
 }
 
 @Configuration
 class PipelineConfigurer(
     val authenticationInterceptor: AuthenticationInterceptor,
-    val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver,
+    val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver
 ) : WebMvcConfigurer {
 
     override fun addInterceptors(registry: InterceptorRegistry) {

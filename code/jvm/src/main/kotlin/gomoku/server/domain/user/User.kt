@@ -5,5 +5,12 @@ data class User(
     val username: String,
     val playCount: Int = 0,
     val elo: Int = 0,
-    val passwordValidationInfo: PasswordValidationInfo,
-)
+    val passwordValidationInfo: PasswordValidationInfo
+) {
+    companion object {
+        const val MIN_PASSWORD_SIZE = 8
+        const val MAX_PASSWORD_SIZE = 20
+        const val MIN_NAME_SIZE = 3
+        const val MAX_NAME_SIZE = 20
+    }
+}

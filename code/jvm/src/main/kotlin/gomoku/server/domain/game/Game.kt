@@ -1,12 +1,17 @@
 package gomoku.server.domain.game
 
-import gomoku.server.domain.game.board.*
+import gomoku.server.domain.game.board.Color
+import gomoku.server.domain.game.board.Position
+import gomoku.server.domain.game.board.SerializedMoves
+import gomoku.server.domain.game.board.at
+import gomoku.server.domain.game.board.nextMoveColor
+import gomoku.server.domain.game.board.toBoard
 import kotlin.random.Random
 
 sealed class Game(
     val gameID: Int,
     val hostID: Int,
-    val rules: Rules,
+    val rules: Rules
 )
 
 /**
@@ -15,7 +20,7 @@ sealed class Game(
 class OpenGame(
     gameID: Int,
     hostID: Int,
-    rules: Rules = defaultRules,
+    rules: Rules = defaultRules
 ) : Game(gameID, hostID, rules)
 
 class OngoingGame(
@@ -24,7 +29,7 @@ class OngoingGame(
     rules: Rules,
     val guestID: Int,
     val moves: SerializedMoves,
-    val isHostBlack: Boolean,
+    val isHostBlack: Boolean
 ) : Game(gameID, hostID, rules)
 
 fun OpenGame.join(guestID: Int): OngoingGame {
@@ -36,7 +41,7 @@ fun OpenGame.join(guestID: Int): OngoingGame {
         guestID = guestID,
         rules = rules,
         moves = emptyList(),
-        isHostBlack = isHostBlack,
+        isHostBlack = isHostBlack
     )
 }
 
@@ -56,15 +61,18 @@ fun Game.getColorFromPlayerID(playerID: Int): Color? {
 }
 
 fun OngoingGame.play(playerID: Int, position: Position): Result<Game> {
-    if (playerID != hostID || playerID != guestID)
+    if (playerID != hostID || playerID != guestID) {
         return Result.failure(THIS_AINT_YO_GAME_Exception())
+    }
 
-    if (!rules.boardSize.isPositionInside(position))
+    if (!rules.boardSize.isPositionInside(position)) {
         return Result.failure(OutOfBoundsException())
+    }
 
     val currentColor = moves.nextMoveColor()
-    if (getColorFromPlayerID(playerID) != currentColor)
+    if (getColorFromPlayerID(playerID) != currentColor) {
         return Result.failure(NotYourTurnException())
+    }
 
     // Construct lookup board
     val board = moves.toBoard()
@@ -82,11 +90,10 @@ fun OngoingGame.play(playerID: Int, position: Position): Result<Game> {
         guestID = guestID,
         rules = rules,
         moves = newMoves,
-        isHostBlack = isHostBlack,
+        isHostBlack = isHostBlack
     )
 
     return Result.success(
         newGame
     )
 }
-

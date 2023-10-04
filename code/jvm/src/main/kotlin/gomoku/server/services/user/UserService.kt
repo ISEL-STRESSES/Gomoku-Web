@@ -2,8 +2,8 @@ package gomoku.server.services.user
 
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.User
+import gomoku.server.domain.user.UserDomain
 import gomoku.server.domain.user.UserExternalInfo
-import gomoku.server.domain.user.UsersDomain
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.TokenCreationError
 import gomoku.server.services.errors.UserCreationError
@@ -12,24 +12,23 @@ import gomoku.utils.success
 import kotlinx.datetime.Clock
 import org.springframework.stereotype.Service
 
-
 @Service
 class UserService(
     private val transactionManager: TransactionManager,
-    private val usersDomain: UsersDomain,
+    private val userDomain: UserDomain,
     private val clock: Clock
 ) {
     fun createUser(username: String, password: String): UserCreationResult {
         // Validate username
-        if (!usersDomain.isUsernameValid(username)) {
+        if (!userDomain.isUsernameValid(username)) {
             return failure(UserCreationError.InvalidUsername)
         }
         // Validate password
-        if (!usersDomain.isSafePassword(password)) {
+        if (!userDomain.isSafePassword(password)) {
             return failure(UserCreationError.InvalidPassword)
         }
         // Hash the password
-        val passwordValidationInfo = usersDomain.createPasswordValidationInfo(password)
+        val passwordValidationInfo = userDomain.createPasswordValidationInfo(password)
 
         return transactionManager.run {
             val usersRepository = it.usersRepository
@@ -50,26 +49,23 @@ class UserService(
             val usersRepository = it.usersRepository
             val user = usersRepository.getUserByUsername(username)
                 ?: return@run failure(TokenCreationError.UserOrPasswordInvalid)
-            if (!usersDomain.validatePassword(password, user.passwordValidationInfo)) {
+            if (!userDomain.validatePassword(password, user.passwordValidationInfo)) {
                 failure(TokenCreationError.UserOrPasswordInvalid)
             }
-            val tokenValue = usersDomain.generateTokenValue()
+            val tokenValue = userDomain.generateTokenValue()
             val now = clock.now()
             val token = Token(
-                tokenValidationInfo = usersDomain.createTokenValidationInfo(tokenValue),
+                tokenValidationInfo = userDomain.createTokenValidationInfo(tokenValue),
                 userId = user.uuid,
                 createdAt = now,
                 lastUsedAt = now
             )
-            usersRepository.createToken(token, usersDomain.maxNumberOfTokensPerUser)
-            success(TokenExternalInfo(tokenValue, usersDomain.getTokenExpiration(token)))
+            usersRepository.createToken(token, userDomain.maxNumberOfTokensPerUser)
+            success(TokenExternalInfo(tokenValue, userDomain.getTokenExpiration(token)))
         }
-
     }
 
-
     fun getUsersData(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserExternalInfo> {
-
         val users = transactionManager.run {
             val usersRepository = it.usersRepository
             usersRepository.findUsersExternalInfo(offset, limit)
@@ -78,14 +74,14 @@ class UserService(
     }
 
     fun getUserByToken(token: String): User? {
-        if (!usersDomain.canBeToken(token)) {
+        if (!userDomain.canBeToken(token)) {
             return null
         }
         return transactionManager.run {
             val usersRepository = it.usersRepository
-            val tokenValidationInfo = usersDomain.createTokenValidationInfo(token)
+            val tokenValidationInfo = userDomain.createTokenValidationInfo(token)
             val userAndToken = usersRepository.getTokenByTokenValidationInfo(tokenValidationInfo)
-            if (userAndToken != null && usersDomain.isTokenTimeValid(clock, userAndToken.second)) {
+            if (userAndToken != null && userDomain.isTokenTimeValid(clock, userAndToken.second)) {
                 usersRepository.updateTokenLastUsed(userAndToken.second, clock.now())
                 userAndToken.first
             } else {
@@ -95,7 +91,6 @@ class UserService(
     }
 
     fun revokeToken(token: String) {
-
     }
 
     companion object {

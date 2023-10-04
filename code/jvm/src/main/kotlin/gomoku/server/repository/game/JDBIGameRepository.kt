@@ -1,4 +1,3 @@
 package gomoku.server.repository.game
 
-class JDBIGameRepository {
-}
+class JDBIGameRepository

@@ -4,7 +4,7 @@ import gomoku.server.domain.user.UserExternalInfo
 import org.springframework.jdbc.core.RowMapper
 import java.sql.ResultSet
 
-class UserRowMapper : RowMapper<UserExternalInfo> {
+class UserRowMappers : RowMapper<UserExternalInfo> {
     override fun mapRow(rs: ResultSet, rowNum: Int): UserExternalInfo {
         return UserExternalInfo(
             uuid = rs.getInt("uuid"),

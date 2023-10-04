@@ -10,4 +10,9 @@ data class Token(
     val userId: Int,
     val createdAt: Instant,
     val lastUsedAt: Instant,
-)
+    val ttl: Int = DEFAULT_TTL
+) {
+    companion object {
+        const val DEFAULT_TTL = 30 * 60 // 30 min
+    }
+}

@@ -1,4 +1,3 @@
 package gomoku.server.repository.game
 
-class Mappers {
-}
+class Mappers

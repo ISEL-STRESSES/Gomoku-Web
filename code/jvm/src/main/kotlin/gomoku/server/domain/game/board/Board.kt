@@ -12,7 +12,6 @@ data class Board(
 fun Board.at(position: Position) =
     grid[position]
 
-
 fun SerializedMoves.toBoard(): Board {
     val finalGrid = this.foldIndexed(mapOf<Position, Color>()) { index, grid, position ->
         val existing = grid[position]
@@ -24,6 +23,6 @@ fun SerializedMoves.toBoard(): Board {
     }
 
     return Board(
-        grid = finalGrid,
+        grid = finalGrid
     )
 }

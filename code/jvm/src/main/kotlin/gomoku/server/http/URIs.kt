@@ -20,7 +20,6 @@ object URIs {
         fun getByID(id: Int) = UriTemplate(GET_BY_ID).expand(id)
         fun login() = URI(LOGIN)
         fun register() = URI(REGISTER)
-
     }
 
     object Games {
@@ -30,4 +29,3 @@ object URIs {
         fun hub() = URI(ROOT + HUB)
     }
 }
-

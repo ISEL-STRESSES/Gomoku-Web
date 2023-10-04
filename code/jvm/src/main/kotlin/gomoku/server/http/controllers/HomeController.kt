@@ -1,8 +1,7 @@
 package gomoku.server.http.controllers
 
-import gomoku.server.http.URIs
-import gomoku.server.domain.Author
 import gomoku.server.domain.ServerInfo
+import gomoku.server.http.URIs
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping

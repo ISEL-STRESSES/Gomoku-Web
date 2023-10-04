@@ -7,7 +7,7 @@ package gomoku.server.domain.game.board
  */
 data class Position(
     val x: Int,
-    val y: Int,
+    val y: Int
 ) {
     init {
         check(x >= 0)
