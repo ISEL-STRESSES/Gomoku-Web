@@ -1,5 +1,5 @@
 package gomoku.server.http.controllers.models.user.OutputModels
 
-data class UserLoginOutputModel(
+data class UserTokenCreateOutputModel(
     val token: String
 )

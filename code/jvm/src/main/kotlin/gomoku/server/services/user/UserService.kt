@@ -5,8 +5,10 @@ import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserDomain
 import gomoku.server.domain.user.UserExternalInfo
 import gomoku.server.repository.TransactionManager
+import gomoku.server.services.errors.LoginError
 import gomoku.server.services.errors.TokenCreationError
 import gomoku.server.services.errors.UserCreationError
+import gomoku.utils.Either
 import gomoku.utils.failure
 import gomoku.utils.success
 import kotlinx.datetime.Clock
@@ -73,6 +75,13 @@ class UserService(
         return users
     }
 
+    fun getUserById(id: Int): User? {
+        return transactionManager.run {
+            val usersRepository = it.usersRepository
+            usersRepository.getUserById(id)
+        }
+    }
+
     fun getUserByToken(token: String): User? {
         if (!userDomain.canBeToken(token)) {
             return null
@@ -87,6 +96,13 @@ class UserService(
             } else {
                 null
             }
+        }
+    }
+
+    fun loginUser(username: String, password: String): LoginResult {
+        return when (val tokenCreationResult = createToken(username, password)) {
+            is Either.Left -> failure(LoginError.UserOrPasswordInvalid)
+            is Either.Right -> success(tokenCreationResult.value)
         }
     }
 

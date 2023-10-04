@@ -16,4 +16,5 @@ interface UserRepository {
     fun createToken(token: Token, maxTokens: Int)
     fun updateTokenLastUsed(token: Token, now: Instant)
     fun removeTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Int
+    fun getUserById(id: Int): User?
 }

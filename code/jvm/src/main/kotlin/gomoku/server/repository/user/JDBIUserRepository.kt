@@ -99,6 +99,13 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .execute()
     }
 
+    override fun getUserById(id: Int): User? {
+        return handle.createQuery("SELECT * FROM users WHERE uuid = :uuid")
+            .bind("uuid", id)
+            .mapTo<User>()
+            .singleOrNull()
+    }
+
     override fun storeUser(username: String, passwordValidationInfo: PasswordValidationInfo): Int =
         handle.createUpdate("insert into users (username, encoded_password) values (:username, :encoded_password)")
             .bind("username", username)
