@@ -1,11 +1,11 @@
-package gomoku.server.http.controllers.models.user.InputModels
+package gomoku.server.http.controllers.user.models.userTokenCreate
 
 import gomoku.server.domain.user.User
 import gomoku.server.validation.SafePassword
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
-data class UserLoginInputModel(
+data class UserCreateTokenInputModel(
 
     @NotBlank
     @get:Size(

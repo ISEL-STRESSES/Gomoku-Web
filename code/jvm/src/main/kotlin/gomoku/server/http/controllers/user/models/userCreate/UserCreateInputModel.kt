@@ -1,4 +1,4 @@
-package gomoku.server.http.controllers.models.user.InputModels
+package gomoku.server.http.controllers.user.models.userCreate
 
 import gomoku.server.domain.user.User
 import gomoku.server.validation.SafePassword
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
-data class UserRegisterInputModel(
+data class UserCreateInputModel(
 
     @NotBlank
     @get:Size(

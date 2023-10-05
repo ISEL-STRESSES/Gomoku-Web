@@ -4,13 +4,12 @@ import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
 import gomoku.server.domain.user.User
-import gomoku.server.domain.user.UserExternalInfo
+import gomoku.server.domain.user.UserData
 import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
-import org.springframework.stereotype.Repository
+import org.slf4j.LoggerFactory
 
-@Repository
 class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun getUserByUsername(username: String): User? =
         handle.createQuery("SELECT * FROM users WHERE username = :username")
@@ -24,14 +23,14 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .mapTo<Int>()
             .single() == 1
 
-    override fun findUsersExternalInfo(offset: Int, limit: Int): List<UserExternalInfo> = // TODO: VER COMO O MATOS FEZ NO TRABALHO DELE
+    override fun getUsersData(offset: Int, limit: Int): List<UserData> = // TODO: VER COMO O MATOS FEZ NO TRABALHO DELE
         handle.createQuery("SELECT * FROM users LIMIT :limit OFFSET :offset")
             .bind("limit", limit)
             .bind("offset", offset)
-            .mapTo<UserExternalInfo>()
+            .mapTo<UserData>()
             .list()
 
-    override fun getTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? =
+    override fun getTokenAndUserByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? =
         handle.createQuery(
             """
                 select uuid, username, encoded_password, games_played, elo, encoded_token, create_date, last_used
@@ -60,6 +59,8 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .bind("user_id", token.userId)
             .bind("offset", maxTokens - 1)
             .execute()
+
+        logger.info("{} tokens deleted when creating new token", deletions)
 
         handle.createUpdate(
             """
@@ -99,10 +100,10 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .execute()
     }
 
-    override fun getUserById(id: Int): User? {
+    override fun getUserById(id: Int): UserData? {
         return handle.createQuery("SELECT * FROM users WHERE uuid = :uuid")
             .bind("uuid", id)
-            .mapTo<User>()
+            .mapTo<UserData>()
             .singleOrNull()
     }
 
@@ -134,5 +135,9 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
                     Instant.fromEpochSeconds(lastUsedAt)
                 )
             )
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(JDBIUserRepository::class.java)
     }
 }

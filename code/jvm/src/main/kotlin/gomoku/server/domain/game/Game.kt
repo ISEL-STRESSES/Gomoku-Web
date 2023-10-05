@@ -62,7 +62,7 @@ fun Game.getColorFromPlayerID(playerID: Int): Color? {
 
 fun OngoingGame.play(playerID: Int, position: Position): Result<Game> {
     if (playerID != hostID || playerID != guestID) {
-        return Result.failure(THIS_AINT_YO_GAME_Exception())
+        return Result.failure(UserNotInGameException())
     }
 
     if (!rules.boardSize.isPositionInside(position)) {

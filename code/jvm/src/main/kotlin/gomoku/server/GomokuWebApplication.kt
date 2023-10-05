@@ -6,6 +6,7 @@ import gomoku.server.domain.user.Sha256TokenEncoder
 import gomoku.server.domain.user.UserDomainConfig
 import gomoku.server.http.pipeline.AuthenticatedUserArgumentResolver
 import gomoku.server.http.pipeline.AuthenticationInterceptor
+import gomoku.server.repository.configureWithAppRequirements
 import kotlinx.datetime.Clock
 import org.jdbi.v3.core.Jdbi
 import org.postgresql.ds.PGSimpleDataSource
@@ -26,7 +27,7 @@ class GomokuWebApplication {
         PGSimpleDataSource().apply {
             setURL(Environment.getDbUrl())
         }
-    )
+    ).configureWithAppRequirements()
 
     @Bean
     fun passwordEncoder() = BCryptPasswordEncoder()

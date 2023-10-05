@@ -21,7 +21,8 @@ class UserDomain(
         private const val MAX_PASSWORD_SIZE = 24
 
         private val usernameRegex = "^[a-zA-Z0-9 ]{$MIN_NAME_SIZE,$MAX_NAME_SIZE}".toRegex()
-        private val passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\$@\$!%*?&#])[A-Za-z\\d\$@\$!%*?&#]{$MIN_PASSWORD_SIZE,$MAX_PASSWORD_SIZE}\$".toRegex()
+        private val passwordRegex =
+            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\$@\$!%*?&#])[A-Za-z\\d\$@\$!%*?&#]{$MIN_PASSWORD_SIZE,$MAX_PASSWORD_SIZE}\$".toRegex()
     }
 
     /**
@@ -30,6 +31,7 @@ class UserDomain(
     fun isUsernameValid(name: String): Boolean {
         return usernameRegex.matches(name)
     }
+
     fun generateTokenValue(): String =
         ByteArray(config.tokenSizeInBytes).let { byteArray ->
             SecureRandom.getInstanceStrong().nextBytes(byteArray)

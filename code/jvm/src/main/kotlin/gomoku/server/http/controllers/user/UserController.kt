@@ -1,12 +1,14 @@
 package gomoku.server.http.controllers.user
 
+import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
-import gomoku.server.http.controllers.models.Problem
-import gomoku.server.http.controllers.models.user.InputModels.UserLoginInputModel
-import gomoku.server.http.controllers.models.user.InputModels.UserRegisterInputModel
-import gomoku.server.http.controllers.models.user.OutputModels.GetUserOutputModel
-import gomoku.server.http.controllers.models.user.OutputModels.GetUsersOutputModel
-import gomoku.server.http.controllers.models.user.OutputModels.UserTokenCreateOutputModel
+import gomoku.server.http.controllers.media.Problem
+import gomoku.server.http.controllers.user.models.UserDataOutputModel
+import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
+import gomoku.server.http.controllers.user.models.getUsersData.GetUsersDataOutputModel
+import gomoku.server.http.controllers.user.models.userCreate.UserCreateInputModel
+import gomoku.server.http.controllers.user.models.userTokenCreate.UserCreateTokenInputModel
+import gomoku.server.http.controllers.user.models.userTokenCreate.UserTokenCreateOutputModel
 import gomoku.server.services.errors.TokenCreationError
 import gomoku.server.services.errors.UserCreationError
 import gomoku.server.services.user.UserService
@@ -26,12 +28,12 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(private val service: UserService) {
 
     @GetMapping(URIs.Users.RANKING)
-    fun ranking(
+    fun getUsersData(
         @RequestParam offset: Int = 0,
         @RequestParam limit: Int = 10
-    ): ResponseEntity<GetUsersOutputModel> {
+    ): ResponseEntity<*> {
         val users = service.getUsersData(offset, limit)
-        return ResponseEntity.ok(GetUsersOutputModel(users))
+        return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
     }
 
     @GetMapping(URIs.Users.GET_BY_ID)
@@ -39,24 +41,27 @@ class UserController(private val service: UserService) {
         @PathVariable id: Int
     ): ResponseEntity<*> {
         val user = service.getUserById(id)
-        return user?.run {
-            ResponseEntity.ok(GetUserOutputModel(this))
-        } ?: Problem.response(404, Problem.userNotFound)
+        return if (user == null) {
+            Problem.response(404, Problem.userNotFound)
+        } else {
+            ResponseEntity.ok(UserDataOutputModel(user))
+        }
     }
 
     @PostMapping(URIs.Users.CREATE)
     fun create(
         @Valid @RequestBody
-        userInput: UserRegisterInputModel
+        userInput: UserCreateInputModel
     ): ResponseEntity<*> {
         val res = service.createUser(username = userInput.username, password = userInput.password)
         return when (res) {
             is Success -> ResponseEntity.status(201)
                 .header(
                     "Location",
-                    URIs.Users.getByID(res.value).toASCIIString()
+                    URIs.Users.byID(res.value).toASCIIString()
                 ).build<Unit>()
-            is Failure -> when(res.value){
+
+            is Failure -> when (res.value) {
                 UserCreationError.InvalidUsername -> Problem.response(400, Problem.invalidUsername)
                 UserCreationError.InvalidPassword -> Problem.response(400, Problem.insecurePassword)
                 UserCreationError.UsernameAlreadyExists -> Problem.response(409, Problem.userAlreadyExists)
@@ -67,13 +72,14 @@ class UserController(private val service: UserService) {
     @PostMapping(URIs.Users.TOKEN)
     fun token(
         @Valid @RequestBody
-        userInput: UserLoginInputModel
+        userInput: UserCreateTokenInputModel
     ): ResponseEntity<*> {
         val res = service.createToken(username = userInput.username, password = userInput.password)
         return when (res) {
             is Success -> ResponseEntity.status(200)
                 .body(UserTokenCreateOutputModel(res.value.tokenValue))
-            is Failure -> when(res.value){
+
+            is Failure -> when (res.value) {
                 TokenCreationError.UserOrPasswordInvalid -> Problem.response(400, Problem.userOrPasswordAreInvalid)
             }
         }
@@ -84,5 +90,13 @@ class UserController(private val service: UserService) {
         @RequestHeader("Authorization") token: String
     ) {
         service.revokeToken(token)
+    }
+
+    @GetMapping(URIs.Users.HOME)
+    fun home(authenticatedUser: AuthenticatedUser): UserHomeOutputModel {
+        return UserHomeOutputModel(
+            authenticatedUser.user.uuid,
+            authenticatedUser.user.username
+        )
     }
 }

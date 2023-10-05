@@ -2,13 +2,11 @@ package gomoku.server.services.user
 
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.User
+import gomoku.server.domain.user.UserData
 import gomoku.server.domain.user.UserDomain
-import gomoku.server.domain.user.UserExternalInfo
 import gomoku.server.repository.TransactionManager
-import gomoku.server.services.errors.LoginError
 import gomoku.server.services.errors.TokenCreationError
 import gomoku.server.services.errors.UserCreationError
-import gomoku.utils.Either
 import gomoku.utils.failure
 import gomoku.utils.success
 import kotlinx.datetime.Clock
@@ -67,15 +65,15 @@ class UserService(
         }
     }
 
-    fun getUsersData(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserExternalInfo> {
+    fun getUsersData(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserData> {
         val users = transactionManager.run {
             val usersRepository = it.usersRepository
-            usersRepository.findUsersExternalInfo(offset, limit)
+            usersRepository.getUsersData(offset, limit)
         }
         return users
     }
 
-    fun getUserById(id: Int): User? {
+    fun getUserById(id: Int): UserData? {
         return transactionManager.run {
             val usersRepository = it.usersRepository
             usersRepository.getUserById(id)
@@ -89,20 +87,13 @@ class UserService(
         return transactionManager.run {
             val usersRepository = it.usersRepository
             val tokenValidationInfo = userDomain.createTokenValidationInfo(token)
-            val userAndToken = usersRepository.getTokenByTokenValidationInfo(tokenValidationInfo)
+            val userAndToken = usersRepository.getTokenAndUserByTokenValidationInfo(tokenValidationInfo)
             if (userAndToken != null && userDomain.isTokenTimeValid(clock, userAndToken.second)) {
                 usersRepository.updateTokenLastUsed(userAndToken.second, clock.now())
                 userAndToken.first
             } else {
                 null
             }
-        }
-    }
-
-    fun loginUser(username: String, password: String): LoginResult {
-        return when (val tokenCreationResult = createToken(username, password)) {
-            is Either.Left -> failure(LoginError.UserOrPasswordInvalid)
-            is Either.Right -> success(tokenCreationResult.value)
         }
     }
 

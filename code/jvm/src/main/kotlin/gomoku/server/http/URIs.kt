@@ -5,21 +5,24 @@ import java.net.URI
 
 object URIs {
 
-    const val HOME = "/"
+    const val PREFIX = "/api"
+    const val HOME = "$PREFIX/"
 
     fun home() = URI(HOME)
 
     object Users {
-        const val ROOT = "/"
+        const val ROOT = "/users"
         const val GET_BY_ID = "/{id}"
+        const val HOME = "/me"
         const val TOKEN = "/token"
         const val CREATE = "/create"
         const val LOGOUT = "/logout"
         const val RANKING = "/ranking"
 
-        fun getByID(id: Int) = UriTemplate(GET_BY_ID).expand(id)
-        fun token() = URI(LOGIN)
-        fun create() = URI(CREATE)
+        fun byID(id: Int) = UriTemplate(GET_BY_ID).expand(id)
+        fun home() = URI(HOME)
+        fun login() = URI(TOKEN)
+        fun register() = URI(CREATE)
     }
 
     object Games {
