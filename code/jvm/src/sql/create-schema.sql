@@ -1,26 +1,22 @@
-create table if not exists "users"
-(
-    uuid             serial primary key,
-    username         varchar(255) not null,
-    encoded_password varchar(255) not null,
-    elo              int          not null default 0,
-    games_played     int          not null default 0,
+create schema dbo;
 
-    unique (username)
+create table if not exists dbo.Users
+(
+    id int generated always as identity primary key,
+    username varchar(64) unique not null,
+    elo int not null default 0,
+    games_played int not null default 0,
+    password_validation varchar(256) not null
 );
 
-create table if not exists "tokens"
+create table if not exists dbo.Tokens
 (
-    user_id       int primary key,
-    encoded_token varchar(255) not null,
-    create_date   timestamp    not null,
-    last_used     timestamp    not null,
-    ttl           interval     not null,
+    token_validation varchar(256) not null,
+    user_id int references dbo.Users(id),
+    created_at bigint not null,
+    last_used bigint not null,
 
-    constraint fk_user foreign key (user_id) references "user" (uuid),
-    constraint positive_ttl check (ttl > interval '0 0:00:00.000'),
-    check (last_used > create_date),
-    check (create_date + ttl > last_used)
+    check (last_used > create_date)
 );
 
 create table if not exists "matches"

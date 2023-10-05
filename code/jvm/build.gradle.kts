@@ -34,6 +34,9 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    // To use WebTestClient on tests
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
+    testImplementation(kotlin("test"))
 
     runtimeOnly("org.postgresql:postgresql")
 }
@@ -47,4 +50,28 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+/**
+ * DB related tasks
+ * - To run `psql` inside the container, do
+ *      docker exec -ti db-tests psql -d db -U dbuser -W
+ *   and provide it with the same password as define on `tests/Dockerfile-db-test`
+ */
+task<Exec>("dbTestsUp") {
+    commandLine("docker-compose", "up", "-d", "--build", "--force-recreate", "db-tests")
+}
+
+task<Exec>("dbTestsWait") {
+    commandLine("docker", "exec", "db-tests", "/app/bin/wait-for-postgres.sh", "localhost")
+    dependsOn("dbTestsUp")
+}
+
+task<Exec>("dbTestsDown") {
+    commandLine("docker-compose", "down")
+}
+
+tasks.named("check") {
+    dependsOn("dbTestsWait")
+    finalizedBy("dbTestsDown")
 }
