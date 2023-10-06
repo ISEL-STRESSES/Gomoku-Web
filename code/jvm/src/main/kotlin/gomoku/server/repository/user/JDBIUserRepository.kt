@@ -23,8 +23,8 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .mapTo<Int>()
             .single() == 1
 
-    override fun getUsersData(offset: Int, limit: Int): List<UserData> = // TODO: VER COMO O MATOS FEZ NO TRABALHO DELE
-        handle.createQuery("SELECT * FROM users LIMIT :limit OFFSET :offset")
+    override fun getUsersData(offset: Int, limit: Int): List<UserData> =
+        handle.createQuery("SELECT * FROM users ORDER BY elo DESC LIMIT :limit OFFSET :offset")
             .bind("limit", limit)
             .bind("offset", offset)
             .mapTo<UserData>()
@@ -35,7 +35,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             """
                 select id, username, password_validation, games_played, elo, token_validation, created_at, last_used
                 from users as player 
-                inner join tokens as tokens 
+                inner join tokens
                 on player.id = tokens.user_id
                 where token_validation = :validation_information
             """
@@ -113,6 +113,14 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .one()
+
+    override fun searchRankings(username: String): List<User> =
+        handle.createQuery(
+            "SELECT * FROM USERS WHERE username LIKE :username ORDER BY elo DESC"
+        )
+            .bind("username", username)
+            .mapTo(User::class.java)
+            .list()
 
     private data class UserAndTokenModel(
         val id: Int,

@@ -18,9 +18,21 @@ create table if not exists tokens
     check (last_used > created_at)
 );
 
+create table if not exists rules
+(
+    rules_id     int          generated always as identity primary key,
+    board_size   int          not null,
+    opening_rule varchar(256) not null default 'free',
+    variant      varchar(256) not null default 'standard',
+
+    unique (board_size, opening_rule, variant),
+    constraint check_board_size check (board_size = 15 or board_size = 19)
+);
+
 create table if not exists lobby
 (
-    id int primary key
+    id       int generated always as identity primary key,
+    rules_id int not null references rules (rules_id)
 );
 
 create table if not exists enters_lobby
@@ -34,19 +46,18 @@ create table if not exists enters_lobby
 
 create table if not exists rules
 (
-    lobby_id     int          not null references lobby (id),
+    rules_id     int          generated always as identity primary key,
     board_size   int          not null,
     opening_rule varchar(256) not null default 'free',
     variant      varchar(256) not null default 'standard',
 
     unique (board_size, opening_rule, variant),
-    primary key (board_size, opening_rule, variant),
     constraint check_board_size check (board_size = 15 or board_size = 19)
 );
 
 create table if not exists matches
 (
-    id                int        primary key,
+    id                int        generated always as identity primary key,
     player_a_id       int        not null references users(id),
     player_b_id       int        not null references users(id),
     is_player_a_black boolean    not null,
