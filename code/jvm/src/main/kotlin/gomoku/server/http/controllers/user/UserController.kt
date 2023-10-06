@@ -1,59 +1,102 @@
 package gomoku.server.http.controllers.user
 
+import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
-import gomoku.server.http.controllers.user.models.get.GetUserOutputModel
-import gomoku.server.http.controllers.user.models.get.GetUsersOutputModel
-import gomoku.server.http.controllers.user.models.login.UserLoginInputModel
-import gomoku.server.http.controllers.user.models.login.UserLoginOutputModel
-import gomoku.server.http.controllers.user.models.register.UserRegisterInputModel
-import gomoku.server.http.controllers.user.models.register.UserRegisterOutputModel
+import gomoku.server.http.controllers.media.Problem
+import gomoku.server.http.controllers.user.models.UserDataOutputModel
+import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
+import gomoku.server.http.controllers.user.models.getUsersData.GetUsersDataOutputModel
+import gomoku.server.http.controllers.user.models.userCreate.UserCreateInputModel
+import gomoku.server.http.controllers.user.models.userTokenCreate.UserCreateTokenInputModel
+import gomoku.server.http.controllers.user.models.userTokenCreate.UserTokenCreateOutputModel
+import gomoku.server.services.errors.TokenCreationError
+import gomoku.server.services.errors.UserCreationError
 import gomoku.server.services.user.UserService
+import gomoku.utils.Failure
+import gomoku.utils.Success
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
-@RestController
+@RestController(URIs.Users.ROOT)
 class UserController(private val service: UserService) {
 
-    @GetMapping(URIs.Users.ROOT)
-    fun getRanking(
+    @GetMapping(URIs.Users.RANKING)
+    fun getUsersData(
         @RequestParam offset: Int = 0,
         @RequestParam limit: Int = 10
-    ): ResponseEntity<GetUsersOutputModel> {
-        val users = service.getRanking(offset, limit)
-        return ResponseEntity.ok(GetUsersOutputModel(users))
+    ): ResponseEntity<*> {
+        val users = service.getUsersData(offset, limit)
+        return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
     }
 
-    @GetMapping(URIs.Users.BY_ID)
-    fun getUser(
+    @GetMapping(URIs.Users.GET_BY_ID)
+    fun getById(
         @PathVariable id: Int
-    ): ResponseEntity<GetUserOutputModel> {
-        val user = service.getUser(id)
-        return ResponseEntity.ok(GetUserOutputModel(user))
+    ): ResponseEntity<*> {
+        val user = service.getUserById(id)
+        return if (user == null) {
+            Problem.response(404, Problem.userNotFound)
+        } else {
+            ResponseEntity.ok(UserDataOutputModel(user))
+        }
     }
 
-    @PostMapping(URIs.Users.REGISTER)
-    fun registerUser(
-        @Valid @RequestBody userInput: UserRegisterInputModel
-    ): ResponseEntity<UserRegisterOutputModel> {
-        val registerOutputDTO = service.registerUser(userInput.toUserRegisterInputDTO())
-        return ResponseEntity.ok(UserRegisterOutputModel(registerOutputDTO))
+    @PostMapping(URIs.Users.CREATE)
+    fun create(
+        @Valid @RequestBody
+        userInput: UserCreateInputModel
+    ): ResponseEntity<*> {
+        val res = service.createUser(username = userInput.username, password = userInput.password)
+        return when (res) {
+            is Success -> ResponseEntity.status(201)
+                .header(
+                    "Location",
+                    URIs.Users.byID(res.value).toASCIIString()
+                ).build<Unit>()
+
+            is Failure -> when (res.value) {
+                UserCreationError.InvalidUsername -> Problem.response(400, Problem.invalidUsername)
+                UserCreationError.InvalidPassword -> Problem.response(400, Problem.insecurePassword)
+                UserCreationError.UsernameAlreadyExists -> Problem.response(409, Problem.userAlreadyExists)
+            }
+        }
     }
 
-    @PostMapping(URIs.Users.LOGIN)
-    fun loginUser(
-        @Valid @RequestBody userInput: UserLoginInputModel
-    ): ResponseEntity<UserLoginOutputModel> {
-        val loginOutputDTO = service.loginUser(userInput.toUserLoginInputDTO())
-        return ResponseEntity.ok(UserLoginOutputModel(loginOutputDTO))
+    @PostMapping(URIs.Users.TOKEN)
+    fun token(
+        @Valid @RequestBody
+        userInput: UserCreateTokenInputModel
+    ): ResponseEntity<*> {
+        val res = service.createToken(username = userInput.username, password = userInput.password)
+        return when (res) {
+            is Success -> ResponseEntity.status(200)
+                .body(UserTokenCreateOutputModel(res.value.tokenValue))
+
+            is Failure -> when (res.value) {
+                TokenCreationError.UserOrPasswordInvalid -> Problem.response(400, Problem.userOrPasswordAreInvalid)
+            }
+        }
     }
 
     @PostMapping(URIs.Users.LOGOUT)
-    fun logoutUser(
+    fun logout(
         @RequestHeader("Authorization") token: String
-    ): ResponseEntity<Unit> {
-        service.logoutUser(token)
-        return ResponseEntity.ok().build()
+    ) {
+        service.revokeToken(token)
     }
 
+    @GetMapping(URIs.Users.HOME)
+    fun home(authenticatedUser: AuthenticatedUser): UserHomeOutputModel {
+        return UserHomeOutputModel(
+            authenticatedUser.user.uuid,
+            authenticatedUser.user.username
+        )
+    }
 }

@@ -10,11 +10,10 @@ enum class BoardSize(val max: Int) {
         this.max > position.x && this.max > position.y
 }
 
-
 data class Rules(
-    val boardSize: BoardSize,
+    val boardSize: BoardSize
 )
 
 val defaultRules = Rules(
-    boardSize = BoardSize.X15,
+    boardSize = BoardSize.X15
 )

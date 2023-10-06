@@ -9,5 +9,4 @@ class GomokuWebApplicationTests {
     @Test
     fun contextLoads() {
     }
-
 }

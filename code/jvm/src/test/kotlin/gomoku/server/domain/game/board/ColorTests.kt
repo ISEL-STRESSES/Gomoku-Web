@@ -21,5 +21,4 @@ class ColorTests {
             expectedColor = expectedColor.other()
         }
     }
-
 }
