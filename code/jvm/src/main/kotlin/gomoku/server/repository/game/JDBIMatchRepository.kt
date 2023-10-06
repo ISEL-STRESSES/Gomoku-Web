@@ -70,7 +70,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
         if (position !in movesDone) {
             handle.createUpdate("update matches set moves = :moves where id = :gameId")
                 .bind("gameId", gameId)
-                .bind("moves", movesDone.plus(position))
+                .bind("moves", movesDone.plus(position.toString()))
                 .execute()
         } else {
             throw IllegalStateException("Position Occupied")
