@@ -33,11 +33,11 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun getTokenAndUserByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? =
         handle.createQuery(
             """
-                select uuid, username, encoded_password, games_played, elo, encoded_token, create_date, last_used
+                select id, username, password_validation, games_played, elo, token_validation, created_at, last_used
                 from users as player 
-                inner join token as tokens 
-                on player.uuid = tokens.user_id
-                where encoded_token = :validation_information
+                inner join tokens as tokens 
+                on player.id = tokens.user_id
+                where token_validation = :validation_information
             """
         )
             .bind("validation_information", tokenValidationInfo.validationInfo)
@@ -48,10 +48,10 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun createToken(token: Token, maxTokens: Int) {
         val deletions = handle.createUpdate(
             """
-            delete from token 
+            delete from tokens 
             where user_id = :user_id 
-                and token.encoded_token in (
-                    select encoded_token from token where user_id = :user_id 
+                and tokens.token_validation in (
+                    select token_validation from tokens where user_id = :user_id 
                         order by last_used desc offset :offset
                 )
             """.trimIndent()
@@ -64,24 +64,23 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
 
         handle.createUpdate(
             """
-                insert into token(user_id, encoded_token, create_date, last_used, ttl) 
-                values (:user_id, :token_validation, :created_at, :last_used_at, :ttl)
+                insert into tokens(user_id, token_validation, created_at, last_used) 
+                values (:user_id, :token_validation, :created_at, :last_used_at)
             """.trimIndent()
         )
             .bind("user_id", token.userId)
             .bind("token_validation", token.tokenValidationInfo.validationInfo)
             .bind("create_date", token.createdAt.epochSeconds)
             .bind("last_used", token.lastUsedAt.epochSeconds)
-            .bind("ttl", token.ttl)
             .execute()
     }
 
     override fun updateTokenLastUsed(token: Token, now: Instant) {
         handle.createUpdate(
             """
-                update token
+                update tokens
                 set last_used = :last_used
-                where encoded_token = :encoded_token
+                where token_validation = :encoded_token
             """.trimIndent()
         )
             .bind("last_used", now.epochSeconds)
@@ -92,8 +91,8 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun removeTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Int {
         return handle.createUpdate(
             """
-                delete from token
-                where encoded_token = :encoded_token
+                delete from tokens
+                where token_validation = :encoded_token
             """
         )
             .bind("encoded_token", tokenValidationInfo.validationInfo)
@@ -101,14 +100,14 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     }
 
     override fun getUserById(id: Int): UserData? {
-        return handle.createQuery("SELECT * FROM users WHERE uuid = :uuid")
+        return handle.createQuery("SELECT * FROM users WHERE id = :uuid")
             .bind("uuid", id)
             .mapTo<UserData>()
             .singleOrNull()
     }
 
     override fun storeUser(username: String, passwordValidationInfo: PasswordValidationInfo): Int =
-        handle.createUpdate("insert into users (username, encoded_password) values (:username, :encoded_password)")
+        handle.createUpdate("insert into users (username, password_validation) values (:username, :password_validation)")
             .bind("username", username)
             .bind("encoded_password", passwordValidationInfo.validationInfo)
             .executeAndReturnGeneratedKeys()

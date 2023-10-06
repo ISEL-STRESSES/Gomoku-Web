@@ -1,7 +1,5 @@
 package gomoku.server.domain.game.board
 
-import gomoku.server.domain.game.InvalidBoardException
-
 data class Board(
     val grid: Map<Position, Color>
 )
