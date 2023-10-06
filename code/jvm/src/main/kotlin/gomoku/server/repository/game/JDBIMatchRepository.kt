@@ -67,7 +67,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .mapTo(Array<String>::class.java)
             .singleOrNull()
             ?.map { Position.fromString(it) } ?: emptyList<Position>()
-        if (movesDone != null && position !in movesDone) {
+        if (position !in movesDone) {
             handle.createUpdate("update matches set moves = :moves where id = :gameId")
                 .bind("gameId", gameId)
                 .bind("moves", movesDone.plus(position))
