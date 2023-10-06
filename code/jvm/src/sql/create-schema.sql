@@ -1,50 +1,59 @@
-create schema dbo;
 
-create table if not exists dbo.Users
+create table if not exists users
 (
-    id int generated always as identity primary key,
-    username varchar(64) unique not null,
-    elo int not null default 0,
-    games_played int not null default 0,
+    id                  int          generated always as identity primary key,
+    username            varchar(64)  unique not null,
+    elo                 int          not null default 0,
+    games_played        int          not null default 0,
     password_validation varchar(256) not null
 );
 
-create table if not exists dbo.Tokens
+create table if not exists tokens
 (
     token_validation varchar(256) not null,
-    user_id int references dbo.Users(id),
-    created_at bigint not null,
-    last_used bigint not null,
+    user_id          int          references users(id),
+    created_at       bigint       not null,
+    last_used        bigint       not null,
 
-    check (last_used > create_date)
+    check (last_used > created_at)
 );
 
-create table if not exists "matches"
+create table if not exists lobby
 (
-    match_id int primary key,
-    host_id  int not null,
-
-    unique (match_id, host_id),
-    constraint fk_user foreign key (host_id) references "user" (uuid)
+    id int primary key
 );
 
-create table if not exists "ongoing_matches"
+create table if not exists enters_lobby
 (
-    match_id      int primary key,
-    match_host_id int not null,
-    guest_id      int not null,
-    moves         text[],
+    lobby_id int not null,
+    user_id  int not null,
 
-    constraint fk_match foreign key (match_id, match_host_id) references "match" (match_id, host_id),
-    constraint fk_user foreign key (guest_id) references "user" (uuid),
-    constraint host_different_than_guess check (match_host_id <> guest_id)
+    constraint fk_lobby foreign key (lobby_id) references lobby (id),
+    constraint fk_user foreign key (user_id) references users (id)
 );
 
-create table if not exists "finished_matches"
+create table if not exists rules
 (
-    match_id int primary key,
-    moves    text[] not null,
-    winner   int    not null,
+    lobby_id     int          not null references lobby (id),
+    board_size   int          not null,
+    opening_rule varchar(256) not null default 'free',
+    variant      varchar(256) not null default 'standard',
 
-    constraint fk_ongoing_match foreign key (match_id) references "ongoing_match" (match_id)
+    unique (board_size, opening_rule, variant),
+    primary key (board_size, opening_rule, variant),
+    constraint check_board_size check (board_size = 15 or board_size = 19)
+);
+
+create table if not exists matches
+(
+    id                int        primary key,
+    player_a_id       int        not null references users(id),
+    player_b_id       int        not null references users(id),
+    is_player_a_black boolean    not null,
+    turn              int        not null,
+    moves             text[]     not null,
+    winner            varchar(4) default null,
+    lobby_id          int        not null references lobby(id),
+
+    constraint winner_check check (winner is null or winner ~* '^(a|b|draw)$')
 );
