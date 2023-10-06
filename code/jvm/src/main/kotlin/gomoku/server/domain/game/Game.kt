@@ -32,16 +32,22 @@ class OngoingGame(
     val isHostBlack: Boolean
 ) : Game(gameID, hostID, rules)
 
-fun OpenGame.join(guestID: Int): OngoingGame {
+fun OpenGame.join(guestID : Int): Result<OngoingGame> {
+    if(hostID == guestID)
+        return Result.failure(AlreadyInGameException())
+
     val isHostBlack = Random.nextBoolean()
 
-    return OngoingGame(
-        gameID = gameID,
-        hostID = hostID,
-        guestID = guestID,
-        rules = rules,
-        moves = emptyList(),
-        isHostBlack = isHostBlack
+    return Result.success(
+        OngoingGame(
+            gameID = gameID,
+            hostID = hostID,
+            guestID = guestID,
+            rules = rules,
+            moves = emptyList(),
+            isHostBlack = isHostBlack,
+        )
+
     )
 }
 
@@ -69,14 +75,17 @@ fun OngoingGame.play(playerID: Int, position: Position): Result<Game> {
         return Result.failure(OutOfBoundsException())
     }
 
-    val currentColor = moves.nextMoveColor()
-    if (getColorFromPlayerID(playerID) != currentColor) {
+    val currentColor = moves.nextColorTurn()
+    if (getColorFromPlayerID(playerID) != currentColor)
         return Result.failure(NotYourTurnException())
     }
 
     // Construct lookup board
-    val board = moves.toBoard()
-    board.at(position)?.let {
+    val boardResult = moves.toBoard()
+    val lookupBoard = boardResult.getOrElse {
+        return Result.failure(it)
+    }
+    lookupBoard.at(position)?.let {
         return Result.failure(IllegalMoveException())
     }
 
