@@ -23,20 +23,32 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .mapTo<Int>()
             .single() == 1
 
-    override fun getUsersData(offset: Int, limit: Int): List<UserData> =
-        handle.createQuery("SELECT * FROM users ORDER BY elo DESC LIMIT :limit OFFSET :offset")
-            .bind("limit", limit)
+    //TODO
+    override fun getUsersStatsData(offset: Int, limit: Int): List<UserData> =
+        handle.createQuery(
+            """
+            select users.id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
+            from users
+            inner join user_stats
+            on users.id = user_stats.user_id
+            inner join rules
+            on user_stats.rules_id = rules.id
+            order by users.id
+            offset :offset
+            limit :limit
+        """.trimIndent())
             .bind("offset", offset)
-            .mapTo<UserData>()
+            .bind("limit", limit)
+            .mapTo<UserData>()//TODO: check if mapper needed bue to have list with a different data class
             .list()
 
     override fun getTokenAndUserByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? =
         handle.createQuery(
             """
-                select id, username, password_validation, games_played, elo, token_validation, created_at, last_used
-                from users as player 
+                select id, username, password_validation, token_validation, created_at, last_used
+                from users 
                 inner join tokens
-                on player.id = tokens.user_id
+                on users.id = tokens.user_id
                 where token_validation = :validation_information
             """
         )
@@ -114,27 +126,24 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .mapTo<Int>()
             .one()
 
-    override fun searchRankings(username: String): List<User> =
-        handle.createQuery(
-            "SELECT * FROM USERS WHERE username LIKE :username ORDER BY elo DESC"
-        )
-            .bind("username", username)
-            .mapTo(User::class.java)
+    //TODO
+    override fun searchRankings(username: String): List<UserData> =
+        handle.createQuery("select * from user_stats where (user_id = (select id from users where username like :username))")
+            .bind("username", "%$username%")
+            .mapTo<UserData>()
             .list()
 
     private data class UserAndTokenModel(
         val id: Int,
         val username: String,
         val passwordValidation: PasswordValidationInfo,
-        val playCount: Int,
-        val elo: Int,
         val tokenValidation: TokenValidationInfo,
         val createdAt: Long,
         val lastUsedAt: Long
     ) {
         val userAndToken: Pair<User, Token>
             get() = Pair(
-                User(id, username, playCount, elo, passwordValidation),
+                User(id, username, passwordValidation),
                 Token(
                     tokenValidation,
                     id,

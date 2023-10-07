@@ -1,68 +1,64 @@
 package gomoku.server.repository.game
 
-import gomoku.server.domain.game.Rules
+import gomoku.server.domain.Rule
+import gomoku.server.domain.game.MatchOutcome
+import gomoku.server.domain.game.Match_State
+import gomoku.server.domain.game.board.Color
+import gomoku.server.domain.game.board.Move
 import gomoku.server.domain.game.board.Position
 
 /**
- * Repository for game data.
+ * Repository for match data.
  */
 interface MatchRepository {
 
     /**
-     * Creates a new set of rules.
-     * @param rules rules of the game
-     * @return id of the lobby
+     * Gets the id of a set of rules, if not found it creates a new one.
+     * @param rule rules of the match
+     * @return id of the rule
      */
-    fun createGameRules(rules: Rules): Int
+    fun getRuleId(rule: Rule): Int
 
     /**
-     * Creates a new waiting lobby.
-     * @param rules rules of the game
-     * @return id of the lobby
-     */
-    fun joinWaitingLobby(rules: Rules): Int
-
-    /**
-     * Initiates a game between two players.
+     * Initiates a match between two players.
      * @param playerAId id of the first player
      * @param playerBId id of the second player
-     * @return id of the game
+     * @return id of the match
      */
-    fun initiateGame(playerAId: Int, playerBId: Int): Int
+    fun initiateMatch(playerAId: Int, playerBId: Int): Int
 
     /**
-     * Gets the winner of the game.
-     * @param gameId id of the game
-     * @return id of the winner, draw or null if the game is not finished
+     * Gets the winner of the match.
+     * @param matchId id of the match
+     * @return id of the winner, draw or null if the match is not finished
      */
-    fun getWinner(gameId: Int): String?
+    fun getWinner(matchId: Int): MatchOutcome?
 
     /**
-     * Gets the moves of the game.
-     * @param gameId id of the game
+     * Gets the moves of the match.
+     * @param matchId id of the match
      * @return list of moves
      */
-    fun getMoves(gameId: Int): List<Position>?
+    fun getMoves(matchId: Int, rule: Rule): List<Move>
 
     /**
-     * Makes a move in the game.
-     * @param gameId id of the game
-     * @param position position of the move
+     * Makes a move in the match.
      * @param matchId id of the match
+     * @param position position of the move
      */
-    fun makeMove(gameId: Int, position: Position, matchId: Int)
+    fun makeMove(matchId: Int, rule: Rule, playerColor: Color, position: Position)
 
     /**
-     * Gets the state of the game.
-     * @param gameId id of the game
-     * @return state of the game
+     * Gets the state of the match.
+     * @param matchId id of the match
+     * @return state of the match
      */
-    fun getGameState(gameId: Int) // TODO: return GameState
+    fun getMatchState(matchId: Int) :Match_State// TODO: return matchState
 
     /**
-     * Gets the turn of the game.
-     * @param gameId id of the game
+     * Gets the turn of the match.
+     * @param matchId id of the match
      * @return the id of the player for the current turn.
      */
-    fun getTurn(gameId: Int): Int?
+    fun getTurn(matchId: Int): Color
 }

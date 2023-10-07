@@ -40,7 +40,7 @@ interface UserRepository {
      * @param limit The maximum number of users to retrieve.
      * @return The list of users.
      */
-    fun getUsersData(offset: Int, limit: Int): List<UserData>
+    fun getUsersStatsData(offset: Int, limit: Int): List<UserData>
 
     /**
      * Retrieves a user by their token information.
@@ -82,5 +82,5 @@ interface UserRepository {
      * @param username The username of the users.
      * @return The list of users.
      */
-    fun searchRankings(username: String): List<User>
+    fun searchRankings(username: String): List<UserData>
 }

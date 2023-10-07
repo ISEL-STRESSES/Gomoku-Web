@@ -1,89 +1,114 @@
 package gomoku.server.repository.game
 
-import gomoku.server.domain.game.Rules
+import gomoku.server.domain.Rule
+import gomoku.server.domain.game.MatchOutcome
+import gomoku.server.domain.game.Match_State
+import gomoku.server.domain.game.board.Color
+import gomoku.server.domain.game.board.Move
 import gomoku.server.domain.game.board.Position
+import gomoku.server.domain.game.board.toColor
+import gomoku.server.domain.game.toMatchState
 import org.jdbi.v3.core.Handle
+import org.jdbi.v3.core.kotlin.mapTo
+import org.jdbi.v3.core.transaction.TransactionIsolationLevel
 
 class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
 
-    private fun createWaitingLobby(rules: Rules): Int =
-        handle.createUpdate("insert into lobby (rules_id) values (:rules)")
-            .bind("rules", rules)
-            .executeAndReturnGeneratedKeys()
-            .mapTo(Int::class.java)
-            .one()
-
-    override fun createGameRules(rules: Rules): Int =
-        handle.createUpdate("insert into rules (board_size, opening_rule, variant) values (:board_size, :opening_rule, :variant)")
-            .bind("rules", rules.boardSize)
-            .executeAndReturnGeneratedKeys()
-            .mapTo(Int::class.java)
-            .one()
-
-    override fun joinWaitingLobby(rules: Rules): Int =
-        handle.createQuery("select id from lobby where rules_id = (select id from rules where board_size = :rules)")
-            .bind("rules", rules.boardSize)
-            .mapTo(Int::class.java)
-            .singleOrNull() ?: createWaitingLobby(rules)
-
-    override fun initiateGame(playerAId: Int, playerBId: Int): Int {
-        val lobbyId = handle.createQuery("select id from lobby where (select lobby_id from enters_lobby where user_id = :playerAId) = (select lobby_id from enters_lobby where user_id = :playerBId)")
-            .mapTo(Int::class.java)
-            .singleOrNull() ?: throw IllegalStateException("Players are not in the same lobby")
-        val isPlayerABlack = Math.random() < 0.5
+    /**
+     * Creates a new set of rules.
+     * @param rule rules of the game
+     * @return id of the rule
+     */
+    private fun createRule(rule: Rule): Int {
         return handle.createUpdate(
             """
-            insert into matches(player_a_id, player_b_id, is_player_a_black, turn, moves, lobby_id ) 
-            values (:playerAId, :playerBId, :isPlayerABlack,:turn, :moves, :lobbyId)
-            """.trimIndent()
-        )
-            .bind("playerAId", playerAId)
-            .bind("playerBId", playerBId)
-            .bind("isPlayerABlack", isPlayerABlack)
-            .bind("turn", if (isPlayerABlack) playerAId else playerBId)
-            .bind("moves", "")
-            .bind("lobbyId", lobbyId)
+            insert into rules(board_size, opening_rule, variant)
+            values (:boardSize, :openingRule, :variant)
+            """.trimIndent())
+            .bind("boardSize", rule.boardSize)
+            .bind("openingRule", rule.openingRule)
+            .bind("variant", rule.variant)
             .executeAndReturnGeneratedKeys()
-            .mapTo(Int::class.java)
+            .mapTo<Int>()
             .one()
     }
 
-    override fun getWinner(gameId: Int): String? = // TODO: find a way to differ between draw and unfinished game
-        handle.createQuery("select winner from matches where id = :gameId")
-            .bind("gameId", gameId)
-            .mapTo(String::class.java)
+    /**
+     * Gets the id of a set of rules, if not found it creates a new one.
+     * @param rule rules of the game
+     * @return id of the rule
+     */
+    override fun getRuleId(rule: Rule): Int {
+        val existingRule = handle.createQuery(
+                """
+                select id from rules where 
+                board_size = :boardSize and 
+                opening_rule = :openingRule and 
+                variant = :variant
+            """.trimIndent())
+            .bind("boardSize", rule.boardSize)
+            .bind("openingRule", rule.openingRule)
+            .bind("variant", rule.variant)
+            .mapTo(Int::class.java)
             .singleOrNull()
-
-    override fun getMoves(gameId: Int): List<Position>? =
-        handle.createQuery("select moves from matches where id = :gameId")
-            .bind("gameId", gameId)
-            .mapTo(Array<String>::class.java)
-            .singleOrNull()
-            ?.map { Position.fromString(it) }
-
-    override fun makeMove(gameId: Int, position: Position, matchId: Int) {
-        val movesDone: List<Position> = handle.createQuery("select moves from matches where id = :gameId")
-            .bind("gameId", gameId)
-            .mapTo(Array<String>::class.java)
-            .singleOrNull()
-            ?.map { Position.fromString(it) } ?: emptyList<Position>()
-        if (position !in movesDone) {
-            handle.createUpdate("update matches set moves = :moves where id = :gameId")
-                .bind("gameId", gameId)
-                .bind("moves", movesDone.plus(position.toString()))
-                .execute()
-        } else {
-            throw IllegalStateException("Position Occupied")
-        }
+        return existingRule ?: createRule(rule)
     }
 
-    override fun getGameState(gameId: Int) {
+    override fun initiateMatch(playerAId: Int, playerBId: Int): Int {
+        handle.transactionIsolationLevel = TransactionIsolationLevel.REPEATABLE_READ
         TODO("Not yet implemented")
     }
 
-    override fun getTurn(gameId: Int): Int? =
-        handle.createQuery("select turn from matches where id = :gameId")
-            .bind("gameId", gameId)
-            .mapTo(Int::class.java)
+    /**
+     * Gets the winner of the match.
+     * @param matchId id of the match
+     * @return id of the winner, draw or null if the match is not finished
+     */
+    override fun getWinner(matchId: Int): MatchOutcome? =
+        handle.createQuery("select match_outcome from matches where id = :matchId and match_outcome = 'finished'")
+            .bind("matchId", matchId)
+            .mapTo<MatchOutcome>()
             .singleOrNull()
+
+
+    override fun getMoves(matchId: Int, rule: Rule): List<Move> =
+        handle.createQuery("""
+                select color, row, col from moves join player 
+                on player.user_id = player_id and moves.match_id = player.match_id and moves.rules_id = player.rules_id
+                where moves.rules_id = :rule_id and moves.match_id = :matchId
+                """.trimIndent())
+            .bind("matchId", matchId)
+            .bind("rule_id", getRuleId(rule))
+            .mapTo<Move>()
+            .toList()
+
+    override fun makeMove(matchId: Int, rule: Rule, playerColor: Color, position: Position) {
+        if (getMoves(matchId, rule).any { it.position == position }) throw IllegalStateException("Move already made")
+        if (getTurn(matchId) != playerColor) throw IllegalStateException("Not your turn")
+        if (getMatchState(matchId) != Match_State.ONGOING) throw IllegalStateException("Match is not in progress")
+        handle.createUpdate(
+            """
+            insert into moves(rules_id, match_id, player_id, row, col)
+            values (:rule_id, :match_id, :player_id, :row, :col)
+            """.trimIndent())
+            .bind("rule_id", getRuleId(rule))
+            .bind("match_id", matchId)
+            .bind("player_id", 1)
+            .bind("color", playerColor.toString())
+            .bind("row", position.x)
+            .bind("col", position.y)
+            .execute()
+    }
+
+    override fun getMatchState(matchId: Int): Match_State =
+        handle.createQuery("select match_state from matches where id = :matchId")
+            .bind("matchId", matchId)
+            .mapTo<String>()
+            .single().toMatchState()
+
+    override fun getTurn(matchId: Int): Color =
+        handle.createQuery("select turn from matches where id = :matchId")
+            .bind("matchId", matchId)
+            .mapTo<String>()
+            .singleOrNull()?.toColor() ?: throw IllegalStateException("Match not found")
 }

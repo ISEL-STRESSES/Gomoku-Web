@@ -28,3 +28,11 @@ fun Int.toColor(): Color {
         Color.WHITE
     }
 }
+
+fun String.toColor(): Color {
+    return when (this) {
+        "BLACK" -> Color.BLACK
+        "WHITE" -> Color.WHITE
+        else -> throw IllegalArgumentException("Invalid color")
+    }
+}
