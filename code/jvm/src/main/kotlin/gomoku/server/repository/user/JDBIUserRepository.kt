@@ -10,24 +10,46 @@ import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.LoggerFactory
 
+/**
+ * JDBI implementation of [UserRepository].
+ * @param handle JDBI handle to the database.
+ * @see UserRepository
+ */
 class JDBIUserRepository(private val handle: Handle) : UserRepository {
+
+    /**
+     * Getter for the [User] object corresponding to the given [username].
+     * @param username The username of the user to get.
+     * @return The [User] object corresponding to the given [username],
+     * or null if no user with this username exists.
+     */
     override fun getUserByUsername(username: String): User? =
         handle.createQuery("SELECT * FROM users WHERE username = :username")
             .bind("username", username)
             .mapTo<User>()
             .singleOrNull()
 
+    /**
+     * Verifies if a user with the given [username] exists.
+     * @param username The username of the user to check.
+     * @return True if a user with the given [username] exists, false otherwise.
+     */
     override fun isUserStoredByUsername(username: String): Boolean =
         handle.createQuery("SELECT COUNT(*) FROM users WHERE username = :username")
             .bind("username", username)
             .mapTo<Int>()
             .single() == 1
 
-    // TODO
+    /**
+     * Gets all the stats related to the users, with pagination.
+     * @param offset The offset of the first user to get.
+     * @param limit The maximum number of users to get.
+     * @return A list of [UserData] objects, containing all the stats related to the users.
+     */
     override fun getUsersStatsData(offset: Int, limit: Int): List<UserData> =
         handle.createQuery(
             """
-            select users.id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
+            select users.id as user_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
             from users
             inner join user_stats
             on users.id = user_stats.user_id
@@ -40,9 +62,16 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
         )
             .bind("offset", offset)
             .bind("limit", limit)
-            .mapTo<UserData>() // TODO: check if mapper needed bue to have list with a different data class
+            .mapTo<UserData>()
             .list()
 
+    /**
+     * Gets the [User] object corresponding to the given [tokenValidationInfo].
+     * @param tokenValidationInfo The [TokenValidationInfo] object to get the [User] from.
+     * @return A [Pair] containing the [User] object corresponding to the given [tokenValidationInfo],
+     * and the [Token] object corresponding to the given [tokenValidationInfo], or null if no user with
+     * this token exists.
+     */
     override fun getTokenAndUserByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? =
         handle.createQuery(
             """
@@ -58,6 +87,11 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .singleOrNull()
             ?.userAndToken
 
+    /**
+     * Creates a [Token] associated to the given [User].
+     * @param token The [Token] to create.
+     * @param maxTokens The maximum number of tokens allowed by [User].
+     */
     override fun createToken(token: Token, maxTokens: Int) {
         val deletions = handle.createUpdate(
             """
@@ -88,6 +122,11 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .execute()
     }
 
+    /**
+     * Updates the last used date of the given [Token].
+     * @param token The [Token] to update.
+     * @param now The current date.
+     */
     override fun updateTokenLastUsed(token: Token, now: Instant) {
         handle.createUpdate(
             """
@@ -101,17 +140,24 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .execute()
     }
 
-    override fun removeTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Int {
-        return handle.createUpdate(
+    /**
+     * Removes the given [Token].
+     * @param tokenValidationInfo The [Token] to remove.
+     * @return The number of tokens removed.
+     */
+    override fun removeTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Int =
+        handle.createUpdate(
             """
                 delete from tokens
                 where token_validation = :encoded_token
-            """
+            """.trimIndent()
         )
             .bind("encoded_token", tokenValidationInfo.validationInfo)
             .execute()
-    }
 
+    /**
+     * Gets the [UserData] object corresponding to the given [id].
+     */
     override fun getUserById(id: Int): UserData? {
         return handle.createQuery("SELECT * FROM users WHERE id = :uuid")
             .bind("uuid", id)
@@ -119,6 +165,9 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .singleOrNull()
     }
 
+    /**
+     *
+     */
     override fun storeUser(username: String, passwordValidationInfo: PasswordValidationInfo): Int =
         handle.createUpdate("insert into users (username, password_validation) values (:username, :password_validation)")
             .bind("username", username)

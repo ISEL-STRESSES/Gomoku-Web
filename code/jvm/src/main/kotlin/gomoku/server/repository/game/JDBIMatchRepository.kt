@@ -1,11 +1,11 @@
 package gomoku.server.repository.game
 
-import gomoku.server.domain.Rule
 import gomoku.server.domain.game.MatchOutcome
 import gomoku.server.domain.game.MatchState
-import gomoku.server.domain.game.board.Color
-import gomoku.server.domain.game.board.Move
-import gomoku.server.domain.game.board.toColor
+import gomoku.server.domain.game.player.Color
+import gomoku.server.domain.game.player.Move
+import gomoku.server.domain.game.player.toColor
+import gomoku.server.domain.game.rules.Rule
 import gomoku.server.domain.game.toMatchState
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
@@ -110,7 +110,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .single().toMatchState()
 
     override fun getTurn(matchId: Int): Color =
-        handle.createQuery("select turn from matches where id = :matchId")
+        handle.createQuery("select Count(*) from moves where match_id = :matchId")
             .bind("matchId", matchId)
             .mapTo<String>()
             .singleOrNull()?.toColor() ?: throw IllegalStateException("Match not found")

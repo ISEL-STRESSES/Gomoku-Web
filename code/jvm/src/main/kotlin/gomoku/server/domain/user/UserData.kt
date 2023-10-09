@@ -1,6 +1,6 @@
 package gomoku.server.domain.user
 
-import gomoku.server.domain.RuleStats
+import gomoku.server.domain.game.rules.RuleStats
 
 /**
  * Represents a user with its statistics listed by rules

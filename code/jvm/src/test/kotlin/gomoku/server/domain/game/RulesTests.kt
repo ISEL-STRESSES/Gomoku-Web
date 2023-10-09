@@ -1,5 +1,6 @@
 package gomoku.server.domain.game
 
+import gomoku.server.domain.game.board.BoardSize
 import gomoku.server.domain.game.board.Position
 import org.junit.jupiter.api.Assertions
 

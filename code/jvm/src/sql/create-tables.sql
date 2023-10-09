@@ -47,7 +47,6 @@ create table if not exists matches
 (
     id            int          generated always as identity,
     rules_id      int,
-    turn          varchar(4)   default 'black',
     match_outcome varchar(4)   default null,
     match_state   varchar(256) not null,
 
@@ -79,7 +78,7 @@ create table if not exists moves
     col       int not null,
 
     constraint fk_moves_player foreign key (match_id, rules_id, player_id) references player(match_id, rules_id, user_id),
-    primary key (rules_id, match_id),
+    primary key (rules_id, match_id, row, col),
     unique (rules_id, match_id, row, col)
 );
 

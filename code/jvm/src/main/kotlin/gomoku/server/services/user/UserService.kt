@@ -68,7 +68,7 @@ class UserService(
     fun getUsersData(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserData> {
         val users = transactionManager.run {
             val usersRepository = it.usersRepository
-            usersRepository.getUsersData(offset, limit)
+            usersRepository.getUsersStatsData(offset, limit)
         }
         return users
     }

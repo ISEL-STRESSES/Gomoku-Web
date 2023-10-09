@@ -1,10 +1,10 @@
 package gomoku.server.repository.game
 
-import gomoku.server.domain.Rule
 import gomoku.server.domain.game.MatchOutcome
 import gomoku.server.domain.game.MatchState
-import gomoku.server.domain.game.board.Color
-import gomoku.server.domain.game.board.Move
+import gomoku.server.domain.game.player.Color
+import gomoku.server.domain.game.player.Move
+import gomoku.server.domain.game.rules.Rule
 
 /**
  * Repository for match data.

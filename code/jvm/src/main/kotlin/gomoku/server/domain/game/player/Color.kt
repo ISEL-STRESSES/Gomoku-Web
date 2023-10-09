@@ -1,4 +1,4 @@
-package gomoku.server.domain.game.board
+package gomoku.server.domain.game.player
 
 /**
  * Represents a piece or color that can be played on GOMOKU

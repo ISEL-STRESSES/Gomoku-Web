@@ -1,5 +1,7 @@
 package gomoku.server.domain.game.board
 
+import gomoku.server.domain.game.player.Color
+import gomoku.server.domain.game.player.toColor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertSame
 
