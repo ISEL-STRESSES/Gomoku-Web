@@ -51,7 +51,7 @@ create table if not exists matches
     match_state   varchar(256) not null,
 
     constraint match_outcome_check check (match_outcome is null or match_outcome ~* '^(a|b|draw)$'),
-    constraint match_state_check check (match_state ~* '^(waiting for player|ongoing|finished)$'),
+    constraint match_state_check check (match_state ~* '^(waiting_player|ongoing|finished)$'),
     constraint fk_matches_rules foreign key (rules_id) references rules(id),
     primary key (rules_id, id)
 );
