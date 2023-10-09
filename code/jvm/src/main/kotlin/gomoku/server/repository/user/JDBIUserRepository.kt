@@ -23,7 +23,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .mapTo<Int>()
             .single() == 1
 
-    //TODO
+    // TODO
     override fun getUsersStatsData(offset: Int, limit: Int): List<UserData> =
         handle.createQuery(
             """
@@ -36,10 +36,11 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             order by users.id
             offset :offset
             limit :limit
-        """.trimIndent())
+            """.trimIndent()
+        )
             .bind("offset", offset)
             .bind("limit", limit)
-            .mapTo<UserData>()//TODO: check if mapper needed bue to have list with a different data class
+            .mapTo<UserData>() // TODO: check if mapper needed bue to have list with a different data class
             .list()
 
     override fun getTokenAndUserByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? =
@@ -126,7 +127,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .mapTo<Int>()
             .one()
 
-    //TODO
+    // TODO
     override fun searchRankings(username: String): List<UserData> =
         handle.createQuery("select * from user_stats where (user_id = (select id from users where username like :username))")
             .bind("username", "%$username%")

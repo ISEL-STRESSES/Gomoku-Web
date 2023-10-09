@@ -9,4 +9,3 @@ data class MatchMoves(
     val black: List<Position>,
     val white: List<Position>
 )
-

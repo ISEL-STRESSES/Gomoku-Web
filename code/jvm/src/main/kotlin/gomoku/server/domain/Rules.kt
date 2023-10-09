@@ -6,7 +6,18 @@ package gomoku.server.domain
 enum class RuleVariant {
     STANDARD,
     RENJU,
-    PRO
+    PRO;
+
+    companion object {
+        fun fromString(string: String): RuleVariant {
+            return when (string) {
+                "STANDARD" -> STANDARD
+                "RENJU" -> RENJU
+                "PRO" -> PRO
+                else -> throw IllegalArgumentException("Unknown rule variant: $string")
+            }
+        }
+    }
 }
 
 /**
@@ -14,7 +25,17 @@ enum class RuleVariant {
  */
 enum class OpeningRule {
     FREE,
-    PRO
+    PRO;
+
+    companion object {
+        fun fromString(string: String): OpeningRule {
+            return when (string) {
+                "FREE" -> FREE
+                "PRO" -> PRO
+                else -> throw IllegalArgumentException("Unknown opening rule: $string")
+            }
+        }
+    }
 }
 
 /**
@@ -25,8 +46,10 @@ enum class OpeningRule {
  */
 open class Rule(val boardSize: Int, val variant: RuleVariant, val openingRule: OpeningRule) {
     init {
-        check(boardSize == 15 || boardSize == 19)
+        check(boardSize.isBoardSizeValid())
     }
+
+    private fun Int.isBoardSizeValid(): Boolean = this == 15 || this == 19
 }
 
 /**

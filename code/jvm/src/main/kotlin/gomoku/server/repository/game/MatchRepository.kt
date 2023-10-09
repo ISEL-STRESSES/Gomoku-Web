@@ -2,10 +2,9 @@ package gomoku.server.repository.game
 
 import gomoku.server.domain.Rule
 import gomoku.server.domain.game.MatchOutcome
-import gomoku.server.domain.game.Match_State
+import gomoku.server.domain.game.MatchState
 import gomoku.server.domain.game.board.Color
 import gomoku.server.domain.game.board.Move
-import gomoku.server.domain.game.board.Position
 
 /**
  * Repository for match data.
@@ -44,16 +43,16 @@ interface MatchRepository {
     /**
      * Makes a move in the match.
      * @param matchId id of the match
-     * @param position position of the move
+     * @param move the position and color of the move
      */
-    fun makeMove(matchId: Int, rule: Rule, playerColor: Color, position: Position)
+    fun makeMove(matchId: Int, rule: Rule, move: Move)
 
     /**
      * Gets the state of the match.
      * @param matchId id of the match
      * @return state of the match
      */
-    fun getMatchState(matchId: Int) :Match_State// TODO: return matchState
+    fun getMatchState(matchId: Int): MatchState // TODO: return matchState
 
     /**
      * Gets the turn of the match.

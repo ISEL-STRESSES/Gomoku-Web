@@ -47,7 +47,7 @@ create table if not exists matches
 (
     id            int          generated always as identity,
     rules_id      int,
-    turn          varchar(4)   not null,
+    turn          varchar(4)   default 'black',
     match_outcome varchar(4)   default null,
     match_state   varchar(256) not null,
 
