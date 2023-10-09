@@ -1,7 +1,7 @@
 package gomoku.server.domain.game.player
 
 /**
- * Represents a piece or color that can be played on GOMOKU
+ * Represents a piece or color that can be played
  */
 enum class Color {
     BLACK, WHITE;
@@ -16,8 +16,8 @@ enum class Color {
 }
 
 /**
- * Helper function to determine if an index is even or odd to decide the color
- * Current structure of the moves list makes it so that pair indexes are black and odd indexes are white
+ * Helper function to determine if an index is even or odd to decide the color of the piece
+ * Current structure of the move list makes it so that pair indexes are black and odd indexes are white
  * @return the color corresponding to the index
  */
 fun Int.toColor(): Color {

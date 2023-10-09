@@ -2,11 +2,17 @@ package gomoku.server.domain.game.board
 
 /**
  * Represents the possible sizes of a match board
+ *
  * @param max The maximum value of the x and y coordinates
+ * @throws IllegalArgumentException If the maximum value is negative
  */
 enum class BoardSize(val max: Int) {
     X15(15),
     X19(19);
+
+    init {
+        check(max >= 0)
+    }
 
     /**
      * Checks if a position is inside the board
@@ -25,20 +31,17 @@ enum class BoardSize(val max: Int) {
             }
         }
     }
+}
 
-    companion object {
-
-        /**
-         * Deserializes a board size from an integer
-         * @param int The integer to deserialize from
-         * @return The deserialized board size
-         */
-        fun fromInt(int: Int): BoardSize {
-            return when (int) {
-                15 -> X15
-                19 -> X19
-                else -> throw IllegalArgumentException("Invalid board size: $int")
-            }
-        }
+/**
+ * Deserializes a board size from an integer
+ * @receiver The integer to deserialize
+ * @return The deserialized board size
+ */
+fun Int.toBoardSize(): BoardSize {
+    return when (this) {
+        15 -> BoardSize.X15
+        19 -> BoardSize.X19
+        else -> throw IllegalArgumentException("Invalid board size: $this")
     }
 }

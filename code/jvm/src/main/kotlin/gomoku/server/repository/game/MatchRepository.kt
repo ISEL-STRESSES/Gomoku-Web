@@ -1,7 +1,7 @@
 package gomoku.server.repository.game
 
-import gomoku.server.domain.game.MatchOutcome
-import gomoku.server.domain.game.MatchState
+import gomoku.server.domain.game.match.MatchOutcome
+import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.rules.Rule

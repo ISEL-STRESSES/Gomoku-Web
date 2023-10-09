@@ -1,4 +1,4 @@
-package gomoku.server.domain.game
+package gomoku.server.domain.game.match
 
 import gomoku.server.domain.game.player.Color
 

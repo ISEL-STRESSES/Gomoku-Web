@@ -5,15 +5,18 @@ package gomoku.server.domain.game.rules
  */
 enum class OpeningRule {
     FREE,
-    PRO;
+    PRO
+}
 
-    companion object {
-        fun fromString(string: String): OpeningRule {
-            return when (string) {
-                "FREE" -> FREE
-                "PRO" -> PRO
-                else -> throw IllegalArgumentException("Unknown opening rule: $string")
-            }
-        }
+/**
+ * Helper function to deserialize an opening rule from a string
+ * @receiver the string to deserialize
+ * @return the opening rule
+ */
+fun String.toOpeningRule(): OpeningRule {
+    return when (this) {
+        "FREE" -> OpeningRule.FREE
+        "PRO" -> OpeningRule.PRO
+        else -> throw IllegalArgumentException("Invalid opening rule")
     }
 }

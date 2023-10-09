@@ -3,7 +3,9 @@ package gomoku.server.domain.game.board
 /**
  * Represents a data point
  *
- * TODO:
+ * @param x The x coordinate
+ * @param y The y coordinate
+ * @throws IllegalArgumentException If any of the coordinates is negative
  */
 data class Position(
     val x: Int,

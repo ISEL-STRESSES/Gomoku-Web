@@ -1,14 +1,14 @@
-package gomoku.server.domain.game
+package gomoku.server.domain.game.match
 
 enum class MatchState {
-    WAITING_FOR_PLAYER,
+    WAITING_PLAYER,
     ONGOING,
     FINISHED
 }
 
 fun String.toMatchState(): MatchState {
     return when (this) {
-        "WAITING_FOR_PLAYER" -> MatchState.WAITING_FOR_PLAYER
+        "WAITING_PLAYER" -> MatchState.WAITING_PLAYER
         "ONGOING" -> MatchState.ONGOING
         "FINISHED" -> MatchState.FINISHED
         else -> throw IllegalArgumentException("Unknown match state: $this")
