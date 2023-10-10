@@ -93,6 +93,67 @@ class JdbiUserRepositoryTests {
         assertEquals(tokenCreationInstant, retrievedToken.createdAt)
     }
 
+    @Test
+    fun `can remove tokens`() = runWithHandle { handle ->
+        // given: a UsersRepository
+        val repo = JDBIUserRepository(handle)
+        // and: a test clock
+        val clock = TestClock()
+
+        // and: a createdUser
+        val userName = newTestUserName()
+        val passwordValidationInfo = PasswordValidationInfo("not-valid")
+        val userId = repo.storeUser(userName, passwordValidationInfo)
+
+        // and: test TokenValidationInfo
+        val testTokenValidationInfo = TokenValidationInfo(newTokenValidationData())
+
+        // when: creating a token
+        val tokenCreationInstant = clock.now()
+        val token = Token(
+            testTokenValidationInfo,
+            userId,
+            createdAt = tokenCreationInstant,
+            lastUsedAt = tokenCreationInstant
+        )
+        repo.createToken(token, 1)
+
+        // then: createToken does not throw errors
+        // no exception
+
+        // when: removing the token
+        val removedTokens = repo.removeTokenByTokenValidationInfo(testTokenValidationInfo)
+
+        // then: the token is removed
+        assertEquals(1, removedTokens)
+
+        // when: retrieving the token and associated user
+        val userAndToken = repo.getTokenAndUserByTokenValidationInfo(testTokenValidationInfo)
+
+        // then: the token and associated user do not exist
+        assertEquals(null, userAndToken)
+    }
+
+    @Test
+    fun `can retrieve users stats`() = runWithHandle { handle ->
+        // given: a UsersRepository
+        val repo = JDBIUserRepository(handle)
+
+        // and: a createdUser
+        val userName = newTestUserName()
+        val passwordValidationInfo = PasswordValidationInfo("not-valid")
+        repo.storeUser(userName, passwordValidationInfo)
+
+        // and: stats for the user
+
+
+        // when: retrieving users stats
+        val usersStats = repo.getUsersStatsData(0, 10)
+
+        // then: the user is in the stats
+        assertTrue(usersStats.any { it.username == userName })
+    }
+
     companion object {
 
         private fun runWithHandle(block: (Handle) -> Unit) = jdbi.useTransaction<Exception>(block)
@@ -103,7 +164,7 @@ class JdbiUserRepositoryTests {
 
         private val jdbi = Jdbi.create(
             PGSimpleDataSource().apply {
-                setURL("jdbc:postgresql://localhost:5432/db?user=dbuser&password=changeit")
+                setURL("jdbc:postgresql://localhost:5432/postgres?user=postgres&password=master")
             }
         ).configureWithAppRequirements()
     }

@@ -13,11 +13,11 @@ create table if not exists tokens
     token_validation varchar(256) not null,
     user_id          int,
     created_at       bigint       not null,
-    last_used        bigint       not null,
+    last_used_at        bigint       not null,
 
-    check (last_used > created_at),
+    check (last_used_at >= created_at),
     constraint fk_tokens_user foreign key (user_id) references users(id),
-    primary key (user_id, token_validation)
+    primary key (token_validation)
 );
 
 create table if not exists rules
