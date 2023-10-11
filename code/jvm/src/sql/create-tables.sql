@@ -24,8 +24,8 @@ create table if not exists rules
 (
     id     int          generated always as identity primary key,
     board_size   int          not null,
-    opening_rule varchar(256) not null default 'free',
-    variant      varchar(256) not null default 'standard',
+    opening_rule varchar(256) not null default 'FREE',
+    variant      varchar(256) not null default 'STANDARD',
 
     unique (board_size, opening_rule, variant),
     constraint check_board_size check (board_size = 15 or board_size = 19)
