@@ -29,16 +29,18 @@ interface MatchRepository {
     /**
      * Gets the winner of the match.
      * @param matchId id of the match
-     * @return id of the winner, draw or null if the match is not finished
+     * @return outcome of the match or null if the match is not finished
      */
-    fun getWinner(matchId: Int): MatchOutcome?
+    fun getMatchOutcome(matchId: Int): MatchOutcome?
 
+    //TODO: TAKE THIS OUT AND MAKE getMove, because that's the only move we need because the rest is already on the client
     /**
      * Gets the moves of the match.
      * @param matchId id of the match
      * @return list of moves
      */
     fun getMoves(matchId: Int, rule: Rule): List<Move>
+
 
     /**
      * Makes a move in the match.
@@ -52,7 +54,16 @@ interface MatchRepository {
      * @param matchId id of the match
      * @return state of the match
      */
-    fun getMatchState(matchId: Int): MatchState // TODO: return matchState
+    fun getMatchState(matchId: Int): MatchState
+
+    //fun setMatchState(matchId: Int, state: MatchState)
+
+    //fun deleteMatch(matchId: Int)
+
+    //fun addPlayerToMatch
+
+    //fun
+
 
     /**
      * Gets the turn of the match.
@@ -60,4 +71,6 @@ interface MatchRepository {
      * @return the id of the player for the current turn.
      */
     fun getTurn(matchId: Int): Color
+
+    //Maybe getGameById ??
 }

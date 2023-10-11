@@ -65,7 +65,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @param matchId id of the match
      * @return id of the winner, draw or null if the match is not finished
      */
-    override fun getWinner(matchId: Int): MatchOutcome? =
+    override fun getMatchOutcome(matchId: Int): MatchOutcome? =
         handle.createQuery("select match_outcome from matches where id = :matchId and match_outcome = 'finished'")
             .bind("matchId", matchId)
             .mapTo<MatchOutcome>()
