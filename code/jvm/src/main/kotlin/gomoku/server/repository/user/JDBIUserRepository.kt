@@ -5,6 +5,7 @@ import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
 import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserData
+import gomoku.server.repository.jdbi.mappers.UserRowMapper
 import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
@@ -75,7 +76,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun getTokenAndUserByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Pair<User, Token>? =
         handle.createQuery(
             """
-                select id, username, password_validation, token_validation, created_at, last_used
+                select id, username, password_validation, token_validation, created_at, last_used_at
                 from users 
                 inner join tokens
                 on users.id = tokens.user_id
@@ -99,7 +100,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             where user_id = :user_id 
                 and tokens.token_validation in (
                     select token_validation from tokens where user_id = :user_id 
-                        order by last_used desc offset :offset
+                        order by last_used_at desc offset :offset
                 )
             """.trimIndent()
         )
@@ -111,14 +112,14 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
 
         handle.createUpdate(
             """
-                insert into tokens(user_id, token_validation, created_at, last_used) 
+                insert into tokens(user_id, token_validation, created_at, last_used_at) 
                 values (:user_id, :token_validation, :created_at, :last_used_at)
             """.trimIndent()
         )
             .bind("user_id", token.userId)
             .bind("token_validation", token.tokenValidationInfo.validationInfo)
-            .bind("create_date", token.createdAt.epochSeconds)
-            .bind("last_used", token.lastUsedAt.epochSeconds)
+            .bind("created_at", token.createdAt.epochSeconds)
+            .bind("last_used_at", token.lastUsedAt.epochSeconds)
             .execute()
     }
 
@@ -131,7 +132,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
         handle.createUpdate(
             """
                 update tokens
-                set last_used = :last_used
+                set last_used_at = :last_used
                 where token_validation = :encoded_token
             """.trimIndent()
         )
@@ -171,7 +172,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun storeUser(username: String, passwordValidationInfo: PasswordValidationInfo): Int =
         handle.createUpdate("insert into users (username, password_validation) values (:username, :password_validation)")
             .bind("username", username)
-            .bind("encoded_password", passwordValidationInfo.validationInfo)
+            .bind("password_validation", passwordValidationInfo.validationInfo)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .one()
@@ -193,12 +194,16 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     ) {
         val userAndToken: Pair<User, Token>
             get() = Pair(
-                User(id, username, passwordValidation),
+                User(
+                    uuid = id,
+                    username = username,
+                    passwordValidationInfo =  passwordValidation
+                ),
                 Token(
-                    tokenValidation,
-                    id,
-                    Instant.fromEpochSeconds(createdAt),
-                    Instant.fromEpochSeconds(lastUsedAt)
+                    tokenValidationInfo = tokenValidation,
+                    userId = id,
+                    createdAt = Instant.fromEpochSeconds(createdAt),
+                    lastUsedAt = Instant.fromEpochSeconds(lastUsedAt)
                 )
             )
     }

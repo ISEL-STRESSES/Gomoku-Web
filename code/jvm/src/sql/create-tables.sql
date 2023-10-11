@@ -13,19 +13,19 @@ create table if not exists tokens
     token_validation varchar(256) not null,
     user_id          int,
     created_at       bigint       not null,
-    last_used        bigint       not null,
+    last_used_at        bigint       not null,
 
-    check (last_used > created_at),
+    check (last_used_at >= created_at),
     constraint fk_tokens_user foreign key (user_id) references users(id),
-    primary key (user_id, token_validation)
+    primary key (token_validation)
 );
 
 create table if not exists rules
 (
     id     int          generated always as identity primary key,
     board_size   int          not null,
-    opening_rule varchar(256) not null default 'free',
-    variant      varchar(256) not null default 'standard',
+    opening_rule varchar(256) not null default 'FREE',
+    variant      varchar(256) not null default 'STANDARD',
 
     unique (board_size, opening_rule, variant),
     constraint check_board_size check (board_size = 15 or board_size = 19)
