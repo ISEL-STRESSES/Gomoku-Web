@@ -8,10 +8,10 @@ import java.security.SecureRandom
 import java.util.*
 
 @Component
-class UserDomain(
+class UsersDomain(
     private val passwordEncoder: PasswordEncoder,
     private val tokenEncoder: TokenEncoder,
-    private val config: UserDomainConfig
+    private val config: UsersDomainConfig
 ) {
 
     companion object {
@@ -20,7 +20,7 @@ class UserDomain(
         private const val MIN_PASSWORD_SIZE = 4
         private const val MAX_PASSWORD_SIZE = 24
 
-        private val usernameRegex = "^[a-zA-Z0-9 ]{$MIN_NAME_SIZE,$MAX_NAME_SIZE}".toRegex()
+        private val usernameRegex = "^[a-zA-Z0-9]{$MIN_NAME_SIZE,$MAX_NAME_SIZE}".toRegex()
         private val passwordRegex =
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\$@\$!%*?&#])[A-Za-z\\d\$@\$!%*?&#]{$MIN_PASSWORD_SIZE,$MAX_PASSWORD_SIZE}\$".toRegex()
     }

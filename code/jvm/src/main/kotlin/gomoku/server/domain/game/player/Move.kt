@@ -1,7 +1,5 @@
 package gomoku.server.domain.game.player
 
-import gomoku.server.domain.game.board.Position
-
 /**
  * Represents a move on the board
  * @param position The position of the move

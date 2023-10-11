@@ -4,7 +4,8 @@ package gomoku.server.domain.game.player
  * Represents a piece or color that can be played
  */
 enum class Color {
-    BLACK, WHITE;
+    BLACK,
+    WHITE;
 
     /**
      * Returns the other color depending on the current color
@@ -26,13 +27,5 @@ fun Int.toColor(): Color {
         Color.BLACK
     } else {
         Color.WHITE
-    }
-}
-
-fun String.toColor(): Color {
-    return when (this) {
-        "BLACK" -> Color.BLACK
-        "WHITE" -> Color.WHITE
-        else -> throw IllegalArgumentException("Invalid color")
     }
 }

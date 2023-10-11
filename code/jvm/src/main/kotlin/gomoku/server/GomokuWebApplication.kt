@@ -3,7 +3,7 @@ package gomoku.server
 import gomoku.server.domain.Author
 import gomoku.server.domain.ServerInfo
 import gomoku.server.domain.user.Sha256TokenEncoder
-import gomoku.server.domain.user.UserDomainConfig
+import gomoku.server.domain.user.UsersDomainConfig
 import gomoku.server.http.pipeline.AuthenticatedUserArgumentResolver
 import gomoku.server.http.pipeline.AuthenticationInterceptor
 import gomoku.server.repository.configureWithAppRequirements
@@ -39,7 +39,7 @@ class GomokuWebApplication {
     fun clock() = Clock.System
 
     @Bean
-    fun userDomainConfig() = UserDomainConfig(
+    fun userDomainConfig() = UsersDomainConfig(
         tokenSizeInBytes = 256 / 8,
         tokenTtl = 24.hours,
         tokenRollingTtl = 1.hours,

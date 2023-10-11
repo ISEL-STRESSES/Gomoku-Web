@@ -1,7 +1,5 @@
 package gomoku.server.domain.game.rules
 
-import gomoku.server.domain.game.board.BoardSize
-import gomoku.server.domain.game.board.toBoardSize
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 
@@ -58,7 +56,7 @@ fun buildRule(boardMaxSize: Int, variantName: String, openingRuleName: String): 
         RuleVariant.STANDARD -> {
             return when (openingRule) {
                 OpeningRule.FREE -> StandardRules(boardSize)
-                OpeningRule.PRO -> ProOpeningRule(boardSize)
+                OpeningRule.PRO -> ProOpeningRules(boardSize)
             }
         }
     }

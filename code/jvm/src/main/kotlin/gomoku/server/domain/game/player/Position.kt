@@ -1,4 +1,4 @@
-package gomoku.server.domain.game.board
+package gomoku.server.domain.game.player
 
 /**
  * Represents a data point
@@ -12,7 +12,7 @@ data class Position(
     val y: Int
 ) {
     init {
-        check(x >= 0)
-        check(y >= 0)
+        require(x >= 0)
+        require(y >= 0)
     }
 }

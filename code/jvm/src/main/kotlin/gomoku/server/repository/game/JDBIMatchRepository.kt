@@ -1,12 +1,12 @@
 package gomoku.server.repository.game
 
-import gomoku.server.domain.game.MatchOutcome
-import gomoku.server.domain.game.MatchState
+import gomoku.server.domain.game.match.MatchOutcome
+import gomoku.server.domain.game.match.MatchState
+import gomoku.server.domain.game.match.toMatchState
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rule
-import gomoku.server.domain.game.toMatchState
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.jdbi.v3.core.transaction.TransactionIsolationLevel
@@ -85,6 +85,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .toList()
 
     override fun makeMove(matchId: Int, rule: Rule, move: Move) {
+        //TODO: Check if this is correct, this is game logic and is already checked in the domain by the service.
         if (getMoves(matchId, rule).any { it.position == move.position }) throw IllegalStateException("Move already made")
         if (getTurn(matchId) != move.color) throw IllegalStateException("Not your turn")
         if (getMatchState(matchId) != MatchState.ONGOING) throw IllegalStateException("Match is not in progress")
@@ -97,7 +98,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .bind("rule_id", getRuleId(rule))
             .bind("match_id", matchId)
             .bind("player_id", 1) // TODO: get player id
-            .bind("color", move.color.toString())
+            .bind("color", move.color.name)
             .bind("row", move.position.x)
             .bind("col", move.position.y)
             .execute()
@@ -112,6 +113,6 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun getTurn(matchId: Int): Color =
         handle.createQuery("select Count(*) from moves where match_id = :matchId")
             .bind("matchId", matchId)
-            .mapTo<String>()
+            .mapTo<Int>()
             .singleOrNull()?.toColor() ?: throw IllegalStateException("Match not found")
 }

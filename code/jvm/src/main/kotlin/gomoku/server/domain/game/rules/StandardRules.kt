@@ -1,8 +1,8 @@
 package gomoku.server.domain.game.rules
 
-import gomoku.server.domain.game.board.BoardSize
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
+import gomoku.server.domain.game.player.Position
 
 /**
  * Represents a Standard rule set
@@ -17,23 +17,15 @@ data class StandardRules(override val boardSize: BoardSize) : Rule() {
         val occupiedPositions = previousMoves.map { it.position }
         val currentColor = move.color
         val currentMove = move.position
-        val allMoves = (0 until boardSize.ordinal).flatMap { x ->
-            (0 until boardSize.ordinal).map { y ->
-                gomoku.server.domain.game.board.Position(x, y)
-            }
-        }
-        return allMoves.filterNot { it in occupiedPositions }
+        val allPositions = boardSize.getAllPositions()
+        return allPositions.filterNot { it in occupiedPositions }
             .contains(currentMove) && currentColor != previousMoves.last().color
     }
 
     override fun possibleMoves(previousMoves: List<Move>, color: Color): List<Move> {
         val occupiedPositions = previousMoves.map { it.position }
-        val allMoves = (0 until boardSize.ordinal).flatMap { x ->
-            (0 until boardSize.ordinal).map { y ->
-                gomoku.server.domain.game.board.Position(x, y)
-            }
-        }
-        return allMoves.filterNot { it in occupiedPositions }.map { Move(it, color) }
+        val allPositions = boardSize.getAllPositions()
+        return allPositions.filterNot { it in occupiedPositions }.map { Move(it, color) }
     }
 
     override fun isWinningMove(previousMoves: List<Move>, move: Move): Boolean {
@@ -46,7 +38,7 @@ data class StandardRules(override val boardSize: BoardSize) : Rule() {
 
         for (direction in directions) {
             if (countPieces(previousMoves, move.position, move.color, direction.first, direction.second) +
-                countPieces(previousMoves, move.position, move.color, -direction.first, -direction.second) - 1 >= 5
+                countPieces(previousMoves, move.position, move.color, -direction.first, -direction.second) + 1 >= 5
             ) {
                 return true
             }
@@ -57,7 +49,7 @@ data class StandardRules(override val boardSize: BoardSize) : Rule() {
 
     private fun countPieces(
         moves: List<Move>,
-        position: gomoku.server.domain.game.board.Position,
+        position: Position,
         color: Color,
         dx: Int,
         dy: Int
@@ -65,7 +57,7 @@ data class StandardRules(override val boardSize: BoardSize) : Rule() {
         var count = 0
         var x = position.x + dx
         var y = position.y + dy
-        while (moves.contains(Move(gomoku.server.domain.game.board.Position(x, y), color))) {
+        while (moves.contains(Move(Position(x, y), color))) {
             count++
             x += dx
             y += dy

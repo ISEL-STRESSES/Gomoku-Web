@@ -1,4 +1,6 @@
-package gomoku.server.domain.game.board
+package gomoku.server.domain.game.rules
+
+import gomoku.server.domain.game.player.Position
 
 /**
  * Represents the possible sizes of a match board
@@ -11,7 +13,7 @@ enum class BoardSize(val max: Int) {
     X19(19);
 
     init {
-        check(max >= 0)
+        require(max >= 0)
     }
 
     /**

@@ -2,7 +2,7 @@ package gomoku.server.domain.user
 
 import kotlin.time.Duration
 
-data class UserDomainConfig(
+data class UsersDomainConfig(
     val tokenSizeInBytes: Int,
     val tokenTtl: Duration,
     val tokenRollingTtl: Duration,

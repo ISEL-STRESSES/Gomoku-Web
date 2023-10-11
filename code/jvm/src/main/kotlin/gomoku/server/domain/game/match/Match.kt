@@ -48,14 +48,10 @@ class FinishedGame(
     playerB: Player,
     rules: Rule,
     moves: List<Move>,
-    val matchOutcome: MatchOutcome
+    private val matchOutcome: MatchOutcome
 ) : Match(gameID, playerA, playerB, rules, moves) {
 
     fun getWinnerOrNull(): Player? {
-        return when (matchOutcome) {
-            MatchOutcome.BLACK_WON -> getPlayerByColor(Color.BLACK)
-            MatchOutcome.WHITE_WON -> getPlayerByColor(Color.WHITE)
-            MatchOutcome.DRAW -> null
-        }
+        return matchOutcome.winnerColor?.let { getPlayerByColor(it) }
     }
 }
