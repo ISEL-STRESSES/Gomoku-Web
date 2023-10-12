@@ -76,14 +76,9 @@ interface MatchRepository {
      */
     fun getMatchState(matchId: Int): MatchState
 
-    /**
-     * Sets the state of the match.
-     * @param matchId id of the match
-     * @param state the new state of the match
-     */
+
     fun setMatchState(matchId: Int, state: MatchState)
 
-    //fun addPlayerToMatch
     /**
      * Gets the winner of the match.
      * @param matchId id of the match
@@ -92,22 +87,29 @@ interface MatchRepository {
     fun getMatchOutcome(matchId: Int): MatchOutcome?
 
     /**
+     * Sets the [MatchOutcome] of the match.
+     * @param matchId id of the match
+     * @param outcome outcome of the match
+     */
+    fun setMatchOutcome(matchId: Int, outcome: MatchOutcome)
+
+    /**
      * Gets the rule of the match.
      * @param matchId id of the match
      * @return the rule
      */
     fun getMatchRule(matchId: Int): Rule
 
-    //TODO: TAKE THIS OUT AND MAKE getMove, because that's the only move we need because the rest is already on the client
     /**
-     * Gets the moves of the match.
+     * Gets the players of a match.
      * @param matchId id of the match
-     * @return list of moves
+     * @return pair of players
      */
-    fun getAllMoves(matchId: Int): List<Move>
+    fun getMatchPlayers(matchId: Int): Pair<Player, Player>?
 
-    fun getLastNMoves(matchId: Int, n: Int): List<Move>
-
+    //moves
+    //TODO: TAKE THIS OUT AND MAKE getMove, because that's the only move we need because the rest is already on the client
+    //TODO: do we need the player id?
     /**
      * Makes a move in the match.
      * @param matchId id of the match
@@ -116,11 +118,24 @@ interface MatchRepository {
     fun makeMove(matchId: Int, move: Move)
 
     /**
+     * Gets the moves of the match.
+     * @param matchId id of the match
+     * @return list of moves
+     */
+    fun getAllMoves(matchId: Int): List<Move>
+
+    /**
+     * Gets the last n moves of the match.
+     * @param matchId id of the match
+     * @param n number of moves to get
+     * @return list of moves
+     */
+    fun getLastNMoves(matchId: Int, n: Int): List<Move>
+
+    /**
      * Gets the turn of the match.
      * @param matchId id of the match
      * @return the id of the player for the current turn.
      */
     fun getTurn(matchId: Int): Color
-
-    //Maybe getGameById ??
 }
