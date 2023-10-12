@@ -1,11 +1,12 @@
 package gomoku.server.repository.user
 
+import gomoku.server.domain.game.player.UserRuleStats
 import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
 import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserData
-import gomoku.server.repository.jdbi.mappers.UserRowMapper
+import gomoku.server.repository.game.MatchRepository
 import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
@@ -17,6 +18,21 @@ import org.slf4j.LoggerFactory
  * @see UserRepository
  */
 class JDBIUserRepository(private val handle: Handle) : UserRepository {
+
+    //user
+    /**
+     * Stores a user in the database.
+     * @param username The username of the user.
+     * @param passwordValidationInfo The password validation information of the user.
+     * @return The id of the user.
+     */
+    override fun storeUser(username: String, passwordValidationInfo: PasswordValidationInfo): Int =
+        handle.createUpdate("insert into users (username, password_validation) values (:username, :password_validation)")
+            .bind("username", username)
+            .bind("password_validation", passwordValidationInfo.validationInfo)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .one()
 
     /**
      * Getter for the [User] object corresponding to the given [username].
@@ -42,30 +58,18 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .single() == 1
 
     /**
-     * Gets all the stats related to the users, with pagination.
-     * @param offset The offset of the first user to get.
-     * @param limit The maximum number of users to get.
-     * @return A list of [UserData] objects, containing all the stats related to the users.
+     * Retrieves a user by their id.
+     * @param id The id of the user.
+     * @return The user if found, null otherwise.
      */
-    override fun getUsersStatsData(offset: Int, limit: Int): List<UserData> =
-        handle.createQuery(
-            """
-            select users.id as user_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
-            from users
-            inner join user_stats
-            on users.id = user_stats.user_id
-            inner join rules
-            on user_stats.rules_id = rules.id
-            order by users.id
-            offset :offset
-            limit :limit
-            """.trimIndent()
-        )
-            .bind("offset", offset)
-            .bind("limit", limit)
+    override fun getUserById(id: Int): UserData? {
+        return handle.createQuery("SELECT * FROM users WHERE id = :uuid")
+            .bind("uuid", id)
             .mapTo<UserData>()
-            .list()
+            .singleOrNull()
+    }
 
+    //token
     /**
      * Gets the [User] object corresponding to the given [tokenValidationInfo].
      * @param tokenValidationInfo The [TokenValidationInfo] object to get the [User] from.
@@ -156,28 +160,86 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .bind("encoded_token", tokenValidationInfo.validationInfo)
             .execute()
 
+    //stats
     /**
-     * Gets the [UserData] object corresponding to the given [id].
+     * Gets all the stats related to the users, with pagination.
+     * @param offset The offset of the first user to get.
+     * @param limit The maximum number of users to get.
+     * @return A list of [UserData] objects, containing all the stats related to the users.
      */
-    override fun getUserById(id: Int): UserData? {
-        return handle.createQuery("SELECT * FROM users WHERE id = :uuid")
-            .bind("uuid", id)
+    override fun getUsersStatsData(offset: Int, limit: Int): List<UserData> =
+        handle.createQuery(
+            """
+            select users.id as user_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
+            from users
+            inner join user_stats
+            on users.id = user_stats.user_id
+            inner join rules
+            on user_stats.rules_id = rules.id
+            order by users.id
+            offset :offset
+            limit :limit
+            """.trimIndent()
+        )
+            .bind("offset", offset)
+            .bind("limit", limit)
             .mapTo<UserData>()
-            .singleOrNull()
-    }
+            .list()
 
     /**
-     *
+     * Retrieves the stats of a user for a given rule.
+     * @param userId The id of the user.
+     * @param ruleId The id of the rule.
+     * @return The stats of the user for the given rule.
      */
-    override fun storeUser(username: String, passwordValidationInfo: PasswordValidationInfo): Int =
-        handle.createUpdate("insert into users (username, password_validation) values (:username, :password_validation)")
-            .bind("username", username)
-            .bind("password_validation", passwordValidationInfo.validationInfo)
-            .executeAndReturnGeneratedKeys()
-            .mapTo<Int>()
-            .one()
+    override fun getUserStatsByRule(userId: Int, ruleId: Int): UserRuleStats? =
+        handle.createQuery(
+            """
+            select * from user_stats
+            where user_id = :user_id and rules_id = :rule_id
+            """.trimIndent()
+        )
+            .bind("user_id", userId)
+            .bind("rule_id", ruleId)
+            .mapTo<UserRuleStats>()
+            .singleOrNull()
 
+    /**
+     * Sets the stats of a user for a given rule.
+     * @param userId The id of the user.
+     * @param userStatsData The stats of the user for the given rule.
+     */
+    override fun setUserRuleStats(userId: Int, userStatsData: UserRuleStats) {
+        val ruleId = handle.createQuery(
+            """
+            select id from rules
+            where board_size = :board_size and opening_rule = :opening_rule and variant = :variant
+            """.trimIndent()
+        )
+            .bind("board_size", userStatsData.rule.boardSize)
+            .bind("opening_rule", userStatsData.rule.openingRule)
+            .bind("variant", userStatsData.rule.variant)
+            .mapTo<Int>()
+            .single()
+
+        handle.createUpdate(
+            """
+            update user_stats set games_played = :games_played, elo = :elo
+            where user_id = :user_id and rules_id = :rules_id
+            """.trimIndent()
+        )
+            .bind("user_id", userId)
+            .bind("rules_id", ruleId)
+            .bind("games_played", userStatsData.gamesPlayed)
+            .bind("elo", userStatsData.elo)
+            .execute()
+    }
     // TODO
+    /**
+     * Retrieves a list of users with the given username.
+     * @param username The username of the users.
+     * @return The list of users.
+     */
     override fun searchRankings(username: String): List<UserData> =
         handle.createQuery("select * from user_stats where (user_id = (select id from users where username like :username))")
             .bind("username", "%$username%")

@@ -1,5 +1,6 @@
 package gomoku.server.repository.user
 
+import gomoku.server.domain.game.player.UserRuleStats
 import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
@@ -12,6 +13,7 @@ import kotlinx.datetime.Instant
  * Contains methods for storing and retrieving user data.
  */
 interface UserRepository {
+    //user
     /**
      * Stores a user in the database.
      * @param username The username of the user.
@@ -35,18 +37,13 @@ interface UserRepository {
     fun isUserStoredByUsername(username: String): Boolean
 
     /**
-     * Retrieves a list of users.
-     * @param offset The offset of the users to retrieve.
-     * @param limit The maximum number of users to retrieve.
-     * @return The list of users.
+     * Retrieves a user by their id.
+     * @param id The id of the user.
+     * @return The user if found, null otherwise.
      */
-    fun getUsersStatsData(offset: Int, limit: Int): List<UserData>
+    fun getUserById(id: Int): UserData?
 
-    //TODO: MAKE
-    //fun getUserStatsByRule(userId: Int, ruleId: Int): UserRuleStats?
-
-    //fun setUserRuleStats(userId: Int, userStatsData: UserRuleStats)
-
+    //token
     /**
      * Retrieves a user by their token information.
      * @param tokenValidationInfo The token of the user.
@@ -75,12 +72,29 @@ interface UserRepository {
      */
     fun removeTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Int
 
+    //stats
     /**
-     * Retrieves a user by their id.
-     * @param id The id of the user.
-     * @return The user if found, null otherwise.
+     * Retrieves a list of users.
+     * @param offset The offset of the users to retrieve.
+     * @param limit The maximum number of users to retrieve.
+     * @return The list of users.
      */
-    fun getUserById(id: Int): UserData?
+    fun getUsersStatsData(offset: Int, limit: Int): List<UserData>
+
+    /**
+     * Retrieves the stats of a user for a given rule.
+     * @param userId The id of the user.
+     * @param ruleId The id of the rule.
+     * @return The stats of the user for the given rule.
+     */
+    fun getUserStatsByRule(userId: Int, ruleId: Int): UserRuleStats?
+
+    /**
+     * Sets the stats of a user for a given rule.
+     * @param userId The id of the user.
+     * @param userStatsData The stats of the user for the given rule.
+     */
+    fun setUserRuleStats(userId: Int, userStatsData: UserRuleStats)
 
     //TODO Check
     /**
