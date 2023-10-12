@@ -13,7 +13,7 @@ import kotlinx.datetime.Instant
  * Contains methods for storing and retrieving user data.
  */
 interface UserRepository {
-    //user
+    // user
     /**
      * Stores a user in the database.
      * @param username The username of the user.
@@ -43,7 +43,7 @@ interface UserRepository {
      */
     fun getUserById(id: Int): UserData?
 
-    //token
+    // token
     /**
      * Retrieves a user by their token information.
      * @param tokenValidationInfo The token of the user.
@@ -72,7 +72,7 @@ interface UserRepository {
      */
     fun removeTokenByTokenValidationInfo(tokenValidationInfo: TokenValidationInfo): Int
 
-    //stats
+    // stats
     /**
      * Retrieves a list of users.
      * @param offset The offset of the users to retrieve.
@@ -96,7 +96,7 @@ interface UserRepository {
      */
     fun setUserRuleStats(userId: Int, userStatsData: UserRuleStats)
 
-    //TODO Check
+    // TODO Check
     /**
      * Retrieves a list of users with the given username.
      * @param username The username of the users.

@@ -30,7 +30,7 @@ class UserDataRowMapper : RowMapper<UserData> {
             } else {
                 userRuleStats.add(
                     UserRuleStats(
-                        rule = rule,
+                        rules = rule,
                         gamesPlayed = rs.getInt("games_played"),
                         elo = rs.getInt("elo")
                     )

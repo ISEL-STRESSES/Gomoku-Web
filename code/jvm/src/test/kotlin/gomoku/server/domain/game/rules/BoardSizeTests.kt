@@ -27,8 +27,8 @@ class BoardSizeTests {
 
     @Test
     fun `getAllPositions returns all valid positions`() {
-        assertEquals(15*15, BoardSize.X15.getAllPositions().size)
-        assertEquals(19*19, BoardSize.X19.getAllPositions().size)
+        assertEquals(15 * 15, BoardSize.X15.getAllPositions().size)
+        assertEquals(19 * 19, BoardSize.X19.getAllPositions().size)
         assertTrue(BoardSize.X15.getAllPositions().contains(Position(0, 0)))
         assertTrue(BoardSize.X19.getAllPositions().contains(Position(18, 18)))
     }

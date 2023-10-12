@@ -19,7 +19,7 @@ import kotlin.math.abs
 import kotlin.random.Random
 
 // Don't forget to ensure DBMS is up (e.g. by running ./gradlew dbTestsWait)
-class JdbiUserRepositoryTests {
+class JDBIUserRepositoryTests {
 
     @Test
     fun `can create and retrieve user`() = runWithHandle { handle ->
@@ -145,7 +145,6 @@ class JdbiUserRepositoryTests {
         repo.storeUser(userName, passwordValidationInfo)
 
         // and: stats for the user
-
 
         // when: retrieving users stats
         val usersStats = repo.getUsersStatsData(0, 10)

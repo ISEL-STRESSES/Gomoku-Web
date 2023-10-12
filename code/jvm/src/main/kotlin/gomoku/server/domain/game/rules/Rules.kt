@@ -9,7 +9,7 @@ import gomoku.server.domain.game.player.Move
  * @property variant variant of the rule
  * @property openingRule opening rule
  */
-sealed class Rule {
+sealed class Rules {
     abstract val boardSize: BoardSize
     abstract val variant: RuleVariant
     abstract val openingRule: OpeningRule
@@ -46,7 +46,7 @@ sealed class Rule {
  * @param openingRuleName opening rule
  * @return the class of the rule
  */
-fun buildRule(boardMaxSize: Int, variantName: String, openingRuleName: String): Rule {
+fun buildRule(boardMaxSize: Int, variantName: String, openingRuleName: String): Rules {
     val variant = variantName.toRuleVariant()
     val openingRule = openingRuleName.toOpeningRule()
     val boardSize = boardMaxSize.toBoardSize()

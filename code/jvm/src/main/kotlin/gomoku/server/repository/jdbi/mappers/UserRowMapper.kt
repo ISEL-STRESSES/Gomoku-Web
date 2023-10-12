@@ -14,5 +14,4 @@ class UserRowMapper : RowMapper<User> {
             passwordValidationInfo = PasswordValidationInfo(rs.getString("password_validation"))
         )
     }
-
 }

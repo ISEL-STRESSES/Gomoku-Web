@@ -1,9 +1,10 @@
 package gomoku.server.domain.game.rules
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 
-class RuleVariantTests {
+class RulesVariantTests {
 
     @Test
     fun `toRuleVariant correctly deserializes valid strings`() {

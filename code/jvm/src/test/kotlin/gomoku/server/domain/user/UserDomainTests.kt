@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
-class UsersDomainTest {
+class UserDomainTests {
 
     private lateinit var passwordEncoder: BCryptPasswordEncoder
     private lateinit var tokenEncoder: Sha256TokenEncoder
@@ -86,7 +86,7 @@ class UsersDomainTest {
             tokenValidationInfo = TokenValidationInfo("dummyInfo2"),
             userId = 1,
             createdAt = currentTime - 2.hours,
-            lastUsedAt = currentTime - (2* TOKEN_ROLLING_TTL_IN_MINUTES).minutes
+            lastUsedAt = currentTime - (2 * TOKEN_ROLLING_TTL_IN_MINUTES).minutes
         )
         assertFalse(usersDomain.isTokenTimeValid(clock, notUsedRecentlyToken))
 
@@ -94,7 +94,7 @@ class UsersDomainTest {
         val oldToken = Token(
             tokenValidationInfo = TokenValidationInfo("dummyInfo3"),
             userId = 1,
-            createdAt = currentTime - (2* TOKEN_TTL_IN_HOURS).days,
+            createdAt = currentTime - (2 * TOKEN_TTL_IN_HOURS).days,
             lastUsedAt = currentTime - 30.minutes
         )
         assertFalse(usersDomain.isTokenTimeValid(clock, oldToken))
@@ -131,7 +131,6 @@ class UsersDomainTest {
         )
         assertEquals(currentTime, usersDomain.getTokenExpiration(token3))
     }
-
 
     @Test
     fun `createTokenValidationInfo should return correct validation info`() {

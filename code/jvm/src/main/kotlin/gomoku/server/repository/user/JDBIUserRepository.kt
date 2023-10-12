@@ -6,7 +6,6 @@ import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
 import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserData
-import gomoku.server.repository.game.MatchRepository
 import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory
  */
 class JDBIUserRepository(private val handle: Handle) : UserRepository {
 
-    //user
+    // user
     /**
      * Stores a user in the database.
      * @param username The username of the user.
@@ -69,7 +68,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .singleOrNull()
     }
 
-    //token
+    // token
     /**
      * Gets the [User] object corresponding to the given [tokenValidationInfo].
      * @param tokenValidationInfo The [TokenValidationInfo] object to get the [User] from.
@@ -160,7 +159,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .bind("encoded_token", tokenValidationInfo.validationInfo)
             .execute()
 
-    //stats
+    // stats
     /**
      * Gets all the stats related to the users, with pagination.
      * @param offset The offset of the first user to get.
@@ -216,9 +215,9 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             where board_size = :board_size and opening_rule = :opening_rule and variant = :variant
             """.trimIndent()
         )
-            .bind("board_size", userStatsData.rule.boardSize)
-            .bind("opening_rule", userStatsData.rule.openingRule)
-            .bind("variant", userStatsData.rule.variant)
+            .bind("board_size", userStatsData.rules.boardSize)
+            .bind("opening_rule", userStatsData.rules.openingRule)
+            .bind("variant", userStatsData.rules.variant)
             .mapTo<Int>()
             .single()
 
@@ -259,7 +258,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
                 User(
                     uuid = id,
                     username = username,
-                    passwordValidationInfo =  passwordValidation
+                    passwordValidationInfo = passwordValidation
                 ),
                 Token(
                     tokenValidationInfo = tokenValidation,

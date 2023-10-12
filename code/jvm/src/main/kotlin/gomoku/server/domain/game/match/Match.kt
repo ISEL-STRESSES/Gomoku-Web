@@ -4,7 +4,7 @@ import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
 import gomoku.server.domain.game.player.toColor
-import gomoku.server.domain.game.rules.Rule
+import gomoku.server.domain.game.rules.Rules
 
 /**
  * Represents a match that is waiting for a player to join.
@@ -12,7 +12,7 @@ import gomoku.server.domain.game.rules.Rule
 sealed class MatchMaker(
     val matchId: Int,
     val player: Player,
-    val rules: Rule
+    val rules: Rules
 )
 
 /**
@@ -22,7 +22,7 @@ sealed class Match(
     matchId: Int,
     val playerA: Player,
     val playerB: Player,
-    rules: Rule,
+    rules: Rules,
     val moves: List<Move> = emptyList()
 ) : MatchMaker(matchId, playerA, rules) {
     fun getPlayerByColor(color: Color): Player {
@@ -41,7 +41,7 @@ class OngoingMatch(
     matchId: Int,
     playerA: Player,
     playerB: Player,
-    rules: Rule,
+    rules: Rules,
     moves: List<Move>
 ) : Match(matchId, playerA, playerB, rules, moves) {
 
@@ -55,7 +55,7 @@ class FinishedGame(
     matchId: Int,
     playerA: Player,
     playerB: Player,
-    rules: Rule,
+    rules: Rules,
     moves: List<Move>,
     private val matchOutcome: MatchOutcome
 ) : Match(matchId, playerA, playerB, rules, moves) {

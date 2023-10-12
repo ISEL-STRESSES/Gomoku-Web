@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class StandardRulesTest {
+class StandardRulesTests {
 
     private val rule = StandardRules(BoardSize.X15)
 
@@ -83,7 +83,7 @@ class StandardRulesTest {
             Move(Position(8, 8), Color.BLACK),
             Move(Position(9, 9), Color.BLACK),
             Move(Position(10, 10), Color.BLACK),
-            Move(Position(11, 11), Color.BLACK),
+            Move(Position(11, 11), Color.BLACK)
         )
         assertTrue(rule.isWinningMove(moves, Move(Position(12, 12), Color.BLACK)))
     }
@@ -109,5 +109,4 @@ class StandardRulesTest {
         )
         assertFalse(rule.isWinningMove(moves, Move(Position(13, 13), Color.BLACK)))
     }
-
 }

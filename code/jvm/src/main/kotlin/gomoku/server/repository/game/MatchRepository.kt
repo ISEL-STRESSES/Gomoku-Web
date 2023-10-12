@@ -6,37 +6,36 @@ import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
-import gomoku.server.domain.game.rules.Rule
-import gomoku.server.domain.user.User
+import gomoku.server.domain.game.rules.Rules
 
 /**
  * Repository for match data.
  */
 interface MatchRepository {
 
-    //TODO : Create a Rule repository?
-    //Rules
+    // TODO : Create a Rule repository?
+    // Rules
     /**
      * Gets the id of a set of rules, if not found it creates a new one.
-     * @param rule rules of the match
+     * @param rules rules of the match
      * @return id of the rule
      */
-    fun getRuleId(rule: Rule): Int
+    fun getRuleId(rules: Rules): Int
 
     /**
      * Gets a rule by its id.
      * @param ruleId id of the rule
      * @return the rule or null if not found
      */
-    fun getRuleById(ruleId: Int): Rule?
+    fun getRuleById(ruleId: Int): Rules?
 
     /**
      * Gets all the rules.
      * @return list of rules
      */
-    fun getAllRules(): List<Rule>
+    fun getAllRules(): List<Rules>
 
-    //Match
+    // Match
     /**
      * Creates a new match, with the given rule and user id
      * setting the match state to [MatchState.WAITING_PLAYER]
@@ -76,7 +75,6 @@ interface MatchRepository {
      */
     fun getMatchState(matchId: Int): MatchState
 
-
     fun setMatchState(matchId: Int, state: MatchState)
 
     /**
@@ -98,7 +96,7 @@ interface MatchRepository {
      * @param matchId id of the match
      * @return the rule
      */
-    fun getMatchRule(matchId: Int): Rule
+    fun getMatchRule(matchId: Int): Rules
 
     /**
      * Gets the players of a match.
@@ -107,9 +105,9 @@ interface MatchRepository {
      */
     fun getMatchPlayers(matchId: Int): Pair<Player, Player>?
 
-    //moves
-    //TODO: TAKE THIS OUT AND MAKE getMove, because that's the only move we need because the rest is already on the client
-    //TODO: do we need the player id?
+    // moves
+    // TODO: TAKE THIS OUT AND MAKE getMove, because that's the only move we need because the rest is already on the client
+    // TODO: do we need the player id?
     /**
      * Makes a move in the match.
      * @param matchId id of the match

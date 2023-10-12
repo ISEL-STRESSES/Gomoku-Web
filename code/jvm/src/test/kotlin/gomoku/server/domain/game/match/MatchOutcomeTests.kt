@@ -21,5 +21,4 @@ class MatchOutcomeTests {
     fun `Verify no winner color`() {
         assertEquals(null, MatchOutcome.DRAW.winnerColor)
     }
-
 }

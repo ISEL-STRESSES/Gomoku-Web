@@ -8,7 +8,7 @@ import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
 import gomoku.server.domain.game.player.toColor
-import gomoku.server.domain.game.rules.Rule
+import gomoku.server.domain.game.rules.Rules
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.jdbi.v3.core.transaction.TransactionIsolationLevel
@@ -17,10 +17,10 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
 
     /**
      * Gets the id of a set of rules, if not found it creates a new one.
-     * @param rule rules of the game
+     * @param rules rules of the game
      * @return id of the rule
      */
-    override fun getRuleId(rule: Rule): Int {
+    override fun getRuleId(rules: Rules): Int {
         val existingRule = handle.createQuery(
             """
                 select id from rules where 
@@ -29,12 +29,12 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
                 variant = :variant
             """.trimIndent()
         )
-            .bind("boardSize", rule.boardSize)
-            .bind("openingRule", rule.openingRule)
-            .bind("variant", rule.variant)
+            .bind("boardSize", rules.boardSize)
+            .bind("openingRule", rules.openingRule)
+            .bind("variant", rules.variant)
             .mapTo(Int::class.java)
             .singleOrNull()
-        return existingRule ?: createRule(rule)
+        return existingRule ?: createRule(rules)
     }
 
     /**
@@ -42,36 +42,36 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @param ruleId id of the rule
      * @return the rule or null if not found
      */
-    override fun getRuleById(ruleId: Int): Rule? =
+    override fun getRuleById(ruleId: Int): Rules? =
         handle.createQuery("select * from rules where id = :ruleId")
             .bind("ruleId", ruleId)
-            .mapTo<Rule>()
+            .mapTo<Rules>()
             .singleOrNull()
 
     /**
      * Gets all the rules.
      * @return list of rules
      */
-    override fun getAllRules(): List<Rule> =
+    override fun getAllRules(): List<Rules> =
         handle.createQuery("select * from rules")
-            .mapTo<Rule>()
+            .mapTo<Rules>()
             .list()
 
     /**
      * Creates a new set of rules.
-     * @param rule rules of the game
+     * @param rules rules of the game
      * @return id of the rule
      */
-    private fun createRule(rule: Rule): Int {
+    private fun createRule(rules: Rules): Int {
         return handle.createUpdate(
             """
             insert into rules(board_size, opening_rule, variant)
             values (:boardSize, :openingRule, :variant)
             """.trimIndent()
         )
-            .bind("boardSize", rule.boardSize)
-            .bind("openingRule", rule.openingRule)
-            .bind("variant", rule.variant)
+            .bind("boardSize", rules.boardSize)
+            .bind("openingRule", rules.openingRule)
+            .bind("variant", rules.variant)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .one()
@@ -89,11 +89,10 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             """
         insert into matches(rules_id, match_state)
         values (:ruleId, :matchState)
-        """.trimIndent()
+            """.trimIndent()
         )
             .bind("ruleId", ruleId)
             .bind("matchState", MatchState.WAITING_PLAYER)
-
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .one()
@@ -102,7 +101,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             """
         insert into player(user_id, match_id, color)
         values (:userId, :matchId, :color)
-        """.trimIndent()
+            """.trimIndent()
         )
             .bind("userId", userId)
             .bind("matchId", matchId)
@@ -135,7 +134,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
         return match
     }
 
-    //TODO check this one
+    // TODO check this one
     /**
      * Initiates a match between two players.
      * @param playerA the first player
@@ -222,7 +221,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @param matchId id of the match
      * @return the rule
      */
-    override fun getMatchRule(matchId: Int): Rule =
+    override fun getMatchRule(matchId: Int): Rules =
         handle.createQuery(
             """
             select board_size, opening_rule, variant from rules where rules.id = (
@@ -231,7 +230,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             """.trimIndent()
         )
             .bind("matchId", matchId)
-            .mapTo<Rule>()
+            .mapTo<Rules>()
             .single()
 
     /**

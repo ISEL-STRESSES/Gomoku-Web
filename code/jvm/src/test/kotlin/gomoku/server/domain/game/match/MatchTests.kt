@@ -15,7 +15,7 @@ class MatchTests {
     private val playerA = Player(1, Color.BLACK)
     private val playerB = Player(2, Color.WHITE)
     private val rules = StandardRules(BoardSize.X15)
-    private val moves : List<Move> = listOf()
+    private val moves: List<Move> = listOf()
 
     @Test
     fun `getPlayerByColor returns correct player for given color in ongoing and finished match`() {

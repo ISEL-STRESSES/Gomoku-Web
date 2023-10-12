@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class RuleTests {
+class RulesTests {
 
     @Test
     fun `buildRule constructs StandardRules for STANDARD variant and FREE opening`() {

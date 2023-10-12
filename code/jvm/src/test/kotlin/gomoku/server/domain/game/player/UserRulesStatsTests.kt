@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-class UserRuleStatsTests {
+class UserRulesStatsTests {
 
     private val validRule = StandardRules(BoardSize.X15) // Assuming a dummy Rule object for testing purposes.
 
@@ -14,7 +14,7 @@ class UserRuleStatsTests {
     fun `PlayerRuleStats initializes with valid values`() {
         val stats = UserRuleStats(validRule, 10, 2000)
 
-        assertEquals(validRule, stats.rule)
+        assertEquals(validRule, stats.rules)
         assertEquals(10, stats.gamesPlayed)
         assertEquals(2000, stats.elo)
     }
