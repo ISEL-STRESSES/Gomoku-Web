@@ -108,7 +108,6 @@ interface MatchRepository {
 
     fun getLastNMoves(matchId: Int, n: Int): List<Move>
 
-
     /**
      * Makes a move in the match.
      * @param matchId id of the match
