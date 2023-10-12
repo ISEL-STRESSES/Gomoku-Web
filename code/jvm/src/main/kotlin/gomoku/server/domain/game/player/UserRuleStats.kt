@@ -8,7 +8,7 @@ import gomoku.server.domain.game.rules.Rule
  * @property gamesPlayed number of games played with this rule
  * @property elo elo of the rule (0-4000)
  */
-data class PlayerRuleStats(val rule: Rule, val gamesPlayed: Int, val elo: Int) {
+data class UserRuleStats(val rule: Rule, val gamesPlayed: Int, val elo: Int) {
     init {
         require(gamesPlayed >= 0)
         require(elo in 0..4000)

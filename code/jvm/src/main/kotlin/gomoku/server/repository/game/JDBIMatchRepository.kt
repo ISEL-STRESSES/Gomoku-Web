@@ -71,31 +71,28 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .mapTo<MatchOutcome>()
             .singleOrNull()
 
-    override fun getMoves(matchId: Int, rule: Rule): List<Move> =
+    override fun getAllMoves(matchId: Int): List<Move> =
         handle.createQuery(
             """
-                select color, row, col from moves join player 
-                on player.user_id = player_id and moves.match_id = player.match_id and moves.rules_id = player.rules_id
-                where moves.rules_id = :rule_id and moves.match_id = :matchId
+                select color, row, col from moves join player on
+                moves.player_user_id = player.user_id and player_match_id = :matchId
             """.trimIndent()
         )
             .bind("matchId", matchId)
-            .bind("rule_id", getRuleId(rule))
             .mapTo<Move>()
             .toList()
 
-    override fun makeMove(matchId: Int, rule: Rule, move: Move) {
-        //TODO: Check if this is correct, this is game logic and is already checked in the domain by the service.
-        if (getMoves(matchId, rule).any { it.position == move.position }) throw IllegalStateException("Move already made")
-        if (getTurn(matchId) != move.color) throw IllegalStateException("Not your turn")
-        if (getMatchState(matchId) != MatchState.ONGOING) throw IllegalStateException("Match is not in progress")
+    override fun getLastNMoves(matchId: Int, n: Int): List<Move> {
+        TODO("Not yet implemented")
+    }
+
+    override fun makeMove(matchId: Int, move: Move) {
         handle.createUpdate(
             """
-            insert into moves(rules_id, match_id, player_id, row, col)
-            values (:rule_id, :match_id, :player_id, :row, :col)
+            insert into moves(player_match_id, player_user_id, row, col)
+            values (:match_id, :player_id, :row, :col)
             """.trimIndent()
         )
-            .bind("rule_id", getRuleId(rule))
             .bind("match_id", matchId)
             .bind("player_id", 1) // TODO: get player id
             .bind("color", move.color.name)
@@ -110,8 +107,12 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .mapTo<String>()
             .single().toMatchState()
 
+    override fun setMatchState(matchId: Int, state: MatchState) {
+        TODO("Not yet implemented")
+    }
+
     override fun getTurn(matchId: Int): Color =
-        handle.createQuery("select Count(*) from moves where match_id = :matchId")
+        handle.createQuery("select Count(*) from moves where player_match_id = :matchId")
             .bind("matchId", matchId)
             .mapTo<Int>()
             .singleOrNull()?.toColor() ?: throw IllegalStateException("Match not found")

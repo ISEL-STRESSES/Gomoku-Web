@@ -1,16 +1,21 @@
 package gomoku.server.repository.game
 
+import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
+import gomoku.server.domain.game.player.Player
 import gomoku.server.domain.game.rules.Rule
+import gomoku.server.domain.user.User
 
 /**
  * Repository for match data.
  */
 interface MatchRepository {
 
+    //TODO : Create a Rule repository?
+    //Rules
     /**
      * Gets the id of a set of rules, if not found it creates a new one.
      * @param rule rules of the match
@@ -19,35 +24,50 @@ interface MatchRepository {
     fun getRuleId(rule: Rule): Int
 
     /**
-     * Initiates a match between two players.
-     * @param playerAId id of the first player
-     * @param playerBId id of the second player
+     * Gets a rule by its id.
+     * @param ruleId id of the rule
+     * @return the rule or null if not found
+     */
+    fun getRuleById(ruleId: Int): Rule?
+
+    /**
+     * Gets all the rules.
+     * @return list of rules
+     */
+    fun getAllRules(): List<Rule>
+
+    //Match
+    /**
+     * Creates a new match, with the given rule and user id
+     * setting the match state to [MatchState.WAITING_PLAYER]
+     * @param ruleId id of the rule
+     * @param userId id of the user
      * @return id of the match
      */
-    fun initiateMatch(playerAId: Int, playerBId: Int): Int
+    fun createMatch(ruleId: Int, userId: Int): Int
 
     /**
-     * Gets the winner of the match.
+     * Joins a player to an already existing match.
      * @param matchId id of the match
-     * @return outcome of the match or null if the match is not finished
+     * @param userId id of the user to join
+     * @return id of the match
      */
-    fun getMatchOutcome(matchId: Int): MatchOutcome?
-
-    //TODO: TAKE THIS OUT AND MAKE getMove, because that's the only move we need because the rest is already on the client
-    /**
-     * Gets the moves of the match.
-     * @param matchId id of the match
-     * @return list of moves
-     */
-    fun getMoves(matchId: Int, rule: Rule): List<Move>
-
+    fun joinUserToMatch(matchId: Int, userId: Int): Int
 
     /**
-     * Makes a move in the match.
-     * @param matchId id of the match
-     * @param move the position and color of the move
+     * Initiates a match between two players.
+     * @param playerA the first player
+     * @param playerB the second player
+     * @return id of the match
      */
-    fun makeMove(matchId: Int, rule: Rule, move: Move)
+    fun initiateMatch(playerA: Player, playerB: Player): Pair<Player, Player>
+
+    /**
+     * Gets the match by its id.
+     * @param matchId id of the match
+     * @return the match or null if not found
+     */
+    fun getMatchById(matchId: Int): Match?
 
     /**
      * Gets the state of the match.
@@ -56,14 +76,45 @@ interface MatchRepository {
      */
     fun getMatchState(matchId: Int): MatchState
 
-    //fun setMatchState(matchId: Int, state: MatchState)
-
-    //fun deleteMatch(matchId: Int)
+    /**
+     * Sets the state of the match.
+     * @param matchId id of the match
+     * @param state the new state of the match
+     */
+    fun setMatchState(matchId: Int, state: MatchState)
 
     //fun addPlayerToMatch
+    /**
+     * Gets the winner of the match.
+     * @param matchId id of the match
+     * @return outcome of the match or null if the match is not finished
+     */
+    fun getMatchOutcome(matchId: Int): MatchOutcome?
 
-    //fun
+    /**
+     * Gets the rule of the match.
+     * @param matchId id of the match
+     * @return the rule
+     */
+    fun getMatchRule(matchId: Int): Rule
 
+    //TODO: TAKE THIS OUT AND MAKE getMove, because that's the only move we need because the rest is already on the client
+    /**
+     * Gets the moves of the match.
+     * @param matchId id of the match
+     * @return list of moves
+     */
+    fun getAllMoves(matchId: Int): List<Move>
+
+    fun getLastNMoves(matchId: Int, n: Int): List<Move>
+
+
+    /**
+     * Makes a move in the match.
+     * @param matchId id of the match
+     * @param move the position and color of the move
+     */
+    fun makeMove(matchId: Int, move: Move)
 
     /**
      * Gets the turn of the match.

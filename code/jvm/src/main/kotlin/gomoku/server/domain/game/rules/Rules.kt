@@ -47,7 +47,6 @@ sealed class Rule {
  * @return the class of the rule
  */
 fun buildRule(boardMaxSize: Int, variantName: String, openingRuleName: String): Rule {
-    //TODO: TAKE THIS NASTY ASS FUNCTION OUT OF HERE
     val variant = variantName.toRuleVariant()
     val openingRule = openingRuleName.toOpeningRule()
     val boardSize = boardMaxSize.toBoardSize()

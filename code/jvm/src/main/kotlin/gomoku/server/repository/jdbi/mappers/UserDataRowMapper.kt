@@ -1,6 +1,6 @@
 package gomoku.server.repository.jdbi.mappers
 
-import gomoku.server.domain.game.player.PlayerRuleStats
+import gomoku.server.domain.game.player.UserRuleStats
 import gomoku.server.domain.game.rules.buildRule
 import gomoku.server.domain.user.UserData
 import org.jdbi.v3.core.mapper.RowMapper
@@ -18,18 +18,18 @@ class UserDataRowMapper : RowMapper<UserData> {
             openingRuleName = rs.getString("opening_rule")
         )
 
-        val playerRuleStats = mutableListOf<PlayerRuleStats>()
+        val userRuleStats = mutableListOf<UserRuleStats>()
         var previousUserId = rs.getInt("id")
         while (rs.next()) {
             if (previousUserId != rs.getInt("id")) {
                 return UserData(
                     uuid = rs.getInt("id"),
                     username = rs.getString("username"),
-                    playerRuleStats = playerRuleStats.toList()
+                    userRuleStats = userRuleStats.toList()
                 )
             } else {
-                playerRuleStats.add(
-                    PlayerRuleStats(
+                userRuleStats.add(
+                    UserRuleStats(
                         rule = rule,
                         gamesPlayed = rs.getInt("games_played"),
                         elo = rs.getInt("elo")
@@ -41,7 +41,7 @@ class UserDataRowMapper : RowMapper<UserData> {
         return UserData(
             uuid = rs.getInt("id"),
             username = rs.getString("username"),
-            playerRuleStats = playerRuleStats
+            userRuleStats = userRuleStats
         )
     }
 }

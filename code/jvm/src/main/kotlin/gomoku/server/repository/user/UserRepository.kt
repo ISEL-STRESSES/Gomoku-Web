@@ -42,6 +42,11 @@ interface UserRepository {
      */
     fun getUsersStatsData(offset: Int, limit: Int): List<UserData>
 
+    //TODO: MAKE
+    //fun getUserStatsByRule(userId: Int, ruleId: Int): UserRuleStats?
+
+    //fun setUserRuleStats(userId: Int, userStatsData: UserRuleStats)
+
     /**
      * Retrieves a user by their token information.
      * @param tokenValidationInfo The token of the user.
@@ -77,6 +82,7 @@ interface UserRepository {
      */
     fun getUserById(id: Int): UserData?
 
+    //TODO Check
     /**
      * Retrieves a list of users with the given username.
      * @param username The username of the users.

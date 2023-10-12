@@ -7,15 +7,24 @@ import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rule
 
 /**
+ * Represents a match that is waiting for a player to join.
+ */
+sealed class MatchMaker(
+    val matchId: Int,
+    val player: Player,
+    val rules: Rule
+)
+
+/**
  * Represents a game that can be played.
  */
 sealed class Match(
-    val gameID: Int,
+    matchId: Int,
     val playerA: Player,
     val playerB: Player,
-    val rules: Rule,
+    rules: Rule,
     val moves: List<Move> = emptyList()
-) {
+) : MatchMaker(matchId, playerA, rules) {
     fun getPlayerByColor(color: Color): Player {
         return when (color) {
             playerA.color -> playerA
@@ -29,12 +38,12 @@ sealed class Match(
  * Represents a game that is currently being played.
  */
 class OngoingMatch(
-    gameID: Int,
+    matchId: Int,
     playerA: Player,
     playerB: Player,
     rules: Rule,
     moves: List<Move>
-) : Match(gameID, playerA, playerB, rules, moves) {
+) : Match(matchId, playerA, playerB, rules, moves) {
 
     val turn = (moves.size).toColor()
 }
@@ -43,13 +52,13 @@ class OngoingMatch(
  * Represents a game that has been finished.
  */
 class FinishedGame(
-    gameID: Int,
+    matchId: Int,
     playerA: Player,
     playerB: Player,
     rules: Rule,
     moves: List<Move>,
     private val matchOutcome: MatchOutcome
-) : Match(gameID, playerA, playerB, rules, moves) {
+) : Match(matchId, playerA, playerB, rules, moves) {
 
     fun getWinnerOrNull(): Player? {
         return matchOutcome.winnerColor?.let { getPlayerByColor(it) }
