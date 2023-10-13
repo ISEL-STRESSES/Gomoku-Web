@@ -7,24 +7,15 @@ import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rules
 
 /**
- * Represents a match that is waiting for a player to join.
- */
-sealed class MatchMaker(
-    val matchId: Int,
-    val player: Player,
-    val rules: Rules
-)
-
-/**
  * Represents a game that can be played.
  */
 sealed class Match(
-    matchId: Int,
+    val matchId: Int,
     val playerA: Player,
     val playerB: Player,
-    rules: Rules,
+    val rules: Rules,
     val moves: List<Move> = emptyList()
-) : MatchMaker(matchId, playerA, rules) {
+) {
     fun getPlayerByColor(color: Color): Player {
         return when (color) {
             playerA.color -> playerA
