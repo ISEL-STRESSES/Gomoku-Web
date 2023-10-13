@@ -6,7 +6,7 @@ TRUNCATE TABLE users, tokens, rules, user_stats, matches, player, moves RESTART 
 -- Inserting data into 'users' table
 DO $$
     BEGIN
-        FOR i IN 1..23 LOOP
+        FOR i IN 1..20 LOOP
                 EXECUTE 'INSERT INTO users(username, password_validation) VALUES (''user' || i || ''', ''password' || i || ''')';
             END LOOP;
     END $$;
@@ -48,8 +48,8 @@ DO $$
 DO $$
     BEGIN
         FOR i IN 1..10 LOOP
-                EXECUTE 'INSERT INTO player(user_id, match_id, rules_id, color) VALUES (' || i+2 || ', ' || i || ', 1, ''black'')';
-                EXECUTE 'INSERT INTO player(user_id, match_id, rules_id, color) VALUES (' || (i + 12) || ', ' || i || ', 1, ''white'')';
+                EXECUTE 'INSERT INTO player(user_id, match_id, rules_id, color) VALUES (' || (2*i - 1) || ', ' || i || ', 1, ''black'')';
+                EXECUTE 'INSERT INTO player(user_id, match_id, rules_id, color) VALUES (' || (2*i) || ', ' || i || ', 1, ''white'')';
             END LOOP;
     END $$;
 
@@ -66,8 +66,8 @@ DO $$
     BEGIN
         FOR i IN 1..7 LOOP
                 -- For each match, the black player id is i+2 and the white player is i+12
-                EXECUTE 'INSERT INTO moves(match_id, player_id, ordinal, row, col) VALUES (' || i || ', ' || (i+2) || ', 1, ' || (i + 3) || ', ' || (i + 3) || ')';
-                EXECUTE 'INSERT INTO moves(match_id, player_id, ordinal, row, col) VALUES (' || i || ', ' || (i + 12) || ', 2, ' || (i + 13) || ', ' || (i + 13) || ')';
+                EXECUTE 'INSERT INTO moves(match_id, player_id, ordinal, row, col) VALUES (' || i || ', ' || (2*i - 1) || ', 1, ' || (i) || ', ' || (i) || ')';
+                EXECUTE 'INSERT INTO moves(match_id, player_id, ordinal, row, col) VALUES (' || i || ', ' || (2*i) || ', 2, ' || (i + 1) || ', ' || (i + 1) || ')';
             END LOOP;
     END $$;
 
