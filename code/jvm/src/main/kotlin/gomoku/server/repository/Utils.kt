@@ -1,6 +1,12 @@
 package gomoku.server.repository
 
-import gomoku.server.repository.jdbi.mappers.*
+import gomoku.server.repository.jdbi.mappers.InstantMapper
+import gomoku.server.repository.jdbi.mappers.LobbyRowMapper
+import gomoku.server.repository.jdbi.mappers.MatchRuleRowMapper
+import gomoku.server.repository.jdbi.mappers.PasswordValidationInfoMapper
+import gomoku.server.repository.jdbi.mappers.TokenValidationInfoMapper
+import gomoku.server.repository.jdbi.mappers.UserDataRowMapper
+import gomoku.server.repository.jdbi.mappers.UserRowMapper
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
 import org.jdbi.v3.postgres.PostgresPlugin
