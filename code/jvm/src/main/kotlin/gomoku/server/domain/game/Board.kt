@@ -1,6 +1,5 @@
 package gomoku.server.domain.game
 
-import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Position
 
@@ -30,26 +29,15 @@ class Board private constructor(
     }
 
     /**
-     * Gets move from the board.
+     * Helper function to check if move is allready done
      */
-    fun getMove(position: Position): Move? {
-        return boardMap[position]
-    }
+    fun hasMove(position: Position): Boolean = boardMap.containsKey(position)
 
     /**
      * Gets all moves from the board by order of play.
      */
     fun getMoves(): List<Move> {
         return listOfMoves
-    }
-
-    /**
-     * Gets all moves from the board by color.
-     * @param color The color of the moves to get
-     * @return The moves
-     */
-    fun getMovesByColor(color: Color): List<Move> {
-        return listOfMoves.filter { it.color == color }
     }
 
     /**
@@ -73,7 +61,7 @@ class Board private constructor(
      * @param position The position to check
      * @return true if the position is inside the board, false otherwise
      */
-    private fun isPositionInside(position: Position) =
+    fun isPositionInside(position: Position) =
         position.x in 0 until size && position.y in 0 until size
 
     /**

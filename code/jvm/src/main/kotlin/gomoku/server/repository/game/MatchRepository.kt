@@ -15,7 +15,6 @@ import gomoku.server.domain.user.User
  */
 interface MatchRepository {
 
-    // TODO : Create a Rule repository?
     // Rules
     /**
      * Gets the id of a set of rules, if not found it creates a new one.
@@ -141,6 +140,12 @@ interface MatchRepository {
      */
     fun getMatchState(matchId: Int): MatchState
 
+    /**
+     * Sets the state of the match.
+     * @param matchId id of the match
+     * @param state state of the match
+     * @return true if the state was set, false otherwise
+     */
     fun setMatchState(matchId: Int, state: MatchState)
 
     /**
@@ -172,8 +177,6 @@ interface MatchRepository {
     fun getMatchPlayers(matchId: Int): Pair<Player, Player>?
 
     // moves
-    // TODO: TAKE THIS OUT AND MAKE getMove, because that's the only move we need because the rest is already on the client
-    // TODO: do we need the player id?
     /**
      * Makes a move in the match.
      * @param matchId id of the match

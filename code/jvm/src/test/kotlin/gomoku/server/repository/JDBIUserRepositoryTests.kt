@@ -146,7 +146,6 @@ class JDBIUserRepositoryTests {
 
         // when: retrieving users stats
         val usersStats = repo.getUsersStatsData(0, 10)
-
         // then: the user is in the stats
         assertTrue(usersStats.any { it.username == userName })
     }

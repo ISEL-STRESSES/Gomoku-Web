@@ -5,12 +5,12 @@ import gomoku.server.domain.user.User
 
 /**
  * Represents a lobby
- * @property id The id of the lobby
  * @property rule The rule of the lobby
- * @property players The players in the lobby
+ * @property user1 The first user to join the lobby
+ * @property user2 The second user to join the lobby or null if no second user has joined yet
  */
 data class Lobby(
-    val id: Int,
-    val rule: Rule,
-    val players: List<User> = emptyList()
+    val rule: Rules,
+    val user1: User,
+    val user2: User? = null
 )

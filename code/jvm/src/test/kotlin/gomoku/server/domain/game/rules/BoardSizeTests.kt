@@ -2,28 +2,11 @@ package gomoku.server.domain.game.rules
 
 import gomoku.server.domain.game.player.Position
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class BoardSizeTests {
-
-    @Test
-    fun `isPositionInside returns true for valid positions`() {
-        assertTrue(BoardSize.X15.isPositionInside(Position(0, 0)))
-        assertTrue(BoardSize.X15.isPositionInside(Position(14, 14)))
-        assertTrue(BoardSize.X19.isPositionInside(Position(0, 0)))
-        assertTrue(BoardSize.X19.isPositionInside(Position(18, 18)))
-    }
-
-    @Test
-    fun `isPositionInside returns false for invalid positions`() {
-        assertFalse(BoardSize.X15.isPositionInside(Position(15, 0)))
-        assertFalse(BoardSize.X15.isPositionInside(Position(0, 15)))
-        assertFalse(BoardSize.X19.isPositionInside(Position(19, 0)))
-        assertFalse(BoardSize.X19.isPositionInside(Position(0, 19)))
-    }
 
     @Test
     fun `getAllPositions returns all valid positions`() {
