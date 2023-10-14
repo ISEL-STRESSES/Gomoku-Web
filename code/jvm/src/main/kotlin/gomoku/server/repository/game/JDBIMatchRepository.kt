@@ -103,7 +103,13 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @return the lobby or null if not found
      */
     override fun getLobbyById(lobbyId: Int): Lobby? =
-        handle.createQuery("select * from lobby where id = :lobbyId")
+        handle.createQuery(
+            """
+            select * from lobby join rules on 
+            lobby.rules_id = rules.id 
+            where id = :lobbyId
+            """.trimIndent()
+        )
             .bind("lobbyId", lobbyId)
             .mapTo<Lobby>()
             .singleOrNull()
@@ -116,7 +122,9 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun getLobbyByUserId(userId: Int): Lobby? =
         handle.createQuery(
             """
-            select * from lobby where user_id = :userId
+            select * from lobby join rules on 
+            lobby.rules_id = rules.id 
+            where user_id = :userId
             """.trimIndent()
         )
             .bind("userId", userId)
@@ -131,7 +139,9 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun getLobbyByRuleId(ruleId: Int): Lobby? =
         handle.createQuery(
             """
-            select * from lobby where rules_id = :ruleId
+            select * from lobby join rules on 
+            lobby.rules_id = rules.id 
+            where rules_id = :ruleId
             """.trimIndent()
         )
             .bind("ruleId", ruleId)
@@ -155,10 +165,12 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
 
         val users = mutableListOf<User>()
         usersId.forEach {
-            users.add(handle.createQuery("select * from users where id = :userId")
-                .bind("userId", it)
-                .mapTo<User>()
-                .single())
+            users.add(
+                handle.createQuery("select * from users where id = :userId")
+                    .bind("userId", it)
+                    .mapTo<User>()
+                    .single()
+            )
         }
         return users
     }
@@ -191,7 +203,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * Removes a lobby.
      * @param lobbyId id of the lobby
      */
-    override fun removeLobby(lobbyId: Int) :Boolean =
+    override fun removeLobby(lobbyId: Int): Boolean =
         handle.createUpdate(
             """
                 delete from lobby where id = :lobbyId
@@ -235,7 +247,6 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .one()
-
 
     /**
      * Creates a new match, with the given rule and user id
