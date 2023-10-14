@@ -12,5 +12,5 @@ import org.apache.tomcat.util.digester.Rule
 data class Lobby(
     val id: Int,
     val rule: Rule,
-    val players: List<Player> = emptyList()
+    val players: List<User> = emptyList()
 )

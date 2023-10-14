@@ -30,7 +30,6 @@ class Board private constructor(
     }
 
     /**
-     *
      * Gets move from the board.
      */
     fun getMove(position: Position): Move? {
@@ -51,5 +50,43 @@ class Board private constructor(
      */
     fun getMovesByColor(color: Color): List<Move> {
         return listOfMoves.filter { it.color == color }
+    }
+
+    /**
+     * Removes the last move from the board and returns a new Board.
+     */
+    fun undoLastMove(): Board {
+        if (listOfMoves.isEmpty()) return this
+        val lastMove = listOfMoves.last()
+        val newListOfMoves = listOfMoves.dropLast(1)
+        val newBoardMap = boardMap - lastMove.position
+        return Board(this.size, newListOfMoves, newBoardMap)
+    }
+
+    /**
+     * Resets the whole board.
+     */
+    fun reset(): Board = createEmptyBoard(this.size)
+
+    /**
+     * Checks if a position is inside the board
+     * @param position The position to check
+     * @return true if the position is inside the board, false otherwise
+     */
+    private fun isPositionInside(position: Position) =
+        position.x in 0 until size && position.y in 0 until size
+
+    /**
+     * Returns true if the board is full, false otherwise
+     */
+    fun isFull(): Boolean {
+        return listOfMoves.size == size * size
+    }
+
+    /**
+     * Returns true if the board is empty, false otherwise
+     */
+    fun isEmpty(): Boolean {
+        return listOfMoves.isEmpty()
     }
 }

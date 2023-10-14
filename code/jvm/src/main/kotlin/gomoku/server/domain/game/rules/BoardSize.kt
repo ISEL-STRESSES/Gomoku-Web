@@ -5,7 +5,7 @@ import gomoku.server.domain.game.player.Position
 /**
  * Represents the possible sizes of a match board
  *
- * @param max The maximum value of the x and y coordinates
+ * @property max The maximum value of the x and y coordinates
  * @throws IllegalArgumentException If the maximum value is negative
  */
 enum class BoardSize(private val max: Int) {
