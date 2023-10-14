@@ -5,23 +5,23 @@ import gomoku.server.domain.game.player.Position
 /**
  * Represents the possible sizes of a match board
  *
- * @property max The maximum value of the x and y coordinates
+ * @property value The maximum value of the x and y coordinates
  * @throws IllegalArgumentException If the maximum value is negative
  */
-enum class BoardSize(private val max: Int) {
+enum class BoardSize(val value: Int) {
     X15(15),
     X19(19);
 
     init {
-        require(max >= 0)
+        require(value >= 0)
     }
 
     /**
      * Returns all possible positions on the board
      */
     fun getAllPositions(): List<Position> {
-        return (0 until max).flatMap { x ->
-            (0 until max).map { y ->
+        return (0 until value).flatMap { x ->
+            (0 until value).map { y ->
                 Position(x, y)
             }
         }

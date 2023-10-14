@@ -38,12 +38,14 @@ create table if not exists rules
 create table if not exists lobby
 (
     id         int          primary key generated always as identity,
-    user_id    int,
+    user_id1   int,
+    user_id2   int,
     rules_id   int          not null,
     created_at bigint       not null,
 
     constraint fk_lobby_user foreign key (user_id) references users(id),
     constraint fk_lobby_rules foreign key (rules_id) references rules(id),
+    constraint different_users check (user_id1 <> user_id2),
     unique (user_id, rules_id)
 );
 
