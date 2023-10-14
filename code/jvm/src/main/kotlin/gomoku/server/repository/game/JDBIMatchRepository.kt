@@ -1,5 +1,6 @@
 package gomoku.server.repository.game
 
+import gomoku.server.domain.game.Lobby
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
@@ -9,6 +10,7 @@ import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
 import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rules
+import gomoku.server.domain.user.User
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.jdbi.v3.core.transaction.TransactionIsolationLevel
@@ -78,6 +80,164 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     }
 
     /**
+     * Joins a user to a lobby if it exists, otherwise it creates a new lobby.
+     * @param ruleId id of the rule
+     * @param userId id of the user
+     * @return id of the lobby
+     */
+    override fun joinLobby(ruleId: Int, userId: Int): Int {
+        val findLobby = handle.createQuery(
+            """
+            select id from lobby where rules_id = :ruleId
+            """.trimIndent()
+        )
+            .bind("ruleId", ruleId)
+            .mapTo<Int>()
+            .singleOrNull()
+        return findLobby ?: createLobby(ruleId, userId)
+    }
+
+    /**
+     * Gets the lobby by its id.
+     * @param lobbyId id of the lobby
+     * @return the lobby or null if not found
+     */
+    override fun getLobbyById(lobbyId: Int): Lobby? =
+        handle.createQuery("select * from lobby where id = :lobbyId")
+            .bind("lobbyId", lobbyId)
+            .mapTo<Lobby>()
+            .singleOrNull()
+
+    /**
+     * Gets the lobby by the user id.
+     * @param userId id of the user
+     * @return the lobby or null if not found
+     */
+    override fun getLobbyByUserId(userId: Int): Lobby? =
+        handle.createQuery(
+            """
+            select * from lobby where user_id = :userId
+            """.trimIndent()
+        )
+            .bind("userId", userId)
+            .mapTo<Lobby>()
+            .singleOrNull()
+
+    /**
+     * Gets the lobby by the rule id.
+     * @param ruleId id of the rule
+     * @return the lobby or null if not found
+     */
+    override fun getLobbyByRuleId(ruleId: Int): Lobby? =
+        handle.createQuery(
+            """
+            select * from lobby where rules_id = :ruleId
+            """.trimIndent()
+        )
+            .bind("ruleId", ruleId)
+            .mapTo<Lobby>()
+            .singleOrNull()
+
+    /**
+     * Gets the users in the lobby.
+     * @param lobbyId id of the lobby
+     * @return list of users
+     */
+    override fun getUsersInLobby(lobbyId: Int): List<User> {
+        val usersId = handle.createQuery(
+            """
+                select user_id from lobby where id = :lobbyId
+            """.trimIndent()
+        )
+            .bind("lobbyId", lobbyId)
+            .mapTo<Int>()
+            .list()
+
+        val users = mutableListOf<User>()
+        usersId.forEach {
+            users.add(handle.createQuery("select * from users where id = :userId")
+                .bind("userId", it)
+                .mapTo<User>()
+                .single())
+        }
+        return users
+    }
+
+    /**
+     * Gets the number of users in the lobby.
+     * @param lobbyId id of the lobby
+     * @return number of users
+     */
+    override fun getNrOfUsersInLobby(lobbyId: Int): Int =
+        handle.createQuery(
+            """
+            select count(user_id) from lobby where id = :lobbyId
+            """.trimIndent()
+        )
+            .bind("lobbyId", lobbyId)
+            .mapTo<Int>()
+            .single()
+
+    /**
+     * Gets all the lobbies.
+     * @return list of lobbies
+     */
+    override fun getAllLobbies(): List<Lobby> =
+        handle.createQuery("select * from lobby")
+            .mapTo<Lobby>()
+            .list()
+
+    /**
+     * Removes a lobby.
+     * @param lobbyId id of the lobby
+     */
+    override fun removeLobby(lobbyId: Int) :Boolean =
+        handle.createUpdate(
+            """
+                delete from lobby where id = :lobbyId
+            """.trimIndent()
+        )
+            .bind("lobbyId", lobbyId)
+            .execute() == 1
+
+    /**
+     * Removes a player from a lobby.
+     * @param lobbyId id of the lobby
+     * @param userId id of the user
+     */
+    override fun removePlayerFromLobby(lobbyId: Int, userId: Int) {
+        handle.createUpdate(
+            """
+            delete from lobby where id = :lobbyId and user_id = :userId
+            """.trimIndent()
+        )
+            .bind("lobbyId", lobbyId)
+            .bind("userId", userId)
+            .execute()
+    }
+
+    /**
+     * Creates a new lobby.
+     * @param ruleId id of the rule
+     * @param userId id of the user
+     * @return id of the lobby
+     */
+    private fun createLobby(ruleId: Int, userId: Int): Int =
+        handle.createUpdate(
+            """
+            insert into lobby(rules_id, created_at, user_id)
+            values (:ruleId, :createdAt, :userId)
+            """.trimIndent()
+        )
+            .bind("ruleId", ruleId)
+            .bind("createdAt", System.currentTimeMillis())
+            .bind("userId", userId)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .one()
+
+
+    /**
      * Creates a new match, with the given rule and user id
      * setting the match state to [MatchState.WAITING_PLAYER]
      * @param ruleId id of the rule
@@ -99,12 +259,13 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
 
         handle.createUpdate(
             """
-        insert into player(user_id, match_id, color)
-        values (:userId, :matchId, :color)
+        insert into player(user_id, match_id, rules_id, color)
+        values (:userId, :matchId, :rulesId, :color)
             """.trimIndent()
         )
             .bind("userId", userId)
             .bind("matchId", matchId)
+            .bind("rulesId", ruleId)
             .bind("color", Color.BLACK)
             .execute()
         return matchId
@@ -124,8 +285,8 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .singleOrNull() ?: throw IllegalStateException("Match not found")
         handle.createUpdate(
             """
-            insert into player(user_id, match_id, color)
-            values (:userId, :matchId, 'WHITE')
+            insert into player(user_id, match_id, rules_id, color)
+            values (:userId, :matchId,(select rules_id from matches where match_id = :matchId), 'WHITE')
             """.trimIndent()
         )
             .bind("userId", userId)
@@ -258,8 +419,8 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun makeMove(matchId: Int, move: Move) {
         handle.createUpdate(
             """
-            insert into moves(player_match_id, player_user_id, row, col)
-            values (:match_id, :player_id, :row, :col)
+            insert into moves(match_id, player_id, ordinal, row, col)
+            values (:match_id, :player_id, (select Count(match_id) from moves where moves.match_id = :match_id), :row, :col)
             """.trimIndent()
         )
             .bind("match_id", matchId)
@@ -279,7 +440,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
         handle.createQuery(
             """
                 select color, row, col from moves join player on
-                moves.player_user_id = player.user_id and player_match_id = :matchId
+                moves.player_id = player.user_id and moves.match_id = :matchId
             """.trimIndent()
         )
             .bind("matchId", matchId)
@@ -296,7 +457,8 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
         handle.createQuery(
             """
                 select color, row, col from moves join player on
-                moves.player_user_id = player.user_id and player_match_id = :matchId
+                moves.player_id = player.user_id and moves.match_id = player.match_id
+                where player.match_id = :matchId
                 order by moves.row desc limit :n
             """.trimIndent()
         )
@@ -311,7 +473,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @return the id of the player for the current turn.
      */
     override fun getTurn(matchId: Int): Color =
-        handle.createQuery("select Count(*) from moves where player_match_id = :matchId")
+        handle.createQuery("select Count(*) from moves where match_id = :matchId")
             .bind("matchId", matchId)
             .mapTo<Int>()
             .singleOrNull()?.toColor() ?: throw IllegalStateException("Match not found")

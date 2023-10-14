@@ -38,7 +38,7 @@ create table if not exists rules
 create table if not exists lobby
 (
     id         int          primary key generated always as identity,
-    user_id    int          not null,
+    user_id    int,
     rules_id   int          not null,
     created_at bigint       not null,
 

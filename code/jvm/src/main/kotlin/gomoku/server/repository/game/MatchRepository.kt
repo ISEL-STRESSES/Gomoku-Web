@@ -1,5 +1,6 @@
 package gomoku.server.repository.game
 
+import gomoku.server.domain.game.Lobby
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
@@ -7,6 +8,7 @@ import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
 import gomoku.server.domain.game.rules.Rules
+import gomoku.server.domain.user.User
 
 /**
  * Repository for match data.
@@ -34,6 +36,70 @@ interface MatchRepository {
      * @return list of rules
      */
     fun getAllRules(): List<Rules>
+
+    //lobby
+    /**
+     * Joins a user to a lobby if it exists, otherwise it creates a new lobby.
+     * @param ruleId id of the rule
+     * @param userId id of the user
+     * @return id of the lobby
+     */
+    fun joinLobby(ruleId: Int, userId: Int): Int
+
+    /**
+     * Gets the lobby by its id.
+     * @param lobbyId id of the lobby
+     * @return the lobby or null if not found
+     */
+    fun getLobbyById(lobbyId: Int): Lobby?
+
+    /**
+     * Gets the lobby by the user id.
+     * @param userId id of the user
+     * @return the lobby or null if not found
+     */
+    fun getLobbyByUserId(userId: Int): Lobby?
+
+    /**
+     * Gets the lobby by the rule id.
+     * @param ruleId id of the rule
+     * @return the lobby or null if not found
+     */
+    fun getLobbyByRuleId(ruleId: Int): Lobby?
+
+    /**
+     * Gets the users in the lobby.
+     * @param lobbyId id of the lobby
+     * @return list of users
+     */
+    fun getUsersInLobby(lobbyId: Int): List<User>
+
+    /**
+     * Gets the number of users in the lobby.
+     * @param lobbyId id of the lobby
+     * @return number of users
+     */
+    fun getNrOfUsersInLobby(lobbyId: Int): Int
+
+    /**
+     * Gets all the lobbies.
+     * @return list of lobbies
+     */
+    fun getAllLobbies(): List<Lobby>
+
+    /**
+     * Removes a lobby.
+     * @param lobbyId id of the lobby
+     * @return true if the lobby was removed, false otherwise
+     */
+    fun removeLobby(lobbyId: Int) :Boolean
+
+    /**
+     * Removes a player from a lobby.
+     * @param lobbyId id of the lobby
+     * @param userId id of the user
+     */
+    fun removePlayerFromLobby(lobbyId: Int, userId: Int)
 
     // Match
     /**
