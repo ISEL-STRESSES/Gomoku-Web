@@ -8,20 +8,13 @@ import gomoku.server.domain.game.player.Position
  * @param max The maximum value of the x and y coordinates
  * @throws IllegalArgumentException If the maximum value is negative
  */
-enum class BoardSize(val max: Int) {
+enum class BoardSize(private val max: Int) {
     X15(15),
     X19(19);
 
     init {
         require(max >= 0)
     }
-
-    /**
-     * Checks if a position is inside the board
-     * @param position The position to check
-     */
-    fun isPositionInside(position: Position) =
-        position.x in 0 until max && position.y in 0 until max
 
     /**
      * Returns all possible positions on the board

@@ -7,19 +7,26 @@ import gomoku.server.domain.game.player.Position
 /**
  * Represents the board of a game.
  */
-class Board {
-    // List of moves made in the game with index to represent the order of the moves
-    private val listOfMoves = mutableListOf<Move>()
+class Board private constructor(
+    private val size: Int,
+    private val listOfMoves: List<Move>,
+    private val boardMap: Map<Position, Move>
+) {
 
-    // Map of moves made in the game with the position of the move as key
-    private val boardMap = mutableMapOf<Position, Move>()
+    companion object {
+        fun createEmptyBoard(size: Int): Board {
+            return Board(size, emptyList(), emptyMap())
+        }
+    }
 
     /**
      * Adds a move to the board.
      */
-    fun addMove(move: Move) {
-        listOfMoves.add(move)
-        boardMap[move.position] = move
+    fun addMove(move: Move): Board {
+        if (!isPositionInside(move.position)) throw IllegalArgumentException("Position is outside the board")
+        val newListOfMoves = listOfMoves + move
+        val newBoardMap = boardMap + (move.position to move)
+        return Board(this.size, newListOfMoves, newBoardMap)
     }
 
     /**
@@ -39,6 +46,8 @@ class Board {
 
     /**
      * Gets all moves from the board by color.
+     * @param color The color of the moves to get
+     * @return The moves
      */
     fun getMovesByColor(color: Color): List<Move> {
         return listOfMoves.filter { it.color == color }
