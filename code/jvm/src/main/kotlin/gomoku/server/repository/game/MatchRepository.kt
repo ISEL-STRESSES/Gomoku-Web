@@ -37,7 +37,7 @@ interface MatchRepository {
      */
     fun getAllRules(): List<Rules>
 
-    //lobby
+    // lobby
     /**
      * Joins a user to a lobby if it exists, otherwise it creates a new lobby.
      * @param ruleId id of the rule
@@ -92,7 +92,7 @@ interface MatchRepository {
      * @param lobbyId id of the lobby
      * @return true if the lobby was removed, false otherwise
      */
-    fun removeLobby(lobbyId: Int) :Boolean
+    fun removeLobby(lobbyId: Int): Boolean
 
     /**
      * Removes a player from a lobby.
