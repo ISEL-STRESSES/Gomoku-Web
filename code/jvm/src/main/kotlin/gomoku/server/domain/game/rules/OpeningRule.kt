@@ -14,7 +14,7 @@ enum class OpeningRule {
  * @return the opening rule
  */
 fun String.toOpeningRule(): OpeningRule {
-    return when (this) {
+    return when (this.uppercase()) {
         "FREE" -> OpeningRule.FREE
         "PRO" -> OpeningRule.PRO
         else -> throw IllegalArgumentException("Invalid opening rule")

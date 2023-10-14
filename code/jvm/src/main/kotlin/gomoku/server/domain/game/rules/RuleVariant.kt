@@ -14,7 +14,7 @@ enum class RuleVariant {
  * @return the rule variant
  */
 fun String.toRuleVariant(): RuleVariant {
-    return when (this) {
+    return when (this.uppercase()) {
         "STANDARD" -> RuleVariant.STANDARD
         else -> throw IllegalArgumentException("Invalid rule variant")
     }

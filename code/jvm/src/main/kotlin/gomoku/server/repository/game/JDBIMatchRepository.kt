@@ -31,7 +31,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
                 variant = :variant
             """.trimIndent()
         )
-            .bind("boardSize", rules.boardSize)
+            .bind("boardSize", rules.boardSize.value)
             .bind("openingRule", rules.openingRule)
             .bind("variant", rules.variant)
             .mapTo(Int::class.java)
@@ -71,7 +71,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             values (:boardSize, :openingRule, :variant)
             """.trimIndent()
         )
-            .bind("boardSize", rules.boardSize)
+            .bind("boardSize", rules.boardSize.value)
             .bind("openingRule", rules.openingRule)
             .bind("variant", rules.variant)
             .executeAndReturnGeneratedKeys()

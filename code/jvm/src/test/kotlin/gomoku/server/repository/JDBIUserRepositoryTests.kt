@@ -6,15 +6,13 @@ import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
 import gomoku.server.domain.user.User
 import gomoku.server.repository.user.JDBIUserRepository
+import gomoku.server.testWithHandleAndRollback
 import org.hibernate.validator.internal.util.Contracts.assertNotNull
-import org.jdbi.v3.core.Handle
-import org.jdbi.v3.core.Jdbi
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
-import org.postgresql.ds.PGSimpleDataSource
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -22,13 +20,13 @@ import kotlin.random.Random
 class JDBIUserRepositoryTests {
 
     @Test
-    fun `can create and retrieve user`() = runWithHandle { handle ->
+    fun `can create and retrieve user`() = testWithHandleAndRollback { handle ->
         // given: a UserRepository
         val repo = JDBIUserRepository(handle)
 
         // when: storing a user
         val userName = newTestUserName()
-        val passwordValidationInfo = PasswordValidationInfo(newTokenValidationData())
+        val passwordValidationInfo = newTestUserPassword()
         repo.storeUser(userName, passwordValidationInfo)
 
         // and: retrieving a user
@@ -54,7 +52,7 @@ class JDBIUserRepositoryTests {
     }
 
     @Test
-    fun `can create and validate tokens`() = runWithHandle { handle ->
+    fun `can create and validate tokens`() = testWithHandleAndRollback { handle ->
         // given: a UsersRepository
         val repo = JDBIUserRepository(handle)
         // and: a test clock
@@ -62,7 +60,7 @@ class JDBIUserRepositoryTests {
 
         // and: a createdUser
         val userName = newTestUserName()
-        val passwordValidationInfo = PasswordValidationInfo("not-valid")
+        val passwordValidationInfo = newTestUserPassword()
         val userId = repo.storeUser(userName, passwordValidationInfo)
 
         // and: test TokenValidationInfo
@@ -94,7 +92,7 @@ class JDBIUserRepositoryTests {
     }
 
     @Test
-    fun `can remove tokens`() = runWithHandle { handle ->
+    fun `can remove tokens`() = testWithHandleAndRollback { handle ->
         // given: a UsersRepository
         val repo = JDBIUserRepository(handle)
         // and: a test clock
@@ -102,7 +100,7 @@ class JDBIUserRepositoryTests {
 
         // and: a createdUser
         val userName = newTestUserName()
-        val passwordValidationInfo = PasswordValidationInfo("not-valid")
+        val passwordValidationInfo = newTestUserPassword()
         val userId = repo.storeUser(userName, passwordValidationInfo)
 
         // and: test TokenValidationInfo
@@ -135,13 +133,13 @@ class JDBIUserRepositoryTests {
     }
 
     @Test
-    fun `can retrieve users stats`() = runWithHandle { handle ->
+    fun `can retrieve users stats`() = testWithHandleAndRollback { handle ->
         // given: a UsersRepository
         val repo = JDBIUserRepository(handle)
 
         // and: a createdUser
         val userName = newTestUserName()
-        val passwordValidationInfo = PasswordValidationInfo("not-valid")
+        val passwordValidationInfo = newTestUserPassword()
         repo.storeUser(userName, passwordValidationInfo)
 
         // and: stats for the user
@@ -155,16 +153,10 @@ class JDBIUserRepositoryTests {
 
     companion object {
 
-        private fun runWithHandle(block: (Handle) -> Unit) = jdbi.useTransaction<Exception>(block)
-
         private fun newTestUserName() = "user-${abs(Random.nextLong())}"
 
-        private fun newTokenValidationData() = "token-${abs(Random.nextLong())}"
+        private fun newTestUserPassword() = PasswordValidationInfo("password-${abs(Random.nextLong())}")
 
-        private val jdbi = Jdbi.create(
-            PGSimpleDataSource().apply {
-                setURL("jdbc:postgresql://localhost:5432/postgres?user=postgres&password=master")
-            }
-        ).configureWithAppRequirements()
+        private fun newTokenValidationData() = "token-${abs(Random.nextLong())}"
     }
 }
