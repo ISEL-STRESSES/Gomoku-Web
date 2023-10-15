@@ -29,20 +29,6 @@ interface MatchRepository {
     fun getRuleById(ruleId: Int): Rules?
 
     /**
-     * Checks if a set of rules is stored.
-     * @param rules rules of the game
-     * @return true if the rules are stored, false otherwise
-     */
-    fun isRuleStored(rules: Rules): Boolean
-
-    /**
-     * Creates a new set of rules.
-     * @param rules rules of the game
-     * @return id of the rule
-     */
-    fun createRule(rules: Rules): Int
-
-    /**
      * Gets all the rules.
      * @return list of rules
      */

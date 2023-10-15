@@ -1,5 +1,6 @@
 package gomoku.server.domain.game
 
+import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Position
 
@@ -33,22 +34,12 @@ class Board private constructor(
      */
     fun hasMove(position: Position): Boolean = boardMap.containsKey(position)
 
+
     /**
      * Gets all moves from the board by order of play.
      */
     fun getMoves(): List<Move> {
         return listOfMoves
-    }
-
-    /**
-     * Removes the last move from the board and returns a new Board.
-     */
-    fun undoLastMove(): Board {
-        if (listOfMoves.isEmpty()) return this
-        val lastMove = listOfMoves.last()
-        val newListOfMoves = listOfMoves.dropLast(1)
-        val newBoardMap = boardMap - lastMove.position
-        return Board(this.size, newListOfMoves, newBoardMap)
     }
 
     /**

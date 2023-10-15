@@ -18,7 +18,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
      * @param rule The rules of the lobby
      * @return The lobby or null if no lobby with the given id exists
      */
-    override fun getLobbyByRules(rule: Rules): Lobby? =
+    override fun getLobbyByRuleId(rule: Rules): Lobby? =
         handle.createQuery(
             """
             SELECT rules.board_size, rules.variant, rules.opening_rule, 
