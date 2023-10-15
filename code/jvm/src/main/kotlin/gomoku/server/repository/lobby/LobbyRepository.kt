@@ -35,4 +35,10 @@ interface LobbyRepository {
      * @param userId The id of the user to join
      */
     fun createLobby(rule: Rules, userId: Int)
+
+    /**
+     * Removes a player from a lobby (Waiting Room)
+     * @param userId The id of the user to remove
+     */
+    fun leaveLobby(userId: Int)
 }

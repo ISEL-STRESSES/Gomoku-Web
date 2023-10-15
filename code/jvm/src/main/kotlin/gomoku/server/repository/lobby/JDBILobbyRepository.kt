@@ -106,4 +106,18 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             .bind("createdAt", Clock.systemUTC().instant().epochSecond)
             .execute()
     }
+
+    /**
+     * Removes a player from a lobby (Waiting Room)
+     * @param userId The id of the user to remove
+     */
+    override fun leaveLobby(userId: Int) {
+        handle.createUpdate(
+            """
+            DELETE FROM lobby WHERE user_id = :userId
+            """.trimIndent()
+        )
+            .bind("userId", userId)
+            .execute()
+    }
 }
