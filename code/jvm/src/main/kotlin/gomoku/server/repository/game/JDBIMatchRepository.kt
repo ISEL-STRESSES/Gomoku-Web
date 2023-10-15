@@ -1,6 +1,5 @@
 package gomoku.server.repository.game
 
-import gomoku.server.domain.game.Lobby
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
@@ -10,7 +9,6 @@ import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
 import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rules
-import gomoku.server.domain.user.User
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.jdbi.v3.core.transaction.TransactionIsolationLevel
@@ -22,8 +20,8 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @param rules rules of the game
      * @return id of the rule
      */
-    override fun getRuleId(rules: Rules): Int {
-        val existingRule = handle.createQuery(
+    override fun getRuleId(rules: Rules): Int =
+        handle.createQuery(
             """
                 select id from rules where 
                 board_size = :boardSize and 
@@ -34,10 +32,8 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .bind("boardSize", rules.boardSize.value)
             .bind("openingRule", rules.openingRule)
             .bind("variant", rules.variant)
-            .mapTo(Int::class.java)
-            .singleOrNull()
-        return existingRule ?: createRule(rules)
-    }
+            .mapTo<Int>()
+            .single()
 
     /**
      * Gets a rule by its id.
@@ -49,6 +45,26 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .bind("ruleId", ruleId)
             .mapTo<Rules>()
             .singleOrNull()
+
+    /**
+     * Checks if a set of rules is stored.
+     * @param rules rules of the game
+     * @return true if the rules are stored, false otherwise
+     */
+    override fun isRuleStored(rules: Rules): Boolean =
+        handle.createQuery(
+            """
+            select count(*) from rules where 
+            board_size = :boardSize and 
+            opening_rule = :openingRule and 
+            variant = :variant
+            """.trimIndent()
+        )
+            .bind("boardSize", rules.boardSize.value)
+            .bind("openingRule", rules.openingRule)
+            .bind("variant", rules.variant)
+            .mapTo(Int::class.java)
+            .single() == 1
 
     /**
      * Gets all the rules.
@@ -64,7 +80,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @param rules rules of the game
      * @return id of the rule
      */
-    private fun createRule(rules: Rules): Int {
+    override fun createRule(rules: Rules): Int {
         return handle.createUpdate(
             """
             insert into rules(board_size, opening_rule, variant)
@@ -78,175 +94,6 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .mapTo<Int>()
             .one()
     }
-
-    /**
-     * Joins a user to a lobby if it exists, otherwise it creates a new lobby.
-     * @param ruleId id of the rule
-     * @param userId id of the user
-     * @return id of the lobby
-     */
-    override fun joinLobby(ruleId: Int, userId: Int): Int {
-        val findLobby = handle.createQuery(
-            """
-            select id from lobby where rules_id = :ruleId
-            """.trimIndent()
-        )
-            .bind("ruleId", ruleId)
-            .mapTo<Int>()
-            .singleOrNull()
-        return findLobby ?: createLobby(ruleId, userId)
-    }
-
-    /**
-     * Gets the lobby by its id.
-     * @param lobbyId id of the lobby
-     * @return the lobby or null if not found
-     */
-    override fun getLobbyById(lobbyId: Int): Lobby? =
-        handle.createQuery(
-            """
-            select * from lobby join rules on 
-            lobby.rules_id = rules.id 
-            where id = :lobbyId
-            """.trimIndent()
-        )
-            .bind("lobbyId", lobbyId)
-            .mapTo<Lobby>()
-            .singleOrNull()
-
-    /**
-     * Gets the lobby by the user id.
-     * @param userId id of the user
-     * @return the lobby or null if not found
-     */
-    override fun getLobbyByUserId(userId: Int): Lobby? =
-        handle.createQuery(
-            """
-            select * from lobby join rules on 
-            lobby.rules_id = rules.id 
-            where user_id = :userId
-            """.trimIndent()
-        )
-            .bind("userId", userId)
-            .mapTo<Lobby>()
-            .singleOrNull()
-
-    /**
-     * Gets the lobby by the rule id.
-     * @param ruleId id of the rule
-     * @return the lobby or null if not found
-     */
-    override fun getLobbyByRuleId(ruleId: Int): Lobby? =
-        handle.createQuery(
-            """
-            select * from lobby join rules on 
-            lobby.rules_id = rules.id 
-            where rules_id = :ruleId
-            """.trimIndent()
-        )
-            .bind("ruleId", ruleId)
-            .mapTo<Lobby>()
-            .singleOrNull()
-
-    /**
-     * Gets the users in the lobby.
-     * @param lobbyId id of the lobby
-     * @return list of users
-     */
-    override fun getUsersInLobby(lobbyId: Int): List<User> {
-        val usersId = handle.createQuery(
-            """
-                select user_id from lobby where id = :lobbyId
-            """.trimIndent()
-        )
-            .bind("lobbyId", lobbyId)
-            .mapTo<Int>()
-            .list()
-
-        val users = mutableListOf<User>()
-        usersId.forEach {
-            users.add(
-                handle.createQuery("select * from users where id = :userId")
-                    .bind("userId", it)
-                    .mapTo<User>()
-                    .single()
-            )
-        }
-        return users
-    }
-
-    /**
-     * Gets the number of users in the lobby.
-     * @param lobbyId id of the lobby
-     * @return number of users
-     */
-    override fun getNrOfUsersInLobby(lobbyId: Int): Int =
-        handle.createQuery(
-            """
-            select count(user_id) from lobby where id = :lobbyId
-            """.trimIndent()
-        )
-            .bind("lobbyId", lobbyId)
-            .mapTo<Int>()
-            .single()
-
-    /**
-     * Gets all the lobbies.
-     * @return list of lobbies
-     */
-    override fun getAllLobbies(): List<Lobby> =
-        handle.createQuery("select * from lobby")
-            .mapTo<Lobby>()
-            .list()
-
-    /**
-     * Removes a lobby.
-     * @param lobbyId id of the lobby
-     */
-    override fun removeLobby(lobbyId: Int): Boolean =
-        handle.createUpdate(
-            """
-                delete from lobby where id = :lobbyId
-            """.trimIndent()
-        )
-            .bind("lobbyId", lobbyId)
-            .execute() == 1
-
-    /**
-     * Removes a player from a lobby.
-     * @param lobbyId id of the lobby
-     * @param userId id of the user
-     */
-    override fun removePlayerFromLobby(lobbyId: Int, userId: Int) {
-        handle.createUpdate(
-            """
-            delete from lobby where id = :lobbyId and user_id = :userId
-            """.trimIndent()
-        )
-            .bind("lobbyId", lobbyId)
-            .bind("userId", userId)
-            .execute()
-    }
-
-    /**
-     * Creates a new lobby.
-     * @param ruleId id of the rule
-     * @param userId id of the user
-     * @return id of the lobby
-     */
-    private fun createLobby(ruleId: Int, userId: Int): Int =
-        handle.createUpdate(
-            """
-            insert into lobby(rules_id, created_at, user_id)
-            values (:ruleId, :createdAt, :userId)
-            """.trimIndent()
-        )
-            .bind("ruleId", ruleId)
-            .bind("createdAt", System.currentTimeMillis())
-            .bind("userId", userId)
-            .executeAndReturnGeneratedKeys()
-            .mapTo<Int>()
-            .one()
 
     /**
      * Creates a new match, with the given rule and user id

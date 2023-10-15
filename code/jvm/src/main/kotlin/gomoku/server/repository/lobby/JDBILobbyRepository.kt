@@ -5,110 +5,105 @@ import gomoku.server.domain.game.rules.Rules
 import gomoku.server.domain.user.User
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
+import java.time.Clock
 
+/**
+ * Repository for lobbies
+ * Implementation using JDBI and PostgresSQL
+ * @property handle The handle to the database
+ */
 class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     /**
      * Gets a lobby by its rules id
      * @param rule The rules of the lobby
      * @return The lobby or null if no lobby with the given id exists
      */
-    override fun getLobby(rule: Rules): Lobby? =
+    override fun getLobbyByRules(rule: Rules): Lobby? =
         handle.createQuery(
             """
-            SELECT * FROM lobby WHERE lobby.rules_id = (
-            select id from rules where variant = :variant and board_size = :boardSize and opening_rule = :openingRule
-            )
+            SELECT rules.board_size, rules.variant, rules.opening_rule, 
+            users.id, users.username, users.password_validation 
+            FROM lobby join users 
+            on users.id = lobby.user_id
+            join rules
+            on lobby.rules_id = rules.id 
+            where lobby.rules_id = (select id from rules where 
+            rules.board_size = :boardSize and 
+            rules.variant = :variant and 
+            rules.opening_rule = :openingRule) 
             """.trimIndent()
         )
             .bind("variant", rule.variant)
             .bind("boardSize", rule.boardSize.value)
             .bind("openingRule", rule.openingRule)
-            .mapToBean(Lobby::class.java)
-            .findFirst()
-            .orElse(null)
+            .mapTo<Lobby>()
+            .singleOrNull()
 
     /**
      * Gets all lobbies
      * @return The lobby or null if no lobby with the given id exists
      */
     override fun getLobbies(): List<Lobby> =
-        handle.createQuery("SELECT * FROM lobby")
+        handle.createQuery(
+            """
+            SELECT rules.board_size, rules.variant, rules.opening_rule, 
+            users.id, users.username, users.password_validation
+            FROM lobby join rules 
+            on lobby.rules_id = rules.id 
+            join users 
+            on lobby.user_id = users.id
+            """.trimIndent()
+        )
             .mapTo<Lobby>()
             .list()
 
     /**
      * Gets a lobby by the id of one of its players
-     * @param userId The id of the player
+     * @param user The id of the player
      * @return The lobby or null if no lobby with the given id exists
      */
-    override fun getLobbyByUser(userId: Int): Lobby? =
+    override fun getLobbyByUser(user: User): Lobby? =
         handle.createQuery(
             """
-            SELECT * FROM lobby WHERE user_id = :userId
+            SELECT rules.board_size, rules.variant, rules.opening_rule, 
+            users.id, users.username, users.password_validation 
+            FROM lobby join users 
+            on lobby.user_id = users.id 
+            join rules 
+            on rules.id = lobby.rules_id
+            where users.id = :userId
             """.trimIndent()
         )
-            .bind("userId", userId)
+            .bind("userId", user)
             .mapTo<Lobby>()
             .singleOrNull()
 
     /**
-     * Gets the users present in a lobby
-     * @param lobbyId The id of the lobby
-     * @return The users in the lobby
-     */
-    override fun getUsersInLobby(lobbyId: Int): List<User> =
-        handle.createQuery(
-            """
-            SELECT * FROM users WHERE id IN (
-            SELECT user_id FROM lobby WHERE id = :lobbyId
-            )
-            """.trimIndent()
-        )
-            .bind("lobbyId", lobbyId)
-            .mapTo<User>()
-            .list()
-
-    /**
-     * Gets the number of users present in a lobby
-     * @param lobbyId The id of the lobby
-     * @return The number of users in the lobby
-     */
-    override fun getNrOfUsersInLobby(lobbyId: Int): Int = getUsersInLobby(lobbyId).size
-
-    /**
-     * Removes a player from a lobby
-     * @param lobbyId The id of the lobby
-     * @param userId The id of the user to remove
-     */
-    override fun removePlayerFromLobby(lobbyId: Int, userId: Int) {
-        handle.createUpdate(
-            """
-            DELETE FROM lobby WHERE id = :lobbyId AND user_id = :userId
-            """.trimIndent()
-        )
-            .bind("lobbyId", lobbyId)
-            .bind("userId", userId)
-            .execute()
-    }
-
-    /**
      * Joins a player to a lobby
-     * @param ruleId The id of the lobby
+     * @param rule The id of the lobby
      * @param userId The id of the user to join
      * @return The id of the lobby the user joined or null if the user could not join
      */
-    override fun joinLobby(ruleId: Int, userId: Int): Int {
-        val lobbyId = handle.createUpdate(
+    override fun createLobby(rule: Rules, userId: Int) {
+        val rulesId = handle.createQuery(
+            """
+            select id from rules where opening_rule = :openingRule and variant = :variant and board_size = :boardSize
+            """.trimIndent()
+        )
+            .bind("openingRule", rule.openingRule)
+            .bind("variant", rule.variant)
+            .bind("boardSize", rule.boardSize.value)
+            .mapTo<Int>()
+            .one()
+
+        handle.createUpdate(
             """
             INSERT INTO lobby (user_id, rules_id, created_at) VALUES (:userId, :ruleId, :createdAt)
             """.trimIndent()
         )
-            .bind("ruleId", ruleId)
+            .bind("ruleId", rulesId)
             .bind("userId", userId)
-            .bind("createdAt", System.currentTimeMillis())
-            .executeAndReturnGeneratedKeys("id")
-            .mapTo<Int>()
-            .firstOrNull()
-        return lobbyId ?: -1
+            .bind("createdAt", Clock.systemUTC().instant().epochSecond)
+            .execute()
     }
 }

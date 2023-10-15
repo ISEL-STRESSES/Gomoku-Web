@@ -65,7 +65,7 @@ DO $$
 DO $$
     BEGIN
         FOR i IN 1..7 LOOP
-                -- For each match, the black player id is i+2 and the white player is i+12
+                -- For each match, the black player id is 2i-1 and the white player is 2i
                 EXECUTE 'INSERT INTO moves(match_id, player_id, ordinal, row, col) VALUES (' || i || ', ' || (2*i - 1) || ', 1, ' || (i) || ', ' || (i) || ')';
                 EXECUTE 'INSERT INTO moves(match_id, player_id, ordinal, row, col) VALUES (' || i || ', ' || (2*i) || ', 2, ' || (i + 1) || ', ' || (i + 1) || ')';
             END LOOP;

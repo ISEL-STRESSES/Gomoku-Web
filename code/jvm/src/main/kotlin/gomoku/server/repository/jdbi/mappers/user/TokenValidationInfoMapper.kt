@@ -1,4 +1,4 @@
-package gomoku.server.repository.jdbi.mappers
+package gomoku.server.repository.jdbi.mappers.user
 
 import gomoku.server.domain.user.TokenValidationInfo
 import org.jdbi.v3.core.mapper.ColumnMapper

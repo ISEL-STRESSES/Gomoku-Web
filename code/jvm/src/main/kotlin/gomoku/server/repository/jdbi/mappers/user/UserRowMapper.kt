@@ -1,4 +1,4 @@
-package gomoku.server.repository.jdbi.mappers
+package gomoku.server.repository.jdbi.mappers.user
 
 import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.domain.user.User
