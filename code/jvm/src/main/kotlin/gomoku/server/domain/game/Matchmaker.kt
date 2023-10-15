@@ -8,6 +8,6 @@ package gomoku.server.domain.game
  * @property id the id of the match or lobby
  */
 data class Matchmaker(
-    val isMatch : Boolean,
+    val isMatch: Boolean,
     val id: Int
 )

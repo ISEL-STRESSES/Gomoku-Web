@@ -34,7 +34,7 @@ interface LobbyRepository {
      * @param rule the rule to create a lobby with
      * @param userId The id of the user to join
      */
-    fun joinLobby(rule: Rules, userId: Int) :Int
+    fun joinLobby(rule: Rules, userId: Int): Int
 
     /**
      * Removes a player from a lobby (Waiting Room)

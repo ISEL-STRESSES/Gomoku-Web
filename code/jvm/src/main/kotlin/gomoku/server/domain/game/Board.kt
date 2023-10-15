@@ -1,6 +1,5 @@
 package gomoku.server.domain.game
 
-import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Position
 
@@ -33,7 +32,6 @@ class Board private constructor(
      * Helper function to check if move is allready done
      */
     fun hasMove(position: Position): Boolean = boardMap.containsKey(position)
-
 
     /**
      * Gets all moves from the board by order of play.

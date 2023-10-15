@@ -55,7 +55,6 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .mapTo<Rules>()
             .list()
 
-
     /**
      * Creates a new match, with the given rule and user id
      * setting the match state to [MatchState.WAITING_PLAYER]

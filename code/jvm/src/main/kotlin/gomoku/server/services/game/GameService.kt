@@ -3,15 +3,14 @@ package gomoku.server.services.game
 import gomoku.server.domain.game.Lobby
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.match.Match
-import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
 import gomoku.server.domain.game.rules.Rules
 import gomoku.server.domain.user.User
-import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.game.MakeMoveError
+import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.utils.failure
 import gomoku.utils.success
 import org.springframework.stereotype.Service
@@ -36,7 +35,7 @@ class GameService(private val transactionManager: TransactionManager) {
                 val matchId = it.matchRepository.createMatch(ruleId, user.uuid)
                 success(Matchmaker(true, matchId))
             } else {
-                success(Matchmaker(false ,it.lobbyRepository.joinLobby(rule, user.uuid)))
+                success(Matchmaker(false, it.lobbyRepository.joinLobby(rule, user.uuid)))
             }
         }
     }
