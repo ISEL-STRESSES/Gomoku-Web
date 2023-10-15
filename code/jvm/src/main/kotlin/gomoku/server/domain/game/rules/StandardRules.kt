@@ -3,6 +3,7 @@ package gomoku.server.domain.game.rules
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Position
+import gomoku.server.domain.game.player.toColor
 
 /**
  * Represents a Standard rule set
@@ -15,7 +16,8 @@ data class StandardRules(override val boardSize: BoardSize) : Rules() {
 
     override fun isValidMove(previousMoves: List<Move>, move: Move): Boolean {
         val occupiedPositions = previousMoves.map { it.position }
-        val currentColor = move.color
+        val currentColor = previousMoves.size.toColor()
+        if (currentColor != move.color) return false
         val currentMove = move.position
         val allPositions = boardSize.getAllPositions()
         return allPositions.filterNot { it in occupiedPositions }

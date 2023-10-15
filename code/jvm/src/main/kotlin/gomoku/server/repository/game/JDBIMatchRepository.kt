@@ -47,26 +47,6 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .singleOrNull()
 
     /**
-     * Checks if a set of rules is stored.
-     * @param rules rules of the game
-     * @return true if the rules are stored, false otherwise
-     */
-    override fun isRuleStored(rules: Rules): Boolean =
-        handle.createQuery(
-            """
-            select count(*) from rules where 
-            board_size = :boardSize and 
-            opening_rule = :openingRule and 
-            variant = :variant
-            """.trimIndent()
-        )
-            .bind("boardSize", rules.boardSize.value)
-            .bind("openingRule", rules.openingRule)
-            .bind("variant", rules.variant)
-            .mapTo(Int::class.java)
-            .single() == 1
-
-    /**
      * Gets all the rules.
      * @return list of rules
      */
@@ -75,25 +55,6 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .mapTo<Rules>()
             .list()
 
-    /**
-     * Creates a new set of rules.
-     * @param rules rules of the game
-     * @return id of the rule
-     */
-    override fun createRule(rules: Rules): Int {
-        return handle.createUpdate(
-            """
-            insert into rules(board_size, opening_rule, variant)
-            values (:boardSize, :openingRule, :variant)
-            """.trimIndent()
-        )
-            .bind("boardSize", rules.boardSize.value)
-            .bind("openingRule", rules.openingRule)
-            .bind("variant", rules.variant)
-            .executeAndReturnGeneratedKeys()
-            .mapTo<Int>()
-            .one()
-    }
 
     /**
      * Creates a new match, with the given rule and user id
