@@ -17,10 +17,10 @@ interface LobbyRepository {
 
     /**
      * Gets a lobby by its rules
-     * @param ruleId The id of the rule
+     * @param rule the rule
      * @return The lobby or null if no lobby with the given id exists
      */
-    fun getLobbyByRuleId(ruleId: Int): Lobby?
+    fun getLobbyByRule(rule: Rules): Lobby?
 
     /**
      * Gets a lobby by the id of one of its players
@@ -31,10 +31,10 @@ interface LobbyRepository {
 
     /**
      * Creates a lobby with a player (Waiting Room)
-     * @param ruleId The id of the rule to create a lobby with
+     * @param rule the rule to create a lobby with
      * @param userId The id of the user to join
      */
-    fun createLobby(ruleId: Int, userId: Int) :Ma
+    fun joinLobby(rule: Rules, userId: Int) :Int
 
     /**
      * Removes a player from a lobby (Waiting Room)

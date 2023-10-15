@@ -1,7 +1,11 @@
 package gomoku.server.services.game
 
 import gomoku.server.domain.game.Matchmaker
-import gomoku.server.services.errors.MatchmakingError
+import gomoku.server.domain.game.match.Match
+import gomoku.server.services.errors.game.MakeMoveError
+import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.utils.Either
 
-typealias MatchMakingResult = Either<MatchmakingError, Matchmaker>
+typealias MatchmakingResult = Either<MatchmakingError, Matchmaker>
+
+typealias MakeMoveResult = Either<MakeMoveError, Match>

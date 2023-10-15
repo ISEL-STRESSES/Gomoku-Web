@@ -1,7 +1,7 @@
 package gomoku.server.domain.game.match
 
+import gomoku.server.domain.game.Board
 import gomoku.server.domain.game.player.Color
-import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
 import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rules
@@ -14,13 +14,27 @@ sealed class Match(
     val playerA: Player,
     val playerB: Player,
     val rules: Rules,
-    val moves: List<Move> = emptyList()
+    val board: Board
 ) {
     fun getPlayerByColor(color: Color): Player {
         return when (color) {
             playerA.color -> playerA
             playerB.color -> playerB
             else -> throw IllegalArgumentException("There can't be a player matching the color $color")
+        }
+    }
+
+    fun copy(
+        matchId: Int = this.matchId,
+        playerA: Player = this.playerA,
+        playerB: Player = this.playerB,
+        rules: Rules = this.rules,
+        board: Board = this.board,
+        matchOutcome: MatchOutcome? = null
+    ): Match {
+        return when (this) {
+            is OngoingMatch -> OngoingMatch(matchId, playerA, playerB, rules, board)
+            is FinishedMatch -> FinishedMatch(matchId, playerA, playerB, rules, board, matchOutcome!!)
         }
     }
 }
@@ -33,22 +47,22 @@ class OngoingMatch(
     playerA: Player,
     playerB: Player,
     rules: Rules,
-    moves: List<Move>
+    moves: Board
 ) : Match(matchId, playerA, playerB, rules, moves) {
 
-    val turn = (moves.size).toColor()
+    val turn = (moves.getMoves().size).toColor()
 }
 
 /**
  * Represents a game that has been finished.
  */
-class FinishedGame(
+class FinishedMatch(
     matchId: Int,
     playerA: Player,
     playerB: Player,
     rules: Rules,
-    moves: List<Move>,
-    private val matchOutcome: MatchOutcome
+    moves: Board,
+    val matchOutcome: MatchOutcome
 ) : Match(matchId, playerA, playerB, rules, moves) {
 
     fun getWinnerOrNull(): Player? {

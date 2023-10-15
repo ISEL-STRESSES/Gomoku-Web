@@ -9,8 +9,8 @@ import gomoku.server.http.controllers.user.models.getUsersData.GetUsersDataOutpu
 import gomoku.server.http.controllers.user.models.userCreate.UserCreateInputModel
 import gomoku.server.http.controllers.user.models.userTokenCreate.UserCreateTokenInputModel
 import gomoku.server.http.controllers.user.models.userTokenCreate.UserTokenCreateOutputModel
-import gomoku.server.services.errors.TokenCreationError
-import gomoku.server.services.errors.UserCreationError
+import gomoku.server.services.errors.user.TokenCreationError
+import gomoku.server.services.errors.user.UserCreationError
 import gomoku.server.services.user.UserService
 import gomoku.utils.Failure
 import gomoku.utils.Success

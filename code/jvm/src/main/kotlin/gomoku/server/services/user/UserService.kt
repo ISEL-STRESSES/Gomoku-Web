@@ -5,8 +5,8 @@ import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserData
 import gomoku.server.domain.user.UsersDomain
 import gomoku.server.repository.TransactionManager
-import gomoku.server.services.errors.TokenCreationError
-import gomoku.server.services.errors.UserCreationError
+import gomoku.server.services.errors.user.TokenCreationError
+import gomoku.server.services.errors.user.UserCreationError
 import gomoku.utils.failure
 import gomoku.utils.success
 import kotlinx.datetime.Clock
