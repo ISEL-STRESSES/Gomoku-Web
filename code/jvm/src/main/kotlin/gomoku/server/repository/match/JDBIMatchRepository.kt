@@ -51,8 +51,8 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             """.trimIndent()
         )
             .bind("ruleId", ruleId)
-            .bind("playerAId", playerBlackId)
-            .bind("playerBId", playerWhiteId)
+            .bind("player_black", playerBlackId)
+            .bind("player_white", playerWhiteId)
             .bind("matchState", MatchState.ONGOING)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
@@ -170,7 +170,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @param matchId id of the match
      * @param move the position and color of the move
      */
-    override fun makeMove(matchId: Int, move: Move) {
+    override fun makeMove(matchId: Int, move: Move): Boolean =
         handle.createUpdate(
             """
             update matches set moves = array_append(matches.moves, :move) where id = :matchId and match_state = 'ONGOING'
@@ -178,8 +178,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
         )
             .bind("match_id", matchId)
             .bind("move", move)
-            .execute()
-    }
+            .execute() > 0
 
     /**
      * Gets the moves of the match.
