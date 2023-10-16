@@ -1,6 +1,10 @@
 package gomoku.server.services.errors.game
 
 sealed class MakeMoveError {
-    object NotYourTurn : MakeMoveError()
-    object InvalidMove : MakeMoveError() // TODO dizer porque? tipo "invalid move, already occupied", "invalid move, out of bounds", etc
+    object InvalidTurn : MakeMoveError()
+    object AlreadyOccupied: MakeMoveError()
+    object ImpossiblePosition: MakeMoveError()
+    object GameNotFound : MakeMoveError()
+    object GameFinished : MakeMoveError()
+    object MakeMoveFailed : MakeMoveError()
 }

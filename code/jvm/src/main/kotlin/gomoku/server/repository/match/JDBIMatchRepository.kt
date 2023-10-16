@@ -1,9 +1,10 @@
-package gomoku.server.repository.game
+package gomoku.server.repository.match
 
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.match.Move
+import gomoku.server.domain.game.match.OngoingMatch
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rules

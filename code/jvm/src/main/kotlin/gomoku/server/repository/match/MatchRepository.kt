@@ -1,4 +1,4 @@
-package gomoku.server.repository.game
+package gomoku.server.repository.match
 
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome

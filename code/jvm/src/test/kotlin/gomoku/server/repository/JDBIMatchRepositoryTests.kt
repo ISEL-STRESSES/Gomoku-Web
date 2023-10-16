@@ -1,6 +1,6 @@
 package gomoku.server.repository
 
-import gomoku.server.repository.game.JDBIMatchRepository
+import gomoku.server.repository.match.JDBIMatchRepository
 import gomoku.server.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull

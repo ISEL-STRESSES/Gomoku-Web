@@ -96,13 +96,13 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
      * Removes a player from a lobby (Waiting Room)
      * @param userId The id of the user to remove
      */
-    override fun leaveLobby(userId: Int) {
-        handle.createUpdate(
+    override fun leaveLobby(userId: Int): Boolean {
+        return handle.createUpdate(
             """
             DELETE FROM lobby WHERE user_id = :userId
             """.trimIndent()
         )
             .bind("userId", userId)
-            .execute()
+            .execute() > 0
     }
 }
