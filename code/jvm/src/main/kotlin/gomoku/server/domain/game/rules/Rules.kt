@@ -46,7 +46,7 @@ sealed class Rules {
     /**
      * Checks if a move is a winning move
      * @param moveContainer previous moves of the match
-     * @param move move to check
+     * @param move move to check if it was a winning move
      * @return true if the move is a winning move, false otherwise
      */
     abstract fun isWinningMove(moveContainer: MoveContainer, move: Move): Boolean

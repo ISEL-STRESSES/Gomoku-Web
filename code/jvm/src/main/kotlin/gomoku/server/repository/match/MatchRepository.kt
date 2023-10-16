@@ -6,6 +6,7 @@ import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.rules.Rules
+import org.jdbi.v3.core.kotlin.mapTo
 
 typealias GamePlayers = Pair<Int, Int>
 
@@ -95,7 +96,7 @@ interface MatchRepository {
      * @param matchId id of the match
      * @param move the position and color of the move
      */
-    fun makeMove(matchId: Int, move: Move)
+    fun makeMove(matchId: Int, move: Move) : Boolean
 
     /**
      * Gets the moves of the match.

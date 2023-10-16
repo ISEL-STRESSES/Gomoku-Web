@@ -14,6 +14,11 @@ data class UserRuleStats(val rules: Rules, val gamesPlayed: Int = 1, val elo: In
         require(gamesPlayed >= 0)
         require(elo in 0..4000)
     }
+
+    companion object {
+        const val K_FACTOR = 40.0
+        const val DEFAULT_ELO = 1500
+    }
 }
 
 /**

@@ -17,3 +17,9 @@ fun String.toMatchOutcome() = when (this) {
     "DRAW" -> MatchOutcome.DRAW
     else -> throw IllegalArgumentException("Invalid match outcome: $this")
 }
+
+fun Color?.toMatchOutcome() = when(this) {
+    Color.BLACK -> MatchOutcome.BLACK_WON
+    Color.WHITE -> MatchOutcome.WHITE_WON
+    null -> MatchOutcome.DRAW
+}

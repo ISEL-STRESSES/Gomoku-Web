@@ -41,12 +41,12 @@ class GameService(private val transactionManager: TransactionManager) {
             val lobby = it.lobbyRepository.getLobbyByRuleId(ruleId)
 
             if (lobby != null) {
-                if (lobby.user.uuid == user.uuid) {
+                if (lobby.userId == user.uuid) {
                     failure(MatchmakingError.SamePlayer)
                 }
-                it.lobbyRepository.leaveLobby(lobby.user.uuid)
-                val playerBlack = if (Random.nextBoolean()) user.uuid else lobby.user.uuid
-                val playerWhite = if (playerBlack == user.uuid) lobby.user.uuid else user.uuid
+                it.lobbyRepository.leaveLobby(lobby.userId)
+                val playerBlack = if (Random.nextBoolean()) user.uuid else lobby.userId
+                val playerWhite = if (playerBlack == user.uuid) lobby.userId else user.uuid
                 val matchId = it.matchRepository.createMatch(ruleId, playerBlack, playerWhite)
                 success(Matchmaker(true, matchId))
             } else {

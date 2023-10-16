@@ -40,12 +40,9 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     override fun getLobbies(): List<Lobby> =
         handle.createQuery(
             """
-            SELECT rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, 
-            users.id, users.username, users.password_validation
+            SELECT rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id
             FROM lobby join rules 
             on lobby.rules_id = rules.id 
-            join users 
-            on lobby.user_id = users.id
             """.trimIndent()
         )
             .mapTo<Lobby>()
@@ -53,22 +50,19 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
 
     /**
      * Gets a lobby by the id of one of its players
-     * @param user The id of the player
+     * @param userId The id of the player
      * @return The lobby or null if no lobby with the given id exists
      */
-    override fun getLobbyByUser(user: User): Lobby? =
+    override fun getLobbyByUserId(userId: Int): Lobby? =
         handle.createQuery(
             """
-            SELECT rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, 
-            users.id, users.username, users.password_validation 
-            FROM lobby join users 
-            on lobby.user_id = users.id 
-            join rules 
+            SELECT rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id            
+            FROM lobby join rules 
             on rules.id = lobby.rules_id
-            where users.id = :userId
+            where lobby.user_id= :userId
             """.trimIndent()
         )
-            .bind("userId", user)
+            .bind("userId", userId)
             .mapTo<Lobby>()
             .singleOrNull()
 

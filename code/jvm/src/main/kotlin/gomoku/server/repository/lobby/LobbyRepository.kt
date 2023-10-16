@@ -1,7 +1,6 @@
 package gomoku.server.repository.lobby
 
 import gomoku.server.domain.game.Lobby
-import gomoku.server.domain.user.User
 
 /**
  * Repository for lobbies
@@ -23,10 +22,10 @@ interface LobbyRepository {
 
     /**
      * Gets a lobby by the id of one of its players
-     * @param user The id of the player
+     * @param userId The id of the player
      * @return The lobby or null if no lobby with the given id exists
      */
-    fun getLobbyByUser(user: User): Lobby?
+    fun getLobbyByUserId(userId: Int): Lobby?
 
     /**
      * Creates a lobby with a player
@@ -40,5 +39,5 @@ interface LobbyRepository {
      * Removes a player from a lobby (Waiting Room)
      * @param userId The id of the user to remove
      */
-    fun leaveLobby(userId: Int)
+    fun leaveLobby(userId: Int) : Boolean
 }
