@@ -186,6 +186,38 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .list()
 
     /**
+     * Gets all the stats related to the users, with pagination, by rule.
+     * @param offset The offset of the first user to get.
+     * @param limit The maximum number of users to get.
+     * @param boardSize The boardSize of the rule
+     * @param openingRule The opening rule of the rule
+     * @param variant The variant of the rule
+     * @return A list of [UserData] objects, containing all the stats related to the users.
+     */
+    override fun getUsersStatsDataByRule(offset: Int, limit: Int, boardSize:Int, variant: String, openingRule: String ) : List<UserData> =
+        handle.createQuery(
+            """
+            select users.id as user_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
+            from users
+            inner join user_stats
+            on users.id = user_stats.user_id
+            inner join rules
+            on user_stats.rules_id = rules.id
+            where rules.board_size = :boardSize and rules.variant = :variant and rules.opening_rule = :openingRule
+            order by users.id
+            offset :offset
+            limit :limit           
+            """.trimIndent()
+        )
+            .bind("offset", offset)
+            .bind("limit", limit)
+            .bind("boardSize", boardSize)
+            .bind("variant", variant)
+            .bind("openingRule", openingRule)
+            .mapTo<UserData>()
+            .list()
+
+    /**
      * Retrieves the stats of a user for a given rule.
      * @param userId The id of the user.
      * @param ruleId The id of the rule.

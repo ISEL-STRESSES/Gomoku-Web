@@ -82,6 +82,17 @@ interface UserRepository {
     fun getUsersStatsData(offset: Int, limit: Int): List<UserData>
 
     /**
+     * Gets all the stats related to the users, with pagination, by rule.
+     * @param offset The offset of the first user to get.
+     * @param limit The maximum number of users to get.
+     * @param boardsize The boardsize of the rule
+     * @param openingRule The opening rule of the rule
+     * @param variant The variant of the rule
+     * @return A list of [UserData] objects, containing all the stats related to the users.
+     */
+    fun getUsersStatsDataByRule(offset: Int, limit: Int, boardsize:Int, variant: String, openingRule: String ) : List<UserData>
+
+    /**
      * Retrieves the stats of a user for a given rule.
      * @param userId The id of the user.
      * @param ruleId The id of the rule.

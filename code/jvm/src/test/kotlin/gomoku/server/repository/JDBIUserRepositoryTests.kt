@@ -1,6 +1,7 @@
 package gomoku.server.repository
 
 import gomoku.server.TestClock
+import gomoku.server.domain.game.rules.buildRule
 import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
@@ -136,16 +137,9 @@ class JDBIUserRepositoryTests {
     fun `can retrieve users stats`() = testWithHandleAndRollback { handle ->
         // given: a UsersRepository
         val repo = JDBIUserRepository(handle)
-
-        // and: a createdUser
-        val userName = newTestUserName()
-        val passwordValidationInfo = newTestUserPassword()
-        repo.storeUser(userName, passwordValidationInfo)
-
-        // and: stats for the user
-
-        // when: retrieving users stats
-        val usersStats = repo.getUsersStatsData(0, 10)
+        // and: a rule
+        val rule = buildRule(15, "PRO", "STANDARD")
+        val usersStats = repo.getUsersStatsDataByRule(0, 10, rule.boardSize.value, rule.variant.name, rule.openingRule.name)
         usersStats.forEach(::println)
         // then: users stats are retrieved
         // Check if the returned list is not null
@@ -156,6 +150,7 @@ class JDBIUserRepositoryTests {
 
         // Check if pagination is correct
         assertEquals(1, usersStats.first().uuid)
+        assertEquals(10, usersStats.last().uuid)
     }
 
     companion object {
