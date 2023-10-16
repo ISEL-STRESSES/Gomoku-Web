@@ -112,7 +112,7 @@ class MoveContainer private constructor(
          * @param movesIndexes The list of moves.
          * @return [AddMoveResult] which is either an error or a new [MoveContainer] with the given moves.
          */
-        fun buildMoveContainer(boardSize: Int, movesIndexes: Array<Int>): AddMoveResult {
+        fun buildMoveContainer(boardSize: Int, movesIndexes: List<Int>): AddMoveResult {
             val moveContainer = createEmptyMoveContainer(boardSize)
             for ((index, boardIndex) in movesIndexes.withIndex()) {
                 val position = Position(boardIndex)
