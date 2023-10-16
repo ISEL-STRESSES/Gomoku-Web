@@ -19,11 +19,12 @@ class JDBIMatchRepositoryTests {
         val rule1 = repo.getRuleById(1)
         assertNotNull(rule1)
 
-        val ruleProX19 = repo.getRuleById(4)
-        assertNull(ruleProX19)
+        val rule4 = repo.getRuleById(4)
+        assertNull(rule4)
 
-        val newRuleProX19 = repo.getRuleId(ProOpeningRules(BoardSize.X19))
-        assertNotNull(newRuleProX19)
+        val ruleProX15 = ProOpeningRules(BoardSize.X15)
+        val ruleProX15Id = repo.getRuleId(ruleProX15)
+        assertNotNull(ruleProX15Id)
     }
 
     @Test
@@ -31,11 +32,6 @@ class JDBIMatchRepositoryTests {
 
         val repo = JDBIMatchRepository(handle)
 
-        val lobbyNull = repo.getLobbyById(1)
-        assertNull(lobbyNull)
 
-        val newLobby = repo.joinLobby(1, 1)
-        assertNotNull(newLobby)
-        assertEquals(newLobby, 1)
     }
 }

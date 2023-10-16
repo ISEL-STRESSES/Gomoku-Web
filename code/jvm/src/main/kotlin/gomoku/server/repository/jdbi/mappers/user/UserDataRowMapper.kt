@@ -43,5 +43,17 @@ class UserDataRowMapper : RowMapper<UserData> {
             username = rs.getString("username"),
             userRuleStats = userRuleStats
         )
+
+        /*val uuid = rs.getInt("user_id")
+        val username = rs.getString("username")
+        val rule = buildRule(
+            rs.getInt("board_size"),
+            rs.getString("variant"),
+            rs.getString("opening_rule")
+        )
+        val gamesPlayed = rs.getInt("games_played")
+        val elo = rs.getInt("elo")
+        val userRuleStats = UserRuleStats(rule, gamesPlayed, elo)
+        return UserData(uuid, username, listOf(userRuleStats))*/
     }
 }

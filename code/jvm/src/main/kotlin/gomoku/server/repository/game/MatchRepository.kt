@@ -19,7 +19,7 @@ interface MatchRepository {
      * @param rules rules of the match
      * @return id of the rule
      */
-    fun getRuleId(rules: Rules): Int
+    fun getRuleId(rules: Rules): Int?
 
     /**
      * Gets a rule by its id.

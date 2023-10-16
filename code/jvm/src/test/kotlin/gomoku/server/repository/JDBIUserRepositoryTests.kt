@@ -146,8 +146,16 @@ class JDBIUserRepositoryTests {
 
         // when: retrieving users stats
         val usersStats = repo.getUsersStatsData(0, 10)
-        // then: the user is in the stats
-        assertTrue(usersStats.any { it.username == userName })
+        usersStats.forEach(::println)
+        // then: users stats are retrieved
+        // Check if the returned list is not null
+        assertNotNull(usersStats)
+
+        // Check if the size of the returned list is as expected
+        assertEquals(10, usersStats.size)
+
+        // Check if pagination is correct
+        assertEquals(1, usersStats.first().uuid)
     }
 
     companion object {

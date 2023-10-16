@@ -20,7 +20,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @param rules rules of the game
      * @return id of the rule
      */
-    override fun getRuleId(rules: Rules): Int =
+    override fun getRuleId(rules: Rules): Int? =
         handle.createQuery(
             """
                 select id from rules where 
@@ -33,7 +33,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .bind("openingRule", rules.openingRule)
             .bind("variant", rules.variant)
             .mapTo<Int>()
-            .single()
+            .singleOrNull()
 
     /**
      * Gets a rule by its id.
