@@ -3,38 +3,17 @@ package gomoku.server.repository.game
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
-import gomoku.server.domain.game.match.toMatchState
 import gomoku.server.domain.game.player.Color
-import gomoku.server.domain.game.player.Move
-import gomoku.server.domain.game.player.Player
+import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rules
+import gomoku.server.domain.user.User
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
-import org.jdbi.v3.core.transaction.TransactionIsolationLevel
 
 class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
 
-    /**
-     * Gets the id of a set of rules, if not found it creates a new one.
-     * @param rules rules of the game
-     * @return id of the rule
-     */
-    override fun getRuleId(rules: Rules): Int? =
-        handle.createQuery(
-            """
-                select id from rules where 
-                board_size = :boardSize and 
-                opening_rule = :openingRule and 
-                variant = :variant
-            """.trimIndent()
-        )
-            .bind("boardSize", rules.boardSize.value)
-            .bind("openingRule", rules.openingRule)
-            .bind("variant", rules.variant)
-            .mapTo<Int>()
-            .singleOrNull()
-
+    //rules
     /**
      * Gets a rule by its id.
      * @param ruleId id of the rule
@@ -55,80 +34,29 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .mapTo<Rules>()
             .list()
 
+    //match
     /**
-     * Creates a new match, with the given rule and user id
-     * setting the match state to [MatchState.WAITING_PLAYER]
+     * Creates a new match, with the given rule and users ids
+     * setting the match state to [MatchState.ONGOING]
      * @param ruleId id of the rule
-     * @param userId id of the user
+     * @param playerBlackId id of the player playing with black stones
+     * @param playerWhiteId id of the player playing with white stones
      * @return id of the match
      */
-    override fun createMatch(ruleId: Int, playerAId: Int, playerBId: Int): Int {
-        val matchId = handle.createUpdate(
+    override fun createMatch(ruleId: Int, playerBlackId: Int, playerWhiteId: Int): Int =
+        handle.createUpdate(
             """
-        insert into matches(rules_id, match_state, player1_id, player2_id)
-        values (:ruleId, :playerAId, :playerBId, :matchState)
+        insert into matches(rules_id, match_state, player_black, player_white)
+        values (:ruleId, :playerBlackId, :playerWhiteId, :matchState)
             """.trimIndent()
         )
             .bind("ruleId", ruleId)
+            .bind("playerAId", playerBlackId)
+            .bind("playerBId", playerWhiteId)
             .bind("matchState", MatchState.ONGOING)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .one()
-
-        handle.createUpdate(
-            """
-        insert into player(user_id, match_id, rules_id, color)
-        values (:userId, :matchId, :rulesId, :color)
-            """.trimIndent()
-        )
-            .bind("userId", userId)
-            .bind("matchId", matchId)
-            .bind("rulesId", ruleId)
-            .bind("color", Color.BLACK)
-            .execute()
-        return matchId
-    }
-
-    /**
-     * Joins a player to an already existing match.
-     * @param matchId id of the match
-     * @param userId id of the user to join
-     * @return id of the match
-     */
-    override fun joinUserToMatch(matchId: Int, userId: Int): Int {
-        handle.transactionIsolationLevel = TransactionIsolationLevel.REPEATABLE_READ
-        val match = handle.createQuery("select id from matches where id = :matchId")
-            .bind("matchId", matchId)
-            .mapTo<Int>()
-            .singleOrNull() ?: throw IllegalStateException("Match not found")
-        handle.createUpdate(
-            """
-            insert into player(user_id, match_id, rules_id, color)
-            values (:userId, :matchId,(select rules_id from matches where match_id = :matchId), 'WHITE')
-            """.trimIndent()
-        )
-            .bind("userId", userId)
-            .bind("matchId", matchId)
-            .execute()
-        return match
-    }
-
-    // TODO check this one
-    /**
-     * Initiates a match between two players.
-     * @param playerA the first player
-     * @param playerB the second player
-     * @return id of the match
-     */
-    override fun initiateMatch(playerA: Player, playerB: Player): Pair<Player, Player> {
-        handle.transactionIsolationLevel = TransactionIsolationLevel.REPEATABLE_READ
-        handle.createUpdate(
-            """
-                update matches set match_state = 'ONGOING' where id = :matchId
-            """.trimIndent()
-        )
-        return playerA to playerB
-    }
 
     /**
      * Gets the match by its id.
@@ -136,7 +64,13 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @return the match or null if not found
      */
     override fun getMatchById(matchId: Int): Match? =
-        handle.createQuery("select * from matches where id = :matchId")
+        handle.createQuery("""
+            select matches.id, matches.player_black, matches.player_white, matches.match_state, matches.match_outcome, matches.moves,
+            rules.board_size, rules.opening_rule, rules.variant
+            from matches join rules
+            on rules.id = matches.rules_id
+            where matches.id = :matchId
+        """.trimIndent())
             .bind("matchId", matchId)
             .mapTo<Match>()
             .singleOrNull()
@@ -144,13 +78,13 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     /**
      * Gets the state of the match.
      * @param matchId id of the match
-     * @return state of the match
+     * @return state of the match or null if the match doesn't exist
      */
-    override fun getMatchState(matchId: Int): MatchState =
+    override fun getMatchState(matchId: Int): MatchState? =
         handle.createQuery("select match_state from matches where id = :matchId")
             .bind("matchId", matchId)
-            .mapTo<String>()
-            .single().toMatchState()
+            .mapTo<MatchState>()
+            .singleOrNull()
 
     /**
      * Sets the state of the match.
@@ -187,7 +121,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun setMatchOutcome(matchId: Int, outcome: MatchOutcome) {
         handle.createUpdate(
             """
-            update matches set match_outcome = :outcome where id = :matchId
+            update matches set match_outcome = :outcome where id = :matchId and match_state = 'FINISHED'
             """.trimIndent()
         )
             .bind("matchId", matchId)
@@ -198,33 +132,33 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     /**
      * Gets the rule of the match.
      * @param matchId id of the match
-     * @return the rule
+     * @return the rule or null if the match doesn't exist
      */
-    override fun getMatchRule(matchId: Int): Rules =
+    override fun getMatchRule(matchId: Int): Rules? =
         handle.createQuery(
             """
-            select board_size, opening_rule, variant from rules where rules.id = (
-            select id from matches where matches.id = :matchId
+            select board_size, variant, opening_rule from rules where rules.id = (
+            select rules_id from matches where matches.id = :matchId
             )
             """.trimIndent()
         )
             .bind("matchId", matchId)
             .mapTo<Rules>()
-            .single()
+            .singleOrNull()
 
     /**
      * Gets the players of a match.
      * @param matchId id of the match
      * @return pair of players
      */
-    override fun getMatchPlayers(matchId: Int): Pair<Player, Player>? =
+    override fun getMatchPlayers(matchId: Int): GamePlayers? =
         handle.createQuery(
             """
-            select user_id, color from player where match_id = :matchId
+            select player_black, player_white from matches where id = :matchId
             """.trimIndent()
         )
             .bind("matchId", matchId)
-            .mapTo<Player>()
+            .mapTo<Int>()
             .list()?.let {
                 it[0] to it[1]
             }
@@ -237,15 +171,11 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun makeMove(matchId: Int, move: Move) {
         handle.createUpdate(
             """
-            insert into moves(match_id, player_id, ordinal, row, col)
-            values (:match_id, :player_id, (select Count(match_id) from moves where moves.match_id = :match_id), :row, :col)
+            update matches set moves = array_append(matches.moves, :move) where id = :matchId and match_state = 'ONGOING'
             """.trimIndent()
         )
             .bind("match_id", matchId)
-            .bind("player_id", 1) // TODO: get player id
-            .bind("color", move.color.name)
-            .bind("row", move.position.x)
-            .bind("col", move.position.y)
+            .bind("move", move)
             .execute()
     }
 
@@ -257,8 +187,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun getAllMoves(matchId: Int): List<Move> =
         handle.createQuery(
             """
-                select color, row, col from moves join player on
-                moves.player_id = player.user_id and moves.match_id = :matchId
+                select moves from matches where id = :matchId
             """.trimIndent()
         )
             .bind("matchId", matchId)
@@ -272,27 +201,19 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @return list of moves
      */
     override fun getLastNMoves(matchId: Int, n: Int): List<Move> =
-        handle.createQuery(
-            """
-                select color, row, col from moves join player on
-                moves.player_id = player.user_id and moves.match_id = player.match_id
-                where player.match_id = :matchId
-                order by moves.row desc limit :n
-            """.trimIndent()
-        )
-            .bind("matchId", matchId)
-            .bind("n", n)
-            .mapTo<Move>()
-            .toList()
+        getAllMoves(matchId).takeLast(n)
 
     /**
      * Gets the turn of the match.
      * @param matchId id of the match
      * @return the id of the player for the current turn.
      */
-    override fun getTurn(matchId: Int): Color =
-        handle.createQuery("select Count(*) from moves where match_id = :matchId")
+    override fun getTurn(matchId: Int): Color? =
+        handle.createQuery("""
+            select array_length(matches.moves, 1) from matches where id = :matchId and match_state = 'ONGOING'
+        """.trimIndent()
+        )
             .bind("matchId", matchId)
             .mapTo<Int>()
-            .singleOrNull()?.toColor() ?: throw IllegalStateException("Match not found")
+            .singleOrNull()?.toColor()
 }

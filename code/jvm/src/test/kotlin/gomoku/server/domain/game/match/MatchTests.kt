@@ -1,10 +1,7 @@
 package gomoku.server.domain.game.match
 
-import gomoku.server.domain.game.MoveContainer
 import gomoku.server.domain.game.player.Color
-import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
-import gomoku.server.domain.game.player.Position
 import gomoku.server.domain.game.rules.BoardSize
 import gomoku.server.domain.game.rules.StandardRules
 import org.junit.jupiter.api.Assertions.assertEquals

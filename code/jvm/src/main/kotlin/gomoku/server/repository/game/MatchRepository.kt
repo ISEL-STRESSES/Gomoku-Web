@@ -4,9 +4,12 @@ import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.player.Color
-import gomoku.server.domain.game.player.Move
-import gomoku.server.domain.game.player.Player
+import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.rules.Rules
+import gomoku.server.domain.user.User
+
+typealias GamePlayers = Pair<Int, Int>
+
 
 /**
  * Repository for match data.
@@ -29,14 +32,14 @@ interface MatchRepository {
 
     // Match
     /**
-     * Creates a new match, with the given rule and user id
-     * setting the match state to [MatchState.WAITING_PLAYER]
+     * Creates a new match, with the given rule and users ids
+     * setting the match state to [MatchState.ONGOING]
      * @param ruleId id of the rule
-     * @param playerAId id of the playerA
-     * @param playerBId id of the playerB
+     * @param playerBlackId id of the player playing with black stones
+     * @param playerWhiteId id of the player playing with white stones
      * @return id of the match
      */
-    fun createMatch(ruleId: Int, playerAId: Int, playerBId: Int): Int
+    fun createMatch(ruleId: Int, playerBlackId: Int, playerWhiteId: Int): Int
 
     /**
      * Gets the match by its id.
@@ -48,22 +51,22 @@ interface MatchRepository {
     /**
      * Gets the state of the match.
      * @param matchId id of the match
-     * @return state of the match
+     * @return state of the match or null if the match doesn't exist
      */
-    fun getMatchState(matchId: Int): MatchState
+    fun getMatchState(matchId: Int): MatchState?
 
     /**
      * Sets the state of the match.
      * @param matchId id of the match
      * @param state state of the match
-     * @return true if the state was set, false otherwise
      */
     fun setMatchState(matchId: Int, state: MatchState)
 
     /**
      * Gets the winner of the match.
      * @param matchId id of the match
-     * @return outcome of the match or null if the match is not finished
+     * @return outcome of the match or null if the match is
+     * not finished or doesn't exist
      */
     fun getMatchOutcome(matchId: Int): MatchOutcome?
 
@@ -77,16 +80,16 @@ interface MatchRepository {
     /**
      * Gets the rule of the match.
      * @param matchId id of the match
-     * @return the rule
+     * @return the rule or null if the match doesn't exist
      */
-    fun getMatchRule(matchId: Int): Rules
+    fun getMatchRule(matchId: Int): Rules?
 
     /**
      * Gets the players of a match.
      * @param matchId id of the match
-     * @return pair of players
+     * @return the GamePlayers or null if the match doesn't exist
      */
-    fun getMatchPlayers(matchId: Int): Pair<Player, Player>?
+    fun getMatchPlayers(matchId: Int): GamePlayers?
 
     // moves
     /**
@@ -114,7 +117,8 @@ interface MatchRepository {
     /**
      * Gets the turn of the match.
      * @param matchId id of the match
-     * @return the id of the player for the current turn.
+     * @return the color of the player whose turn it is, of null if
+     * the match has already ended or doesn't exist.
      */
-    fun getTurn(matchId: Int): Color
+    fun getTurn(matchId: Int): Color?
 }

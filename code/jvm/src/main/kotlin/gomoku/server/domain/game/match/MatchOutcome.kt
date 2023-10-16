@@ -10,3 +10,10 @@ enum class MatchOutcome(val winnerColor: Color? = null) {
     WHITE_WON(Color.WHITE),
     DRAW
 }
+
+fun String.toMatchOutcome() = when (this) {
+    "BLACK_WON" -> MatchOutcome.BLACK_WON
+    "WHITE_WON" -> MatchOutcome.WHITE_WON
+    "DRAW" -> MatchOutcome.DRAW
+    else -> throw IllegalArgumentException("Invalid match outcome: $this")
+}

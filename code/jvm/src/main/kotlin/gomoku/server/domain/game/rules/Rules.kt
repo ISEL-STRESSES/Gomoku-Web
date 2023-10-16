@@ -1,8 +1,8 @@
 package gomoku.server.domain.game.rules
 
-import gomoku.server.domain.game.MoveContainer
+import gomoku.server.domain.game.match.MoveContainer
 import gomoku.server.domain.game.player.Color
-import gomoku.server.domain.game.player.Move
+import gomoku.server.domain.game.match.Move
 import gomoku.utils.Either
 
 typealias IsValidMoveResult = Either<MoveError, Unit>

@@ -1,6 +1,7 @@
 package gomoku.server.domain.game
 
-import gomoku.server.domain.game.player.Position
+import gomoku.server.domain.game.match.MoveContainer
+import gomoku.server.domain.game.match.Position
 import gomoku.server.domain.game.rules.BoardSize
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse

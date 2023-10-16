@@ -1,7 +1,8 @@
 package gomoku.server.domain.game.rules
 
 import gomoku.server.domain.game.player.Color
-import gomoku.server.domain.game.player.Move
+import gomoku.server.domain.game.match.Move
+import gomoku.server.domain.game.match.MoveContainer
 
 data class ProOpeningRules(override val boardSize: BoardSize) : Rules() {
     override val variant: RuleVariant = RuleVariant.STANDARD
