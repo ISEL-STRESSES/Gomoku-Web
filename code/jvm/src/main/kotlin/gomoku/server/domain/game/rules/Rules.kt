@@ -1,5 +1,6 @@
 package gomoku.server.domain.game.rules
 
+import gomoku.server.domain.game.MoveContainer
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.utils.Either
@@ -25,11 +26,11 @@ sealed class Rules {
 
     /**
      * Checks if a move is valid based on the rules of the match
-     * @param previousMoves previous moves of the match
+     * @param moveContainer previous moves of the match
      * @param move move to check
      * @return true if the move is valid, false otherwise
      */
-    abstract fun isValidMove(previousMoves: List<Move>, move: Move): IsValidMoveResult
+    abstract fun isValidMove(moveContainer: MoveContainer, move: Move): IsValidMoveResult
 
     /**
      * Returns the possible moves based on the rules of the match
@@ -37,7 +38,7 @@ sealed class Rules {
      * @param color color of the player
      * @return the possible moves
      */
-    abstract fun possibleMoves(previousMoves: List<Move>, color: Color): List<Move>
+    abstract fun possibleMoves(moveContainer: MoveContainer, color: Color): List<Move>
 
     /**
      * Checks if a move is a winning move
@@ -45,7 +46,7 @@ sealed class Rules {
      * @param move move to check
      * @return true if the move is a winning move, false otherwise
      */
-    abstract fun isWinningMove(previousMoves: List<Move>, move: Move): Boolean
+    abstract fun isWinningMove(moveContainer: MoveContainer, move: Move): Boolean
 }
 
 /**

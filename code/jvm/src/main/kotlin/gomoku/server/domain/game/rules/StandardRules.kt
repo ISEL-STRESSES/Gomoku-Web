@@ -1,5 +1,6 @@
 package gomoku.server.domain.game.rules
 
+import gomoku.server.domain.game.MoveContainer
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Position
@@ -16,9 +17,9 @@ data class StandardRules(override val boardSize: BoardSize) : Rules() {
     override val variant: RuleVariant = RuleVariant.STANDARD
     override val openingRule: OpeningRule = OpeningRule.FREE
 
-    override fun isValidMove(previousMoves: List<Move>, move: Move): IsValidMoveResult {
-        val occupiedPositions = previousMoves.map { it.position }
-        val currentColor = previousMoves.size.toColor()
+    override fun isValidMove(moveContainer: List<Move>, move: Move): IsValidMoveResult {
+        val occupiedPositions = moveContainer.map { it.position }
+        val currentColor = moveContainer.size.toColor()
         if (currentColor != move.color) return failure(MoveError.InvalidTurn)
         val currentMove = move.position
         val allPositions = boardSize.getAllPositions()
@@ -27,13 +28,13 @@ data class StandardRules(override val boardSize: BoardSize) : Rules() {
         return success(Unit)
     }
 
-    override fun possibleMoves(previousMoves: List<Move>, color: Color): List<Move> {
-        val occupiedPositions = previousMoves.map { it.position }
+    override fun possibleMoves(moveContainer: MoveContainer, color: Color): List<Move> {
+        val occupiedPositions = moveContainer.getMoves().map { it.position }
         val allPositions = boardSize.getAllPositions()
         return allPositions.filterNot { it in occupiedPositions }.map { Move(it, color) }
     }
 
-    override fun isWinningMove(previousMoves: List<Move>, move: Move): Boolean {
+    override fun isWinningMove(moveContainer: MoveContainer, move: Move): Boolean {
         val directions = listOf(
             Pair(0, 1), // Horizontal
             Pair(1, 0), // Vertical
@@ -42,8 +43,8 @@ data class StandardRules(override val boardSize: BoardSize) : Rules() {
         )
 
         for (direction in directions) {
-            if (countPieces(previousMoves, move.position, move.color, direction.first, direction.second) +
-                countPieces(previousMoves, move.position, move.color, -direction.first, -direction.second) + 1 >= 5
+            if (countPieces(moveContainer, move.position, move.color, direction.first, direction.second) +
+                countPieces(moveContainer, move.position, move.color, -direction.first, -direction.second) + 1 >= 5
             ) {
                 return true
             }
@@ -53,7 +54,7 @@ data class StandardRules(override val boardSize: BoardSize) : Rules() {
     }
 
     private fun countPieces(
-        moves: List<Move>,
+        moveContainer: MoveContainer,
         position: Position,
         color: Color,
         dx: Int,
@@ -62,7 +63,7 @@ data class StandardRules(override val boardSize: BoardSize) : Rules() {
         var count = 0
         var x = position.x + dx
         var y = position.y + dy
-        while (moves.contains(Move(Position(x, y), color))) {
+        while (moveContainer.hasMove((Position(x, y))) {
             count++
             x += dx
             y += dy

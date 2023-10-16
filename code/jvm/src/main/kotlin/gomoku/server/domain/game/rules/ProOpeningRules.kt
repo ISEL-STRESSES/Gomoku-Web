@@ -6,7 +6,7 @@ import gomoku.server.domain.game.player.Move
 data class ProOpeningRules(override val boardSize: BoardSize) : Rules() {
     override val variant: RuleVariant = RuleVariant.STANDARD
     override val openingRule: OpeningRule = OpeningRule.PRO
-    override fun isValidMove(previousMoves: List<Move>, move: Move): Boolean {
+    override fun isValidMove(moveContainer: List<Move>, move: Move): IsValidMoveResult {
         TODO("Not yet implemented")
     }
 

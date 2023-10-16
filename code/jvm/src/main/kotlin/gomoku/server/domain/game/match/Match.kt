@@ -1,6 +1,6 @@
 package gomoku.server.domain.game.match
 
-import gomoku.server.domain.game.Board
+import gomoku.server.domain.game.MoveContainer
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Player
 import gomoku.server.domain.game.player.toColor
@@ -14,7 +14,7 @@ sealed class Match(
     val playerA: Player,
     val playerB: Player,
     val rules: Rules,
-    val board: Board
+    val moveContainer: MoveContainer
 ) {
     fun getPlayerByColor(color: Color): Player {
         return when (color) {
@@ -34,7 +34,7 @@ class OngoingMatch(
     playerA: Player,
     playerB: Player,
     rules: Rules,
-    moves: Board
+    moves: MoveContainer
 ) : Match(matchId, playerA, playerB, rules, moves) {
 
     val turn = (moves.getMoves().size).toColor()
@@ -48,7 +48,7 @@ class FinishedMatch(
     playerA: Player,
     playerB: Player,
     rules: Rules,
-    moves: Board,
+    moves: MoveContainer,
     private val matchOutcome: MatchOutcome
 ) : Match(matchId, playerA, playerB, rules, moves) {
 

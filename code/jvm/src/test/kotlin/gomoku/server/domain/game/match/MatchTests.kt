@@ -1,6 +1,6 @@
 package gomoku.server.domain.game.match
 
-import gomoku.server.domain.game.Board
+import gomoku.server.domain.game.MoveContainer
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
@@ -16,7 +16,7 @@ class MatchTests {
     private val playerA = Player(1, Color.BLACK)
     private val playerB = Player(2, Color.WHITE)
     private val rules = StandardRules(BoardSize.X15)
-    private val moves: Board = Board.createEmptyBoard(rules.boardSize.value)
+    private val moves: MoveContainer = MoveContainer.createEmptyMoveContainer(rules.boardSize.value)
 
     @Test
     fun `getPlayerByColor returns correct player for given color in ongoing and finished match`() {

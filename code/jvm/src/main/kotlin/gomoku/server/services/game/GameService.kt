@@ -45,9 +45,9 @@ class GameService(private val transactionManager: TransactionManager) {
     fun makeMove(game: Match, move: Move): MakeMoveResult {
             return transactionManager.run {
                 //val game = it.matchRepository.getMatchById(gameId)
-                if (game.rules.isValidMove(game.board.getMoves()/*game.moves*/, move)) {
+                if (game.rules.isValidMove(game.moveContainer.getMoves()/*game.moves*/, move)) {
 
-                    if (game.rules.isWinningMove(game.board.getMoves(), move)) {
+                    if (game.rules.isWinningMove(game.moveContainer.getMoves(), move)) {
                         it.matchRepository.makeMove(game.matchId, move)
                         it.matchRepository.setMatchState(game.matchId, MatchState.FINISHED)
                         val newGame = it.matchRepository.getMatchById(game.matchId)
@@ -57,7 +57,7 @@ class GameService(private val transactionManager: TransactionManager) {
                     }
                     val newGame = it.matchRepository.getMatchById(game.matchId)
 
-                    val newGame = game.board.addMove(move)
+                    val newGame = game.moveContainer.addMove(move)
                     success(newGame)
                 } else {
                     failure(MakeMoveError.InvalidMove)
