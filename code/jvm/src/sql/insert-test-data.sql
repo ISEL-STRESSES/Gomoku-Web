@@ -1,7 +1,7 @@
 BEGIN TRANSACTION;
 
 -- Truncating tables first
-TRUNCATE TABLE users, tokens, rules, user_stats, matches, player, moves RESTART IDENTITY CASCADE;
+TRUNCATE TABLE users, tokens, rules, user_stats, matches,
 
 -- Inserting data into 'users' table
 DO $$
@@ -36,13 +36,15 @@ DO $$
             END LOOP;
     END $$;
 
--- Step 1: Inserting data into 'matches' table without player references
+-- Step 1: Inserting data into 'matches' without moves
 DO $$
     BEGIN
-        FOR i IN 1..10 LOOP
-                EXECUTE 'INSERT INTO matches(rules_id, match_outcome, match_state) VALUES (1, NULL, ''ongoing'')';
+        FOR i IN 1..20 LOOP
+                EXECUTE 'INSERT INTO matches(rules_id, player_black, player_white, match_outcome, match_state) VALUES (1,'||i||','||2*i||', NULL, ''ongoing'')';
             END LOOP;
     END $$;
+
+--
 
 -- Step 2: Inserting data into 'player' table
 DO $$

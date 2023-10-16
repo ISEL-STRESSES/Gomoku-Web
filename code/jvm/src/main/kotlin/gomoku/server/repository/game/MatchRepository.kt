@@ -15,13 +15,6 @@ interface MatchRepository {
 
     // Rules
     /**
-     * Gets the id of a set of rules, if not found it creates a new one.
-     * @param rules rules of the match
-     * @return id of the rule
-     */
-    fun getRuleId(rules: Rules): Int?
-
-    /**
      * Gets a rule by its id.
      * @param ruleId id of the rule
      * @return the rule or null if not found
@@ -39,26 +32,11 @@ interface MatchRepository {
      * Creates a new match, with the given rule and user id
      * setting the match state to [MatchState.WAITING_PLAYER]
      * @param ruleId id of the rule
-     * @param userId id of the user
+     * @param playerAId id of the playerA
+     * @param playerBId id of the playerB
      * @return id of the match
      */
-    fun createMatch(ruleId: Int, userId: Int): Int
-
-    /**
-     * Joins a player to an already existing match.
-     * @param matchId id of the match
-     * @param userId id of the user to join
-     * @return id of the match
-     */
-    fun joinUserToMatch(matchId: Int, userId: Int): Int
-
-    /**
-     * Initiates a match between two players.
-     * @param playerA the first player
-     * @param playerB the second player
-     * @return id of the match
-     */
-    fun initiateMatch(playerA: Player, playerB: Player): Pair<Player, Player>
+    fun createMatch(ruleId: Int, playerAId: Int, playerBId: Int): Int
 
     /**
      * Gets the match by its id.

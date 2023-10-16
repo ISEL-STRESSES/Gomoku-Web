@@ -62,15 +62,15 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @param userId id of the user
      * @return id of the match
      */
-    override fun createMatch(ruleId: Int, userId: Int): Int {
+    override fun createMatch(ruleId: Int, playerAId: Int, playerBId: Int): Int {
         val matchId = handle.createUpdate(
             """
-        insert into matches(rules_id, match_state)
-        values (:ruleId, :matchState)
+        insert into matches(rules_id, match_state, player1_id, player2_id)
+        values (:ruleId, :playerAId, :playerBId, :matchState)
             """.trimIndent()
         )
             .bind("ruleId", ruleId)
-            .bind("matchState", MatchState.WAITING_PLAYER)
+            .bind("matchState", MatchState.ONGOING)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .one()
