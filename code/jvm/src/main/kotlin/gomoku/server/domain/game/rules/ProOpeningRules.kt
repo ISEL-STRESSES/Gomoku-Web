@@ -7,15 +7,15 @@ import gomoku.server.domain.game.match.MoveContainer
 data class ProOpeningRules(override val boardSize: BoardSize) : Rules() {
     override val variant: RuleVariant = RuleVariant.STANDARD
     override val openingRule: OpeningRule = OpeningRule.PRO
-    override fun isValidMove(moveContainer: List<Move>, move: Move): IsValidMoveResult {
+    override fun isValidMove(moveContainer: MoveContainer, move: Move, turn: Color): IsValidMoveResult {
         TODO("Not yet implemented")
     }
 
-    override fun possibleMoves(previousMoves: List<Move>, color: Color): List<Move> {
+    override fun possibleMoves(moveContainer: MoveContainer, color: Color): List<Move> {
         TODO("Not yet implemented")
     }
 
-    override fun isWinningMove(previousMoves: List<Move>, move: Move): Boolean {
+    override fun isWinningMove(moveContainer: MoveContainer, move: Move): Boolean {
         TODO("Not yet implemented")
     }
 }

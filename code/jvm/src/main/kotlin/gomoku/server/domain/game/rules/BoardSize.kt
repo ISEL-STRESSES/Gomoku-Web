@@ -15,17 +15,6 @@ enum class BoardSize(val value: Int) {
     init {
         require(value >= 0)
     }
-
-    /**
-     * Returns all possible positions on the board
-     */
-    fun getAllPositions(): List<Position> {
-        return (0 until value).flatMap { x ->
-            (0 until value).map { y ->
-                Position(x, y)
-            }
-        }
-    }
 }
 
 /**

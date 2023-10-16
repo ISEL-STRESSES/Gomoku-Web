@@ -30,7 +30,10 @@ class MatchTests {
 
     @Test
     fun `OngoingMatch computes correct turn color`() {
-        val movesWithEvenSize = listOf(Move(Position(1, 1), Color.BLACK), Move(Position(1, 2), Color.WHITE)) // Size = 2
+        val movesWithEvenSize = listOf(Move(Position(
+            1,
+            1
+        ), Color.BLACK), Move(Position(1, 2), Color.WHITE)) // Size = 2
         val ongoingMatchEven = OngoingMatch(1, playerA, playerB, rules, movesWithEvenSize)
         assertEquals(Color.BLACK, ongoingMatchEven.turn)
 
@@ -44,12 +47,12 @@ class MatchTests {
         val matchOutcomeWinnerA = MatchOutcome.BLACK_WON
         val finishedMatchA = FinishedMatch(1, playerA, playerB, rules, moves, matchOutcomeWinnerA)
 
-        assertEquals(playerA, finishedMatchA.getWinnerOrNull())
+        assertEquals(playerA, finishedMatchA.getWinnerIdOrNull())
 
         val matchOutcomeWinnerB = MatchOutcome.WHITE_WON
         val finishedMatchB = FinishedMatch(1, playerA, playerB, rules, moves, matchOutcomeWinnerB)
 
-        assertEquals(playerB, finishedMatchB.getWinnerOrNull())
+        assertEquals(playerB, finishedMatchB.getWinnerIdOrNull())
     }
 
     @Test
@@ -57,6 +60,6 @@ class MatchTests {
         val matchOutcomeNoWinner = MatchOutcome.DRAW
         val finishedMatch = FinishedMatch(1, playerA, playerB, rules, moves, matchOutcomeNoWinner)
 
-        assertNull(finishedMatch.getWinnerOrNull())
+        assertNull(finishedMatch.getWinnerIdOrNull())
     }
 }

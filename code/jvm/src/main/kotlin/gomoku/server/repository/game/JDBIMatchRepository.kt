@@ -206,7 +206,8 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     /**
      * Gets the turn of the match.
      * @param matchId id of the match
-     * @return the id of the player for the current turn.
+     * @return the color of the player whose turn it is, of null if
+     * the match has already ended or doesn't exist.
      */
     override fun getTurn(matchId: Int): Color? =
         handle.createQuery("""

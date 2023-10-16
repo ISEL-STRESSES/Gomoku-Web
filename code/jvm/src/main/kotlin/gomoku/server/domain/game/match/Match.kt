@@ -8,31 +8,22 @@ import gomoku.server.domain.game.rules.Rules
  */
 sealed class Match(
     val matchId: Int,
-    val playerA: Player,
-    val playerB: Player,
+    val playerBlack: Int,
+    val playerWhite: Int,
     val rules: Rules,
     val moveContainer: MoveContainer
-) {
-    fun getPlayerByColor(color: Color): Player {
-        return when (color) {
-            playerA.color -> playerA
-            playerB.color -> playerB
-            else -> throw IllegalArgumentException("There can't be a player matching the color $color")
-        }
-    }
-
-}
+)
 
 /**
  * Represents a game that is currently being played.
  */
 class OngoingMatch(
     matchId: Int,
-    playerA: Player,
-    playerB: Player,
+    playerBlack: Int,
+    playerWhite: Int,
     rules: Rules,
     moves: MoveContainer
-) : Match(matchId, playerA, playerB, rules, moves) {
+) : Match(matchId, playerBlack, playerWhite, rules, moves) {
 
     val turn = (moves.getMoves().size).toColor()
 }
@@ -42,14 +33,20 @@ class OngoingMatch(
  */
 class FinishedMatch(
     matchId: Int,
-    playerA: Player,
-    playerB: Player,
+    playerBlack: Int,
+    playerWhite: Int,
     rules: Rules,
     moves: MoveContainer,
     private val matchOutcome: MatchOutcome
-) : Match(matchId, playerA, playerB, rules, moves) {
+) : Match(matchId, playerBlack, playerWhite, rules, moves) {
 
-    fun getWinnerOrNull(): Player? {
-        return matchOutcome.winnerColor?.let { getPlayerByColor(it) }
+    fun getWinnerIdOrNull(): Int? {
+        return matchOutcome.let {
+            when(it) {
+                MatchOutcome.BLACK_WON -> playerBlack
+                MatchOutcome.WHITE_WON -> playerWhite
+                MatchOutcome.DRAW -> null
+            }
+        }
     }
 }

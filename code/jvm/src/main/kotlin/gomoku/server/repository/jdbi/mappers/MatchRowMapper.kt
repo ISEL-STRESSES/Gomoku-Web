@@ -13,7 +13,7 @@ import java.sql.ResultSet
 
 class MatchRowMapper : RowMapper<Match> {
     override fun map(rs: ResultSet, ctx: StatementContext): Match {
-        val moves = rs.getArray("moves")
+        val moves = (rs.getArray("moves").array as Array<*>).map { it as Int }
         val moveContainerResult = buildMoveContainer(rs.getInt("board_size"), moves)
         val moveContainer = if (moveContainerResult is Either.Right) moveContainerResult.value
         else throw IllegalArgumentException("Invalid moves array")

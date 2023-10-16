@@ -16,21 +16,19 @@ data class StandardRules(override val boardSize: BoardSize) : Rules() {
     override val variant: RuleVariant = RuleVariant.STANDARD
     override val openingRule: OpeningRule = OpeningRule.FREE
 
-    override fun isValidMove(moveContainer: List<Move>, move: Move): IsValidMoveResult {
-        val occupiedPositions = moveContainer.map { it.position }
-        val currentColor = moveContainer.size.toColor()
-        if (currentColor != move.color) return failure(MoveError.InvalidTurn)
-        val currentMove = move.position
-        val allPositions = boardSize.getAllPositions()
-        if (currentMove !in allPositions) return failure(MoveError.ImpossiblePosition)
-        if (currentMove in occupiedPositions) return failure(MoveError.AlreadyOccupied)
+    override fun isValidMove(moveContainer: MoveContainer, move: Move, turn: Color): IsValidMoveResult {
+        if (turn != move.color) return failure(MoveError.InvalidTurn)
+        if (!moveContainer.isPositionInside(move.position)) return failure(MoveError.ImpossiblePosition)
+        if (moveContainer.hasMove(move.position)) return failure(MoveError.AlreadyOccupied)
+
         return success(Unit)
     }
 
     override fun possibleMoves(moveContainer: MoveContainer, color: Color): List<Move> {
-        val occupiedPositions = moveContainer.getMoves().map { it.position }
-        val allPositions = boardSize.getAllPositions()
-        return allPositions.filterNot { it in occupiedPositions }.map { Move(it, color) }
+        return (0..moveContainer.maxIndex)
+            .map { Position(it) }
+            .filterNot { moveContainer.hasMove(it) }
+            .map { Move(it, color) }
     }
 
     override fun isWinningMove(moveContainer: MoveContainer, move: Move): Boolean {
@@ -60,9 +58,12 @@ data class StandardRules(override val boardSize: BoardSize) : Rules() {
         dy: Int
     ): Int {
         var count = 0
-        var x = position.x + dx
-        var y = position.y + dy
-        while (moveContainer.hasMove((Position(x, y))) {
+        var x = position.value % moveContainer.boardSize + dx
+        var y = position.value / moveContainer.boardSize + dy
+
+        while (moveContainer.hasMove(Position(y * moveContainer.boardSize + x)) &&
+            moveContainer.getMoves().any { it.position == Position(y * moveContainer.boardSize + x) && it.color == color }
+        ) {
             count++
             x += dx
             y += dy

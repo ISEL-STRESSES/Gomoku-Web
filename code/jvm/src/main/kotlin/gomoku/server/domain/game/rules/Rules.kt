@@ -28,21 +28,22 @@ sealed class Rules {
      * Checks if a move is valid based on the rules of the match
      * @param moveContainer previous moves of the match
      * @param move move to check
-     * @return true if the move is valid, false otherwise
+     * @param turn color of the player trying to play
+     * @return true if the move is valid in this set of rules, false otherwise
      */
-    abstract fun isValidMove(moveContainer: MoveContainer, move: Move): IsValidMoveResult
+    abstract fun isValidMove(moveContainer: MoveContainer, move: Move, turn: Color): IsValidMoveResult
 
     /**
      * Returns the possible moves based on the rules of the match
-     * @param previousMoves previous moves of the match
+     * @param moveContainer previous moves of the match
      * @param color color of the player
-     * @return the possible moves
+     * @return the possible moves possible in this set of rules
      */
     abstract fun possibleMoves(moveContainer: MoveContainer, color: Color): List<Move>
 
     /**
      * Checks if a move is a winning move
-     * @param previousMoves previous moves of the match
+     * @param moveContainer previous moves of the match
      * @param move move to check
      * @return true if the move is a winning move, false otherwise
      */
