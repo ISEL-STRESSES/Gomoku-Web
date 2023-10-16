@@ -1,5 +1,6 @@
 package gomoku.server.domain.game.match
 
+import gomoku.server.domain.game.Board
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Player
@@ -15,7 +16,7 @@ class MatchTests {
     private val playerA = Player(1, Color.BLACK)
     private val playerB = Player(2, Color.WHITE)
     private val rules = StandardRules(BoardSize.X15)
-    private val moves: List<Move> = listOf()
+    private val moves: Board = Board.createEmptyBoard(rules.boardSize.value)
 
     @Test
     fun `getPlayerByColor returns correct player for given color in ongoing and finished match`() {
@@ -24,7 +25,7 @@ class MatchTests {
         assertEquals(playerA, match.getPlayerByColor(playerA.color))
         assertEquals(playerB, match.getPlayerByColor(playerB.color))
 
-        val match2 = FinishedGame(1, playerA, playerB, rules, moves, MatchOutcome.BLACK_WON)
+        val match2 = FinishedMatch(1, playerA, playerB, rules, moves, MatchOutcome.BLACK_WON)
 
         assertEquals(playerA, match2.getPlayerByColor(playerA.color))
         assertEquals(playerB, match2.getPlayerByColor(playerB.color))
@@ -44,21 +45,21 @@ class MatchTests {
     @Test
     fun `FinishedGame getWinnerOrNull() returns correct winner`() {
         val matchOutcomeWinnerA = MatchOutcome.BLACK_WON
-        val finishedGameA = FinishedGame(1, playerA, playerB, rules, moves, matchOutcomeWinnerA)
+        val finishedMatchA = FinishedMatch(1, playerA, playerB, rules, moves, matchOutcomeWinnerA)
 
-        assertEquals(playerA, finishedGameA.getWinnerOrNull())
+        assertEquals(playerA, finishedMatchA.getWinnerOrNull())
 
         val matchOutcomeWinnerB = MatchOutcome.WHITE_WON
-        val finishedGameB = FinishedGame(1, playerA, playerB, rules, moves, matchOutcomeWinnerB)
+        val finishedMatchB = FinishedMatch(1, playerA, playerB, rules, moves, matchOutcomeWinnerB)
 
-        assertEquals(playerB, finishedGameB.getWinnerOrNull())
+        assertEquals(playerB, finishedMatchB.getWinnerOrNull())
     }
 
     @Test
     fun `FinishedGame getWinnerOrNull() returns null for draw`() {
         val matchOutcomeNoWinner = MatchOutcome.DRAW
-        val finishedGame = FinishedGame(1, playerA, playerB, rules, moves, matchOutcomeNoWinner)
+        val finishedMatch = FinishedMatch(1, playerA, playerB, rules, moves, matchOutcomeNoWinner)
 
-        assertNull(finishedGame.getWinnerOrNull())
+        assertNull(finishedMatch.getWinnerOrNull())
     }
 }

@@ -10,17 +10,17 @@ import gomoku.server.domain.user.User
 interface LobbyRepository {
 
     /**
-     * Gets a lobby by its rules
-     * @param rule The rules of the lobby
-     * @return The lobby or null if no lobby with the given id exists
-     */
-    fun getLobbyByRules(rule: Rules): Lobby?
-
-    /**
      * Gets all lobbies
      * @return The lobby or null if no lobby with the given id exists
      */
     fun getLobbies(): List<Lobby>
+
+    /**
+     * Gets a lobby by its rules
+     * @param rule the rule
+     * @return The lobby or null if no lobby with the given id exists
+     */
+    fun getLobbyByRule(rule: Rules): Lobby?
 
     /**
      * Gets a lobby by the id of one of its players
@@ -31,10 +31,10 @@ interface LobbyRepository {
 
     /**
      * Creates a lobby with a player (Waiting Room)
-     * @param rule The rule to create a lobby with
+     * @param rule the rule to create a lobby with
      * @param userId The id of the user to join
      */
-    fun createLobby(rule: Rules, userId: Int)
+    fun joinLobby(rule: Rules, userId: Int): Int
 
     /**
      * Removes a player from a lobby (Waiting Room)

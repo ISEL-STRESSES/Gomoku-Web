@@ -1,8 +1,8 @@
 package gomoku.server.services.user
 
-import gomoku.server.services.errors.LoginError
-import gomoku.server.services.errors.TokenCreationError
-import gomoku.server.services.errors.UserCreationError
+import gomoku.server.services.errors.user.LoginError
+import gomoku.server.services.errors.user.TokenCreationError
+import gomoku.server.services.errors.user.UserCreationError
 import gomoku.utils.Either
 
 typealias UserCreationResult = Either<UserCreationError, Int>

@@ -18,7 +18,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
      * @param rule The rules of the lobby
      * @return The lobby or null if no lobby with the given id exists
      */
-    override fun getLobbyByRules(rule: Rules): Lobby? =
+    override fun getLobbyByRule(rule: Rules): Lobby? =
         handle.createQuery(
             """
             SELECT rules.board_size, rules.variant, rules.opening_rule, 
@@ -84,7 +84,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
      * @param userId The id of the user to join
      * @return The id of the lobby the user joined or null if the user could not join
      */
-    override fun createLobby(rule: Rules, userId: Int) {
+    override fun joinLobby(rule: Rules, userId: Int): Int {
         val rulesId = handle.createQuery(
             """
             select id from rules where opening_rule = :openingRule and variant = :variant and board_size = :boardSize
@@ -96,7 +96,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             .mapTo<Int>()
             .one()
 
-        handle.createUpdate(
+        return handle.createUpdate(
             """
             INSERT INTO lobby (user_id, rules_id, created_at) VALUES (:userId, :ruleId, :createdAt)
             """.trimIndent()
@@ -104,7 +104,9 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             .bind("ruleId", rulesId)
             .bind("userId", userId)
             .bind("createdAt", Clock.systemUTC().instant().epochSecond)
-            .execute()
+            .executeAndReturnGeneratedKeys("id")
+            .mapTo<Int>()
+            .one()
     }
 
     /**

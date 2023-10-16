@@ -2,6 +2,15 @@ package gomoku.server.domain.game.rules
 
 import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
+import gomoku.utils.Either
+
+typealias IsValidMoveResult = Either<MoveError, Unit>
+
+sealed class MoveError {
+    object ImpossiblePosition : MoveError()
+    object AlreadyOccupied : MoveError()
+    object InvalidTurn : MoveError()
+}
 
 /**
  * Represents a rule
@@ -20,7 +29,7 @@ sealed class Rules {
      * @param move move to check
      * @return true if the move is valid, false otherwise
      */
-    abstract fun isValidMove(previousMoves: List<Move>, move: Move): Boolean
+    abstract fun isValidMove(previousMoves: List<Move>, move: Move): IsValidMoveResult
 
     /**
      * Returns the possible moves based on the rules of the match
