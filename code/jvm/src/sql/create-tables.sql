@@ -1,5 +1,14 @@
 BEGIN TRANSACTION;
 
+-- drop all tables
+drop table if exists matches;
+drop table if exists user_stats;
+drop table if exists lobby;
+drop table if exists rules;
+drop table if exists tokens;
+drop table if exists users;
+
+
 -- users table
 create table if not exists users
 (
@@ -69,11 +78,14 @@ create table if not exists matches
     player_white  int          not null,
     match_outcome varchar(4)   default null,
     match_state   varchar(256) not null,
-    moves         Int[]        default [],
+    moves         INTEGER[]   NOT NULL DEFAULT ARRAY[]::INTEGER[],
 
+    constraint fk_matches_rules foreign key (rules_id) references rules(id),
+    constraint fk_matches_player1 foreign key (player_black) references users(id),
+    constraint fk_matches_player2 foreign key (player_white) references users(id),
     constraint match_outcome_check check (match_outcome is null or match_outcome ~* '^(a|b|draw)$'),
     constraint match_state_check check (match_state ~* '^(ongoing|finished)$'),
-    constraint fk_matches_rules foreign key (rules_id) references rules(id),
-    constraint fk_matches_player1 foreign key (player_black) references users(id),  -- References the new player primary key
-    constraint fk_matches_player2 foreign key (player_white) references users(id)   -- References the new player primary key
+    constraint different_users check (player_black <> player_white)
 );
+
+COMMIT ;

@@ -1,7 +1,7 @@
 BEGIN TRANSACTION;
 
 -- Truncating tables first
-TRUNCATE TABLE users, tokens, rules, user_stats, matches,
+TRUNCATE TABLE users, tokens, rules, user_stats, matches RESTART IDENTITY CASCADE;
 
 -- Inserting data into 'users' table
 DO $$
@@ -39,37 +39,17 @@ DO $$
 -- Step 1: Inserting data into 'matches' without moves
 DO $$
     BEGIN
-        FOR i IN 1..20 LOOP
+        FOR i IN 1..10 LOOP
                 EXECUTE 'INSERT INTO matches(rules_id, player_black, player_white, match_outcome, match_state) VALUES (1,'||i||','||2*i||', NULL, ''ongoing'')';
             END LOOP;
     END $$;
 
---
+-- Step 2: Inserting data into 'matches' with moves
 
--- Step 2: Inserting data into 'player' table
 DO $$
     BEGIN
-        FOR i IN 1..10 LOOP
-                EXECUTE 'INSERT INTO player(user_id, match_id, rules_id, color) VALUES (' || (2*i - 1) || ', ' || i || ', 1, ''black'')';
-                EXECUTE 'INSERT INTO player(user_id, match_id, rules_id, color) VALUES (' || (2*i) || ', ' || i || ', 1, ''white'')';
-            END LOOP;
-    END $$;
-
--- Step 3: Update the 'matches' table to set player references
-DO $$
-    BEGIN
-        FOR i IN 1..10 LOOP
-                EXECUTE 'UPDATE matches SET player1_id = ' || (2*i - 1) || ', player2_id = ' || (2*i) || ' WHERE id = ' || i;
-            END LOOP;
-    END $$;
-
--- Inserting data into 'moves' table
-DO $$
-    BEGIN
-        FOR i IN 1..7 LOOP
-                -- For each match, the black player id is 2i-1 and the white player is 2i
-                EXECUTE 'INSERT INTO moves(match_id, player_id, ordinal, row, col) VALUES (' || i || ', ' || (2*i - 1) || ', 1, ' || (i) || ', ' || (i) || ')';
-                EXECUTE 'INSERT INTO moves(match_id, player_id, ordinal, row, col) VALUES (' || i || ', ' || (2*i) || ', 2, ' || (i + 1) || ', ' || (i + 1) || ')';
+        FOR i IN 1..20 LOOP
+                EXECUTE 'UPDATE matches set moves = ''{' || i || ', ' || (i + 1) || '}'' where id =  '|| i||' ';
             END LOOP;
     END $$;
 
