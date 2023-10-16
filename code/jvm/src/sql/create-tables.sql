@@ -83,7 +83,7 @@ create table if not exists matches
     constraint fk_matches_rules foreign key (rules_id) references rules(id),
     constraint fk_matches_player1 foreign key (player_black) references users(id),
     constraint fk_matches_player2 foreign key (player_white) references users(id),
-    constraint match_outcome_check check (match_outcome is null or match_outcome ~* '^(a|b|draw)$'),
+    constraint match_outcome_check check (match_outcome is null or match_outcome ~* '^(black_won|white_won|draw)$'),
     constraint match_state_check check (match_state ~* '^(ongoing|finished)$'),
     constraint different_users check (player_black <> player_white)
 );
