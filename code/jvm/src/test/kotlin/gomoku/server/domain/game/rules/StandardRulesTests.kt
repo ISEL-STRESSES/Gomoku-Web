@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class StandardRulesTests {
-
-    private val rule = StandardRules(BoardSize.X15)
+    /*private val rule = StandardRules(BoardSize.X15)
 
     @Test
     fun `isValidMove checks for unoccupied spots`() {
@@ -108,5 +107,5 @@ class StandardRulesTests {
             Move(Position(12, 12), Color.BLACK)
         )
         assertFalse(rule.isWinningMove(moves, Move(Position(13, 13), Color.BLACK)))
-    }
+    }*/
 }

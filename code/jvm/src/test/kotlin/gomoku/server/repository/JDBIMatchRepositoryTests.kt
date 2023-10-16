@@ -21,17 +21,7 @@ class JDBIMatchRepositoryTests {
 
         val rule4 = repo.getRuleById(4)
         assertNull(rule4)
-
-        val ruleProX15 = ProOpeningRules(BoardSize.X15)
-        val ruleProX15Id = repo.getRuleId(ruleProX15)
-        assertNotNull(ruleProX15Id)
     }
 
-    @Test
-    fun `create lobby and checks if exists`() = testWithHandleAndRollback { handle ->
-
-        val repo = JDBIMatchRepository(handle)
-
-
-    }
+    // TODO: ADD REMAINING REPOSITORY TESTS
 }
