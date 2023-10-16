@@ -11,8 +11,7 @@ import gomoku.utils.success
  * Represents a Standard rule set
  * @constructor creates a default rule with board size 15, standard variant and free opening rule
  */
-data class StandardRules(override val boardSize: BoardSize) : Rules() {
-
+data class StandardRules(override val ruleId: Int, override val boardSize: BoardSize) : Rules() {
     override val variant: RuleVariant = RuleVariant.STANDARD
     override val openingRule: OpeningRule = OpeningRule.FREE
 

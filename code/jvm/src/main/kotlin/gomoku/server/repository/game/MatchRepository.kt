@@ -3,13 +3,11 @@ package gomoku.server.repository.game
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
-import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.match.Move
+import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.rules.Rules
-import gomoku.server.domain.user.User
 
 typealias GamePlayers = Pair<Int, Int>
-
 
 /**
  * Repository for match data.

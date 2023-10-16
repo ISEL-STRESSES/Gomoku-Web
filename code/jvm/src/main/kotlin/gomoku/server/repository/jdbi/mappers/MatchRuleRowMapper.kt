@@ -9,6 +9,7 @@ import java.sql.ResultSet
 class MatchRuleRowMapper : RowMapper<Rules> {
     override fun map(rs: ResultSet, ctx: StatementContext?): Rules {
         return buildRule(
+            rs.getInt("id"),
             rs.getInt("board_size"),
             rs.getString("variant"),
             rs.getString("opening_rule")

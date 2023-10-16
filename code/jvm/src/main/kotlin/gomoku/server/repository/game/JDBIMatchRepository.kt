@@ -3,17 +3,16 @@ package gomoku.server.repository.game
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
-import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.match.Move
+import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rules
-import gomoku.server.domain.user.User
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
 class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
 
-    //rules
+    // rules
     /**
      * Gets a rule by its id.
      * @param ruleId id of the rule
@@ -34,7 +33,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .mapTo<Rules>()
             .list()
 
-    //match
+    // match
     /**
      * Creates a new match, with the given rule and users ids
      * setting the match state to [MatchState.ONGOING]
@@ -64,13 +63,15 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @return the match or null if not found
      */
     override fun getMatchById(matchId: Int): Match? =
-        handle.createQuery("""
+        handle.createQuery(
+            """
             select matches.id, matches.player_black, matches.player_white, matches.match_state, matches.match_outcome, matches.moves,
-            rules.board_size, rules.opening_rule, rules.variant
+            rules.id as rules_id,rules.board_size, rules.opening_rule, rules.variant
             from matches join rules
             on rules.id = matches.rules_id
             where matches.id = :matchId
-        """.trimIndent())
+            """.trimIndent()
+        )
             .bind("matchId", matchId)
             .mapTo<Match>()
             .singleOrNull()
@@ -137,7 +138,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun getMatchRule(matchId: Int): Rules? =
         handle.createQuery(
             """
-            select board_size, variant, opening_rule from rules where rules.id = (
+            select id, board_size, variant, opening_rule from rules where rules.id = (
             select rules_id from matches where matches.id = :matchId
             )
             """.trimIndent()
@@ -210,9 +211,10 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * the match has already ended or doesn't exist.
      */
     override fun getTurn(matchId: Int): Color? =
-        handle.createQuery("""
+        handle.createQuery(
+            """
             select array_length(matches.moves, 1) from matches where id = :matchId and match_state = 'ONGOING'
-        """.trimIndent()
+            """.trimIndent()
         )
             .bind("matchId", matchId)
             .mapTo<Int>()

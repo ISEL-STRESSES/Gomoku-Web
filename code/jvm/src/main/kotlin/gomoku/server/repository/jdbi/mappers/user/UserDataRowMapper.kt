@@ -13,6 +13,7 @@ import java.sql.ResultSet
 class UserDataRowMapper : RowMapper<UserData> {
     override fun map(rs: ResultSet, ctx: StatementContext): UserData {
         val rule = buildRule(
+            ruleId = rs.getInt("rules_id"),
             boardMaxSize = rs.getInt("board_size"),
             variantName = rs.getString("variant"),
             openingRuleName = rs.getString("opening_rule")

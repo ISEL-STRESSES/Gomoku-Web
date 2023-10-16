@@ -12,12 +12,11 @@ class MatchTests {
 
     private val playerA = 1
     private val playerB = 4
-    private val rules = StandardRules(BoardSize.X15)
+    private val rules = StandardRules(1, BoardSize.X15)
     private val moves: MoveContainer = MoveContainer.createEmptyMoveContainer(rules.boardSize.value)
 
     @Test
     fun `OngoingMatch computes correct turn color`() {
-
         val newContainerWithMoves1 = moves.addMove(Move(Position(1), Color.BLACK))
         if (newContainerWithMoves1 is Either.Right<MoveContainer>) {
             val ongoingMatch1 = OngoingMatch(1, playerA, playerB, rules, newContainerWithMoves1.value)
@@ -26,17 +25,17 @@ class MatchTests {
             if (newContainerWithMoves2 is Either.Right<MoveContainer>) {
                 val ongoingMatch2 = OngoingMatch(1, playerA, playerB, rules, newContainerWithMoves2.value)
                 assertEquals(Color.BLACK, ongoingMatch2.turn)
-            }else{
+            } else {
                 assert(false)
             }
-        }else{
+        } else {
             assert(false)
         }
 
         val newContainerWithMovesFail = moves.addMove(Move(Position(225), Color.BLACK))
         if (newContainerWithMovesFail is Either.Left<AddMoveError>) {
             assert(true)
-        }else{
+        } else {
             assert(false)
         }
     }

@@ -9,7 +9,7 @@ class RulesTests {
 
     @Test
     fun `buildRule constructs StandardRules for STANDARD variant and FREE opening`() {
-        val rule = buildRule(15, "STANDARD", "FREE")
+        val rule = buildRule(1, 15, "STANDARD", "FREE")
         assertTrue(rule is StandardRules)
         assertEquals(BoardSize.X15, rule.boardSize)
         assertEquals(OpeningRule.FREE, rule.openingRule)
@@ -17,7 +17,7 @@ class RulesTests {
 
     @Test
     fun `buildRule constructs ProOpeningRules for STANDARD variant and PRO opening`() {
-        val rule = buildRule(19, "STANDARD", "PRO")
+        val rule = buildRule(1, 19, "STANDARD", "PRO")
         assertTrue(rule is ProOpeningRules)
         assertEquals(BoardSize.X19, rule.boardSize)
         assertEquals(OpeningRule.PRO, rule.openingRule)
@@ -28,21 +28,21 @@ class RulesTests {
     @Test
     fun `buildRule throws exception for invalid variant`() {
         assertThrows(IllegalArgumentException::class.java) {
-            buildRule(15, "INVALID_VARIANT", "FREE")
+            buildRule(1, 15, "INVALID_VARIANT", "FREE")
         }
     }
 
     @Test
     fun `buildRule throws exception for invalid openingRule`() {
         assertThrows(IllegalArgumentException::class.java) {
-            buildRule(15, "STANDARD", "INVALID_OPENING")
+            buildRule(1, 15, "STANDARD", "INVALID_OPENING")
         }
     }
 
     @Test
     fun `buildRule throws exception for invalid boardMaxSize`() {
         assertThrows(IllegalArgumentException::class.java) {
-            buildRule(1111, "STANDARD", "FREE")
+            // buildRule(, 1111, "STANDARD", "FREE")
         }
     }
 }

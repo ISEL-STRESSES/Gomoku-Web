@@ -138,7 +138,7 @@ class JDBIUserRepositoryTests {
         // given: a UsersRepository
         val repo = JDBIUserRepository(handle)
         // and: a rule
-        val rule = buildRule(15, "PRO", "STANDARD")
+        val rule = buildRule(3, 15, "PRO", "STANDARD")
         val usersStats = repo.getUsersStatsDataByRule(0, 10, rule.boardSize.value, rule.variant.name, rule.openingRule.name)
         usersStats.forEach(::println)
         // then: users stats are retrieved

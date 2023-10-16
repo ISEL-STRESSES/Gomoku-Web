@@ -1,7 +1,6 @@
 package gomoku.server.repository.lobby
 
 import gomoku.server.domain.game.Lobby
-import gomoku.server.domain.game.rules.Rules
 import gomoku.server.domain.user.User
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
@@ -15,38 +14,33 @@ import java.time.Clock
 class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     /**
      * Gets a lobby by its rules id
-     * @param rule The rules of the lobby
-     * @return The lobby or null if no lobby with the given id exists
+     * @param ruleId the rule id of the lobby
+     * @return The lobby or null if no lobby with the given rule id exists
      */
-    override fun getLobbyByRule(rule: Rules): Lobby? =
+    override fun getLobbyByRuleId(ruleId: Int): Lobby? =
         handle.createQuery(
             """
-            SELECT rules.board_size, rules.variant, rules.opening_rule, 
+            SELECT rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, 
             users.id, users.username, users.password_validation 
             FROM lobby join users 
             on users.id = lobby.user_id
             join rules
             on lobby.rules_id = rules.id 
-            where lobby.rules_id = (select id from rules where 
-            rules.board_size = :boardSize and 
-            rules.variant = :variant and 
-            rules.opening_rule = :openingRule) 
+            where lobby.rules_id = :ruleId
             """.trimIndent()
         )
-            .bind("variant", rule.variant)
-            .bind("boardSize", rule.boardSize.value)
-            .bind("openingRule", rule.openingRule)
+            .bind("ruleId", ruleId)
             .mapTo<Lobby>()
             .singleOrNull()
 
     /**
      * Gets all lobbies
-     * @return The lobby or null if no lobby with the given id exists
+     * @return The list of lobbies
      */
     override fun getLobbies(): List<Lobby> =
         handle.createQuery(
             """
-            SELECT rules.board_size, rules.variant, rules.opening_rule, 
+            SELECT rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, 
             users.id, users.username, users.password_validation
             FROM lobby join rules 
             on lobby.rules_id = rules.id 
@@ -65,7 +59,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     override fun getLobbyByUser(user: User): Lobby? =
         handle.createQuery(
             """
-            SELECT rules.board_size, rules.variant, rules.opening_rule, 
+            SELECT rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, 
             users.id, users.username, users.password_validation 
             FROM lobby join users 
             on lobby.user_id = users.id 
@@ -79,29 +73,18 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             .singleOrNull()
 
     /**
-     * Joins a player to a lobby
-     * @param rule The id of the lobby
+     * Creates a lobby with a player
+     * @param ruleId the rule id to create a lobby with
      * @param userId The id of the user to join
-     * @return The id of the lobby the user joined or null if the user could not join
+     * @return The id of the lobby the user joined
      */
-    override fun joinLobby(rule: Rules, userId: Int): Int {
-        val rulesId = handle.createQuery(
-            """
-            select id from rules where opening_rule = :openingRule and variant = :variant and board_size = :boardSize
-            """.trimIndent()
-        )
-            .bind("openingRule", rule.openingRule)
-            .bind("variant", rule.variant)
-            .bind("boardSize", rule.boardSize.value)
-            .mapTo<Int>()
-            .one()
-
+    override fun createLobby(ruleId: Int, userId: Int): Int {
         return handle.createUpdate(
             """
             INSERT INTO lobby (user_id, rules_id, created_at) VALUES (:userId, :ruleId, :createdAt)
             """.trimIndent()
         )
-            .bind("ruleId", rulesId)
+            .bind("ruleId", ruleId)
             .bind("userId", userId)
             .bind("createdAt", Clock.systemUTC().instant().epochSecond)
             .executeAndReturnGeneratedKeys("id")

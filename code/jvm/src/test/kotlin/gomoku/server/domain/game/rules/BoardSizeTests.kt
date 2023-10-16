@@ -1,8 +1,6 @@
 package gomoku.server.domain.game.rules
 
-import gomoku.server.domain.game.match.Position
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 

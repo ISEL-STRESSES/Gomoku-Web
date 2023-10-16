@@ -90,7 +90,7 @@ interface UserRepository {
      * @param variant The variant of the rule
      * @return A list of [UserData] objects, containing all the stats related to the users.
      */
-    fun getUsersStatsDataByRule(offset: Int, limit: Int, boardsize:Int, variant: String, openingRule: String ) : List<UserData>
+    fun getUsersStatsDataByRule(offset: Int, limit: Int, boardsize: Int, variant: String, openingRule: String): List<UserData>
 
     /**
      * Retrieves the stats of a user for a given rule.

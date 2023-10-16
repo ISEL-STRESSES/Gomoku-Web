@@ -42,7 +42,7 @@ class FinishedMatch(
 
     fun getWinnerIdOrNull(): Int? {
         return matchOutcome.let {
-            when(it) {
+            when (it) {
                 MatchOutcome.BLACK_WON -> playerBlack
                 MatchOutcome.WHITE_WON -> playerWhite
                 MatchOutcome.DRAW -> null

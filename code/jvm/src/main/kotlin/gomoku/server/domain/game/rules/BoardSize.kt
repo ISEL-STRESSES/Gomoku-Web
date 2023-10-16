@@ -1,7 +1,5 @@
 package gomoku.server.domain.game.rules
 
-import gomoku.server.domain.game.match.Position
-
 /**
  * Represents the possible sizes of a match board
  *

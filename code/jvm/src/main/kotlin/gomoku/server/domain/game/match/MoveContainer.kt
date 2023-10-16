@@ -41,7 +41,7 @@ class MoveContainer private constructor(
 
         return if (!isPositionInside(position)) {
             failure(AddMoveError.ImpossiblePosition)
-        } else if (hasMove(position)){
+        } else if (hasMove(position)) {
             failure(AddMoveError.AlreadyOccupied)
         } else {
             board[position.value] = move.color

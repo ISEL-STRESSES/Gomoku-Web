@@ -189,12 +189,12 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * Gets all the stats related to the users, with pagination, by rule.
      * @param offset The offset of the first user to get.
      * @param limit The maximum number of users to get.
-     * @param boardSize The boardSize of the rule
+     * @param boardsize The boardSize of the rule
      * @param openingRule The opening rule of the rule
      * @param variant The variant of the rule
      * @return A list of [UserData] objects, containing all the stats related to the users.
      */
-    override fun getUsersStatsDataByRule(offset: Int, limit: Int, boardSize:Int, variant: String, openingRule: String ) : List<UserData> =
+    override fun getUsersStatsDataByRule(offset: Int, limit: Int, boardsize: Int, variant: String, openingRule: String): List<UserData> =
         handle.createQuery(
             """
             select users.id as user_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
@@ -211,7 +211,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
         )
             .bind("offset", offset)
             .bind("limit", limit)
-            .bind("boardSize", boardSize)
+            .bind("boardSize", boardsize)
             .bind("variant", variant)
             .bind("openingRule", openingRule)
             .mapTo<UserData>()

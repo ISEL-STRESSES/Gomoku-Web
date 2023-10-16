@@ -1,11 +1,8 @@
 package gomoku.server.repository
 
-import gomoku.server.domain.game.rules.BoardSize
-import gomoku.server.domain.game.rules.ProOpeningRules
 import gomoku.server.repository.game.JDBIMatchRepository
 import gomoku.server.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 

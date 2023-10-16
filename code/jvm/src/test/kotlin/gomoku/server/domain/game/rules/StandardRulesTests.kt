@@ -1,12 +1,5 @@
 package gomoku.server.domain.game.rules
 
-import gomoku.server.domain.game.player.Color
-import gomoku.server.domain.game.match.Move
-import gomoku.server.domain.game.match.Position
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-
 class StandardRulesTests {
     /*private val rule = StandardRules(BoardSize.X15)
 

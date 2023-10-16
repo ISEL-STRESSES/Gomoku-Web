@@ -8,7 +8,7 @@ import org.junit.jupiter.api.assertThrows
 
 class UserRulesStatsTests {
 
-    private val validRule = StandardRules(BoardSize.X15) // Assuming a dummy Rule object for testing purposes.
+    private val validRule = StandardRules(1, BoardSize.X15) // Assuming a dummy Rule object for testing purposes.
 
     @Test
     fun `PlayerRuleStats initializes with valid values`() {
