@@ -4,6 +4,8 @@ import gomoku.server.domain.game.player.Color
 import gomoku.server.domain.game.player.Move
 import gomoku.server.domain.game.player.Position
 import gomoku.server.domain.game.player.toColor
+import gomoku.utils.failure
+import gomoku.utils.success
 
 /**
  * Represents a Standard rule set
@@ -14,14 +16,15 @@ data class StandardRules(override val boardSize: BoardSize) : Rules() {
     override val variant: RuleVariant = RuleVariant.STANDARD
     override val openingRule: OpeningRule = OpeningRule.FREE
 
-    override fun isValidMove(previousMoves: List<Move>, move: Move): Boolean {
+    override fun isValidMove(previousMoves: List<Move>, move: Move): IsValidMoveResult {
         val occupiedPositions = previousMoves.map { it.position }
         val currentColor = previousMoves.size.toColor()
-        if (currentColor != move.color) return false
+        if (currentColor != move.color) return failure(MoveError.InvalidTurn)
         val currentMove = move.position
         val allPositions = boardSize.getAllPositions()
-        return allPositions.filterNot { it in occupiedPositions }
-            .contains(currentMove) && currentColor != previousMoves.last().color
+        if (currentMove !in allPositions) return failure(MoveError.ImpossiblePosition)
+        if (currentMove in occupiedPositions) return failure(MoveError.AlreadyOccupied)
+        return success(Unit)
     }
 
     override fun possibleMoves(previousMoves: List<Move>, color: Color): List<Move> {

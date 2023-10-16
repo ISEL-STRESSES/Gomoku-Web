@@ -7,7 +7,7 @@ import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rules
 
 /**
- * Represents a game that can be played.
+ * Represents a game.
  */
 sealed class Match(
     val matchId: Int,
@@ -24,19 +24,6 @@ sealed class Match(
         }
     }
 
-    fun copy(
-        matchId: Int = this.matchId,
-        playerA: Player = this.playerA,
-        playerB: Player = this.playerB,
-        rules: Rules = this.rules,
-        board: Board = this.board,
-        matchOutcome: MatchOutcome? = null
-    ): Match {
-        return when (this) {
-            is OngoingMatch -> OngoingMatch(matchId, playerA, playerB, rules, board)
-            is FinishedMatch -> FinishedMatch(matchId, playerA, playerB, rules, board, matchOutcome!!)
-        }
-    }
 }
 
 /**
@@ -62,7 +49,7 @@ class FinishedMatch(
     playerB: Player,
     rules: Rules,
     moves: Board,
-    val matchOutcome: MatchOutcome
+    private val matchOutcome: MatchOutcome
 ) : Match(matchId, playerA, playerB, rules, moves) {
 
     fun getWinnerOrNull(): Player? {

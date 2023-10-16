@@ -13,8 +13,24 @@ class Board private constructor(
 ) {
 
     companion object {
+        /**
+         * Creates an empty board of the given size.
+         * @param size The size of the board
+         * @return The empty board
+         */
         fun createEmptyBoard(size: Int): Board {
             return Board(size, emptyList(), emptyMap())
+        }
+
+        /**
+         * Factory method to create a board from a list of moves.
+         * @param size The size of the board.
+         * @param moves The list of moves.
+         * @return A board instance with the specified moves.
+         */
+        fun createBoardWithMoves(size: Int, movesList: List<Move>): Board {
+            val board = createEmptyBoard(size)
+            return movesList.fold(board) { acc, move -> acc.addMove(move) }
         }
     }
 

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service
 @Service
 class GameService(private val transactionManager: TransactionManager) {
 
+    //TODO("recieve rulesId and we work based on that... Same apllies to repository functions")
     fun startMatchmakingProcess(rule: Rules, user: User): MatchmakingResult {
         return transactionManager.run {
             val lobby = it.lobbyRepository.getLobbyByRule(rule)
@@ -40,24 +41,28 @@ class GameService(private val transactionManager: TransactionManager) {
         }
     }
 
+    //TODO("recieve gameId and then we get game")
     fun makeMove(game: Match, move: Move): MakeMoveResult {
-        return if (game.rules.isValidMove(game.board.getMoves(), move)) {
-            transactionManager.run {
-                if (game.rules.isWinningMove(game.board.getMoves(), move)) {
-                    it.matchRepository.makeMove(game.matchId, move)
-                    it.matchRepository.setMatchState(game.matchId, MatchState.FINISHED)
+            return transactionManager.run {
+                //val game = it.matchRepository.getMatchById(gameId)
+                if (game.rules.isValidMove(game.board.getMoves()/*game.moves*/, move)) {
+
+                    if (game.rules.isWinningMove(game.board.getMoves(), move)) {
+                        it.matchRepository.makeMove(game.matchId, move)
+                        it.matchRepository.setMatchState(game.matchId, MatchState.FINISHED)
+                        val newGame = it.matchRepository.getMatchById(game.matchId)
+                        return@run success(newGame)
+                    } else {
+                        it.matchRepository.makeMove(game.matchId, move)
+                    }
                     val newGame = it.matchRepository.getMatchById(game.matchId)
-                    return@run success(newGame)
+
+                    val newGame = game.board.addMove(move)
+                    success(newGame)
                 } else {
-                    it.matchRepository.makeMove(game.matchId, move)
+                    failure(MakeMoveError.InvalidMove)
                 }
-                val newGame = it.matchRepository.getMatchById(game.matchId)
             }
-            val newGame = game.board.addMove(move)
-            success(newGame)
-        } else {
-            failure(MakeMoveError.InvalidMove)
-        }
     }
 
     fun getLobbyInfoByUser(user: User): Lobby? {
