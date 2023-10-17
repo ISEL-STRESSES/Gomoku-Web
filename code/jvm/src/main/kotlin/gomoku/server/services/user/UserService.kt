@@ -129,7 +129,7 @@ class UserService(
      * @param id The id of the user.
      * @return The user, or null if the user doesn't exist.
      */
-    fun getUserById(id: Int): UserData? { // TODO: This doesn't give the user's stats
+    fun getUserById(id: Int): User? { // TODO: This doesn't give the user's stats
         return transactionManager.run {
             val usersRepository = it.usersRepository
             usersRepository.getUserById(id)

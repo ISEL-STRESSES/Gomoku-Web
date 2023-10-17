@@ -62,10 +62,10 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * @param id The id of the user.
      * @return The user if found, null otherwise.
      */
-    override fun getUserById(id: Int): UserData? {
+    override fun getUserById(id: Int): User? {
         return handle.createQuery("SELECT * FROM users WHERE id = :uuid")
             .bind("uuid", id)
-            .mapTo<UserData>()
+            .mapTo<User>()
             .singleOrNull()
     }
 

@@ -42,7 +42,7 @@ interface UserRepository {
      * @param id The id of the user.
      * @return The user if found, null otherwise.
      */
-    fun getUserById(id: Int): UserData?
+    fun getUserById(id: Int): User?
 
     // token
     /**

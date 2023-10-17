@@ -32,6 +32,7 @@ class JDBIMatchRepositoryTests {
     fun `create match and check if exists`() = testWithHandleAndRollback { handle ->
 
         val repo = JDBIMatchRepository(handle)
+        val uRepo = JDBIUserRepository(handle)
 
         val matchIdNull = repo.getMatchById(11)
         assertNull(matchIdNull)
