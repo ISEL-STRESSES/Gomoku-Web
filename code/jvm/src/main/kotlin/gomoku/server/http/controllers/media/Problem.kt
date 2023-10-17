@@ -79,7 +79,6 @@ class Problem(
             )
         )
 
-        // kabbom TODO
         val makeMoveFailed = Problem(
             URI(
                 PROBLEM_BASE_URL + "make-move-failed"

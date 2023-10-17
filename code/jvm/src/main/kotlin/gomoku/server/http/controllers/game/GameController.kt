@@ -7,7 +7,8 @@ import gomoku.server.http.controllers.media.Problem
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.game.GameService
-import gomoku.utils.Either
+import gomoku.utils.Failure
+import gomoku.utils.Success
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -27,17 +28,15 @@ class GameController(private val gameService: GameService) {
      * @param offset The offset
      * @param limit The limit
      * @param authenticatedUser The authenticated user
-     * @param gameState The game state
      * @return The list of games
      */
     @GetMapping(URIs.Game.HUB)
     fun games(
         @RequestParam offset: Int = 0,
         @RequestParam limit: Int = 10,
-        @RequestParam authenticatedUser: AuthenticatedUser,
-        @RequestParam gameState: String? = "ONGOING"
+        @RequestParam authenticatedUser: AuthenticatedUser
     ): ResponseEntity<*> {
-        val matches = gameService.getMatches(offset, limit, authenticatedUser.user.uuid, gameState)
+        val matches = gameService.getUserFinishedMatches(offset, limit, authenticatedUser.user.uuid)
         return ResponseEntity.ok(matches)
     }
 
@@ -50,7 +49,7 @@ class GameController(private val gameService: GameService) {
     @GetMapping(URIs.Game.GET_BY_ID)
     fun gameDetails(@PathVariable id: Int, @RequestParam authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val game = gameService.getGame(id)
-        if (game is Either.Left) {
+        if (game is Failure) {
             return Problem.response(404, Problem.gameNotFound)
         }
         return ResponseEntity.ok(game)
@@ -77,8 +76,8 @@ class GameController(private val gameService: GameService) {
     fun makePlay(@PathVariable id: Int, @RequestParam userId: Int, @RequestParam pos: Int): ResponseEntity<*> {
         val moveResult = gameService.makeMove(id, userId, pos)
         return when (moveResult) {
-            is Either.Left -> moveResult.value.resolveProblem()
-            is Either.Right -> ResponseEntity.ok(moveResult)
+            is Failure -> moveResult.value.resolveProblem()
+            is Success -> ResponseEntity.ok(moveResult)
         }
     }
 
@@ -93,8 +92,8 @@ class GameController(private val gameService: GameService) {
     fun startMatchmaking(@PathVariable rulesId: Int, @RequestParam userId: Int): ResponseEntity<*> {
         val matchmaker = gameService.startMatchmakingProcess(rulesId, userId)
         return when (matchmaker) {
-            is Either.Left -> matchmaker.value.resolveProblem()
-            is Either.Right -> ResponseEntity.ok(matchmaker)
+            is Failure -> matchmaker.value.resolveProblem()
+            is Success -> ResponseEntity.ok(matchmaker)
         }
     }
 
@@ -140,7 +139,7 @@ class GameController(private val gameService: GameService) {
             MakeMoveError.AlreadyOccupied -> Problem.response(400, Problem.positionOccupied)
             MakeMoveError.ImpossiblePosition -> Problem.response(400, Problem.impossiblePosition)
             MakeMoveError.InvalidTurn -> Problem.response(400, Problem.notYourTurn)
-            MakeMoveError.MakeMoveFailed -> Problem.response(500, Problem.makeMoveFailed) // TODO look at the status code
+            MakeMoveError.MakeMoveFailed -> Problem.response(500, Problem.makeMoveFailed)
         }
 
     /**

@@ -3,7 +3,6 @@ package gomoku.server.services.game
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.match.Color
 import gomoku.server.domain.game.match.FinishedMatch
-import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.match.Move
@@ -84,7 +83,7 @@ class GameService(private val transactionManager: TransactionManager) {
                     val isValidMoveResult = match.rules.isValidMove(match.moveContainer, currMove, match.turn)
                     when (isValidMoveResult) {
                         is Either.Left -> return@run isValidMoveResult.value.resolveError()
-                        is Either.Right -> { return@run resolveValidMove(match, currMove, it) }
+                        is Either.Right -> return@run resolveValidMove(match, currMove, it)
                     }
                 }
             }
@@ -225,7 +224,7 @@ class GameService(private val transactionManager: TransactionManager) {
     /**
      *
      */
-    fun getMatches(offset: Int, limit: Int, userId: Int, state: String?): List<Match> {
+    fun getUserFinishedMatches(offset: Int, limit: Int, userId: Int): List<FinishedMatch> {
         return transactionManager.run {
             TODO()
         }
