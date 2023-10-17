@@ -166,7 +166,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * @param limit The maximum number of users to get.
      * @return A list of [UserData] objects, containing all the stats related to the users.
      */
-    override fun getUsersStatsData(offset: Int, limit: Int): List<UserData> =
+    override fun getUsersStatsDataByRule(offset: Int, limit: Int, rulesId: Int): List<UserData> =
         handle.createQuery(
             """
             select users.id as user_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
@@ -175,11 +175,13 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             on users.id = user_stats.user_id
             inner join rules
             on user_stats.rules_id = rules.id
+            where rules.id = :rules_id
             order by users.id
             offset :offset
             limit :limit
             """.trimIndent()
         )
+            .bind("rules_id", rulesId)
             .bind("offset", offset)
             .bind("limit", limit)
             .mapTo<UserData>()
@@ -204,7 +206,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
         )
             .bind("user_id", userId)
             .mapTo<UserData>()
-            .list()
+            .singleOrNull()
 
     /**
      * Retrieves the stats of a user for a given rule.
@@ -243,15 +245,16 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .bind("elo", userStatsData.elo)
             .execute()
     }
-    // TODO
+
     /**
      * Retrieves a list of users with the given username.
      * @param username The username of the users.
      * @return The list of users.
      */
-    override fun searchRankings(username: String): List<UserData> =
-        handle.createQuery("select * from user_stats where (user_id = (select id from users where username like :username))")
+    override fun searchRankings(username: String, rulesId: Int): List<UserData> =
+        handle.createQuery("select * from user_stats where (user_id = (select id from users where username like :username) and rules_id = :rulesId)")
             .bind("username", "%$username%")
+            .bind("rules_id", rulesId)
             .mapTo<UserData>()
             .list()
 

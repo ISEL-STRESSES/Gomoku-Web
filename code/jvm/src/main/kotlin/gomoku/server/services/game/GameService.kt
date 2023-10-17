@@ -141,8 +141,10 @@ class GameService(private val transactionManager: TransactionManager) {
         }
     }
 
-    fun getAvailableRules(offset: Int, limit: Int): List<Rules> {
-        TODO()
+    fun getAvailableRules(): List<Rules> {
+        return transactionManager.run {
+            it.matchRepository.getAllRules()
+        }
     }
 
     fun getCurrentTurnPlayerId(matchId: Int): Int? {
