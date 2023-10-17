@@ -11,3 +11,9 @@ data class UserData(
     val username: String,
     val userRuleStats: List<UserRuleStats>
 )
+
+data class ListUserData(
+    val uuid: Int,
+    val username: String,
+    val userRuleStats: List<UserRuleStats>
+)

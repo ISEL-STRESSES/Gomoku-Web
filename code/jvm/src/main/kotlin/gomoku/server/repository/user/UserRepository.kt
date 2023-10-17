@@ -1,5 +1,6 @@
 package gomoku.server.repository.user
 
+import gomoku.server.domain.user.ListUserData
 import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
@@ -80,7 +81,7 @@ interface UserRepository {
      * @param limit The maximum number of users to get.
      * @return A list of [UserData] objects, containing all the stats related to the users.
      */
-    fun getUsersStatsDataByRule(rulesId: Int, offset: Int, limit: Int): List<UserData>
+    fun getUsersStatsDataByRule(rulesId: Int, offset: Int, limit: Int): List<ListUserData>
 
     /**
      * Retrieves the stats of a user for every rule.

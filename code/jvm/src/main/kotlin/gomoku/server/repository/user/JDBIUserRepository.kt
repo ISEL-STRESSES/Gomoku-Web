@@ -1,5 +1,6 @@
 package gomoku.server.repository.user
 
+import gomoku.server.domain.user.ListUserData
 import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
@@ -166,10 +167,10 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * @param limit The maximum number of users to get.
      * @return A list of [UserData] objects, containing all the stats related to the users.
      */
-    override fun getUsersStatsDataByRule(offset: Int, limit: Int, rulesId: Int): List<UserData> =
+    override fun getUsersStatsDataByRule(rulesId: Int, offset: Int, limit: Int): List<ListUserData> =
         handle.createQuery(
             """
-            select users.id as user_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
+            select users.id as user_id, rules.id as rule_id, users.username, user_stats.games_played, user_stats.elo
             from users
             inner join user_stats
             on users.id = user_stats.user_id
@@ -184,7 +185,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .bind("rules_id", rulesId)
             .bind("offset", offset)
             .bind("limit", limit)
-            .mapTo<UserData>()
+            .mapTo<ListUserData>()
             .list()
 
     /**
@@ -195,7 +196,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun getUserStats(userId: Int): UserData? =
         handle.createQuery(
             """
-            select users.id as user_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
+            select users.id as user_id, rules.id as rule_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
             from users
             inner join user_stats
             on users.id = user_stats.user_id

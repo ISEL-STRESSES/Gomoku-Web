@@ -11,30 +11,19 @@ import java.sql.ResultSet
  */
 class UserDataRowMapper : RowMapper<UserData> {
     override fun map(rs: ResultSet, ctx: StatementContext): UserData {
+        val uuid = rs.getInt("user_id")
+        val username = rs.getString("username")
+
         val userRuleStats = mutableListOf<UserRuleStats>()
-        var previousUserId = rs.getInt("id")
-        while (rs.next()) {
-            if (previousUserId != rs.getInt("id")) {
-                return UserData(
-                    uuid = rs.getInt("id"),
-                    username = rs.getString("username"),
-                    userRuleStats = userRuleStats.toList()
-                )
-            } else {
-                userRuleStats.add(
-                    UserRuleStats(
-                        ruleId = rs.getInt("rule_id"),
-                        gamesPlayed = rs.getInt("games_played"),
-                        elo = rs.getInt("elo")
-                    )
-                )
-            }
-            previousUserId = rs.getInt("id")
-        }
-        return UserData(
-            uuid = rs.getInt("id"),
-            username = rs.getString("username"),
-            userRuleStats = userRuleStats
-        )
+
+        do {
+            val ruleId = rs.getInt("rule_id")
+            val gamesPlayed = rs.getInt("games_played")
+            val elo = rs.getInt("elo")
+
+            userRuleStats.add(UserRuleStats(ruleId, gamesPlayed, elo))
+        } while (rs.next())
+
+        return UserData(uuid, username, userRuleStats)
     }
 }

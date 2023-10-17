@@ -138,19 +138,31 @@ class JDBIUserRepositoryTests {
         // given: a UsersRepository
         val repo = JDBIUserRepository(handle)
         // and: a rule
-        val rule = buildRule(3, 15, "PRO", "STANDARD")
-//        val usersStats = repo.getUsersStatsDataByRule(0, 10, rule.ruleId) TODO FIX
-//        usersStats.forEach(::println)
-//        // then: users stats are retrieved
-//        // Check if the returned list is not null
-//        assertNotNull(usersStats)
-//
-//        // Check if the size of the returned list is as expected
-//        assertEquals(10, usersStats.size)
-//
-//        // Check if pagination is correct
-//        assertEquals(1, usersStats.first().uuid)
-//        assertEquals(10, usersStats.last().uuid)
+        val usersStats = repo.getUsersStatsDataByRule(2, 0, 10)
+        println("----- USERS STATS -----")
+        usersStats.forEach(::println)
+        // then: users stats are retrieved
+        // Check if the returned list is not null
+        assertNotNull(usersStats)
+
+        // Check if the size of the returned list is as expected
+        assertEquals(10, usersStats.size)
+
+        // Check if pagination is correct
+        assertEquals(1, usersStats.first().uuid)
+        assertEquals(10, usersStats.last().uuid)
+
+        val userStats = repo.getUserStats(1)
+        assertNotNull(userStats)
+        assertEquals(1, userStats!!.uuid)
+        println("----- USER1 STATS -----")
+        userStats.userRuleStats.forEach(::println)
+
+        val userRuleStats = repo.getUserRuleStats(1, 2)
+        assertNotNull(userRuleStats)
+        assertEquals(2, userRuleStats!!.ruleId)
+        assertEquals(1500, userRuleStats.elo)
+        assertEquals(5, userRuleStats.gamesPlayed)
     }
 
     companion object {

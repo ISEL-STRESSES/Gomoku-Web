@@ -1,5 +1,6 @@
 package gomoku.server.services.user
 
+import gomoku.server.domain.user.ListUserData
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserData
@@ -94,7 +95,7 @@ class UserService(
      * @param limit The limit of the results.
      * @return The list of users.
      */
-    fun getUsersRuleStats(ruleId: Int, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserData> =
+    fun getUsersRuleStats(ruleId: Int, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<ListUserData> =
         transactionManager.run {
             val usersRepository = it.usersRepository
             usersRepository.getUsersStatsDataByRule(ruleId, offset, limit)
