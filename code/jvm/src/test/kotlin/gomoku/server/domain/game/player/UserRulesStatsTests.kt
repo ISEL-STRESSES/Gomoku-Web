@@ -2,19 +2,17 @@ package gomoku.server.domain.game.player
 
 import gomoku.server.domain.game.rules.BoardSize
 import gomoku.server.domain.game.rules.StandardRules
+import gomoku.server.domain.user.UserRuleStats
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class UserRulesStatsTests {
-
-    private val validRule = StandardRules(1, BoardSize.X15) // Assuming a dummy Rule object for testing purposes.
-
     @Test
     fun `PlayerRuleStats initializes with valid values`() {
-        val stats = UserRuleStats(validRule, 10, 2000)
+        val stats = UserRuleStats(1, 10, 2000)
 
-        assertEquals(validRule, stats.rules)
+        assertEquals(1, stats.ruleId)
         assertEquals(10, stats.gamesPlayed)
         assertEquals(2000, stats.elo)
     }
@@ -22,21 +20,21 @@ class UserRulesStatsTests {
     @Test
     fun `PlayerRuleStats throws exception for negative gamesPlayed`() {
         assertThrows<IllegalArgumentException> {
-            UserRuleStats(validRule, -1, 2000)
+            UserRuleStats(1, -1, 2000)
         }
     }
 
     @Test
     fun `PlayerRuleStats throws exception for elo less than 0`() {
         assertThrows<IllegalArgumentException> {
-            UserRuleStats(validRule, 10, -1)
+            UserRuleStats(1, 10, -1)
         }
     }
 
     @Test
     fun `PlayerRuleStats throws exception for elo greater than 4000`() {
         assertThrows<IllegalArgumentException> {
-            UserRuleStats(validRule, 10, 4001)
+            UserRuleStats(1, 10, 4001)
         }
     }
 }

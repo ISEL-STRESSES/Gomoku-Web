@@ -1,6 +1,5 @@
 package gomoku.server.domain.user
 
-import gomoku.server.domain.game.player.updateElo
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 

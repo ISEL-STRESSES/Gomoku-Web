@@ -1,11 +1,11 @@
 package gomoku.server.repository.user
 
-import gomoku.server.domain.game.player.UserRuleStats
 import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
 import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserData
+import gomoku.server.domain.user.UserRuleStats
 import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
@@ -186,15 +186,11 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .list()
 
     /**
-     * Gets all the stats related to the users, with pagination, by rule.
-     * @param offset The offset of the first user to get.
-     * @param limit The maximum number of users to get.
-     * @param boardsize The boardSize of the rule
-     * @param openingRule The opening rule of the rule
-     * @param variant The variant of the rule
-     * @return A list of [UserData] objects, containing all the stats related to the users.
+     * Retrieves the stats of a user for every rule.
+     * @param userId The id of the user.
+     * @return The stats of the user for every rule, or null if the user doesn't exist.
      */
-    override fun getUsersStatsDataByRule(offset: Int, limit: Int, boardsize: Int, variant: String, openingRule: String): List<UserData> =
+    override fun getUserStats(userId: Int): UserData? =
         handle.createQuery(
             """
             select users.id as user_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
@@ -203,17 +199,10 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             on users.id = user_stats.user_id
             inner join rules
             on user_stats.rules_id = rules.id
-            where rules.board_size = :boardSize and rules.variant = :variant and rules.opening_rule = :openingRule
-            order by users.id
-            offset :offset
-            limit :limit           
+            where users.id = :user_id
             """.trimIndent()
         )
-            .bind("offset", offset)
-            .bind("limit", limit)
-            .bind("boardSize", boardsize)
-            .bind("variant", variant)
-            .bind("openingRule", openingRule)
+            .bind("user_id", userId)
             .mapTo<UserData>()
             .list()
 
@@ -223,7 +212,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * @param ruleId The id of the rule.
      * @return The stats of the user for the given rule.
      */
-    override fun getUserStatsByRule(userId: Int, ruleId: Int): UserRuleStats? =
+    override fun getUserRuleStats(userId: Int, ruleId: Int): UserRuleStats? =
         handle.createQuery(
             """
             select * from user_stats
@@ -241,17 +230,6 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * @param userStatsData The stats of the user for the given rule.
      */
     override fun setUserRuleStats(userId: Int, userStatsData: UserRuleStats) {
-        val ruleId = handle.createQuery(
-            """
-            select id from rules
-            where board_size = :board_size and opening_rule = :opening_rule and variant = :variant
-            """.trimIndent()
-        )
-            .bind("board_size", userStatsData.rules.boardSize)
-            .bind("opening_rule", userStatsData.rules.openingRule)
-            .bind("variant", userStatsData.rules.variant)
-            .mapTo<Int>()
-            .single()
 
         handle.createUpdate(
             """
@@ -260,7 +238,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             """.trimIndent()
         )
             .bind("user_id", userId)
-            .bind("rules_id", ruleId)
+            .bind("rules_id", userStatsData.ruleId)
             .bind("games_played", userStatsData.gamesPlayed)
             .bind("elo", userStatsData.elo)
             .execute()

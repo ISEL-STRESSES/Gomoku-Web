@@ -1,8 +1,8 @@
 package gomoku.server.repository.jdbi.mappers.user
 
-import gomoku.server.domain.game.player.UserRuleStats
 import gomoku.server.domain.game.rules.buildRule
 import gomoku.server.domain.user.UserData
+import gomoku.server.domain.user.UserRuleStats
 import org.jdbi.v3.core.mapper.RowMapper
 import org.jdbi.v3.core.statement.StatementContext
 import java.sql.ResultSet
@@ -12,12 +12,6 @@ import java.sql.ResultSet
  */
 class UserDataRowMapper : RowMapper<UserData> {
     override fun map(rs: ResultSet, ctx: StatementContext): UserData {
-        val rule = buildRule(
-            ruleId = rs.getInt("rules_id"),
-            boardMaxSize = rs.getInt("board_size"),
-            variantName = rs.getString("variant"),
-            openingRuleName = rs.getString("opening_rule")
-        )
 
         val userRuleStats = mutableListOf<UserRuleStats>()
         var previousUserId = rs.getInt("id")
@@ -31,7 +25,7 @@ class UserDataRowMapper : RowMapper<UserData> {
             } else {
                 userRuleStats.add(
                     UserRuleStats(
-                        rules = rule,
+                        ruleId = rs.getInt("rule_id"),
                         gamesPlayed = rs.getInt("games_played"),
                         elo = rs.getInt("elo")
                     )
@@ -44,17 +38,5 @@ class UserDataRowMapper : RowMapper<UserData> {
             username = rs.getString("username"),
             userRuleStats = userRuleStats
         )
-
-        /*val uuid = rs.getInt("user_id")
-        val username = rs.getString("username")
-        val rule = buildRule(
-            rs.getInt("board_size"),
-            rs.getString("variant"),
-            rs.getString("opening_rule")
-        )
-        val gamesPlayed = rs.getInt("games_played")
-        val elo = rs.getInt("elo")
-        val userRuleStats = UserRuleStats(rule, gamesPlayed, elo)
-        return UserData(uuid, username, listOf(userRuleStats))*/
     }
 }

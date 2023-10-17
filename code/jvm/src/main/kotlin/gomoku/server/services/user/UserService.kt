@@ -3,6 +3,7 @@ package gomoku.server.services.user
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserData
+import gomoku.server.domain.user.UserRuleStats
 import gomoku.server.domain.user.UsersDomain
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.user.TokenCreationError
@@ -12,12 +13,26 @@ import gomoku.utils.success
 import kotlinx.datetime.Clock
 import org.springframework.stereotype.Service
 
+/**
+ * Service for user-related operations
+ * @param transactionManager The transaction manager
+ * @param usersDomain The domain for user-related operations
+ * @param clock The clock
+ */
 @Service
 class UserService(
     private val transactionManager: TransactionManager,
     private val usersDomain: UsersDomain,
     private val clock: Clock
 ) {
+
+    /**
+     * Creates a user with the given username and password.
+     * @param username The username of the user.
+     * @param password The password of the user.
+     * @return The result of the operation, Either a [UserCreationError] or the id of the created user.
+     * @see UserCreationResult
+     */
     fun createUser(username: String, password: String): UserCreationResult {
         // Validate username
         if (!usersDomain.isUsernameValid(username)) {
@@ -41,6 +56,13 @@ class UserService(
         }
     }
 
+    /**
+     * Creates a token for the given username and password.
+     * @param username The username of the user.
+     * @param password The password of the user.
+     * @return The result of the operation, Either a [TokenCreationError] or the token.
+     * @see TokenCreationResult
+     */
     fun createToken(username: String, password: String): TokenCreationResult {
         if (username.isBlank() || password.isBlank()) {
             return failure(TokenCreationError.UserOrPasswordInvalid)
@@ -65,22 +87,59 @@ class UserService(
         }
     }
 
-    // TODO: GETUSERSSTATSDATA
-    fun getUsersData(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserData> {
-        val users = transactionManager.run {
+    /**
+     * Gets the stats of the users that have played a game with the given rule.
+     * @param ruleId The id of the rule.
+     * @param offset The offset of the results.
+     * @param limit The limit of the results.
+     * @return The list of users.
+     */
+    fun getUsersRuleStats(ruleId: Int, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserData> =
+        transactionManager.run {
             val usersRepository = it.usersRepository
-            usersRepository.getUsersStatsData(offset, limit)
+            usersRepository.getUsersStatsDataByRule(ruleId, offset, limit)
         }
-        return users
-    }
 
-    fun getUserById(id: Int): UserData? {
+    /**
+     * Gets the stats of the user for every rule.
+     * @param userId The id of the user.
+     * @return The stats of the user for every rule, or null if the user doesn't exist.
+     */
+    fun getUserStats(userId: Int): UserData? =
+        transactionManager.run {
+            val usersRepository = it.usersRepository
+            usersRepository.getUserStats(userId)
+        }
+
+    /**
+     * Gets the stats of the user for a given rule.
+     * @param userId The id of the user.
+     * @param ruleId The id of the rule.
+     * @return The stats of the user for the given rule, or null if the user doesn't exist.
+     */
+    fun getUserRuleStats(userId: Int, ruleId: Int): UserRuleStats? =
+        transactionManager.run {
+            val usersRepository = it.usersRepository
+            usersRepository.getUserRuleStats(userId, ruleId)
+        }
+
+    /**
+     * Gets a user by its id.
+     * @param id The id of the user.
+     * @return The user, or null if the user doesn't exist.
+     */
+    fun getUserById(id: Int): UserData? { //TODO: This doesn't give the user's stats
         return transactionManager.run {
             val usersRepository = it.usersRepository
             usersRepository.getUserById(id)
         }
     }
 
+    /**
+     * Gets a user by its token.
+     * @param token The token of the user.
+     * @return The user, or null if the user doesn't exist.
+     */
     fun getUserByToken(token: String): User? {
         if (!usersDomain.canBeToken(token)) {
             return null
@@ -98,7 +157,16 @@ class UserService(
         }
     }
 
+    /**
+     * Revokes a token.
+     * @param token The token to revoke.
+     */
     fun revokeToken(token: String) {
+        transactionManager.run {
+            val usersRepository = it.usersRepository
+            val tokenValidationInfo = usersDomain.createTokenValidationInfo(token)
+            usersRepository.removeTokenByTokenValidationInfo(tokenValidationInfo)
+        }
     }
 
     companion object {

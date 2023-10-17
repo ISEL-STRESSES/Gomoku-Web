@@ -1,11 +1,11 @@
 package gomoku.server.repository.user
 
-import gomoku.server.domain.game.player.UserRuleStats
 import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
 import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserData
+import gomoku.server.domain.user.UserRuleStats
 import kotlinx.datetime.Instant
 
 /**
@@ -74,31 +74,28 @@ interface UserRepository {
 
     // stats
     /**
-     * Retrieves a list of users.
-     * @param offset The offset of the users to retrieve.
-     * @param limit The maximum number of users to retrieve.
-     * @return The list of users.
-     */
-    fun getUsersStatsData(offset: Int, limit: Int): List<UserData>
-
-    /**
      * Gets all the stats related to the users, with pagination, by rule.
+     * @param rulesId The id of the rules.
      * @param offset The offset of the first user to get.
      * @param limit The maximum number of users to get.
-     * @param boardSize The boardSize of the rule
-     * @param openingRule The opening rule of the rule
-     * @param variant The variant of the rule
      * @return A list of [UserData] objects, containing all the stats related to the users.
      */
-    fun getUsersStatsDataByRule(offset: Int, limit: Int, boardSize: Int, variant: String, openingRule: String): List<UserData>
+    fun getUsersStatsDataByRule(rulesId: Int, offset: Int, limit: Int): List<UserData>
+
+    /**
+     * Retrieves the stats of a user for every rule.
+     * @param userId The id of the user.
+     * @return The stats of the user for every rule, or null if the user doesn't exist.
+     */
+    fun getUserStats(userId: Int): UserData?
 
     /**
      * Retrieves the stats of a user for a given rule.
      * @param userId The id of the user.
      * @param ruleId The id of the rule.
-     * @return The stats of the user for the given rule.
+     * @return The stats of the user for the given rule, or null if the user doesn't exist.
      */
-    fun getUserStatsByRule(userId: Int, ruleId: Int): UserRuleStats?
+    fun getUserRuleStats(userId: Int, ruleId: Int): UserRuleStats?
 
     /**
      * Sets the stats of a user for a given rule.
@@ -110,7 +107,8 @@ interface UserRepository {
     /**
      * Retrieves a list of users with the given username.
      * @param username The username of the users.
+     * @param rulesId The id of the rules.
      * @return The list of users.
      */
-    fun searchRankings(username: String): List<UserData>
+    fun searchRankings(username: String, rulesId: Int): List<UserData>
 }

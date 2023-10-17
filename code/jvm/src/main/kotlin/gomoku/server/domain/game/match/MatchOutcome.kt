@@ -1,7 +1,5 @@
 package gomoku.server.domain.game.match
 
-import gomoku.server.domain.game.player.Color
-
 /**
  * Represents the outcome of a match
  */
@@ -18,7 +16,7 @@ fun String.toMatchOutcome() = when (this) {
     else -> throw IllegalArgumentException("Invalid match outcome: $this")
 }
 
-fun Color?.toMatchOutcome() = when(this) {
+fun Color?.toMatchOutcome() = when (this) {
     Color.BLACK -> MatchOutcome.BLACK_WON
     Color.WHITE -> MatchOutcome.WHITE_WON
     null -> MatchOutcome.DRAW

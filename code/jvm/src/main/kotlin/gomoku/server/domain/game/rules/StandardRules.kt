@@ -1,9 +1,9 @@
 package gomoku.server.domain.game.rules
 
+import gomoku.server.domain.game.match.Color
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.match.MoveContainer
 import gomoku.server.domain.game.match.Position
-import gomoku.server.domain.game.player.Color
 import gomoku.utils.failure
 import gomoku.utils.success
 

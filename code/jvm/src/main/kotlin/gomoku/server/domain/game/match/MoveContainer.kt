@@ -1,7 +1,5 @@
 package gomoku.server.domain.game.match
 
-import gomoku.server.domain.game.player.Color
-import gomoku.server.domain.game.player.toColor
 import gomoku.utils.Either
 import gomoku.utils.failure
 import gomoku.utils.success

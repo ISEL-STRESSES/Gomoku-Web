@@ -1,7 +1,5 @@
 package gomoku.server.domain.user
 
-import gomoku.server.domain.game.player.UserRuleStats
-
 /**
  * Represents a user with its statistics listed by rules
  * @property uuid unique identifier of the user

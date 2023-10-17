@@ -39,5 +39,5 @@ interface LobbyRepository {
      * Removes a player from a lobby (Waiting Room)
      * @param userId The id of the user to remove
      */
-    fun leaveLobby(userId: Int) : Boolean
+    fun leaveLobby(userId: Int): Boolean
 }

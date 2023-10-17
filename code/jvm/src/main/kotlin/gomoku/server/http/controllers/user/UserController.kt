@@ -4,6 +4,8 @@ import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
 import gomoku.server.http.controllers.media.Problem
 import gomoku.server.http.controllers.user.models.UserDataOutputModel
+import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
+import gomoku.server.http.controllers.user.models.UserStatsOutputModel
 import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
 import gomoku.server.http.controllers.user.models.getUsersData.GetUsersDataOutputModel
 import gomoku.server.http.controllers.user.models.userCreate.UserCreateInputModel
@@ -28,12 +30,36 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(private val service: UserService) {
 
     @GetMapping(URIs.Users.RANKING)
-    fun getUsersData(
+    fun getUsersRuleData(
+        @PathVariable ruleId: Int,
         @RequestParam offset: Int = 0,
         @RequestParam limit: Int = 10
     ): ResponseEntity<*> {
-        val users = service.getUsersData(offset, limit)
+        val users = service.getUsersRuleStats(ruleId, offset, limit)
         return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
+    }
+
+    @GetMapping(URIs.Users.USER_STATS)
+    fun getUserStats(@PathVariable userId: Int): ResponseEntity<*> {
+        val userStats = service.getUserStats(userId)
+        return if (userStats == null) {
+            Problem.response(404, Problem.userNotFound)
+        } else {
+            ResponseEntity.ok(UserStatsOutputModel(userStats.uuid, userStats.username, userStats.userRuleStats))
+        }
+    }
+
+    @GetMapping(URIs.Users.USER_RANKING)
+    fun getUserRuleStats(
+        @PathVariable userId: Int,
+        @PathVariable ruleId: Int
+    ): ResponseEntity<*> {
+        val userRuleStats = service.getUserRuleStats(userId, ruleId)
+        return if (userRuleStats == null) {
+            Problem.response(404, Problem.userNotFound)
+        } else {
+            ResponseEntity.ok(UserRuleStatsOutputModel(userRuleStats.ruleId, userRuleStats.gamesPlayed, userRuleStats.elo))
+        }
     }
 
     @GetMapping(URIs.Users.GET_BY_ID)

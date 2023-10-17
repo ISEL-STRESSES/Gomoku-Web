@@ -1,7 +1,6 @@
 package gomoku.server.domain.game
 
 import gomoku.server.domain.game.rules.Rules
-import gomoku.server.domain.user.User
 
 /**
  * Represents a lobby

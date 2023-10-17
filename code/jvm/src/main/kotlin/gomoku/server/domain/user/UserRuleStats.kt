@@ -1,15 +1,14 @@
-package gomoku.server.domain.game.player
+package gomoku.server.domain.user
 
-import gomoku.server.domain.game.rules.Rules
 import kotlin.math.pow
 
 /**
  * Represents the statistics of a rule
- * @property rules rule
+ * @property ruleId id of the rule
  * @property gamesPlayed number of games played with this rule
  * @property elo elo of the rule (0-4000)
  */
-data class UserRuleStats(val rules: Rules, val gamesPlayed: Int = 1, val elo: Int = DEFAULT_ELO) {
+data class UserRuleStats(val ruleId: Int, val gamesPlayed: Int = 1, val elo: Int = DEFAULT_ELO) {
     init {
         require(gamesPlayed >= 0)
         require(elo in 0..4000)
@@ -18,6 +17,9 @@ data class UserRuleStats(val rules: Rules, val gamesPlayed: Int = 1, val elo: In
     companion object {
         const val K_FACTOR = 40.0
         const val DEFAULT_ELO = 1500
+        const val WIN = 1.0
+        const val DRAW = 0.5
+        const val LOSE = 0.0
     }
 }
 

@@ -1,6 +1,5 @@
 package gomoku.server.domain.game.match
 
-import gomoku.server.domain.game.player.toColor
 import gomoku.server.domain.game.rules.Rules
 
 /**

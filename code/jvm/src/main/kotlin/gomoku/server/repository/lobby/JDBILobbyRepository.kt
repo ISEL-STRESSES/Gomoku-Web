@@ -1,7 +1,6 @@
 package gomoku.server.repository.lobby
 
 import gomoku.server.domain.game.Lobby
-import gomoku.server.domain.user.User
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import java.time.Clock
