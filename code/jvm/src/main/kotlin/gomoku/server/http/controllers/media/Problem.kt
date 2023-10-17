@@ -48,5 +48,54 @@ class Problem(
                 PROBLEM_BASE_URL + "user-not-found"
             )
         )
+
+        val gameNotFound = Problem(
+            URI(
+                PROBLEM_BASE_URL + "game-not-found"
+            )
+        )
+
+        val positionOccupied = Problem(
+            URI(
+                PROBLEM_BASE_URL + "position-occupied"
+            )
+        )
+
+        val notYourTurn = Problem(
+            URI(
+                PROBLEM_BASE_URL + "not-your-turn"
+            )
+        )
+
+        val gameAlreadyFinished = Problem(
+            URI(
+                PROBLEM_BASE_URL + "game-already-finished"
+            )
+        )
+
+        val impossiblePosition = Problem(
+            URI(
+                PROBLEM_BASE_URL + "impossible-position"
+            )
+        )
+
+        // kabbom TODO
+        val makeMoveFailed = Problem(
+            URI(
+                PROBLEM_BASE_URL + "make-move-failed"
+            )
+        )
+
+        val samePlayer = Problem(
+            URI(
+                PROBLEM_BASE_URL + "same-player"
+            )
+        )
+
+        val lobbyNotFound = Problem(
+            URI(
+                PROBLEM_BASE_URL + "lobby-not-found"
+            )
+        )
     }
 }

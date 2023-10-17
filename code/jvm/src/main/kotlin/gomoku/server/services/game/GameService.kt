@@ -17,6 +17,7 @@ import gomoku.server.domain.user.updateElo
 import gomoku.server.repository.Transaction
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.game.MakeMoveError
+import gomoku.server.services.errors.game.MatchNotFoundError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.utils.Either
 import gomoku.utils.failure
@@ -60,70 +61,30 @@ class GameService(private val transactionManager: TransactionManager) {
     /**
      * Makes a move in the given match.
      * @param gameId id of the match
-     * @param move move to be made
+     * @param userId id of the user that wants to make the move
+     * @param pos position of the move
      * @return the result of the move
      * @see MakeMoveResult
      */
     fun makeMove(gameId: Int, userId: Int, pos: Int): MakeMoveResult {
         return transactionManager.run {
-            val match = it.matchRepository.getMatchById(gameId) ?: return@run failure(MakeMoveError.GameNotFound)
+            val match = it.matchRepository.getMatchById(gameId)
+                ?: return@run failure(MakeMoveError.GameNotFound)
             when (match) {
                 is FinishedMatch -> return@run failure(MakeMoveError.GameFinished)
                 is OngoingMatch -> {
-                    val currMove = Move(Position(pos), if (match.playerBlack == userId) Color.BLACK else Color.WHITE)
+                    val currMove = Move(
+                        position = Position(pos),
+                        color = if (match.playerBlack == userId) {
+                            Color.BLACK
+                        } else {
+                            Color.WHITE
+                        }
+                    )
                     val isValidMoveResult = match.rules.isValidMove(match.moveContainer, currMove, match.turn)
                     when (isValidMoveResult) {
                         is Either.Left -> return@run isValidMoveResult.value.resolveError()
-                        is Either.Right -> {
-                            if (match.rules.isWinningMove(match.moveContainer, currMove)) {
-                                if (!it.matchRepository.addToMoveArray(
-                                        match.matchId,
-                                        currMove.position.value
-                                    )
-                                ) {
-                                    return@run failure(MakeMoveError.MakeMoveFailed)
-                                }
-                                it.matchRepository.setMatchState(match.matchId, MatchState.FINISHED)
-                                it.matchRepository.setMatchOutcome(match.matchId, currMove.color.toMatchOutcome())
-
-                                val winnerId = if (currMove.color == Color.BLACK) match.playerBlack else match.playerWhite
-                                val loserId = if (currMove.color == Color.BLACK) match.playerWhite else match.playerBlack
-
-                                updatePlayerStats(
-                                    winnerId,
-                                    loserId,
-                                    match.rules.ruleId,
-                                    it,
-                                    UserRuleStats.WIN,
-                                    UserRuleStats.LOSE
-                                )
-                            } else {
-                                if (!it.matchRepository.addToMoveArray(
-                                        match.matchId,
-                                        currMove.position.value
-                                    )
-                                ) {
-                                    return@run failure(MakeMoveError.MakeMoveFailed)
-                                }
-                                if (match.moveContainer.isFull()) {
-                                    it.matchRepository.setMatchState(match.matchId, MatchState.FINISHED)
-                                    it.matchRepository.setMatchOutcome(match.matchId, MatchOutcome.DRAW)
-
-                                    updatePlayerStats(
-                                        match.playerBlack,
-                                        match.playerWhite,
-                                        match.rules.ruleId,
-                                        it,
-                                        UserRuleStats.DRAW,
-                                        UserRuleStats.DRAW
-                                    )
-                                }
-                            }
-                            val newGame = it.matchRepository.getMatchById(match.matchId) ?: return@run failure(
-                                MakeMoveError.GameNotFound
-                            )
-                            return@run success(newGame)
-                        }
+                        is Either.Right -> { return@run resolveValidMove(match, currMove, it) }
                     }
                 }
             }
@@ -131,35 +92,69 @@ class GameService(private val transactionManager: TransactionManager) {
     }
 
     /**
+     * Resolves a valid move.
+     * @param match the match
+     * @param move the move to be made
+     * @param tr the transaction context
+     * @return the result of the move
+     * @see MakeMoveResult
+     */
+    private fun resolveValidMove(match: OngoingMatch, move: Move, tr: Transaction): MakeMoveResult {
+        if (match.rules.isWinningMove(match.moveContainer, move)) {
+            if (!tr.matchRepository.addToMoveArray(match.matchId, move.position.value)) {
+                return failure(MakeMoveError.MakeMoveFailed)
+            }
+            tr.matchRepository.setMatchState(match.matchId, MatchState.FINISHED)
+            tr.matchRepository.setMatchOutcome(match.matchId, move.color.toMatchOutcome())
+
+            val winnerId = if (move.color == Color.BLACK) match.playerBlack else match.playerWhite
+            val loserId = if (move.color == Color.BLACK) match.playerWhite else match.playerBlack
+
+            updatePlayerStats(winnerId, loserId, match.rules.ruleId, tr, UserRuleStats.WIN)
+        } else {
+            if (!tr.matchRepository.addToMoveArray(match.matchId, move.position.value)) {
+                return failure(MakeMoveError.MakeMoveFailed)
+            }
+            if (match.moveContainer.isFull()) {
+                tr.matchRepository.setMatchState(match.matchId, MatchState.FINISHED)
+                tr.matchRepository.setMatchOutcome(match.matchId, MatchOutcome.DRAW)
+
+                updatePlayerStats(match.playerBlack, match.playerWhite, match.rules.ruleId, tr, UserRuleStats.DRAW)
+            }
+        }
+        val newGame = tr.matchRepository.getMatchById(match.matchId)
+            ?: return failure(MakeMoveError.GameNotFound)
+        return success(newGame)
+    }
+
+    /**
      * Updates the statistics of two players based on the game outcome.
      * @param player1Id The ID of the first player.
      * @param player2Id The ID of the second player.
      * @param ruleId The rules set being followed in the match.
-     * @param transaction The transaction context.
+     * @param tr The transaction context.
      * @param player1Score The score/result of the first player after the match.
-     * @param player2Score The score/result of the second player after the match.
      */
     private fun updatePlayerStats(
         player1Id: Int,
         player2Id: Int,
         ruleId: Int,
-        transaction: Transaction,
-        player1Score: Double,
-        player2Score: Double
+        tr: Transaction,
+        player1Score: Double
     ) {
-        val statsPlayer1 = transaction.usersRepository.getUserRanking(player1Id, ruleId) ?: UserRuleStats(ruleId)
-        val statsPlayer2 = transaction.usersRepository.getUserRanking(player2Id, ruleId) ?: UserRuleStats(ruleId)
+        val statsPlayer1 = tr.usersRepository.getUserRanking(player1Id, ruleId) ?: UserRuleStats(ruleId)
+        val statsPlayer2 = tr.usersRepository.getUserRanking(player2Id, ruleId) ?: UserRuleStats(ruleId)
 
         val newPlayer1Elo = updateElo(statsPlayer1.elo.toDouble(), statsPlayer2.elo.toDouble(), player1Score)
-        val newPlayer2Elo = updateElo(statsPlayer2.elo.toDouble(), statsPlayer1.elo.toDouble(), player2Score)
+        val newPlayer2Elo = updateElo(statsPlayer2.elo.toDouble(), statsPlayer1.elo.toDouble(), 1 - player1Score)
 
-        transaction.usersRepository.setUserRuleStats(
-            player1Id,
-            statsPlayer1.copy(gamesPlayed = statsPlayer1.gamesPlayed + 1, elo = newPlayer1Elo.toInt())
+        tr.usersRepository.setUserRuleStats(
+            userId = player1Id,
+            userStatsData = statsPlayer1.copy(gamesPlayed = statsPlayer1.gamesPlayed + 1, elo = newPlayer1Elo.toInt())
         )
-        transaction.usersRepository.setUserRuleStats(
-            player2Id,
-            statsPlayer2.copy(gamesPlayed = statsPlayer2.gamesPlayed + 1, elo = newPlayer2Elo.toInt())
+        tr.usersRepository.setUserRuleStats(
+            userId = player2Id,
+            userStatsData = statsPlayer2.copy(gamesPlayed = statsPlayer2.gamesPlayed + 1, elo = newPlayer2Elo.toInt())
         )
     }
 
@@ -218,7 +213,7 @@ class GameService(private val transactionManager: TransactionManager) {
     }
 
     /**
-     *
+     * TODO should this be a part of get match details?
      */
     fun getMatchState(matchId: Int, userId: Int): MatchState? {
         return transactionManager.run {
@@ -226,13 +221,28 @@ class GameService(private val transactionManager: TransactionManager) {
         }
     }
 
+    // TODO is state needed if so in what context
+    /**
+     *
+     */
     fun getMatches(offset: Int, limit: Int, userId: Int, state: String?): List<Match> {
         return transactionManager.run {
             TODO()
         }
     }
 
-    fun getGame(gameId: Int): Match? {
-        TODO()
-    }
+    /**
+     * Gets the details of a game.
+     * @param gameId The id of the game.
+     * @return The details of the game.
+     */
+    fun getGame(gameId: Int): GetMatchResult =
+        transactionManager.run {
+            val match = it.matchRepository.getMatchById(gameId)
+            when (match) {
+                null -> return@run failure(MatchNotFoundError.GameMatchNotFound)
+                is FinishedMatch -> return@run success(match)
+                is OngoingMatch -> return@run success(match)
+            }
+        }
 }
