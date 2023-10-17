@@ -138,7 +138,7 @@ class JDBIMatchRepositoryTests {
     }
 
     @Test
-    fun `create match and check if exists`() = testWithHandleAndRollback { handle ->
+    fun `check base match flow`() = testWithHandleAndRollback { handle ->
 
         val repo = JDBIMatchRepository(handle)
         val uRepo = JDBIUserRepository(handle)
@@ -174,6 +174,9 @@ class JDBIMatchRepositoryTests {
         val matchRule = repo.getMatchRule(matchId)
         assertNotNull(matchRule)
         assertEquals(1, matchRule.ruleId)
+        assertEquals(BoardSize.X15, matchRule.boardSize)
+        assertEquals(OpeningRule.FREE, matchRule.openingRule)
+        assertEquals(RuleVariant.STANDARD, matchRule.variant)
 
         val matchPlayers = repo.getMatchPlayers(matchId)
         assertNotNull(matchPlayers)

@@ -22,9 +22,9 @@ DO $$
 -- Inserting data into 'rules' table
 INSERT INTO rules(board_size, opening_rule, variant)
 VALUES
-    (15, 'free', 'standard'),
-    (19, 'free', 'standard'),
-    (15, 'pro', 'standard');
+    (15, 'FREE', 'STANDARD'),
+    (19, 'FREE', 'STANDARD'),
+    (15, 'PRO', 'STANDARD');
 
 -- Inserting data into 'user_stats' table
 DO $$
