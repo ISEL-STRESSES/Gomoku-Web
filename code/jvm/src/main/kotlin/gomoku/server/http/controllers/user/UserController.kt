@@ -31,17 +31,17 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(private val service: UserService) {
 
     @GetMapping(URIs.Users.RANKING)
-    fun getUsersRuleData(
+    fun ranking(
         @PathVariable ruleId: Int,
         @RequestParam offset: Int = 0,
         @RequestParam limit: Int = 10
     ): ResponseEntity<*> {
-        val users = service.getUsersRuleStats(ruleId, offset, limit)
+        val users = service.getRanking(ruleId, offset, limit)
         return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
     }
 
     @GetMapping(URIs.Users.USER_STATS)
-    fun getUserStats(@PathVariable userId: Int): ResponseEntity<*> {
+    fun userStats(@PathVariable userId: Int): ResponseEntity<*> {
         val userStats = service.getUserStats(userId)
         return if (userStats == null) {
             Problem.response(404, Problem.userNotFound)
@@ -51,16 +51,27 @@ class UserController(private val service: UserService) {
     }
 
     @GetMapping(URIs.Users.USER_RANKING)
-    fun getUserRuleStats(
+    fun userRanking(
         @PathVariable userId: Int,
         @PathVariable ruleId: Int
     ): ResponseEntity<*> {
-        val userRuleStats = service.getUserRuleStats(userId, ruleId)
+        val userRuleStats = service.getUserRanking(userId, ruleId)
         return if (userRuleStats == null) {
             Problem.response(404, Problem.userNotFound)
         } else {
             ResponseEntity.ok(UserRuleStatsOutputModel(userRuleStats))
         }
+    }
+
+    @GetMapping(URIs.Users.RANKING_SEARCH)
+    fun searchRanking(
+        @PathVariable ruleId: Int,
+        @RequestParam username: String,
+        @RequestParam offset: Int = 0,
+        @RequestParam limit: Int = 10
+    ): ResponseEntity<*> {
+        val users = service.searchRanking(ruleId, username, offset, limit)
+        return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
     }
 
     @GetMapping(URIs.Users.GET_BY_ID)
@@ -117,7 +128,6 @@ class UserController(private val service: UserService) {
         @RequestHeader("Authorization") token: String
     ) {
         service.revokeToken(token)
-
     }
 
     @GetMapping(URIs.Users.HOME)

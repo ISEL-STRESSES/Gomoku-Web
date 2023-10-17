@@ -162,12 +162,13 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
 
     // stats
     /**
-     * Gets all the stats related to the users, with pagination.
+     * Gets the ranking of the users for a given rule.
+     * @param rulesId The id of the rule.
      * @param offset The offset of the first user to get.
      * @param limit The maximum number of users to get.
-     * @return A list of [UserData] objects, containing all the stats related to the users.
+     * @return A list of [ListUserData] objects, containing all the stats related to the users.
      */
-    override fun getUsersStatsDataByRule(rulesId: Int, offset: Int, limit: Int): List<ListUserData> =
+    override fun getRanking(rulesId: Int, offset: Int, limit: Int): List<ListUserData> =
         handle.createQuery(
             """
             select users.id as user_id, rules.id as rule_id, users.username, user_stats.games_played, user_stats.elo
@@ -215,7 +216,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * @param ruleId The id of the rule.
      * @return The stats of the user for the given rule.
      */
-    override fun getUserRuleStats(userId: Int, ruleId: Int): UserRuleStats? =
+    override fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats? =
         handle.createQuery(
             """
             select * from user_stats
@@ -251,7 +252,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * @param username The username of the users.
      * @return The list of users.
      */
-    override fun searchRankings(username: String, rulesId: Int): List<UserData> =
+    override fun searchUsersRuleStatsByUsername(username: String, rulesId: Int, offset: Int, limit: Int): List<UserData> =
         handle.createQuery("select * from user_stats where (user_id = (select id from users where username like :username) and rules_id = :rulesId)")
             .bind("username", "%$username%")
             .bind("rules_id", rulesId)

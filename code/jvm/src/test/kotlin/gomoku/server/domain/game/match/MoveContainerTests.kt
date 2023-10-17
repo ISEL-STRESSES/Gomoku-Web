@@ -1,10 +1,5 @@
 package gomoku.server.domain.game.match
 
-import gomoku.server.domain.game.match.AddMoveError
-import gomoku.server.domain.game.match.Color
-import gomoku.server.domain.game.match.Move
-import gomoku.server.domain.game.match.MoveContainer
-import gomoku.server.domain.game.match.Position
 import gomoku.server.domain.game.rules.BoardSize
 import gomoku.utils.Either
 import gomoku.utils.rightOrNull
@@ -13,7 +8,6 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import kotlin.test.fail
 
 class MoveContainerTests {
 
@@ -58,10 +52,10 @@ class MoveContainerTests {
     @Test
     fun `addMove with move inside board and position occupied returns failure with AlreadyOccupied error`() {
         var moveContainer = MoveContainer.createEmptyMoveContainer(3)
-        moveContainer = moveContainer.addMove(Move(Position(0), Color.BLACK)).rightOrNull()!!
         val move = Move(Position(0), Color.WHITE)
+        moveContainer = moveContainer.addMove(move).rightOrNull()!!
         val result = moveContainer.addMove(move)
-        assertTrue(result is Either.Right)
+        assertTrue(result is Either.Left && result.value == AddMoveError.AlreadyOccupied)
     }
 
     @Test

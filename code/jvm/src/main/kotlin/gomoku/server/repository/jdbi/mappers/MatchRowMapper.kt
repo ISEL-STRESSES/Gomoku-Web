@@ -21,8 +21,8 @@ class MatchRowMapper : RowMapper<Match> {
             throw IllegalArgumentException("Invalid moves array")
         }
 
-        return when (rs.getString("match_state")) {
-            "ongoing" -> OngoingMatch(
+        return when (rs.getString("match_state").uppercase()) {
+            "ONGOING" -> OngoingMatch(
                 matchId = rs.getInt("id"),
                 playerBlack = rs.getInt("player_black"),
                 playerWhite = rs.getInt("player_white"),
@@ -34,7 +34,7 @@ class MatchRowMapper : RowMapper<Match> {
                 ),
                 moves = moveContainer
             )
-            "finished" -> FinishedMatch(
+            "FINISHED" -> FinishedMatch(
                 matchId = rs.getInt("id"),
                 playerBlack = rs.getInt("player_black"),
                 playerWhite = rs.getInt("player_white"),

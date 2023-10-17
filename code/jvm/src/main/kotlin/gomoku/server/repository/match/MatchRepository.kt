@@ -93,9 +93,10 @@ interface MatchRepository {
     /**
      * Makes a move in the match.
      * @param matchId id of the match
-     * @param move the position and color of the move
+     * @param index index of the move
+     * @return true if the move was added, false otherwise
      */
-    fun makeMove(matchId: Int, move: Move): Boolean
+    fun addToMoveArray(matchId: Int, index: Int): Boolean
 
     /**
      * Gets the moves of the match.

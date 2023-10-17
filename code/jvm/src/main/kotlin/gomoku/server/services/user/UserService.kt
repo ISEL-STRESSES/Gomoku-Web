@@ -95,10 +95,10 @@ class UserService(
      * @param limit The limit of the results.
      * @return The list of users.
      */
-    fun getUsersRuleStats(ruleId: Int, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<ListUserData> =
+    fun getRanking(ruleId: Int, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<ListUserData> =
         transactionManager.run {
             val usersRepository = it.usersRepository
-            usersRepository.getUsersStatsDataByRule(ruleId, offset, limit)
+            usersRepository.getRanking(ruleId, offset, limit)
         }
 
     /**
@@ -118,10 +118,24 @@ class UserService(
      * @param ruleId The id of the rule.
      * @return The stats of the user for the given rule, or null if the user doesn't exist.
      */
-    fun getUserRuleStats(userId: Int, ruleId: Int): UserRuleStats? =
+    fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats? =
         transactionManager.run {
             val usersRepository = it.usersRepository
-            usersRepository.getUserRuleStats(userId, ruleId)
+            usersRepository.getUserRanking(userId, ruleId)
+        }
+
+    /**
+     * Searches for users stats by their username in a specific rule.
+     * @param ruleId The id of the rule.
+     * @param username The username of the users.
+     * @param offset The offset of the first user to get.
+     * @param limit The maximum number of users to get.
+     * @return A list of [UserData] objects, containing all the stats related to the users.
+     */
+    fun searchRanking(ruleId: Int, username: String, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserData> =
+        transactionManager.run {
+            val usersRepository = it.usersRepository
+            usersRepository.searchUsersRuleStatsByUsername(username, ruleId, offset, limit)
         }
 
     /**
@@ -169,7 +183,6 @@ class UserService(
             usersRepository.removeTokenByTokenValidationInfo(tokenValidationInfo)
         }
     }
-
 
     companion object {
         const val DEFAULT_OFFSET = 0

@@ -20,6 +20,7 @@ object URIs {
         const val RANKING = "/ranking/{ruleId}"
         const val USER_RANKING = "/ranking/{userId}/{ruleId}"
         const val USER_STATS = "/stats/{userId}"
+        const val RANKING_SEARCH = "/ranking/{ruleId}/search"
 
         fun byID(id: Int) = UriTemplate(GET_BY_ID).expand(id)
         fun home() = URI(HOME)
@@ -29,23 +30,25 @@ object URIs {
         fun ranking(ruleId: Int) = UriTemplate(RANKING).expand(ruleId)
         fun userRanking(userId: Int, ruleId: Int) = UriTemplate(USER_RANKING).expand(userId, ruleId)
         fun userStats(userId: Int) = UriTemplate(USER_STATS).expand(userId)
+        fun rankingSearch(ruleId: Int) = UriTemplate(RANKING_SEARCH).expand(ruleId)
     }
 
     object Game {
         const val ROOT = "/game"
         const val HUB = "/"
-        const val GET_BY_ID = "/{id}" //details
-        const val PLAY = "/{id}/" //
-        const val JOIN_LOBBY = "/{rulesId}"
+        const val GET_BY_ID = "/{id}" // details
+        const val MAKE_PLAY = "/{id}/" // try to make a move
+        const val GAME_RULES = "/rules"
+        const val MATCH_MAKE = "/{rulesId}"
         const val JOIN = "/{id}/join"
         const val LEAVE_GAME = "/{id}/leave"
         const val LEAVE_LOBBY = "{lobbyId}/leave"
 
         fun hub() = URI(ROOT + HUB)
         fun byId(id: Int) = UriTemplate(GET_BY_ID).expand(id)
-        fun joinLobby(rulesId : Int) = UriTemplate(ROOT).expand(rulesId)
+        fun joinLobby(rulesId: Int) = UriTemplate(ROOT).expand(rulesId)
         fun leaveLobby(lobbyId: Int) = UriTemplate(LEAVE_LOBBY).expand(lobbyId)
         fun leaveGame(gameID: Int) = UriTemplate(LEAVE_GAME).expand(gameID)
-        fun play(gameId: Int) = UriTemplate(PLAY).expand(gameId)
+        fun play(gameId: Int) = UriTemplate(MAKE_PLAY).expand(gameId)
     }
 }

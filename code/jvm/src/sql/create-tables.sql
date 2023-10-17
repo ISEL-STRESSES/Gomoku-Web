@@ -76,7 +76,7 @@ create table if not exists matches
     rules_id      int          not null,
     player_black  int          not null,
     player_white  int          not null,
-    match_outcome varchar(4)   default null,
+    match_outcome varchar(256)   default null,
     match_state   varchar(256) not null,
     moves         INTEGER[]   NOT NULL DEFAULT ARRAY[]::INTEGER[],
 

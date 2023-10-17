@@ -7,7 +7,7 @@ data class UserByIdOutputModel(
     val uuid: Int,
     val username: String,
     val passwordValidationInfo: PasswordValidationInfo
-){
+) {
     constructor(user: User) : this(
         uuid = user.uuid,
         username = user.username,

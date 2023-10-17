@@ -81,7 +81,7 @@ interface UserRepository {
      * @param limit The maximum number of users to get.
      * @return A list of [UserData] objects, containing all the stats related to the users.
      */
-    fun getUsersStatsDataByRule(rulesId: Int, offset: Int, limit: Int): List<ListUserData>
+    fun getRanking(rulesId: Int, offset: Int, limit: Int): List<ListUserData>
 
     /**
      * Retrieves the stats of a user for every rule.
@@ -96,7 +96,7 @@ interface UserRepository {
      * @param ruleId The id of the rule.
      * @return The stats of the user for the given rule, or null if the user doesn't exist.
      */
-    fun getUserRuleStats(userId: Int, ruleId: Int): UserRuleStats?
+    fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats?
 
     /**
      * Sets the stats of a user for a given rule.
@@ -111,5 +111,5 @@ interface UserRepository {
      * @param rulesId The id of the rules.
      * @return The list of users.
      */
-    fun searchRankings(username: String, rulesId: Int): List<UserData>
+    fun searchUsersRuleStatsByUsername(username: String, rulesId: Int, offset: Int, limit: Int): List<UserData>
 }

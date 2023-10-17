@@ -6,7 +6,7 @@ import org.jdbi.v3.core.mapper.RowMapper
 import org.jdbi.v3.core.statement.StatementContext
 import java.sql.ResultSet
 
-class ListUserRowMapper: RowMapper<ListUserData> {
+class ListUserRowMapper : RowMapper<ListUserData> {
     override fun map(rs: ResultSet, ctx: StatementContext?): ListUserData {
         val uuid = rs.getInt("user_id")
         val username = rs.getString("username")

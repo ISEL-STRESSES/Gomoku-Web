@@ -40,7 +40,7 @@ DO $$
 DO $$
     BEGIN
         FOR i IN 1..10 LOOP
-                EXECUTE 'INSERT INTO matches(rules_id, player_black, player_white, match_outcome, match_state) VALUES (1,'||i||','||2*i||', NULL, ''ongoing'')';
+                EXECUTE 'INSERT INTO matches(rules_id, player_black, player_white, match_outcome, match_state) VALUES (1,'||i||','||2*i||', NULL, ''ONGOING'')';
             END LOOP;
     END $$;
 

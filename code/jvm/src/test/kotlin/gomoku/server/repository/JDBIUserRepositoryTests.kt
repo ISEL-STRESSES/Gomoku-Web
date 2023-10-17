@@ -1,7 +1,6 @@
 package gomoku.server.repository
 
 import gomoku.server.TestClock
-import gomoku.server.domain.game.rules.buildRule
 import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
@@ -138,7 +137,7 @@ class JDBIUserRepositoryTests {
         // given: a UsersRepository
         val repo = JDBIUserRepository(handle)
         // and: a rule
-        val usersStats = repo.getUsersStatsDataByRule(2, 0, 10)
+        val usersStats = repo.getRanking(2, 0, 10)
         println("----- USERS STATS -----")
         usersStats.forEach(::println)
         // then: users stats are retrieved
@@ -158,7 +157,7 @@ class JDBIUserRepositoryTests {
         println("----- USER1 STATS -----")
         userStats.userRuleStats.forEach(::println)
 
-        val userRuleStats = repo.getUserRuleStats(1, 2)
+        val userRuleStats = repo.getUserRanking(1, 2)
         assertNotNull(userRuleStats)
         assertEquals(2, userRuleStats!!.ruleId)
         assertEquals(1500, userRuleStats.elo)

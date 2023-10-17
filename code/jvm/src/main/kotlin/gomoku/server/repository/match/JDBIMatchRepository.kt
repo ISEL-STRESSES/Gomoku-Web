@@ -7,6 +7,7 @@ import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.match.toColor
 import gomoku.server.domain.game.rules.Rules
+import gomoku.server.repository.jdbi.mappers.MovesRowMapper
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
@@ -164,21 +165,24 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             }
             .firstOrNull()
 
-
     /**
      * Makes a move in the match.
      * @param matchId id of the match
-     * @param move the position and color of the move
+     * @param index index of the move
+     * @return true if the move was added, false otherwise
      */
-    override fun makeMove(matchId: Int, move: Move): Boolean =
-        handle.createUpdate(
+    override fun addToMoveArray(matchId: Int, index: Int): Boolean {
+        val update = handle.createUpdate(
             """
-            update matches set moves = array_append(matches.moves, :move) where id = :matchId and match_state = 'ONGOING'
+            update matches set moves = array_append(matches.moves, :index) where id = :matchId and match_state = 'ONGOING'
             """.trimIndent()
         )
-            .bind("match_id", matchId)
-            .bind("move", move)
-            .execute() > 0
+            .bind("matchId", matchId)
+            .bind("index", index)
+            .execute()
+
+        return update == 1
+    }
 
     /**
      * Gets the moves of the match.
@@ -188,12 +192,12 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun getAllMoves(matchId: Int): List<Move> =
         handle.createQuery(
             """
-            select moves from matches where id = :matchId
+            select m.moves, r.board_size from matches m join rules r on r.id = m.rules_id where m.id = :matchId
             """.trimIndent()
         )
             .bind("matchId", matchId)
-            .mapTo<Move>()
-            .toList()
+            .map(MovesRowMapper())
+            .one()
 
     /**
      * Gets the last n moves of the match.

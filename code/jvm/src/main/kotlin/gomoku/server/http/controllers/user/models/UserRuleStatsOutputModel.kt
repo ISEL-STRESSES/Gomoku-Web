@@ -6,7 +6,7 @@ data class UserRuleStatsOutputModel(
     val ruleId: Int,
     val gamesPlayed: Int,
     val elo: Int
-){
+) {
     constructor(userRuleStats: UserRuleStats) : this(
         ruleId = userRuleStats.ruleId,
         gamesPlayed = userRuleStats.gamesPlayed,

@@ -1,6 +1,8 @@
 package gomoku.server.domain.game.match
 
 import gomoku.utils.Either
+import gomoku.utils.Failure
+import gomoku.utils.Success
 import gomoku.utils.failure
 import gomoku.utils.success
 
@@ -42,8 +44,9 @@ class MoveContainer private constructor(
         } else if (hasMove(position)) {
             failure(AddMoveError.AlreadyOccupied)
         } else {
-            board[position.value] = move.color
-            success(MoveContainer(boardSize, orderOfMoves + move, board))
+            val newBoard = board.copyOf()
+            newBoard[position.value] = move.color
+            success(MoveContainer(boardSize, orderOfMoves + move, newBoard))
         }
     }
 
@@ -69,12 +72,6 @@ class MoveContainer private constructor(
     fun getMoves(): List<Move> {
         return orderOfMoves
     }
-
-    /**
-     * Resets the whole board.
-     * @return A new empty [MoveContainer] of the same size.
-     */
-    fun reset(): MoveContainer = createEmptyMoveContainer(this.boardSize)
 
     /**
      * Checks if a given position is inside the board's bounds.
@@ -117,14 +114,15 @@ class MoveContainer private constructor(
          * @return [AddMoveResult] which is either an error or a new [MoveContainer] with the given moves.
          */
         fun buildMoveContainer(boardSize: Int, movesIndexes: List<Int>): AddMoveResult {
-            val moveContainer = createEmptyMoveContainer(boardSize)
+            var moveContainer = createEmptyMoveContainer(boardSize)
             for ((index, boardIndex) in movesIndexes.withIndex()) {
                 val position = Position(boardIndex)
                 val color = index.toColor()
                 val move = Move(position, color)
                 val addMoveResult = moveContainer.addMove(move)
-                if (addMoveResult is Either.Left) {
-                    return failure(addMoveResult.value)
+                when (addMoveResult) {
+                    is Success -> moveContainer = addMoveResult.value
+                    is Failure -> return failure(addMoveResult.value)
                 }
             }
             return success(moveContainer)
