@@ -1,7 +1,5 @@
 package gomoku.server.domain.game.player
 
-import gomoku.server.domain.game.rules.BoardSize
-import gomoku.server.domain.game.rules.StandardRules
 import gomoku.server.domain.user.UserRuleStats
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

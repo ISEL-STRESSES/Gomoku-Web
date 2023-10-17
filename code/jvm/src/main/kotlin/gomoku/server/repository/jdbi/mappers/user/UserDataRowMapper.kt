@@ -1,6 +1,5 @@
 package gomoku.server.repository.jdbi.mappers.user
 
-import gomoku.server.domain.game.rules.buildRule
 import gomoku.server.domain.user.UserData
 import gomoku.server.domain.user.UserRuleStats
 import org.jdbi.v3.core.mapper.RowMapper
@@ -12,7 +11,6 @@ import java.sql.ResultSet
  */
 class UserDataRowMapper : RowMapper<UserData> {
     override fun map(rs: ResultSet, ctx: StatementContext): UserData {
-
         val userRuleStats = mutableListOf<UserRuleStats>()
         var previousUserId = rs.getInt("id")
         while (rs.next()) {

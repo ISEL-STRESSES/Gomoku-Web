@@ -232,7 +232,6 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * @param userStatsData The stats of the user for the given rule.
      */
     override fun setUserRuleStats(userId: Int, userStatsData: UserRuleStats) {
-
         handle.createUpdate(
             """
             update user_stats set games_played = :games_played, elo = :elo
