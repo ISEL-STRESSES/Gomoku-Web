@@ -19,8 +19,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     override fun getLobbyByRuleId(ruleId: Int): Lobby? =
         handle.createQuery(
             """
-            SELECT rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, 
-            users.id, users.username, users.password_validation 
+            SELECT rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, users.id as user_id
             FROM lobby join users 
             on users.id = lobby.user_id
             join rules

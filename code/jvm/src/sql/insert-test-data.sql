@@ -53,4 +53,8 @@ DO $$
             END LOOP;
     END $$;
 
+-- Inserting data into 'lobby' table for tests
+INSERT INTO lobby (user_id, rules_id, created_at) VALUES (1, 1, 18102023);
+INSERT INTO lobby (user_id, rules_id, created_at) VALUES (2, 3, 18102023);
+
 COMMIT;
