@@ -3,6 +3,7 @@ package gomoku.server.http.controllers.user
 import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
 import gomoku.server.http.controllers.media.Problem
+import gomoku.server.http.controllers.user.models.UserByIdOutputModel
 import gomoku.server.http.controllers.user.models.UserDataOutputModel
 import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
 import gomoku.server.http.controllers.user.models.UserStatsOutputModel
@@ -58,7 +59,7 @@ class UserController(private val service: UserService) {
         return if (userRuleStats == null) {
             Problem.response(404, Problem.userNotFound)
         } else {
-            ResponseEntity.ok(UserRuleStatsOutputModel(userRuleStats.ruleId, userRuleStats.gamesPlayed, userRuleStats.elo))
+            ResponseEntity.ok(UserRuleStatsOutputModel(userRuleStats))
         }
     }
 
@@ -70,7 +71,7 @@ class UserController(private val service: UserService) {
         return if (user == null) {
             Problem.response(404, Problem.userNotFound)
         } else {
-            ResponseEntity.ok(UserDataOutputModel(user))
+            ResponseEntity.ok(UserByIdOutputModel(user))
         }
     }
 
@@ -116,6 +117,7 @@ class UserController(private val service: UserService) {
         @RequestHeader("Authorization") token: String
     ) {
         service.revokeToken(token)
+
     }
 
     @GetMapping(URIs.Users.HOME)

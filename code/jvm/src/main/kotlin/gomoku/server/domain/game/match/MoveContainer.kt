@@ -51,7 +51,7 @@ class MoveContainer private constructor(
      * Gets the last made move.
      * @return The last made move, or null if no move has been made yet.
      */
-    fun getLastMove(): Move? = orderOfMoves.lastOrNull()
+    fun getLastMoveOrNull(): Move? = orderOfMoves.lastOrNull()
 
     /**
      * Checks if a move exists at the given position.

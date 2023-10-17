@@ -3,6 +3,7 @@ package gomoku.server.repository
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
 import gomoku.server.repository.match.JDBIMatchRepository
+import gomoku.server.repository.user.JDBIUserRepository
 import gomoku.server.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -35,7 +36,12 @@ class JDBIMatchRepositoryTests {
         val matchIdNull = repo.getMatchById(11)
         assertNull(matchIdNull)
 
-        val matchId = repo.createMatch(1, 1, 2)
+        val player1 = uRepo.getUserById(1)
+        assertNotNull(player1)
+        val player2 = uRepo.getUserById(2)
+        assertNotNull(player2)
+
+        val matchId = repo.createMatch(1, player1.uuid, player2.uuid)
         assertEquals(11, matchId)
 
         val matchState = repo.getMatchState(11)
