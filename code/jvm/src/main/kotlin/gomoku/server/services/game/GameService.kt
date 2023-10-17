@@ -8,6 +8,7 @@ import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.match.OngoingMatch
+import gomoku.server.domain.game.match.Position
 import gomoku.server.domain.game.match.toMatchOutcome
 import gomoku.server.domain.game.rules.MoveError
 import gomoku.server.domain.game.rules.Rules
@@ -63,13 +64,14 @@ class GameService(private val transactionManager: TransactionManager) {
      * @return the result of the move
      * @see MakeMoveResult
      */
-    fun makeMove(gameId: Int, move: Move): MakeMoveResult {
+    fun makeMove(gameId: Int, userId: Int, pos: Int): MakeMoveResult {
         return transactionManager.run {
             val match = it.matchRepository.getMatchById(gameId) ?: return@run failure(MakeMoveError.GameNotFound)
             when (match) {
                 is FinishedMatch -> return@run failure(MakeMoveError.GameFinished)
                 is OngoingMatch -> {
-                    val isValidMoveResult = match.rules.isValidMove(match.moveContainer, move, match.turn)
+                    val currMove = Move(Position(pos), if (match.playerBlack == userId) Color.BLACK else Color.WHITE)
+                    val isValidMoveResult = match.rules.isValidMove(match.moveContainer, currMove, match.turn)
                     when (isValidMoveResult) {
                         is Either.Left -> return@run isValidMoveResult.value.resolveError()
                         is Either.Right -> {
