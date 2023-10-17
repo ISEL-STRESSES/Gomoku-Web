@@ -45,14 +45,14 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun createMatch(ruleId: Int, playerBlackId: Int, playerWhiteId: Int): Int =
         handle.createUpdate(
             """
-        insert into matches(rules_id, match_state, player_black, player_white)
-        values (:ruleId, :matchState, :playerBlackId, :playerWhiteId)
+            insert into matches(rules_id, match_state, player_black, player_white)
+            values (:ruleId, :matchState, :playerBlackId, :playerWhiteId)
             """.trimIndent()
         )
             .bind("ruleId", ruleId)
             .bind("matchState", MatchState.ONGOING.name)
-            .bind("player_black", playerBlackId)
-            .bind("player_white", playerWhiteId)
+            .bind("playerBlackId", playerBlackId)
+            .bind("playerWhiteId", playerWhiteId)
             .executeAndReturnGeneratedKeys()
             .mapTo<Int>()
             .one()
@@ -109,7 +109,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @return id of the winner, draw or null if the match is not finished
      */
     override fun getMatchOutcome(matchId: Int): MatchOutcome? =
-        handle.createQuery("select match_outcome from matches where id = :matchId and match_outcome = 'finished'")
+        handle.createQuery("select match_outcome from matches where id = :matchId and match_state = 'FINISHED'")
             .bind("matchId", matchId)
             .mapTo<MatchOutcome>()
             .singleOrNull()
@@ -159,10 +159,11 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             """.trimIndent()
         )
             .bind("matchId", matchId)
-            .mapTo<Int>()
-            .list()?.let {
-                it[0] to it[1]
+            .map { rs, _ ->
+                Pair(rs.getInt("player_black"), rs.getInt("player_white"))
             }
+            .firstOrNull()
+
 
     /**
      * Makes a move in the match.
@@ -187,7 +188,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun getAllMoves(matchId: Int): List<Move> =
         handle.createQuery(
             """
-                select moves from matches where id = :matchId
+            select moves from matches where id = :matchId
             """.trimIndent()
         )
             .bind("matchId", matchId)
