@@ -46,7 +46,7 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
         handle.createUpdate(
             """
         insert into matches(rules_id, match_state, player_black, player_white)
-        values (:ruleId, :playerBlackId, :playerWhiteId, :matchState)
+        values (:ruleId, :matchState, :playerBlackId, :playerWhiteId)
             """.trimIndent()
         )
             .bind("ruleId", ruleId)

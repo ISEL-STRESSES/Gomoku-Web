@@ -31,10 +31,21 @@ object URIs {
         fun userStats(userId: Int) = UriTemplate(USER_STATS).expand(userId)
     }
 
-    object Games {
-        const val ROOT = "/games"
+    object Game {
+        const val ROOT = "/game"
         const val HUB = "/"
+        const val GET_BY_ID = "/{id}" //details
+        const val PLAY = "/{id}/" //
+        const val JOIN_LOBBY = "/{rulesId}"
+        const val JOIN = "/{id}/join"
+        const val LEAVE_GAME = "/{id}/leave"
+        const val LEAVE_LOBBY = "{lobbyId}/leave"
 
         fun hub() = URI(ROOT + HUB)
+        fun byId(id: Int) = UriTemplate(GET_BY_ID).expand(id)
+        fun joinLobby(rulesId : Int) = UriTemplate(ROOT).expand(rulesId)
+        fun leaveLobby(lobbyId: Int) = UriTemplate(LEAVE_LOBBY).expand(lobbyId)
+        fun leaveGame(gameID: Int) = UriTemplate(LEAVE_GAME).expand(gameID)
+        fun play(gameId: Int) = UriTemplate(PLAY).expand(gameId)
     }
 }
