@@ -61,8 +61,11 @@ class GameController(private val gameService: GameService) {
      * @return The available rules
      */
     @GetMapping(URIs.Game.GAME_RULES)
-    fun rules(): ResponseEntity<List<Rules>> {
+    fun rules(): ResponseEntity<*> {
         val rules = gameService.getAvailableRules()
+        if (rules.isEmpty())
+            return Problem.response(404, Problem.noRulesFound)
+
         return ResponseEntity.ok(rules)
     }
 
@@ -155,4 +158,5 @@ class GameController(private val gameService: GameService) {
         }
 
     // TODO: MAKE THE OTHER RESOLVE PROBLEM FUNCTIONS
+    // TODO: Make all user functions return a Result and resolve error on controller layer?????
 }

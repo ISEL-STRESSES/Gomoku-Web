@@ -103,7 +103,7 @@ interface UserRepository {
      * @param ruleId The id of the rule.
      * @return The stats of the user for the given rule, or null if the user doesn't exist.
      */
-    fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats?
+    fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats? // TODO add result cause user adn rule not found
 
     /**
      * Sets the stats of a user for a given rule.

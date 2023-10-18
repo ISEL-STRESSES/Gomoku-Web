@@ -44,6 +44,8 @@ class Problem(typeUri: URI) {
 
         val gameNotFound = Problem(URI(PROBLEM_BASE_URL + "game-not-found"))
 
+        val noRulesFound = Problem(URI(PROBLEM_BASE_URL + "rules-not-found"))
+
         val positionOccupied = Problem(URI(PROBLEM_BASE_URL + "position-occupied"))
 
         val notYourTurn = Problem(URI(PROBLEM_BASE_URL + "not-your-turn"))

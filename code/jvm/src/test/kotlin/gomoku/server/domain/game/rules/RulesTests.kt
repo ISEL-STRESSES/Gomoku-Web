@@ -42,7 +42,7 @@ class RulesTests {
     @Test
     fun `buildRule throws exception for invalid boardMaxSize`() {
         assertThrows(IllegalArgumentException::class.java) {
-            // buildRule(, 1111, "STANDARD", "FREE")
+            buildRule(2, 1111, "STANDARD", "FREE")
         }
     }
 }

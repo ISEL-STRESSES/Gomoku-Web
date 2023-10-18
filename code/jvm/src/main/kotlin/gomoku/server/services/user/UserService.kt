@@ -47,11 +47,10 @@ class UserService(
         val passwordValidationInfo = usersDomain.createPasswordValidationInfo(password)
 
         return transactionManager.run {
-            val usersRepository = it.usersRepository
-            if (usersRepository.isUserStoredByUsername(username)) {
+            if (it.usersRepository.isUserStoredByUsername(username)) {
                 failure(UserCreationError.UsernameAlreadyExists)
             } else {
-                val uuid = usersRepository.storeUser(username, passwordValidationInfo)
+                val uuid = it.usersRepository.storeUser(username, passwordValidationInfo)
                 success(uuid)
             }
         }
@@ -108,8 +107,7 @@ class UserService(
      */
     fun getUserStats(userId: Int): UserData? =
         transactionManager.run {
-            val usersRepository = it.usersRepository
-            usersRepository.getUserStats(userId)
+            it.usersRepository.getUserStats(userId)
         }
 
     /**
@@ -135,13 +133,10 @@ class UserService(
      */
     fun searchRanking(ruleId: Int, username: String, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserData>? =
         transactionManager.run {
-            val usersRepository = it.usersRepository
-            val matchRepository = it.matchRepository
-
-            val availableRules = matchRepository.getAllRules()
+            val availableRules = it.matchRepository.getAllRules()
 
             if (availableRules.any { rule -> rule.ruleId == ruleId }) {
-                usersRepository.searchRankingByUsername(username, ruleId, offset, limit)
+                it.usersRepository.searchRankingByUsername(username, ruleId, offset, limit)
             } else {
                 null
             }
@@ -152,10 +147,9 @@ class UserService(
      * @param id The id of the user.
      * @return The user, or null if the user doesn't exist.
      */
-    fun getUserById(id: Int): User? { // TODO: This doesn't give the user's stats
+    fun getUserById(id: Int): User? {
         return transactionManager.run {
-            val usersRepository = it.usersRepository
-            usersRepository.getUserById(id)
+            it.usersRepository.getUserById(id)
         }
     }
 
@@ -169,11 +163,10 @@ class UserService(
             return null
         }
         return transactionManager.run {
-            val usersRepository = it.usersRepository
             val tokenValidationInfo = usersDomain.createTokenValidationInfo(token)
-            val userAndToken = usersRepository.getTokenAndUserByTokenValidationInfo(tokenValidationInfo)
+            val userAndToken = it.usersRepository.getTokenAndUserByTokenValidationInfo(tokenValidationInfo)
             if (userAndToken != null && usersDomain.isTokenTimeValid(clock, userAndToken.second)) {
-                usersRepository.updateTokenLastUsed(userAndToken.second, clock.now())
+                it.usersRepository.updateTokenLastUsed(userAndToken.second, clock.now())
                 userAndToken.first
             } else {
                 null

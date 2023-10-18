@@ -44,7 +44,7 @@ class UserController(private val service: UserService) {
     @GetMapping(URIs.Users.RANKING)
     fun ranking(
         @PathVariable ruleId: Int,
-        @RequestParam offset: Int = 0, // TODO: IMPLEMENT DEFAULT OFFSET AND LIMIT
+        @RequestParam offset: Int = 0,
         @RequestParam limit: Int = 10
     ): ResponseEntity<*> {
         val users = service.getRanking(ruleId, offset, limit)

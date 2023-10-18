@@ -1,5 +1,7 @@
 package gomoku.server.repository.jdbi.mappers
 
+import gomoku.server.domain.game.exceptions.ImpossiblePositionException
+import gomoku.server.domain.game.exceptions.PositionAlreadyOccupiedException
 import gomoku.server.domain.game.match.AddMoveError
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.match.MoveContainer.Companion.buildMoveContainer
@@ -36,8 +38,8 @@ class MovesRowMapper : RowMapper<List<Move>> {
         return when (moveContainerResult) {
             is Success -> moveContainerResult.value.getMoves()
             is Failure -> when (moveContainerResult.value) {
-                AddMoveError.ImpossiblePosition -> throw IllegalArgumentException("Invalid position")
-                AddMoveError.AlreadyOccupied -> throw IllegalArgumentException("Position already occupied") // TODO: THROW APPROPRIATE EXCEPTION
+                AddMoveError.ImpossiblePosition -> throw ImpossiblePositionException()
+                AddMoveError.AlreadyOccupied -> throw PositionAlreadyOccupiedException()
             }
         }
     }
