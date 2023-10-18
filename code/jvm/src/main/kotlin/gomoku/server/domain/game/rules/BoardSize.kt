@@ -12,7 +12,7 @@ enum class BoardSize(val value: Int) {
     X19(19);
 
     init {
-        require(value >= 0)
+        require(value >= 0) { "Board size cannot be negative (value: $value)" }
     }
 }
 

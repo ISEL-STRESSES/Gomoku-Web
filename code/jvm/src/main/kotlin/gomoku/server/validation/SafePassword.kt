@@ -7,6 +7,14 @@ import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Payload
 import kotlin.reflect.KClass
 
+/**
+ * Annotation for safe password
+ * @property message message to return if the password is not safe
+ * @property groups groups of the annotation
+ * @property payload payload
+ * @see SafePasswordValidator
+ * @see Constraint
+ */
 @MustBeDocumented
 @Constraint(validatedBy = [SafePasswordValidator::class])
 @Target(AnnotationTarget.FIELD, AnnotationTarget.PROPERTY_GETTER)
@@ -17,8 +25,19 @@ annotation class SafePassword(
     val payload: Array<KClass<out Payload>> = []
 )
 
+/**
+ * Validator for safe password
+ * @see SafePassword
+ * @see ConstraintValidator
+ */
 class SafePasswordValidator : ConstraintValidator<SafePassword, String> {
 
+    /**
+     * Checks if the password is safe
+     * @param value the password to check
+     * @param context the context
+     * @return true if the password is safe, false otherwise
+     */
     override fun isValid(value: String?, context: ConstraintValidatorContext): Boolean {
         if (value == null) return false
         val regex =

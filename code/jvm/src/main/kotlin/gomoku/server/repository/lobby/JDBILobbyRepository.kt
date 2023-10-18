@@ -9,6 +9,7 @@ import java.time.Clock
  * Repository for lobbies
  * Implementation using JDBI and PostgresSQL
  * @property handle The handle to the database
+ * @see LobbyRepository
  */
 class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     /**

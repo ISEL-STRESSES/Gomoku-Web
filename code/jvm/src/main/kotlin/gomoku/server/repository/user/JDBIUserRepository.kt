@@ -284,6 +284,15 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .mapTo<UserData>()
             .list()
 
+    /**
+     * Represents a user and a token.
+     * @param id The id of the user.
+     * @param username The username of the user.
+     * @param passwordValidation The password validation information of the user.
+     * @param tokenValidation The token validation information of the user.
+     * @param createdAt The creation date of the token.
+     * @param lastUsedAt The last used date of the token.
+     */
     private data class UserAndTokenModel(
         val id: Int,
         val username: String,

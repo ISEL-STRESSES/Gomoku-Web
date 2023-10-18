@@ -8,8 +8,17 @@ import java.sql.ResultSet
 
 /**
  * Maps rows from the database to a [UserData] object
+ * @see RowMapper
+ * @see UserData
  */
 class UserDataRowMapper : RowMapper<UserData> {
+
+    /**
+     * Maps a row of the result set to a [UserData]
+     * @param rs The result set to map
+     * @param ctx The statement context
+     * @return The [UserData] from the result set
+     */
     override fun map(rs: ResultSet, ctx: StatementContext): UserData {
         val uuid = rs.getInt("user_id")
         val username = rs.getString("username")

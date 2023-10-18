@@ -3,6 +3,9 @@ package gomoku.server.http
 import org.springframework.web.util.UriTemplate
 import java.net.URI
 
+/**
+ * Contains the URIs for the application
+ */
 object URIs {
 
     const val PREFIX = "/api"
@@ -10,6 +13,9 @@ object URIs {
 
     fun home() = URI(HOME)
 
+    /**
+     * Contains the URIs for the users endpoints
+     */
     object Users {
         const val ROOT = "/users"
         const val GET_BY_ID = "/{id}"
@@ -33,6 +39,9 @@ object URIs {
         fun rankingSearch(ruleId: Int) = UriTemplate(RANKING_SEARCH).expand(ruleId)
     }
 
+    /**
+     * Contains the URIs for the game endpoints
+     */
     object Game {
         const val ROOT = "/game"
         const val HUB = "/"

@@ -9,6 +9,11 @@ import gomoku.server.repository.user.JDBIUserRepository
 import gomoku.server.repository.user.UserRepository
 import org.jdbi.v3.core.Handle
 
+/**
+ * A JDBI implementation of [Transaction]
+ * @see Transaction
+ * @see Handle
+ */
 class JDBITransaction(private val handle: Handle) : Transaction {
 
     override val usersRepository: UserRepository = JDBIUserRepository(handle)
@@ -17,6 +22,9 @@ class JDBITransaction(private val handle: Handle) : Transaction {
 
     override val lobbyRepository: LobbyRepository = JDBILobbyRepository(handle)
 
+    /**
+     * Rolls back the transaction
+     */
     override fun rollback() {
         handle.rollback()
     }

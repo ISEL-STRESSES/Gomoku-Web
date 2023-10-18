@@ -8,11 +8,26 @@ import org.springframework.stereotype.Component
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
 
+/**
+ * Interceptor that enforces authentication
+ * for endpoints that require it
+ * @property authorizationHeaderProcessor The [RequestTokenProcessor] to use
+ * to process the authorization header
+ * @see RequestTokenProcessor
+ */
 @Component
 class AuthenticationInterceptor(
     private val authorizationHeaderProcessor: RequestTokenProcessor
 ) : HandlerInterceptor {
 
+    /**
+     * Pre-handle method that enforces authentication
+     * for endpoints that require it
+     * @param request The request
+     * @param response The response
+     * @param handler The handler
+     * @return True if the request is valid, false otherwise
+     */
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         if (handler is HandlerMethod && handler.methodParameters.any {
             it.parameterType == AuthenticatedUser::class.java
@@ -30,12 +45,10 @@ class AuthenticationInterceptor(
                 true
             }
         }
-
         return true
     }
 
     companion object {
-
         private val logger = LoggerFactory.getLogger(AuthenticationInterceptor::class.java)
         const val NAME_AUTHORIZATION_HEADER = "Authorization"
         private const val NAME_WWW_AUTHENTICATE_HEADER = "WWW-Authenticate"

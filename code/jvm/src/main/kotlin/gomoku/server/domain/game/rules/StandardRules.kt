@@ -15,6 +15,13 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
     override val variant: RuleVariant = RuleVariant.STANDARD
     override val openingRule: OpeningRule = OpeningRule.FREE
 
+    /**
+     * Checks if a move is valid based on the rules of the match
+     * @param moveContainer previous moves of the match
+     * @param move move to check
+     * @param turn color of the player trying to play
+     * @return the move result
+     */
     override fun isValidMove(moveContainer: MoveContainer, move: Move, turn: Color): IsValidMoveResult {
         if (turn != move.color) return failure(MoveError.InvalidTurn)
         if (!moveContainer.isPositionInside(move.position)) return failure(MoveError.ImpossiblePosition)
@@ -23,6 +30,12 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
         return success(Unit)
     }
 
+    /**
+     * Returns the possible moves based on the rules of the match
+     * @param moveContainer previous moves of the match
+     * @param color color of the player
+     * @return the possible moves possible in the set of rules
+     */
     override fun possibleMoves(moveContainer: MoveContainer, color: Color): List<Move> {
         return (0..moveContainer.maxIndex)
             .map { Position(it) }
@@ -30,6 +43,12 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
             .map { Move(it, color) }
     }
 
+    /**
+     * Checks if a move is a winning move
+     * @param moveContainer previous moves of the match
+     * @param move move to check if it was a winning move
+     * @return true if the move is a winning move, false otherwise
+     */
     override fun isWinningMove(moveContainer: MoveContainer, move: Move): Boolean {
         val directions = listOf(
             Pair(0, 1), // Horizontal

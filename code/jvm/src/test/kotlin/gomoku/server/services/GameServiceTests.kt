@@ -1,8 +1,6 @@
 package gomoku.server.services
 
 import gomoku.server.failureOrNull
-import gomoku.server.jbdiTest
-import gomoku.server.repository.jdbi.JDBITransactionManager
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.game.GameService

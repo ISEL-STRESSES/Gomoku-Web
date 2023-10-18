@@ -49,7 +49,11 @@ class GameController(private val gameService: GameService) {
     @GetMapping(URIs.Game.GET_BY_ID)
     fun gameDetails(@PathVariable id: Int, @RequestParam authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val game = gameService.getGame(id)
-        return ResponseEntity.ok(game) ?: Problem.response(404, Problem.gameNotFound)
+        return if (game != null) {
+            ResponseEntity.ok(game)
+        } else {
+            Problem.response(404, Problem.gameNotFound)
+        }
     }
 
     /**

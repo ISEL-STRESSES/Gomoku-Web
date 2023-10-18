@@ -16,9 +16,9 @@ data class UsersDomainConfig(
     val maxTokensPerUser: Int
 ) {
     init {
-        require(tokenSizeInBytes > 0)
-        require(tokenTtl.isPositive())
-        require(tokenRollingTtl.isPositive())
-        require(maxTokensPerUser > 0)
+        require(tokenSizeInBytes > 0) { "tokenSizeInBytes must be positive" }
+        require(tokenTtl.isPositive()) { "tokenTtl must be positive" }
+        require(tokenRollingTtl.isPositive()) { "tokenRollingTtl must be positive" }
+        require(maxTokensPerUser > 0) { "maxTokensPerUser must be positive" }
     }
 }

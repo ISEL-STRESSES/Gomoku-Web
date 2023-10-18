@@ -12,6 +12,9 @@ data class UserData(
     val userRuleStats: List<UserRuleStats>
 )
 
+/**
+ * TODO check why 2 classes for the same thing
+ */
 data class ListUserData(
     val uuid: Int,
     val username: String,

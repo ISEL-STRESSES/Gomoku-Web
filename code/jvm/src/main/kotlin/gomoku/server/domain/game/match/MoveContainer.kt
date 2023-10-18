@@ -6,8 +6,18 @@ import gomoku.utils.Success
 import gomoku.utils.failure
 import gomoku.utils.success
 
+/**
+ * Represents the result of a move addition, using Either concept.
+ * @see AddMoveError
+ * @see MoveContainer
+ */
 typealias AddMoveResult = Either<AddMoveError, MoveContainer>
 
+/**
+ * Represents an error that can occur when adding a move to the board.
+ * @property ImpossiblePosition the position is outside the board
+ * @property AlreadyOccupied the position is already occupied
+ */
 sealed class AddMoveError {
     object ImpossiblePosition : AddMoveError()
     object AlreadyOccupied : AddMoveError()

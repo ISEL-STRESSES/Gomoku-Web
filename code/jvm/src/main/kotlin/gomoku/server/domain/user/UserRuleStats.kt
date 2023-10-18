@@ -10,8 +10,8 @@ import kotlin.math.pow
  */
 data class UserRuleStats(val ruleId: Int, val gamesPlayed: Int = 1, val elo: Int = DEFAULT_ELO) {
     init {
-        require(gamesPlayed >= 0)
-        require(elo in 0..4000)
+        require(gamesPlayed >= 0) { "gamesPlayed must be positive" }
+        require(elo in 0..4000) { "elo must be between 0 and 4000" }
     }
 
     companion object {
@@ -25,7 +25,6 @@ data class UserRuleStats(val ruleId: Int, val gamesPlayed: Int = 1, val elo: Int
 
 /**
  * Computes the expected score for player A based on the ratings of both player A and B.
- *
  * @param ratingPA Rating of player A.
  * @param ratingPB Rating of player B.
  * @return Expected score for player A.
@@ -36,7 +35,6 @@ fun expectedScore(ratingPA: Double, ratingPB: Double): Double {
 
 /**
  * Updates and returns the new Elo rating for player A after a game.
- *
  * @param ratingPA Current rating of player A.
  * @param ratingPB Rating of player B.
  * @param playerAScore Actual score of player A (1 for win, 0.5 for draw, 0 for loss).

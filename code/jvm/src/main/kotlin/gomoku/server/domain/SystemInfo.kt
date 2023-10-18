@@ -11,7 +11,8 @@ package gomoku.server.domain
 data class Author(
     val studentID: Int,
     val name: String,
-    val email: String
+    val email: String,
+    val socials: List<Socials>
 )
 
 /**
@@ -22,4 +23,14 @@ data class Author(
 data class ServerInfo(
     val version: String,
     val authors: List<Author>
+)
+
+/**
+ * Represents a social media link
+ * @property name the name of the social media
+ * @property url the url of the social media
+ */
+data class Socials(
+    val name: String,
+    val url: String
 )

@@ -2,7 +2,6 @@ package gomoku.server.domain.game.match
 
 /**
  * Represents a data point
- *
  * @param value The value of the coordinate
  * @throws IllegalArgumentException If any of the coordinates is negative
  */

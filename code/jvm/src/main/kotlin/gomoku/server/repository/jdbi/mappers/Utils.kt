@@ -11,6 +11,11 @@ import gomoku.utils.Failure
 import gomoku.utils.Success
 import java.sql.ResultSet
 
+/**
+ * Maps a row of the result set to a [MoveContainer]
+ * @param rs The result set to map
+ * @return The [MoveContainer] from the result set
+ */
 fun getMoveContainerFromRS(rs: ResultSet): MoveContainer {
     val boardSize = rs.getInt("board_size")
     val moves = (rs.getArray("moves").array as Array<*>).map { it as Int }
@@ -24,6 +29,12 @@ fun getMoveContainerFromRS(rs: ResultSet): MoveContainer {
     }
 }
 
+/**
+ * Maps a row of the result set to a [FinishedMatch]
+ * @param rs The result set to map
+ * @param moveContainer The [MoveContainer] the moves of the finished match
+ * @return The [FinishedMatch] from the result set
+ */
 fun getFinishedMatchFromRS(rs: ResultSet, moveContainer: MoveContainer): FinishedMatch = FinishedMatch(
     matchId = rs.getInt("id"),
     playerBlack = rs.getInt("player_black"),
@@ -38,6 +49,12 @@ fun getFinishedMatchFromRS(rs: ResultSet, moveContainer: MoveContainer): Finishe
     matchOutcome = rs.getString("match_outcome").toMatchOutcome()
 )
 
+/**
+ * Maps a row of the result set to a [OngoingMatch]
+ * @param rs The result set to map
+ * @param moveContainer The [MoveContainer] the moves of the ongoing match
+ * @return The [OngoingMatch] from the result set
+ */
 fun getOngoingMatchFromRS(rs: ResultSet, moveContainer: MoveContainer): OngoingMatch = OngoingMatch(
     matchId = rs.getInt("id"),
     playerBlack = rs.getInt("player_black"),

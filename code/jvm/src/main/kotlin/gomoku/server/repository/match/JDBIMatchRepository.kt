@@ -12,6 +12,11 @@ import gomoku.server.repository.jdbi.mappers.MovesRowMapper
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
+/**
+ * Repository for matches using JDBI and PostgreSQL
+ * @property handle The handle to the database
+ * @see MatchRepository
+ */
 class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
 
     // rules

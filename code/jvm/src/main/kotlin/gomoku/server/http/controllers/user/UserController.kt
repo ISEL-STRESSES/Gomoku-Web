@@ -85,6 +85,14 @@ class UserController(private val service: UserService) {
         }
     }
 
+    /**
+     * Gets the ranking of the users for a given rule
+     * @param ruleId The id of the rule
+     * @param username The username to search
+     * @param offset The offset
+     * @param limit The limit
+     * @return The ranking of the users or a [Problem] if the rule does not exist
+     */
     @GetMapping(URIs.Users.RANKING_SEARCH)
     fun searchRanking(
         @PathVariable ruleId: Int,
@@ -96,6 +104,11 @@ class UserController(private val service: UserService) {
         return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
     }
 
+    /**
+     * Gets the user by its id
+     * @param id The id of the user
+     * @return The user or a [Problem] if the user does not exist
+     */
     @GetMapping(URIs.Users.GET_BY_ID)
     fun getById(
         @PathVariable id: Int
@@ -108,6 +121,11 @@ class UserController(private val service: UserService) {
         }
     }
 
+    /**
+     * Creates a user given its username and password
+     * @param userInput The user input
+     * @return The created user or if not a [Problem]
+     */
     @PostMapping(URIs.Users.CREATE)
     fun create(
         @Valid @RequestBody
@@ -129,6 +147,11 @@ class UserController(private val service: UserService) {
         }
     }
 
+    /**
+     * Creates a token for a user given its username and password
+     * @param userInput The user input
+     * @return The created token or if not a [Problem]
+     */
     @PostMapping(URIs.Users.TOKEN)
     fun token(
         @Valid @RequestBody
@@ -145,6 +168,10 @@ class UserController(private val service: UserService) {
         }
     }
 
+    /**
+     * Logs out a user given its token
+     * @param token The token of the user
+     */
     @PostMapping(URIs.Users.LOGOUT)
     fun logout(
         @RequestHeader("Authorization") token: String
@@ -152,6 +179,10 @@ class UserController(private val service: UserService) {
         service.revokeToken(token)
     }
 
+    /**
+     * Gets the home of a user
+     * @param authenticatedUser The authenticated user
+     */
     @GetMapping(URIs.Users.HOME)
     fun home(authenticatedUser: AuthenticatedUser): UserHomeOutputModel {
         return UserHomeOutputModel(

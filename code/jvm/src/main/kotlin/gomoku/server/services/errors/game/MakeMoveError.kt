@@ -1,5 +1,8 @@
 package gomoku.server.services.errors.game
 
+/**
+ * Error for making a move
+ */
 sealed class MakeMoveError {
     object InvalidTurn : MakeMoveError()
     object AlreadyOccupied : MakeMoveError()
