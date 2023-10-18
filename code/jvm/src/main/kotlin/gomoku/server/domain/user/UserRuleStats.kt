@@ -19,7 +19,7 @@ data class UserRuleStats(val ruleId: Int, val gamesPlayed: Int = 1, val elo: Int
         const val DEFAULT_ELO = 1500
         const val WIN = 1.0
         const val DRAW = 0.5
-        const val LOSE = 0.0
+        const val LOSS = 0.0
     }
 }
 

@@ -10,7 +10,7 @@ class EloTest {
     fun `playerA wins and has the same base points as playerB`() {
         val pointsA = 1500.0
         val pointsB = 1500.0
-        assertTrue(updateElo(pointsA, pointsB, UserRuleStats.WIN) > updateElo(pointsA, pointsB, UserRuleStats.LOSE))
+        assertTrue(updateElo(pointsA, pointsB, UserRuleStats.WIN) > updateElo(pointsA, pointsB, UserRuleStats.LOSS))
     }
 
     @Test
@@ -38,20 +38,20 @@ class EloTest {
     fun `playerA loses and has the same base points as playerB`() {
         val pointsA = 1500.0
         val pointsB = 1500.0
-        assertTrue(updateElo(pointsA, pointsB, UserRuleStats.LOSE) < pointsA)
+        assertTrue(updateElo(pointsA, pointsB, UserRuleStats.LOSS) < pointsA)
     }
 
     @Test
     fun `playerA loses and has higher base points than playerB`() {
         val pointsA = 1600.0
         val pointsB = 1500.0
-        assertTrue(updateElo(pointsA, pointsB, UserRuleStats.LOSE) < pointsA)
+        assertTrue(updateElo(pointsA, pointsB, UserRuleStats.LOSS) < pointsA)
     }
 
     @Test
     fun `playerA loses and has lower base points than playerB`() {
         val pointsA = 1400.0
         val pointsB = 1500.0
-        assertTrue(updateElo(pointsA, pointsB, UserRuleStats.LOSE) < pointsA)
+        assertTrue(updateElo(pointsA, pointsB, UserRuleStats.LOSS) < pointsA)
     }
 }

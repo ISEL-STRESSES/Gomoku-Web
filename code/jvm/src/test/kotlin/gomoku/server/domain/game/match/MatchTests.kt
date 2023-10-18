@@ -2,7 +2,6 @@ package gomoku.server.domain.game.match
 
 import gomoku.server.domain.game.rules.BoardSize
 import gomoku.server.domain.game.rules.StandardRules
-import gomoku.utils.Either
 import gomoku.utils.Failure
 import gomoku.utils.Success
 import org.junit.jupiter.api.Assertions.assertEquals

@@ -164,6 +164,64 @@ class JDBIUserRepositoryTests {
         assertEquals(5, userRuleStats.gamesPlayed)
     }
 
+    @Test
+    fun `isUserStoredByUsername returns false when user does not exist`() = testWithHandleAndRollback { handle ->
+        // given: a UsersRepository
+        val repo = JDBIUserRepository(handle)
+
+        // when: asking if a user exists
+        val isUserIsStored = repo.isUserStoredByUsername("non-existing-user")
+
+        // then: response is false
+        assertFalse(isUserIsStored)
+    }
+
+    @Test
+    fun `isUserStoredByUsername returns true when user does exist`() = testWithHandleAndRollback { handle ->
+        // given: a UsersRepository
+        val repo = JDBIUserRepository(handle)
+
+        // and: a createdUser
+        val userName = newTestUserName()
+        val passwordValidationInfo = newTestUserPassword()
+        repo.storeUser(userName, passwordValidationInfo)
+
+        // when: asking if the user exists
+        val isUserIsStored = repo.isUserStoredByUsername(userName)
+
+        // then: response is true
+        assertTrue(isUserIsStored)
+    }
+
+    @Test
+    fun `isUserStoredById returns false when user does not exist`() = testWithHandleAndRollback { handle ->
+        // given: a UsersRepository
+        val repo = JDBIUserRepository(handle)
+
+        // when: asking if a user exists
+        val isUserIsStored = repo.isUserStoredById(0)
+
+        // then: response is false
+        assertFalse(isUserIsStored)
+    }
+
+    @Test
+    fun `isUserStoredById returns true when user does exist`() = testWithHandleAndRollback { handle ->
+        // given: a UsersRepository
+        val repo = JDBIUserRepository(handle)
+
+        // and: a createdUser
+        val userName = newTestUserName()
+        val passwordValidationInfo = newTestUserPassword()
+        val userId = repo.storeUser(userName, passwordValidationInfo)
+
+        // when: asking if the user exists
+        val isUserIsStored = repo.isUserStoredById(userId)
+
+        // then: response is true
+        assertTrue(isUserIsStored)
+    }
+
     companion object {
 
         private fun newTestUserName() = "user-${abs(Random.nextLong())}"

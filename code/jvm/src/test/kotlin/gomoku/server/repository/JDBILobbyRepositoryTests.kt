@@ -13,7 +13,7 @@ import kotlin.test.assertTrue
 class JDBILobbyRepositoryTests {
 
     @Test
-    fun `getLobbyByRuleId should return correct lobby`() = testWithHandleAndRollback{ handle ->
+    fun `getLobbyByRuleId should return correct lobby`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val ruleId = 1
 
@@ -24,7 +24,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `getLobbyByRuleId should return null for non-existing ruleId`() = testWithHandleAndRollback{ handle ->
+    fun `getLobbyByRuleId should return null for non-existing ruleId`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val ruleId = 2
 
@@ -34,7 +34,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `getLobbyByRuleId should be null for invalid ruleId`() = testWithHandleAndRollback{ handle ->
+    fun `getLobbyByRuleId should be null for invalid ruleId`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val ruleId = -1
 
@@ -44,7 +44,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `getLobbies should return list of lobbies`() = testWithHandleAndRollback{ handle ->
+    fun `getLobbies should return list of lobbies`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val lobbies = repo.getLobbies()
 
@@ -61,7 +61,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `getLobbyByUserId should return correct lobby`() = testWithHandleAndRollback{ handle ->
+    fun `getLobbyByUserId should return correct lobby`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val userId = 1
 
@@ -72,7 +72,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `getLobbyByUserId should return null for user not in any lobby`() = testWithHandleAndRollback{ handle ->
+    fun `getLobbyByUserId should return null for user not in any lobby`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val userId = 3
 
@@ -82,7 +82,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `getLobbyByUserId should be null for invalid userId`() = testWithHandleAndRollback{ handle ->
+    fun `getLobbyByUserId should be null for invalid userId`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val userId = -1
 
@@ -92,7 +92,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `createLobby should create a lobby for valid ruleId and userId`() = testWithHandleAndRollback{ handle ->
+    fun `createLobby should create a lobby for valid ruleId and userId`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val ruleId = 2
         val userId = 3
@@ -108,7 +108,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `createLobby should throw exception for invalid ruleId`() = testWithHandleAndRollback{ handle ->
+    fun `createLobby should throw exception for invalid ruleId`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val ruleId = -1
         val userId = 6
@@ -119,7 +119,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `createLobby should throw exception for invalid userId`() = testWithHandleAndRollback{ handle ->
+    fun `createLobby should throw exception for invalid userId`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val ruleId = 5
         val userId = -1
@@ -130,7 +130,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `leaveLobby should remove user from existing lobby`() = testWithHandleAndRollback{ handle ->
+    fun `leaveLobby should remove user from existing lobby`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val userId = 1
 
@@ -143,7 +143,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `leaveLobby should return false for user not in any lobby`() = testWithHandleAndRollback{ handle ->
+    fun `leaveLobby should return false for user not in any lobby`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val userId = 3
 
@@ -153,7 +153,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `leaveLobby should be false for invalid userId`() = testWithHandleAndRollback{ handle ->
+    fun `leaveLobby should be false for invalid userId`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val userId = -1
 

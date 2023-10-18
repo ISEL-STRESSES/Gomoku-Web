@@ -27,19 +27,35 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Controller for user-related endpoints
+ * @property service The user service
+ */
 @RestController(URIs.Users.ROOT)
 class UserController(private val service: UserService) {
 
+    /**
+     * Gets the ranking of the users for a given rule
+     * @param ruleId The id of the rule
+     * @param offset The offset
+     * @param limit The limit
+     * @return The ranking of the users
+     */
     @GetMapping(URIs.Users.RANKING)
     fun ranking(
         @PathVariable ruleId: Int,
-        @RequestParam offset: Int = 0,
+        @RequestParam offset: Int = 0, // TODO: IMPLEMENT DEFAULT OFFSET AND LIMIT
         @RequestParam limit: Int = 10
     ): ResponseEntity<*> {
         val users = service.getRanking(ruleId, offset, limit)
         return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
     }
 
+    /**
+     * Gets the stats of a user
+     * @param userId The id of the user
+     * @return The stats of the user or a problem if the user does not exist
+     */
     @GetMapping(URIs.Users.USER_STATS)
     fun userStats(@PathVariable userId: Int): ResponseEntity<*> {
         val userStats = service.getUserStats(userId)
@@ -50,6 +66,12 @@ class UserController(private val service: UserService) {
         }
     }
 
+    /**
+     * Gets the ranking of a user for a given rule
+     * @param userId The id of the user
+     * @param ruleId The id of the rule
+     * @return The ranking of the user or a problem if the user does not exist
+     */
     @GetMapping(URIs.Users.USER_RANKING)
     fun userRanking(
         @PathVariable userId: Int,

@@ -1,5 +1,6 @@
 package gomoku.server.repository
 
+import gomoku.server.repository.jdbi.mappers.FinishedMatchRowMapper
 import gomoku.server.repository.jdbi.mappers.InstantMapper
 import gomoku.server.repository.jdbi.mappers.LobbyRowMapper
 import gomoku.server.repository.jdbi.mappers.MatchRowMapper
@@ -28,6 +29,7 @@ fun Jdbi.configureWithAppRequirements(): Jdbi {
     registerRowMapper(MatchRuleRowMapper())
     registerRowMapper(LobbyRowMapper())
     registerRowMapper(MatchRowMapper())
+    registerRowMapper(FinishedMatchRowMapper())
 
     return this
 }

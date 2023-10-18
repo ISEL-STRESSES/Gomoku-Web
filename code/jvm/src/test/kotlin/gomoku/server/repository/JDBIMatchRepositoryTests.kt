@@ -12,6 +12,7 @@ import gomoku.server.domain.game.rules.RuleVariant
 import gomoku.server.repository.match.JDBIMatchRepository
 import gomoku.server.repository.user.JDBIUserRepository
 import gomoku.server.testWithHandleAndRollback
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -205,4 +206,74 @@ class JDBIMatchRepositoryTests {
         assertEquals(Color.BLACK, getLastNMoves[0].color)
         assertEquals(Position(3), getLastNMoves[0].position)
     }
+
+    @Test
+    fun `isRuleStoredById returns true if rule exists`() = testWithHandleAndRollback { handle ->
+        val repo = JDBIMatchRepository(handle)
+
+        val ruleExists = repo.isRuleStoredById(1)
+        assertTrue(ruleExists)
+    }
+
+    @Test
+    fun `isRuleStoredById returns false if rule doesn't exist`() = testWithHandleAndRollback { handle ->
+        val repo = JDBIMatchRepository(handle)
+
+        val ruleExists = repo.isRuleStoredById(666)
+        assertFalse(ruleExists)
+    }
+
+    @Test
+    fun `getUserFinishedMatches returns only finished matches for user`() = testWithHandleAndRollback { handle ->
+        val repo = JDBIMatchRepository(handle)
+
+        val userId = 1
+        val otherPlayerId = 2
+        val anotherPlayerId = 3
+
+        val finishedMatchId1 = repo.createFinishedMatch(userId, otherPlayerId)
+        val finishedMatchId2 = repo.createFinishedMatch(userId, anotherPlayerId)
+        val ongoingMatchId = repo.createMatch(1, userId, otherPlayerId)
+
+        val matches = repo.getUserFinishedMatches(0, 10, userId)
+
+        assertTrue(matches.any { it.matchId == finishedMatchId1 })
+        assertTrue(matches.any { it.matchId == finishedMatchId2 })
+        assertFalse(matches.any { it.matchId == ongoingMatchId })
+    }
+
+    @Test
+    fun `getUserFinishedMatches respects pagination`() = testWithHandleAndRollback { handle ->
+        val repo = JDBIMatchRepository(handle)
+
+        val userId = 1
+        val otherPlayerId = 2
+        val anotherPlayerId = 3
+
+        // Setup: Create multiple finished matches for the user.
+        repo.createFinishedMatch(userId, otherPlayerId)
+        repo.createFinishedMatch(userId, anotherPlayerId)
+        repo.createFinishedMatch(userId, anotherPlayerId)
+        repo.createFinishedMatch(userId, anotherPlayerId)
+
+        val matchesPage1 = repo.getUserFinishedMatches(0, 2, userId)
+        val matchesPage2 = repo.getUserFinishedMatches(2, 2, userId)
+
+        assertEquals(2, matchesPage1.size)
+        assertEquals(2, matchesPage2.size)
+        assertTrue(matchesPage1[0].matchId != matchesPage2[0].matchId)
+        assertTrue(matchesPage1[1].matchId != matchesPage2[1].matchId)
+    }
+}
+
+fun JDBIMatchRepository.createFinishedMatch(userId: Int, opponentId: Int): Int {
+    // Create an ongoing match first
+    val matchId = this.createMatch(1, userId, opponentId)
+
+    // Set the match to finished
+    this.setMatchState(matchId, MatchState.FINISHED)
+    // Setting the outcome to BLACK_WON just for coherence
+    this.setMatchOutcome(matchId, MatchOutcome.BLACK_WON)
+
+    return matchId
 }

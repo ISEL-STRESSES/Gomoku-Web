@@ -12,9 +12,15 @@ import java.sql.ResultSet
 class MovesRowMapper : RowMapper<List<Move>> {
     override fun map(rs: ResultSet, ctx: StatementContext): List<Move> {
         val boardSize = rs.getInt("board_size")
-        val movesIndexes = (rs.getArray("moves").array as Array<*>).map { it as Int }
+        val movesIndexes = (rs.getArray("moves")?.array as? Array<*>)
 
-        val moveContainerResult = buildMoveContainer(boardSize, movesIndexes)
+        if (movesIndexes == null || movesIndexes.isEmpty()) {
+            return emptyList()
+        }
+
+        val movesIndexesInt = movesIndexes.map { it as Int }
+
+        val moveContainerResult = buildMoveContainer(boardSize, movesIndexesInt)
 
         return when (moveContainerResult) {
             is Success -> moveContainerResult.value.getMoves()

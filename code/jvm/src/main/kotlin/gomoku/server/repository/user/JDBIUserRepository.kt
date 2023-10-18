@@ -58,6 +58,17 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .single() == 1
 
     /**
+     * Verifies if a user with the given [id] exists.
+     * @param id The id of the user to check.
+     * @return True if a user with the given [id] exists, false otherwise.
+     */
+    override fun isUserStoredById(id: Int): Boolean =
+        handle.createQuery("SELECT COUNT(*) FROM users WHERE id = :id")
+            .bind("id", id)
+            .mapTo<Int>()
+            .single() == 1
+
+    /**
      * Retrieves a user by their id.
      * @param id The id of the user.
      * @return The user if found, null otherwise.

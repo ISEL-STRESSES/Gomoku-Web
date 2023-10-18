@@ -35,6 +35,17 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .mapTo<Rules>()
             .list()
 
+    /**
+     * Checks if a rule with the given id is stored in the database.
+     * @param ruleId id of the rule
+     * @return true if the rule is stored, false otherwise
+     */
+    override fun isRuleStoredById(ruleId: Int): Boolean =
+        handle.createQuery("select id from rules where id = :ruleId")
+            .bind("ruleId", ruleId)
+            .mapTo<Int>()
+            .singleOrNull() != null
+
     // match
     /**
      * Creates a new match, with the given rule and users ids

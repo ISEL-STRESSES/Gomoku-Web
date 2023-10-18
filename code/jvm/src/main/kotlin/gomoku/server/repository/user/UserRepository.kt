@@ -38,6 +38,13 @@ interface UserRepository {
     fun isUserStoredByUsername(username: String): Boolean
 
     /**
+     * Checks if a user with the given id is stored in the database.
+     * @param id The id of the user.
+     * @return True if the user is stored, false otherwise.
+     */
+    fun isUserStoredById(id: Int): Boolean
+
+    /**
      * Retrieves a user by their id.
      * @param id The id of the user.
      * @return The user if found, null otherwise.

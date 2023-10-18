@@ -3,6 +3,7 @@ package gomoku.server.services.game
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.match.Color
 import gomoku.server.domain.game.match.FinishedMatch
+import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.match.Move
@@ -16,7 +17,6 @@ import gomoku.server.domain.user.updateElo
 import gomoku.server.repository.Transaction
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.game.MakeMoveError
-import gomoku.server.services.errors.game.MatchNotFoundError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.utils.Failure
 import gomoku.utils.Success
@@ -45,15 +45,18 @@ class GameService(private val transactionManager: TransactionManager) {
 
             if (lobby != null) {
                 if (lobby.userId == userId) {
-                    failure(MatchmakingError.SamePlayer)
+                    return@run failure(MatchmakingError.SamePlayer)
                 }
-                it.lobbyRepository.leaveLobby(lobby.userId)
+                val didLeave = it.lobbyRepository.leaveLobby(lobby.userId)
+                if (!didLeave) {
+                    return@run failure(MatchmakingError.LeaveLobbyFailed)
+                }
                 val playerBlack = if (Random.nextBoolean()) userId else lobby.userId
                 val playerWhite = if (playerBlack == userId) lobby.userId else userId
                 val matchId = it.matchRepository.createMatch(ruleId, playerBlack, playerWhite)
-                success(Matchmaker(true, matchId))
+                return@run success(Matchmaker(true, matchId))
             } else {
-                success(Matchmaker(false, it.lobbyRepository.createLobby(ruleId, userId)))
+                return@run success(Matchmaker(false, it.lobbyRepository.createLobby(ruleId, userId)))
             }
         }
     }
@@ -143,7 +146,7 @@ class GameService(private val transactionManager: TransactionManager) {
         player1Score: Double
     ) {
         val statsPlayer1 = tr.usersRepository.getUserRanking(player1Id, ruleId) ?: UserRuleStats(ruleId)
-        val statsPlayer2 = tr.usersRepository.getUserRanking(player2Id, ruleId) ?: UserRuleStats(ruleId)
+        val statsPlayer2 = tr.usersRepository.getUserRanking(player2Id, ruleId) ?: UserRuleStats(ruleId) // TODO: NOT SURE IF THIS IS CORRECT
 
         val newPlayer1Elo = updateElo(statsPlayer1.elo.toDouble(), statsPlayer2.elo.toDouble(), player1Score)
         val newPlayer2Elo = updateElo(statsPlayer2.elo.toDouble(), statsPlayer1.elo.toDouble(), 1 - player1Score)
@@ -174,22 +177,20 @@ class GameService(private val transactionManager: TransactionManager) {
      * @return true if the user was removed from
      * the matchmaking process, false otherwise
      */
-    fun leaveLobby(userId: Int): Boolean {
-        return transactionManager.run {
+    fun leaveLobby(userId: Int): Boolean =
+        transactionManager.run {
             it.lobbyRepository.leaveLobby(userId)
         }
-    }
 
     /**
      * Gets the available rules.
      * This function doesn't use limit and offset because there are only a limited number of rules that can be delivered at once.
      * @return a list of the available rules
      */
-    fun getAvailableRules(): List<Rules> {
-        return transactionManager.run {
+    fun getAvailableRules(): List<Rules> =
+        transactionManager.run {
             it.matchRepository.getAllRules()
         }
-    }
 
     /**
      * Gets the id of the player that has the turn in a given match.
@@ -212,44 +213,25 @@ class GameService(private val transactionManager: TransactionManager) {
         }
     }
 
-    // TODO: Check if this function is needed
-    /**
-     * Gets the state of a match.
-     * @param matchId id of the match
-     * @param userId id of the user
-     * @return the [MatchState], or null if the match doesn't exist
-     */
-    fun getMatchState(matchId: Int, userId: Int): MatchState? {
-        return transactionManager.run {
-            TODO()
-        }
-    }
-
     /**
      * Gets the finished matches of a user.
-     * @param offset the offset for the mathces list
+     * @param offset the offset for the matches list
      * @param limit the limit for the matches list
      * @param userId the id of the user to get the matches from
      * @return the list of [FinishedMatch]
      */
-    fun getUserFinishedMatches(offset: Int, limit: Int, userId: Int): List<FinishedMatch> {
-        return transactionManager.run {
+    fun getUserFinishedMatches(offset: Int, limit: Int, userId: Int): List<FinishedMatch> =
+        transactionManager.run {
             it.matchRepository.getUserFinishedMatches(offset, limit, userId)
         }
-    }
 
     /**
      * Gets the details of a game.
      * @param gameId The id of the game.
-     * @return The details of the game.
+     * @return The details of the game, or null if the game doesn't exist.
      */
-    fun getGame(gameId: Int): GetMatchResult =
+    fun getGame(gameId: Int): Match? =
         transactionManager.run {
-            val match = it.matchRepository.getMatchById(gameId)
-            if (match == null) {
-                failure(MatchNotFoundError.GameMatchNotFound)
-            } else{
-                success(match)
-            }
+            it.matchRepository.getMatchById(gameId)
         }
 }

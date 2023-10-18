@@ -49,6 +49,15 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
         return false
     }
 
+    /**
+     * Private function that counts the number of pieces of the same color in a given direction
+     * @param moveContainer The move container
+     * @param position The position to start counting from
+     * @param color The color of the pieces to count
+     * @param dx The x direction to count in
+     * @param dy The y direction to count in
+     * @return The number of pieces of the same color in the given direction
+     */
     private fun countPieces(
         moveContainer: MoveContainer,
         position: Position,

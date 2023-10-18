@@ -49,10 +49,7 @@ class GameController(private val gameService: GameService) {
     @GetMapping(URIs.Game.GET_BY_ID)
     fun gameDetails(@PathVariable id: Int, @RequestParam authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val game = gameService.getGame(id)
-        if (game is Failure) {
-            return Problem.response(404, Problem.gameNotFound)
-        }
-        return ResponseEntity.ok(game)
+        return ResponseEntity.ok(game) ?: Problem.response(404, Problem.gameNotFound)
     }
 
     /**
@@ -150,5 +147,8 @@ class GameController(private val gameService: GameService) {
     private fun MatchmakingError.resolveProblem(): ResponseEntity<*> =
         when (this) {
             MatchmakingError.SamePlayer -> Problem.response(400, Problem.samePlayer)
+            MatchmakingError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
         }
+
+    // TODO: MAKE THE OTHER RESOLVEPROBLEM FUNCTIONS
 }

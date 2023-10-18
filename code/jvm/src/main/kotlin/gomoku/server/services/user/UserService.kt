@@ -118,9 +118,10 @@ class UserService(
      * @param ruleId The id of the rule.
      * @return The stats of the user for the given rule, or null if the user doesn't exist.
      */
-    fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats? =
+    fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats? = // TODO: Return result, rule can be invalid or user can be invalid
         transactionManager.run {
             val usersRepository = it.usersRepository
+
             usersRepository.getUserRanking(userId, ruleId)
         }
 

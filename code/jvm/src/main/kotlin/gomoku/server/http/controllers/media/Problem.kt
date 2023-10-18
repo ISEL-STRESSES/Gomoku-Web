@@ -3,8 +3,12 @@ package gomoku.server.http.controllers.media
 import org.springframework.http.ResponseEntity
 import java.net.URI
 
-//TODO: ADD THE PROBLEMS THAT ARE NOT ALREADY IN THE DOCS TO THE DOCS!
+// TODO: ADD THE PROBLEMS THAT ARE NOT ALREADY IN THE DOCS TO THE DOCS!
 
+/**
+ * Represents a problem
+ * @param typeUri The type of the problem
+ */
 class Problem(
     typeUri: URI
 ) {
@@ -102,6 +106,12 @@ class Problem(
         val lobbyNotFound = Problem(
             URI(
                 PROBLEM_BASE_URL + "lobby-not-found"
+            )
+        )
+
+        val leaveLobbyFailed = Problem(
+            URI(
+                PROBLEM_BASE_URL + "leave-lobby-failed"
             )
         )
     }

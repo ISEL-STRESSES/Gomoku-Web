@@ -29,6 +29,13 @@ interface MatchRepository {
      */
     fun getAllRules(): List<Rules>
 
+    /**
+     * Checks if a rule with the given id is stored in the database.
+     * @param ruleId id of the rule
+     * @return true if the rule is stored, false otherwise
+     */
+    fun isRuleStoredById(ruleId: Int): Boolean
+
     // Match
     /**
      * Creates a new match, with the given rule and users ids

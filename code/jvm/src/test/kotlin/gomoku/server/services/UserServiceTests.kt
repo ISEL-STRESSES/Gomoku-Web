@@ -20,7 +20,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration
 
-class UserServicesTests {
+class UserServiceTests {
 
     private val transactionManager = JDBITransactionManager(jbdiTest())
     private val usersDomain = UsersDomain(
@@ -38,7 +38,7 @@ class UserServicesTests {
     @Test
     fun `createUser should create a user with valid username and password`() {
         val username = "userTest"
-        val password = "ByQYP78&j7Aug2" //Random password that uses a caps, a number and a special character
+        val password = "ByQYP78&j7Aug2" // Random password that uses a caps, a number and a special character
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val userService = UserService(
@@ -273,4 +273,6 @@ class UserServicesTests {
 
         // TODO(): Add assertions
     }
+
+    // TODO: Add tests for set methods and others needed.
 }
