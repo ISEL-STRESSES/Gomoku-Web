@@ -14,6 +14,12 @@ private val jdbi = Jdbi.create(
     }
 ).configureWithAppRequirements()
 
+fun jbdiTest() = Jdbi.create(
+    PGSimpleDataSource().apply {
+        setURL(System.getenv("DB_URL"))
+    }
+).configureWithAppRequirements()
+
 fun testWithHandleAndRollback(block: (Handle) -> Unit) = jdbi.useTransaction<Exception> { handle ->
     block(handle)
     handle.rollback()
