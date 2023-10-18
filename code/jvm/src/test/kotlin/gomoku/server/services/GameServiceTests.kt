@@ -15,10 +15,6 @@ import kotlin.test.Test
 
 class GameServiceTests {
 
-    private val transactionManager =
-        JDBITransactionManager(jbdiTest())
-    private val gameService = GameService(transactionManager)
-
     @Test
     fun `startMatchmakingProcess should start a new lobby if no existing lobbies with the same ruleId exist`() {
         val ruleId = 1
