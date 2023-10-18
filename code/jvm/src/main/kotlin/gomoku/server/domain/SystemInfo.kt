@@ -1,7 +1,5 @@
 package gomoku.server.domain
 
-// TODO: Change this and send more info like git, etc.
-
 /**
  * Represents an author of the code
  * @property studentID the student id of the author

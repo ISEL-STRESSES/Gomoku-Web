@@ -23,7 +23,7 @@ fun <R> success(value: R) = Either.Right(value)
  */
 fun <L> failure(error: L) = Either.Left(error)
 
-// Typealiases for success and failure
+// Type aliases for success and failure
 /**
  * Represents Success
  */

@@ -13,7 +13,7 @@ import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
 /**
- * Repository for matches using JDBI and PostgreSQL
+ * Repository for matches using JDBI and PostgresSQL
  * @property handle The handle to the database
  * @see MatchRepository
  */

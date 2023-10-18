@@ -82,7 +82,7 @@ class GomokuWebApplication {
                 listOf(
                     Socials(
                         name = "GitHub",
-                        url = "" // TODO
+                        url = "https://github.com/RodrigoHCorreia"
                     )
                 )
             ),
@@ -93,7 +93,7 @@ class GomokuWebApplication {
                 listOf(
                     Socials(
                         name = "GitHub",
-                        url = "" // TODO
+                        url = "https://github.com/Matos16"
                     )
                 )
             ),
@@ -104,7 +104,7 @@ class GomokuWebApplication {
                 listOf(
                     Socials(
                         name = "GitHub",
-                        url = "" // TODO
+                        url = "https://github.com/Sideghost"
                     )
                 )
             )

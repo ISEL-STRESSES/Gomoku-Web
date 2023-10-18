@@ -9,13 +9,12 @@ import java.net.URI
  * Represents a problem
  * @param typeUri The type of the problem
  */
-class Problem(
-    typeUri: URI
-) {
-    val type = typeUri.toASCIIString() // TODO what for?
+class Problem(typeUri: URI) {
+
+    val type: String = typeUri.toASCIIString() // TODO what for?
 
     companion object {
-        const val MEDIA_TYPE = "application/problem+json"
+        private const val MEDIA_TYPE = "application/problem+json"
         private const val PROBLEM_BASE_URL = "https://github.com/isel-leic-daw/2023-daw-leic51d-01/main/docs/problems/"
 
         /**

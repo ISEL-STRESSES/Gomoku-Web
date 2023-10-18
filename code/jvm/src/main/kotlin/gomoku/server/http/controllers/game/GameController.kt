@@ -154,5 +154,5 @@ class GameController(private val gameService: GameService) {
             MatchmakingError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
         }
 
-    // TODO: MAKE THE OTHER RESOLVEPROBLEM FUNCTIONS
+    // TODO: MAKE THE OTHER RESOLVE PROBLEM FUNCTIONS
 }
