@@ -14,11 +14,11 @@ class MovesRowMapper : RowMapper<List<Move>> {
         val boardSize = rs.getInt("board_size")
         val movesIndexes = (rs.getArray("moves").array as Array<*>).map { it as Int }
 
-        val addMoveResult = buildMoveContainer(boardSize, movesIndexes)
+        val moveContainerResult = buildMoveContainer(boardSize, movesIndexes)
 
-        return when (addMoveResult) {
-            is Success -> addMoveResult.value.getMoves()
-            is Failure -> when (addMoveResult.value) {
+        return when (moveContainerResult) {
+            is Success -> moveContainerResult.value.getMoves()
+            is Failure -> when (moveContainerResult.value) {
                 AddMoveError.ImpossiblePosition -> throw IllegalArgumentException("Invalid position")
                 AddMoveError.AlreadyOccupied -> throw IllegalArgumentException("Position already occupied") // TODO: THROW APPROPRIATE EXCEPTION
             }

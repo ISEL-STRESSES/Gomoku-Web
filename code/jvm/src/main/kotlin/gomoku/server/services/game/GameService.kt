@@ -18,7 +18,8 @@ import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchNotFoundError
 import gomoku.server.services.errors.game.MatchmakingError
-import gomoku.utils.Either
+import gomoku.utils.Failure
+import gomoku.utils.Success
 import gomoku.utils.failure
 import gomoku.utils.success
 import org.springframework.stereotype.Service
@@ -82,8 +83,8 @@ class GameService(private val transactionManager: TransactionManager) {
                     )
                     val isValidMoveResult = match.rules.isValidMove(match.moveContainer, currMove, match.turn)
                     when (isValidMoveResult) {
-                        is Either.Left -> return@run isValidMoveResult.value.resolveError()
-                        is Either.Right -> return@run resolveValidMove(match, currMove, it)
+                        is Failure -> return@run isValidMoveResult.value.resolveError()
+                        is Success -> return@run resolveValidMove(match, currMove, it)
                     }
                 }
             }
@@ -147,11 +148,11 @@ class GameService(private val transactionManager: TransactionManager) {
         val newPlayer1Elo = updateElo(statsPlayer1.elo.toDouble(), statsPlayer2.elo.toDouble(), player1Score)
         val newPlayer2Elo = updateElo(statsPlayer2.elo.toDouble(), statsPlayer1.elo.toDouble(), 1 - player1Score)
 
-        tr.usersRepository.setUserRuleStats(
+        tr.usersRepository.setUserRanking(
             userId = player1Id,
             userStatsData = statsPlayer1.copy(gamesPlayed = statsPlayer1.gamesPlayed + 1, elo = newPlayer1Elo.toInt())
         )
-        tr.usersRepository.setUserRuleStats(
+        tr.usersRepository.setUserRanking(
             userId = player2Id,
             userStatsData = statsPlayer2.copy(gamesPlayed = statsPlayer2.gamesPlayed + 1, elo = newPlayer2Elo.toInt())
         )
@@ -211,8 +212,12 @@ class GameService(private val transactionManager: TransactionManager) {
         }
     }
 
+    // TODO: Check if this function is needed
     /**
-     * TODO should this be a part of get match details?
+     * Gets the state of a match.
+     * @param matchId id of the match
+     * @param userId id of the user
+     * @return the [MatchState], or null if the match doesn't exist
      */
     fun getMatchState(matchId: Int, userId: Int): MatchState? {
         return transactionManager.run {
@@ -220,13 +225,16 @@ class GameService(private val transactionManager: TransactionManager) {
         }
     }
 
-    // TODO is state needed if so in what context
     /**
-     *
+     * Gets the finished matches of a user.
+     * @param offset the offset for the mathces list
+     * @param limit the limit for the matches list
+     * @param userId the id of the user to get the matches from
+     * @return the list of [FinishedMatch]
      */
     fun getUserFinishedMatches(offset: Int, limit: Int, userId: Int): List<FinishedMatch> {
         return transactionManager.run {
-            TODO()
+            it.matchRepository.getUserFinishedMatches(offset, limit, userId)
         }
     }
 
@@ -238,10 +246,10 @@ class GameService(private val transactionManager: TransactionManager) {
     fun getGame(gameId: Int): GetMatchResult =
         transactionManager.run {
             val match = it.matchRepository.getMatchById(gameId)
-            when (match) {
-                null -> return@run failure(MatchNotFoundError.GameMatchNotFound)
-                is FinishedMatch -> return@run success(match)
-                is OngoingMatch -> return@run success(match)
+            if (match == null) {
+                failure(MatchNotFoundError.GameMatchNotFound)
+            } else{
+                success(match)
             }
         }
 }

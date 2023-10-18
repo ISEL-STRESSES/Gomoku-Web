@@ -130,12 +130,20 @@ class UserService(
      * @param username The username of the users.
      * @param offset The offset of the first user to get.
      * @param limit The maximum number of users to get.
-     * @return A list of [UserData] objects, containing all the stats related to the users.
+     * @return A list of [UserData] objects, containing all the stats related to the users, or null if the ruleId is invalid.
      */
-    fun searchRanking(ruleId: Int, username: String, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserData> =
+    fun searchRanking(ruleId: Int, username: String, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserData>? =
         transactionManager.run {
             val usersRepository = it.usersRepository
-            usersRepository.searchUsersRuleStatsByUsername(username, ruleId, offset, limit)
+            val matchRepository = it.matchRepository
+
+            val availableRules = matchRepository.getAllRules()
+
+            if (availableRules.any { rule -> rule.ruleId == ruleId }) {
+                usersRepository.searchRankingByUsername(username, ruleId, offset, limit)
+            } else {
+                null
+            }
         }
 
     /**

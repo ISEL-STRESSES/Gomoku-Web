@@ -3,6 +3,8 @@ package gomoku.server.domain.game.match
 import gomoku.server.domain.game.rules.BoardSize
 import gomoku.server.domain.game.rules.StandardRules
 import gomoku.utils.Either
+import gomoku.utils.Failure
+import gomoku.utils.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
@@ -17,11 +19,11 @@ class MatchTests {
     @Test
     fun `OngoingMatch computes correct turn color`() {
         val newContainerWithMoves1 = moves.addMove(Move(Position(1), Color.BLACK))
-        if (newContainerWithMoves1 is Either.Right<MoveContainer>) {
+        if (newContainerWithMoves1 is Success) {
             val ongoingMatch1 = OngoingMatch(1, playerA, playerB, rules, newContainerWithMoves1.value)
             assertEquals(Color.WHITE, ongoingMatch1.turn)
             val newContainerWithMoves2 = newContainerWithMoves1.value.addMove(Move(Position(2), Color.WHITE))
-            if (newContainerWithMoves2 is Either.Right<MoveContainer>) {
+            if (newContainerWithMoves2 is Success) {
                 val ongoingMatch2 = OngoingMatch(1, playerA, playerB, rules, newContainerWithMoves2.value)
                 assertEquals(Color.BLACK, ongoingMatch2.turn)
             } else {
@@ -32,7 +34,7 @@ class MatchTests {
         }
 
         val newContainerWithMovesFail = moves.addMove(Move(Position(225), Color.BLACK))
-        if (newContainerWithMovesFail is Either.Left<AddMoveError>) {
+        if (newContainerWithMovesFail is Failure) {
             assert(true)
         } else {
             assert(false)

@@ -70,7 +70,7 @@ class UserController(private val service: UserService) {
         @RequestParam offset: Int = 0,
         @RequestParam limit: Int = 10
     ): ResponseEntity<*> {
-        val users = service.searchRanking(ruleId, username, offset, limit)
+        val users = service.searchRanking(ruleId, username, offset, limit) ?: return Problem.response(404, Problem.invalidRule)
         return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
     }
 

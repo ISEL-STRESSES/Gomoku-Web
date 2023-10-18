@@ -1,6 +1,7 @@
 package gomoku.server.repository.match
 
 import gomoku.server.domain.game.match.Color
+import gomoku.server.domain.game.match.FinishedMatch
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
@@ -76,6 +77,24 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
             .bind("matchId", matchId)
             .mapTo<Match>()
             .singleOrNull()
+
+    override fun getUserFinishedMatches(offset: Int, limit: Int, userId: Int): List<FinishedMatch> =
+        handle.createQuery(
+            """
+                select matches.id, matches.player_black, matches.player_white, matches.match_state, matches.match_outcome, matches.moves,
+                rules.id as rules_id, rules.board_size, rules.opening_rule, rules.variant
+                from matches join rules
+                on rules.id = matches.rules_id
+                where (matches.player_black = :userId or matches.player_white = :userId) and matches.match_state = 'FINISHED'
+                order by matches.id desc
+                limit :limit offset :offset
+            """.trimIndent()
+        )
+            .bind("userId", userId)
+            .bind("limit", limit)
+            .bind("offset", offset)
+            .mapTo<FinishedMatch>()
+            .list()
 
     /**
      * Gets the state of the match.

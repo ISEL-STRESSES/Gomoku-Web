@@ -3,6 +3,8 @@ package gomoku.server.http.controllers.media
 import org.springframework.http.ResponseEntity
 import java.net.URI
 
+//TODO: ADD THE PROBLEMS THAT ARE NOT ALREADY IN THE DOCS TO THE DOCS!
+
 class Problem(
     typeUri: URI
 ) {
@@ -15,6 +17,12 @@ class Problem(
             .status(status)
             .header("Content-Type", MEDIA_TYPE)
             .body<Any>(problem)
+
+        val invalidRule = Problem(
+            URI(
+                PROBLEM_BASE_URL + "invalid-rule"
+            )
+        )
 
         val userAlreadyExists = Problem(
             URI(

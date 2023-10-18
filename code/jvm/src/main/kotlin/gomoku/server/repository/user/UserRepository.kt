@@ -103,7 +103,7 @@ interface UserRepository {
      * @param userId The id of the user.
      * @param userStatsData The stats of the user for the given rule.
      */
-    fun setUserRuleStats(userId: Int, userStatsData: UserRuleStats)
+    fun setUserRanking(userId: Int, userStatsData: UserRuleStats)
 
     /**
      * Retrieves a list of users with the given username.
@@ -111,5 +111,5 @@ interface UserRepository {
      * @param rulesId The id of the rules.
      * @return The list of users.
      */
-    fun searchUsersRuleStatsByUsername(username: String, rulesId: Int, offset: Int, limit: Int): List<UserData>
+    fun searchRankingByUsername(username: String, rulesId: Int, offset: Int, limit: Int): List<UserData>
 }

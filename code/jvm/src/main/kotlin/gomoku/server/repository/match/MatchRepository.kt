@@ -1,6 +1,7 @@
 package gomoku.server.repository.match
 
 import gomoku.server.domain.game.match.Color
+import gomoku.server.domain.game.match.FinishedMatch
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
@@ -45,6 +46,13 @@ interface MatchRepository {
      * @return the match or null if not found
      */
     fun getMatchById(matchId: Int): Match?
+
+    /**
+     * Gets the finished matches of a user.
+     * @param offset the offset of the matches list
+     * @param limit the limit
+     */
+    fun getUserFinishedMatches(offset: Int, limit: Int, userId: Int): List<FinishedMatch>
 
     /**
      * Gets the state of the match.

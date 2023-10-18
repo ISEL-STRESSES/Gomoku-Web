@@ -233,7 +233,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * @param userId The id of the user.
      * @param userStatsData The stats of the user for the given rule.
      */
-    override fun setUserRuleStats(userId: Int, userStatsData: UserRuleStats) {
+    override fun setUserRanking(userId: Int, userStatsData: UserRuleStats) {
         handle.createUpdate(
             """
             update user_stats set games_played = :games_played, elo = :elo
@@ -250,12 +250,26 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     /**
      * Retrieves a list of users with the given username.
      * @param username The username of the users.
-     * @return The list of users.
+     * @param rulesId The id of the rule.
+     * @param offset The offset of the user list.
+     * @param limit The limit of the user list.
+     * @return The list of [UserData] with the given username
      */
-    override fun searchUsersRuleStatsByUsername(username: String, rulesId: Int, offset: Int, limit: Int): List<UserData> =
-        handle.createQuery("select * from user_stats where (user_id = (select id from users where username like :username) and rules_id = :rulesId)")
+    override fun searchRankingByUsername(username: String, rulesId: Int, offset: Int, limit: Int): List<UserData> =
+        handle.createQuery(
+            """
+            select us.user_id, us.rules_id as rule_id, us.games_played, us.elo, u.username from user_stats us
+            join users u on us.user_id = u.id
+            where u.username like :username
+            and us.rules_id = :rulesId
+            order by us.user_id
+            limit :limit offset :offset
+            """.trimIndent()
+        )
             .bind("username", "%$username%")
-            .bind("rules_id", rulesId)
+            .bind("rulesId", rulesId)
+            .bind("offset", offset)
+            .bind("limit", limit)
             .mapTo<UserData>()
             .list()
 

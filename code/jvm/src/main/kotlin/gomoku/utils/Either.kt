@@ -12,7 +12,7 @@ fun <L> failure(error: L) = Either.Left(error)
 typealias Success<S> = Either.Right<S>
 typealias Failure<F> = Either.Left<F>
 
-fun <L, R> Either<L, R>.rightOrNull(): R? = when (this) {
-    is Either.Right -> this.value
+fun <L, R> Either<L, R>.successOrNull(): R? = when (this) {
+    is Success -> this.value
     else -> null
 }
