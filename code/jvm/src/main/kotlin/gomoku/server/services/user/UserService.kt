@@ -68,8 +68,7 @@ class UserService(
             return failure(TokenCreationError.UserOrPasswordInvalid)
         }
         return transactionManager.run {
-            val usersRepository = it.usersRepository
-            val user = usersRepository.getUserByUsername(username)
+            val user = it.usersRepository.getUserByUsername(username)
                 ?: return@run failure(TokenCreationError.UserOrPasswordInvalid)
             if (!usersDomain.validatePassword(password, user.passwordValidationInfo)) {
                 failure(TokenCreationError.UserOrPasswordInvalid)
@@ -82,7 +81,7 @@ class UserService(
                 createdAt = now,
                 lastUsedAt = now
             )
-            usersRepository.createToken(token, usersDomain.maxNumberOfTokensPerUser)
+            it.usersRepository.createToken(token, usersDomain.maxNumberOfTokensPerUser)
             success(TokenExternalInfo(tokenValue, usersDomain.getTokenExpiration(token)))
         }
     }
@@ -96,8 +95,7 @@ class UserService(
      */
     fun getRanking(ruleId: Int, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<ListUserData> =
         transactionManager.run {
-            val usersRepository = it.usersRepository
-            usersRepository.getRanking(ruleId, offset, limit)
+            it.usersRepository.getRanking(ruleId, offset, limit)
         }
 
     /**
@@ -118,9 +116,7 @@ class UserService(
      */
     fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats? = // TODO: Return result, rule can be invalid or user can be invalid
         transactionManager.run {
-            val usersRepository = it.usersRepository
-
-            usersRepository.getUserRanking(userId, ruleId)
+            it.usersRepository.getUserRanking(userId, ruleId)
         }
 
     /**
