@@ -59,5 +59,7 @@ class Problem(typeUri: URI) {
         val lobbyNotFound = Problem(URI(PROBLEM_BASE_URL + "lobby-not-found"))
 
         val leaveLobbyFailed = Problem(URI(PROBLEM_BASE_URL + "leave-lobby-failed"))
+
+        val tokenNotRevoked = Problem(URI(PROBLEM_BASE_URL + "token-not-revoked"))
     }
 }

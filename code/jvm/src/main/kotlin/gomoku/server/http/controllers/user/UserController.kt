@@ -91,18 +91,11 @@ class UserController(private val service: UserService) {
      * Gets the ranking of the users for a given rule
      * @param ruleId The id of the rule
      * @param username The username to search
-     * @param offset The offset
-     * @param limit The limit
      * @return The ranking of the users or a [Problem] if the rule does not exist
      */
     @GetMapping(URIs.Users.RANKING_SEARCH)
-    fun searchRanking(
-        @PathVariable ruleId: Int,
-        @RequestParam username: String,
-        @RequestParam offset: Int = 0,
-        @RequestParam limit: Int = 10
-    ): ResponseEntity<*> {
-        val users = service.searchRanking(ruleId, username, offset, limit) ?: return Problem.response(404, Problem.invalidRule)
+    fun searchRanking(@PathVariable ruleId: Int, @RequestParam username: String): ResponseEntity<*> {
+        val users = service.searchRanking(ruleId, username) ?: return Problem.response(404, Problem.invalidRule)
         return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
     }
 
@@ -112,15 +105,9 @@ class UserController(private val service: UserService) {
      * @return The user or a [Problem] if the user does not exist
      */
     @GetMapping(URIs.Users.GET_BY_ID)
-    fun getById(
-        @PathVariable id: Int
-    ): ResponseEntity<*> {
-        val user = service.getUserById(id)
-        return if (user == null) {
-            Problem.response(404, Problem.userNotFound)
-        } else {
-            ResponseEntity.ok(UserByIdOutputModel(user))
-        }
+    fun getById(@PathVariable id: Int): ResponseEntity<*> {
+        val user = service.getUserById(id) ?: return Problem.response(404, Problem.userNotFound)
+        return ResponseEntity.ok(UserByIdOutputModel(user))
     }
 
     /**
@@ -129,10 +116,8 @@ class UserController(private val service: UserService) {
      * @return The created user or if not a [Problem]
      */
     @PostMapping(URIs.Users.CREATE)
-    fun create(
-        @Valid @RequestBody
-        userInput: UserCreateInputModel
-    ): ResponseEntity<*> {
+    fun create(@Valid @RequestBody userInput: UserCreateInputModel): ResponseEntity<*> {
+
         val res = service.createUser(username = userInput.username, password = userInput.password)
         return when (res) {
             is Success -> ResponseEntity.status(201)
@@ -155,10 +140,7 @@ class UserController(private val service: UserService) {
      * @return The created token or if not a [Problem]
      */
     @PostMapping(URIs.Users.TOKEN)
-    fun token(
-        @Valid @RequestBody
-        userInput: UserCreateTokenInputModel
-    ): ResponseEntity<*> {
+    fun token(@Valid @RequestBody userInput: UserCreateTokenInputModel): ResponseEntity<*> {
         val res = service.createToken(username = userInput.username, password = userInput.password)
         return when (res) {
             is Success -> ResponseEntity.status(200)
@@ -175,10 +157,10 @@ class UserController(private val service: UserService) {
      * @param token The token of the user
      */
     @PostMapping(URIs.Users.LOGOUT)
-    fun logout(
-        @RequestHeader("Authorization") token: String
-    ) {
-        service.revokeToken(token) //TODO: TEST IS FAILING BECAUSE THIS IS NOT CORRECTLY REVOKING TOKEN
+    fun logout(@RequestHeader("Authorization") token: String) {
+        //println(token)
+        if (!service.revokeToken(token.split(" ")[1]))
+            Problem.response(500, Problem.tokenNotRevoked)
     }
 
     /**
@@ -186,7 +168,7 @@ class UserController(private val service: UserService) {
      * @param authenticatedUser The authenticated user
      */
     @GetMapping(URIs.Users.HOME)
-    fun home(authenticatedUser: AuthenticatedUser): UserHomeOutputModel {
+    fun home(authenticatedUser: AuthenticatedUser): UserHomeOutputModel { // TODO test is failing here
         return UserHomeOutputModel(
             id = authenticatedUser.user.uuid,
             username = authenticatedUser.user.username

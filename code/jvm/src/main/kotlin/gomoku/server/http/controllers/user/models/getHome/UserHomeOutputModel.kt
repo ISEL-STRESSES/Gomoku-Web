@@ -1,7 +1,7 @@
 package gomoku.server.http.controllers.user.models.getHome
 
 /**
- * Represents a user with its statistics listed by rules
+ * Represents a user output model
  * to be sent from the API
  * @property id unique identifier of the user
  * @property username username of the user

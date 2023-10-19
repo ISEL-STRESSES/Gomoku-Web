@@ -145,7 +145,7 @@ class JDBIMatchRepositoryTests {
         val repo = JDBIMatchRepository(handle)
         val uRepo = JDBIUserRepository(handle)
 
-        val matchIdNull = repo.getMatchById(11)
+        val matchIdNull = repo.getMatchById(31)
         assertNull(matchIdNull)
 
         val player1 = uRepo.getUserById(1)

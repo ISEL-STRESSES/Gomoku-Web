@@ -93,9 +93,10 @@ class UserService(
      * @param limit The limit of the results.
      * @return The list of users.
      */
-    fun getRanking(ruleId: Int, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<ListUserData> =
+    fun getRanking(ruleId: Int, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<ListUserData>? =
         transactionManager.run {
-            it.usersRepository.getRanking(ruleId, offset, limit)
+            val statsFound = it.usersRepository.getRanking(ruleId, offset, limit)
+            statsFound.ifEmpty { null }
         }
 
     /**
@@ -173,12 +174,12 @@ class UserService(
     /**
      * Revokes a token.
      * @param token The token to revoke.
+     * @return True if the token was revoked, false otherwise.
      */
-    fun revokeToken(token: String) {
-        transactionManager.run {
-            val usersRepository = it.usersRepository
-            val tokenValidationInfo = usersDomain.createTokenValidationInfo(token)
-            usersRepository.removeTokenByTokenValidationInfo(tokenValidationInfo)
+    fun revokeToken(token: String) : Boolean {
+        val tokenValidationInfo = usersDomain.createTokenValidationInfo(token)
+        return transactionManager.run {
+            it.usersRepository.removeTokenByTokenValidationInfo(tokenValidationInfo) == 1
         }
     }
 

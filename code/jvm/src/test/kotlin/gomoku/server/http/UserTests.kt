@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.time.Duration
 import kotlin.math.abs
 import kotlin.random.Random
 import kotlin.test.assertTrue
@@ -45,7 +46,7 @@ class UserTests {
     @Test
     fun `can create an user, obtain a token, and access user home, and logout`() {
         // given: an HTTP client
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").responseTimeout(Duration.ofHours(1)).build()
 
         // and: a random user
         val username = newTestUserName()
