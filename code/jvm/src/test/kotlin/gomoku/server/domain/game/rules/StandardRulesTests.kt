@@ -1,104 +1,88 @@
 package gomoku.server.domain.game.rules
 
+import gomoku.server.domain.game.match.Color
+import gomoku.server.domain.game.match.Move
+import gomoku.server.domain.game.match.MoveContainer
+import gomoku.server.domain.game.match.Position
+import gomoku.utils.Failure
+import gomoku.utils.Success
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
 class StandardRulesTests {
-    /*private val rule = StandardRules(BoardSize.X15)
+    private val rule = StandardRules(1, BoardSize.X15)
 
     @Test
     fun `isValidMove checks for unoccupied spots`() {
-        val moves = listOf(Move(Position(7, 7), Color.BLACK))
-        assertTrue(rule.isValidMove(moves, Move(Position(8, 8), Color.WHITE)))
-        assertFalse(rule.isValidMove(moves, Move(Position(7, 7), Color.WHITE)))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(7))
+        val moves = (result as Success).value
+        assertTrue(rule.isValidMove(moves, Move(Position(8), Color.WHITE), Color.WHITE) is Success)
+        assertTrue(rule.isValidMove(moves, Move(Position(7), Color.WHITE), Color.WHITE) is Failure)
     }
 
     @Test
     fun `isValidMove checks for alternating colors`() {
-        val moves = listOf(Move(Position(7, 7), Color.BLACK))
-        assertFalse(rule.isValidMove(moves, Move(Position(8, 8), Color.BLACK)))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(7))
+        val moves = (result as Success).value
+        assertTrue(rule.isValidMove(moves, Move(Position(8), Color.BLACK), Color.WHITE) is Failure)
     }
 
     @Test
     fun `possibleMoves returns unoccupied spots`() {
-        val moves = listOf(Move(Position(7, 7), Color.BLACK))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(7))
+        val moves = (result as Success).value
         val possible = rule.possibleMoves(moves, Color.WHITE)
-        assertTrue(possible.contains(Move(Position(8, 8), Color.WHITE)))
-        assertFalse(possible.contains(Move(Position(7, 7), Color.WHITE)))
+        assertTrue(possible.contains(Move(Position(8), Color.WHITE)))
+        assertFalse(possible.contains(Move(Position(7), Color.WHITE)))
     }
 
     @Test
     fun `isWinningMove detects horizontal win`() {
-        val moves = listOf(
-            Move(Position(8, 7), Color.BLACK),
-            Move(Position(9, 7), Color.BLACK),
-            Move(Position(10, 7), Color.BLACK),
-            Move(Position(11, 7), Color.BLACK)
-        )
-        assertTrue(rule.isWinningMove(moves, Move(Position(12, 7), Color.BLACK)))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8,20,9,30,10,2,11,3))
+        val moves = (result as Success).value
+        assertTrue(rule.isWinningMove(moves, Move(Position(12), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove detects vertical win`() {
-        val moves = listOf(
-            Move(Position(7, 8), Color.BLACK),
-            Move(Position(7, 9), Color.BLACK),
-            Move(Position(7, 10), Color.BLACK),
-            Move(Position(7, 11), Color.BLACK)
-        )
-        assertTrue(rule.isWinningMove(moves, Move(Position(7, 12), Color.BLACK)))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(1,20,16,30,31,2,46,3))
+        val moves = (result as Success).value
+        assertTrue(rule.isWinningMove(moves, Move(Position(61), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove detects diagonal win (top-left to bottom-right)`() {
-        val moves = listOf(
-            Move(Position(8, 8), Color.BLACK),
-            Move(Position(9, 9), Color.BLACK),
-            Move(Position(10, 10), Color.BLACK),
-            Move(Position(11, 11), Color.BLACK)
-        )
-        assertTrue(rule.isWinningMove(moves, Move(Position(12, 12), Color.BLACK)))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(1,20,17,30,33,2,49,3))
+        val moves = (result as Success).value
+        assertTrue(rule.isWinningMove(moves, Move(Position(65), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove detects diagonal win (top-right to bottom-left)`() {
-        val moves = listOf(
-            Move(Position(11, 8), Color.BLACK),
-            Move(Position(10, 9), Color.BLACK),
-            Move(Position(9, 10), Color.BLACK),
-            Move(Position(8, 11), Color.BLACK)
-        )
-        assertTrue(rule.isWinningMove(moves, Move(Position(7, 12), Color.BLACK)))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(26,20,40,30,54,2,68,3))
+        val moves = (result as Success).value
+        assertTrue(rule.isWinningMove(moves, Move(Position(82), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove should detect more then 5 pieces in a row`() {
-        val moves = listOf(
-            Move(Position(7, 7), Color.BLACK),
-            Move(Position(8, 8), Color.BLACK),
-            Move(Position(9, 9), Color.BLACK),
-            Move(Position(10, 10), Color.BLACK),
-            Move(Position(11, 11), Color.BLACK)
-        )
-        assertTrue(rule.isWinningMove(moves, Move(Position(12, 12), Color.BLACK)))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8,20,9,30,10,2,11,3,12,4))
+        val moves = (result as Success).value
+        assertTrue(rule.isWinningMove(moves, Move(Position(13), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove doesn't detect less than 5 pieces in a row`() {
-        val moves = listOf(
-            Move(Position(8, 8), Color.BLACK),
-            Move(Position(9, 9), Color.BLACK),
-            Move(Position(10, 10), Color.BLACK)
-        )
-        assertFalse(rule.isWinningMove(moves, Move(Position(11, 11), Color.BLACK)))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8,20,9,30,10,2))
+        val moves = (result as Success).value
+        assertFalse(rule.isWinningMove(moves, Move(Position(11), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove doesn't detect win with gaps`() {
-        val moves = listOf(
-            Move(Position(7, 7), Color.BLACK),
-            Move(Position(8, 8), Color.BLACK),
-            Move(Position(10, 10), Color.BLACK),
-            Move(Position(11, 11), Color.BLACK),
-            Move(Position(12, 12), Color.BLACK)
-        )
-        assertFalse(rule.isWinningMove(moves, Move(Position(13, 13), Color.BLACK)))
-    }*/
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8,20,9,30,22,2,11,3,12,4))
+        val moves = (result as Success).value
+        assertFalse(rule.isWinningMove(moves, Move(Position(13), Color.BLACK)))
+    }
 }

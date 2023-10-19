@@ -10,12 +10,14 @@ import gomoku.utils.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import kotlin.test.Test
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class GameServiceTests {
 
     @Test
     fun `startMatchmakingProcess should start a new lobby if no existing lobbies with the same ruleId exist`() {
-        val ruleId = 1
+        val ruleId = 2
         val userId = 1 // Some random user
 
         testWithTransactionManagerAndRollback { transactionManager ->
@@ -48,8 +50,8 @@ class GameServiceTests {
     @Test
     fun `startMatchmakingProcess should handle the case where the user is matched into a game`() {
         val ruleId = 1
-        val userId1 = 1
-        val userId2 = 2
+        val userId1 = 3
+        val userId2 = 5
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
@@ -79,8 +81,8 @@ class GameServiceTests {
 
     @Test
     fun `makeMove should fail to make a move for a finished game`() {
-        val gameId = 2
-        val userId = 2
+        val gameId = 7
+        val userId = 7
         val position = 1
 
         testWithTransactionManagerAndRollback { transactionManager ->
@@ -96,16 +98,17 @@ class GameServiceTests {
     @Test
     fun `makeMove should fail if trying to place a move on an already occupied position`() {
         val gameId = 3
-        val userId = 3
+        val userId1 = 3
+        val userId2 = 6
         val position = 2
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
             // Simulate a move on the position
-            gameService.makeMove(gameId, userId, position)
+            gameService.makeMove(gameId, userId1, position)
 
-            val result = gameService.makeMove(gameId, userId, position)
+            val result = gameService.makeMove(gameId, userId2, position)
 
             assertTrue(result is Failure)
             assertEquals(MakeMoveError.AlreadyOccupied, result.failureOrNull())
@@ -133,13 +136,170 @@ class GameServiceTests {
 
     @Test
     fun `makeMove should resolve to a winning move if the move results in a win`() {
-        TODO()
+        val gameId = 10
+        val userId1 = 10
+        val position = 13
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.makeMove(gameId, userId1, position)
+
+            assertTrue(result is Success)
+        }
     }
 
     @Test
     fun `makeMove should set the game state to finished if the move container is full`() {
-        TODO()
+
     }
 
-    // TODO: Test other game service methods
+    @Test
+    fun `leaveLobby should be true if the user was on it`() {
+        val ruleId = 1
+        val userId = 3
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            gameService.startMatchmakingProcess(ruleId, userId)
+
+            val result = gameService.leaveLobby(userId)
+
+            assertTrue(result)
+        }
+    }
+
+    @Test
+    fun `leaveLobby should be false if the user was not on it`() {
+        val userId = 16
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.leaveLobby(userId)
+
+            assertTrue(!result)
+        }
+    }
+
+    @Test
+    fun `getAvailableRules `() {
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getAvailableRules()
+
+            assertTrue(result.isNotEmpty())
+            assertEquals(3, result.size)
+        }
+    }
+
+    @Test
+    fun `getCurrentTurnPlayerId should return the id of the player whose turn it is`() {
+        val gameId = 1
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getCurrentTurnPlayerId(gameId)
+
+            assertEquals(1, result)
+        }
+    }
+
+    @Test
+    fun `getCurrentTurnPlayerId should return null if the game doesn't exist`() {
+        val gameId = 100
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getCurrentTurnPlayerId(gameId)
+
+            assertNull(result)
+        }
+    }
+
+    @Test
+    fun `getCurrentTurnPlayerId should return null if the game is finished`() {
+        val gameId = 7
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getCurrentTurnPlayerId(gameId)
+
+            assertNull(result)
+        }
+    }
+
+    @Test
+    fun `getGame should return a Match if the game exists`() {
+        val gameId = 1
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getGame(gameId)
+
+            assertNotNull(result)
+            assertEquals(result.matchId, gameId)
+            assertEquals(result.playerBlack, 1)
+            assertEquals(result.playerWhite, 2)
+            assertEquals(result.rules.ruleId, 1)
+        }
+    }
+
+    @Test
+    fun `getGame should return null if the game doesn't exist`() {
+        val gameId = 100
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getGame(gameId)
+
+            assertNull(result)
+        }
+    }
+
+    @Test
+    fun `getUserFinishedMatches should return a list of finished matches`() {
+        val userId = 7
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getUserFinishedMatches(0, 10, userId)
+
+            assertTrue(result.isNotEmpty())
+        }
+    }
+
+    @Test
+    fun `getUserFinishedMatches should return an empty list if the user has no finished matches`() {
+        val userId = 2
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getUserFinishedMatches(0, 10, userId)
+
+            assertTrue(result.isEmpty())
+        }
+    }
+
+    @Test
+    fun `getUserFinishedMatches should return an empty list if the user doesn't exist`() {
+        val userId = 100
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getUserFinishedMatches(0, 10, userId)
+
+            assertTrue(result.isEmpty())
+        }
+    }
 }
