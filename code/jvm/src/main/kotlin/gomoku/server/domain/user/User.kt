@@ -1,10 +1,14 @@
 package gomoku.server.domain.user
 
+/**
+ * Represents a user
+ * @property uuid The id of the user
+ * @property username The username of the user
+ * @property passwordValidationInfo The password validation info of the user
+ */
 data class User(
     val uuid: Int,
     val username: String,
-    val playCount: Int = 0,
-    val elo: Int = 0,
     val passwordValidationInfo: PasswordValidationInfo
 ) {
     companion object {

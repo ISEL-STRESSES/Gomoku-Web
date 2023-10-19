@@ -12,9 +12,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
+/**
+ * Exception handler for the application
+ * @see ResponseEntityExceptionHandler
+ */
 @ControllerAdvice
 class ExceptionHandler : ResponseEntityExceptionHandler() {
 
+    /**
+     * Handles [MethodArgumentNotValidException]s
+     * @param ex The exception
+     * @param headers The headers
+     * @param status The status
+     * @param request The request
+     * @return A response entity with a problem
+     */
     override fun handleMethodArgumentNotValid(
         ex: MethodArgumentNotValidException,
         headers: HttpHeaders,
@@ -25,6 +37,14 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         return Problem.response(400, Problem.invalidRequestContent)
     }
 
+    /**
+     * Handles [HttpMessageNotReadableException]s
+     * @param ex The exception
+     * @param headers The headers
+     * @param status The status
+     * @param request The request
+     * @return A response entity with a problem
+     */
     override fun handleHttpMessageNotReadable(
         ex: HttpMessageNotReadableException,
         headers: HttpHeaders,
@@ -35,9 +55,11 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         return Problem.response(400, Problem.invalidRequestContent)
     }
 
-    @ExceptionHandler(
-        Exception::class
-    )
+    /**
+     * Handles [Exception]s
+     * @return A response entity with a problem
+     */
+    @ExceptionHandler(Exception::class)
     fun handleAll(): ResponseEntity<Unit> {
         return ResponseEntity.status(500).build()
     }
