@@ -13,7 +13,7 @@ class Problem(typeUri: URI) {
 
     companion object {
         private const val MEDIA_TYPE = "application/problem+json"
-        private const val PROBLEM_BASE_URL = "https://github.com/isel-leic-daw/2023-daw-leic51d-01/main/docs/problems/"
+        private const val PROBLEM_BASE_URL = "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/"
 
         /**
          * Creates a response entity with the given status and problem

@@ -1,5 +1,9 @@
 package gomoku.server.domain.user
 
+import gomoku.server.domain.user.User.Companion.MAX_NAME_SIZE
+import gomoku.server.domain.user.User.Companion.MAX_PASSWORD_SIZE
+import gomoku.server.domain.user.User.Companion.MIN_NAME_SIZE
+import gomoku.server.domain.user.User.Companion.MIN_PASSWORD_SIZE
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -21,12 +25,8 @@ class UsersDomain(
 ) {
 
     companion object {
-        private const val MIN_NAME_SIZE = 3
-        private const val MAX_NAME_SIZE = 20
-        private const val MIN_PASSWORD_SIZE = 4
-        private const val MAX_PASSWORD_SIZE = 24
 
-        private val usernameRegex = "^[a-zA-Z0-9]{$MIN_NAME_SIZE,$MAX_NAME_SIZE}".toRegex()
+        private val usernameRegex = "^[\\S]{$MIN_NAME_SIZE,$MAX_NAME_SIZE}".toRegex()
         private val passwordRegex =
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\$@\$!%*?&#])[A-Za-z\\d\$@\$!%*?&#]{$MIN_PASSWORD_SIZE,$MAX_PASSWORD_SIZE}\$".toRegex()
     }

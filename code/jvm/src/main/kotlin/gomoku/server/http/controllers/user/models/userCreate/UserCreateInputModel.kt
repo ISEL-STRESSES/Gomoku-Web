@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Size
  * Represents the input model for creating a user
  * sent to the API
  * @property username The username of the user
- * @property email The email of the user
  * @property password The password of the user
  */
 data class UserCreateInputModel(
@@ -21,9 +20,6 @@ data class UserCreateInputModel(
         max = User.MAX_NAME_SIZE
     )
     val username: String,
-
-    @field:Email
-    val email: String,
 
     @SafePassword
     val password: String

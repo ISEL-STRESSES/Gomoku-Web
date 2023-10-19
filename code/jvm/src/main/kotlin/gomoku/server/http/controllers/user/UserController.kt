@@ -178,18 +178,18 @@ class UserController(private val service: UserService) {
     fun logout(
         @RequestHeader("Authorization") token: String
     ) {
-        service.revokeToken(token)
+        service.revokeToken(token) //TODO: TEST IS FAILING BECAUSE THIS IS NOT CORRECTLY REVOKING TOKEN
     }
 
     /**
      * Gets the home of a user
      * @param authenticatedUser The authenticated user
      */
-    @GetMapping(URIs.Users.HUB)
+    @GetMapping(URIs.Users.HOME)
     fun home(authenticatedUser: AuthenticatedUser): UserHomeOutputModel {
         return UserHomeOutputModel(
-            authenticatedUser.user.uuid,
-            authenticatedUser.user.username
+            id = authenticatedUser.user.uuid,
+            username = authenticatedUser.user.username
         )
     }
 }
