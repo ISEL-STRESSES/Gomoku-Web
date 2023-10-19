@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
@@ -31,7 +32,8 @@ import org.springframework.web.bind.annotation.RestController
  * Controller for user-related endpoints
  * @property service The user service
  */
-@RestController(URIs.Users.ROOT)
+@RestController("Users")
+@RequestMapping(URIs.Users.ROOT)
 class UserController(private val service: UserService) {
 
     /**
@@ -183,7 +185,7 @@ class UserController(private val service: UserService) {
      * Gets the home of a user
      * @param authenticatedUser The authenticated user
      */
-    @GetMapping(URIs.Users.HOME)
+    @GetMapping(URIs.Users.HUB)
     fun home(authenticatedUser: AuthenticatedUser): UserHomeOutputModel {
         return UserHomeOutputModel(
             authenticatedUser.user.uuid,
