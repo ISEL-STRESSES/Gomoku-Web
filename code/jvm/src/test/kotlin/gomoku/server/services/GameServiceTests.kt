@@ -255,7 +255,6 @@ class GameServiceTests {
 
     @Test
     fun `getCurrentTurnPlayerId should return null if the game is finished`() {
-        // todo
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
             // before

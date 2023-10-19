@@ -197,18 +197,13 @@ class GameService(private val transactionManager: TransactionManager) {
      * @param matchId id of the match
      * @return the id of the player that has the turn, or null if the match doesn't exist
      */
-    fun getCurrentTurnPlayerId(matchId: Int): Int? {
+    fun getCurrentTurnPlayerId(matchId: Int): Int? { //TODO: ADD RESULT TO DISTINGUISH FROM MATCH NOT FOUND OR NO TURN (GAME IS FINISHED)
         return transactionManager.run {
-            val currentColor = it.matchRepository.getTurn(matchId)
-            val players = it.matchRepository.getMatchPlayers(matchId)
-            if (players != null) {
-                if (currentColor == Color.BLACK) {
-                    players.first
-                } else {
-                    players.second
-                }
-            } else {
-                null
+            val currentColor = it.matchRepository.getTurn(matchId) ?: return@run null
+            val players = it.matchRepository.getMatchPlayers(matchId) ?: return@run null
+            when(currentColor) {
+                Color.BLACK -> players.first
+                Color.WHITE -> players.second
             }
         }
     }
