@@ -10,6 +10,7 @@ import gomoku.server.domain.game.rules.BoardSize
 import gomoku.server.domain.game.rules.OpeningRule
 import gomoku.server.domain.game.rules.RuleVariant
 import gomoku.server.repository.match.JDBIMatchRepository
+import gomoku.server.repository.match.MatchRepository
 import gomoku.server.repository.user.JDBIUserRepository
 import gomoku.server.testWithHandleAndRollback
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -266,9 +267,9 @@ class JDBIMatchRepositoryTests {
     }
 }
 
-fun JDBIMatchRepository.createFinishedMatch(userId: Int, opponentId: Int): Int {
+fun MatchRepository.createFinishedMatch(userId: Int, opponentId: Int): Int {
     // Create an ongoing match first
-    val matchId = this.createMatch(1, userId, opponentId)
+    val matchId = this.createMatch(2, userId, opponentId)
 
     // Set the match to finished
     this.setMatchState(matchId, MatchState.FINISHED)

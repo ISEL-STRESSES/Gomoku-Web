@@ -57,26 +57,26 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-///**
-//* DB related tasks
-//* - To run `psql` inside the container, do
-//*      docker exec -ti db-tests psql -d db -U dbuser -W
-//*   and provide it with the same password as define on `tests/Dockerfile-db-test`
-//*/
-//task<Exec>("dbTestsUp") {
+// /**
+// * DB related tasks
+// * - To run `psql` inside the container, do
+// *      docker exec -ti db-tests psql -d db -U dbuser -W
+// *   and provide it with the same password as define on `tests/Dockerfile-db-test`
+// */
+// task<Exec>("dbTestsUp") {
 //    commandLine("docker-compose", "up", "-d", "--build", "--force-recreate", "db-tests")
-//}
+// }
 //
-//task<Exec>("dbTestsWait") {
+// task<Exec>("dbTestsWait") {
 //    commandLine("docker", "exec", "db-tests", "/app/bin/wait-for-postgres.sh", "localhost")
 //    dependsOn("dbTestsUp")
-//}
+// }
 //
-//task<Exec>("dbTestsDown") {
+// task<Exec>("dbTestsDown") {
 //    commandLine("docker-compose", "down")
-//}
+// }
 //
-//tasks.named("check") {
+// tasks.named("check") {
 //    dependsOn("dbTestsWait")
 //    finalizedBy("dbTestsDown")
-//}
+// }

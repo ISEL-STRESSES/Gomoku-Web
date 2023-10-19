@@ -5,4 +5,4 @@ package gomoku.server.domain.game.exceptions
  * @param msg The exception message
  * @see Exception
  */
-class ImpossiblePositionException(msg :String = "") : Exception(msg)
+class ImpossiblePositionException(msg: String = "") : Exception(msg)

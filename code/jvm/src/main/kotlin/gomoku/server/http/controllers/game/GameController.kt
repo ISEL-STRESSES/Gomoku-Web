@@ -1,6 +1,5 @@
 package gomoku.server.http.controllers.game
 
-import gomoku.server.domain.game.rules.Rules
 import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
 import gomoku.server.http.controllers.media.Problem
@@ -63,8 +62,9 @@ class GameController(private val gameService: GameService) {
     @GetMapping(URIs.Game.GAME_RULES)
     fun rules(): ResponseEntity<*> {
         val rules = gameService.getAvailableRules()
-        if (rules.isEmpty())
+        if (rules.isEmpty()) {
             return Problem.response(404, Problem.noRulesFound)
+        }
 
         return ResponseEntity.ok(rules)
     }

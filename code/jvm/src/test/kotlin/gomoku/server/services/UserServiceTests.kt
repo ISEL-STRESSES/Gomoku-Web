@@ -14,6 +14,7 @@ import gomoku.utils.Failure
 import gomoku.utils.Success
 import org.junit.jupiter.api.Test
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -55,12 +56,14 @@ class UserServiceTests {
 
     @Test
     fun `createUser should fail for invalid username`() {
-        val username = "1"
-        val password = "ByQYP78&j7Aug2"
-        val result = userService.createUser(username, password)
+        testWithTransactionManagerAndRollback {
+            val username = "1"
+            val password = "ByQYP78&j7Aug2"
+            val result = userService.createUser(username, password)
 
-        assertTrue(result is Failure)
-        assertEquals(UserCreationError.InvalidUsername, result.value)
+            assertTrue(result is Failure)
+            assertEquals(UserCreationError.InvalidUsername, result.value)
+        }
     }
 
     @Test
@@ -76,13 +79,15 @@ class UserServiceTests {
 
     @Test
     fun `createUser should fail for existing username`() {
-        val existingUsername = "user1"
-        val password = "ByQYP78&j7Aug2"
+        testWithTransactionManagerAndRollback {
+            val existingUsername = "user1"
+            val password = "ByQYP78&j7Aug2"
 
-        val result = userService.createUser(existingUsername, password)
+            val result = userService.createUser(existingUsername, password)
 
-        assertTrue(result is Failure)
-        assertEquals(UserCreationError.UsernameAlreadyExists, result.value)
+            assertTrue(result is Failure)
+            assertEquals(UserCreationError.UsernameAlreadyExists, result.value)
+        }
     }
 
     @Test
@@ -228,13 +233,20 @@ class UserServiceTests {
 
     @Test
     fun `getUserByToken should return user for valid token`() {
-        val validToken = "9_ASchOpibhyN4eOl4iIFeBfsDi3Z2fgO9J2837J7Hg="
+        testWithTransactionManagerAndRollback {
+            val randomPassword = "ByQYP78&j7Aug2"
+            val testUserUsername = "testUser" + Random.nextBits(10)
+            val testUser = userService.createUser(testUserUsername, randomPassword)
+            require(testUser is Success)
+            val testToken = userService.createToken(testUserUsername, randomPassword)
+            require(testToken is Success)
 
-        val result = userService.getUserByToken(validToken)
+            val result = userService.getUserByToken(testToken.value.tokenValue)
 
-        assertNotNull(result)
-        assertEquals(2, result.uuid)
-        assertEquals("user2", result.username)
+            assertNotNull(result)
+            assertEquals(testUser.value, result.uuid)
+            assertEquals(testUserUsername, result.username)
+        }
     }
 
     @Test
@@ -248,20 +260,19 @@ class UserServiceTests {
 
     @Test
     fun `revokeToken should revoke valid token`() {
-        val validToken = "9_ASchOpibhyN4eOl4iIFeBfsDi3Z2fgO9J2837J7Hg="
+        testWithTransactionManagerAndRollback {
+            val randomPassword = "ByQYP78&j7Aug2"
+            val testUserUsername = "testUser" + Random.nextBits(10)
+            val testUser = userService.createUser(testUserUsername, randomPassword)
+            require(testUser is Success)
+            val testToken = userService.createToken(testUserUsername, randomPassword)
+            require(testToken is Success)
 
-        testWithTransactionManagerAndRollback { transactionManager ->
-            val userService = UserService(
-                transactionManager = transactionManager,
-                usersDomain = usersDomain,
-                clock = clock
-            )
+            userService.revokeToken(testToken.value.tokenValue)
 
-            userService.revokeToken(validToken)
+            val result = userService.getUserByToken(testToken.value.tokenValue)
 
-            val result = userService.getUserByToken(validToken)
-
-            assertNotNull(result)
+            assertNull(result)
         }
     }
 

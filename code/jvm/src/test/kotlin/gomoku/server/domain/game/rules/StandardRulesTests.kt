@@ -39,49 +39,49 @@ class StandardRulesTests {
 
     @Test
     fun `isWinningMove detects horizontal win`() {
-        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8,20,9,30,10,2,11,3))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8, 20, 9, 30, 10, 2, 11, 3))
         val moves = (result as Success).value
         assertTrue(rule.isWinningMove(moves, Move(Position(12), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove detects vertical win`() {
-        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(1,20,16,30,31,2,46,3))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(1, 20, 16, 30, 31, 2, 46, 3))
         val moves = (result as Success).value
         assertTrue(rule.isWinningMove(moves, Move(Position(61), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove detects diagonal win (top-left to bottom-right)`() {
-        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(1,20,17,30,33,2,49,3))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(1, 20, 17, 30, 33, 2, 49, 3))
         val moves = (result as Success).value
         assertTrue(rule.isWinningMove(moves, Move(Position(65), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove detects diagonal win (top-right to bottom-left)`() {
-        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(26,20,40,30,54,2,68,3))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(26, 20, 40, 30, 54, 2, 68, 3))
         val moves = (result as Success).value
         assertTrue(rule.isWinningMove(moves, Move(Position(82), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove should detect more then 5 pieces in a row`() {
-        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8,20,9,30,10,2,11,3,12,4))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8, 20, 9, 30, 10, 2, 11, 3, 12, 4))
         val moves = (result as Success).value
         assertTrue(rule.isWinningMove(moves, Move(Position(13), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove doesn't detect less than 5 pieces in a row`() {
-        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8,20,9,30,10,2))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8, 20, 9, 30, 10, 2))
         val moves = (result as Success).value
         assertFalse(rule.isWinningMove(moves, Move(Position(11), Color.BLACK)))
     }
 
     @Test
     fun `isWinningMove doesn't detect win with gaps`() {
-        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8,20,9,30,22,2,11,3,12,4))
+        val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(8, 20, 9, 30, 22, 2, 11, 3, 12, 4))
         val moves = (result as Success).value
         assertFalse(rule.isWinningMove(moves, Move(Position(13), Color.BLACK)))
     }
