@@ -8,7 +8,6 @@ drop table if exists rules;
 drop table if exists tokens;
 drop table if exists users;
 
-
 -- users table
 create table if not exists users
 (

@@ -48,10 +48,15 @@ DO $$
 
 DO $$
     BEGIN
-        FOR i IN 1..20 LOOP
+        FOR i IN 1..10 LOOP
                 EXECUTE 'UPDATE matches set moves = ''{' || i || ', ' || (i + 1) || '}'' where id =  '|| i||' ';
             END LOOP;
     END $$;
+
+-- Step 3: Make 1 match be 1 move away from being finished
+insert into matches(rules_id, player_black, player_white, match_outcome, match_state) values (1, 1, 2, NULL, 'ONGOING');
+UPDATE matches set moves = '{0, 10, 1, 20, 2, 30, 3, 31}' where id = 11;
+
 
 -- Inserting data into 'lobby' table for tests
 INSERT INTO lobby (user_id, rules_id, created_at) VALUES (1, 1, 18102023);

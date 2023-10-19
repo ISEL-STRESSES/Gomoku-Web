@@ -1,6 +1,7 @@
 package gomoku.server.services
 
 import gomoku.server.TestClock
+import gomoku.server.domain.game.match.FinishedMatch
 import gomoku.server.domain.user.Sha256TokenEncoder
 import gomoku.server.domain.user.UsersDomain
 import gomoku.server.domain.user.UsersDomainConfig
@@ -10,6 +11,7 @@ import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.game.GameService
 import gomoku.server.services.user.UserService
+import gomoku.server.successOrNull
 import gomoku.server.testWithTransactionManagerAndRollback
 import gomoku.utils.Failure
 import gomoku.utils.Success
@@ -183,7 +185,17 @@ class GameServiceTests {
 
     @Test
     fun `makeMove should set the game state to finished if the move container is full`() {
-        // todo
+        val gameId = 11
+        val userId1 = 1
+        val position = 4
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.makeMove(gameId, userId1, position)
+
+            assertTrue(result is Success && result.value is FinishedMatch && (result.value as FinishedMatch).getWinnerIdOrNull() == userId1)
+        }
     }
 
     @Test
