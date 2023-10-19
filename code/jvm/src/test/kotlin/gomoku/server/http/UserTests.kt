@@ -91,7 +91,7 @@ class UserTests {
             .jsonPath("username").isEqualTo(username)
 
         // when: getting the user home with an invalid token
-        // then: the response is a 4001 with the proper problem
+        // then: the response is a 401 with the proper problem
         client.get().uri("/users/me")
             .header("Authorization", "Bearer ${result.token}-invalid")
             .exchange()
@@ -114,9 +114,216 @@ class UserTests {
             .expectHeader().valueEquals("WWW-Authenticate", "bearer")
     }
 
+    @Test
+    fun `get rule ranking for an existing rule`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random rule id
+        val ruleId = 1
+
+        // when: searching for the ranking of a rule
+        // then: the response is a 200
+        client.get().uri("/users/ranking/$ruleId")
+            .exchange()
+            .expectStatus().isOk
+    }
+
+    @Test
+    fun `get rule ranking for a non existing rule`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random rule id
+        val ruleId = 100
+
+        // when: searching for the ranking of a rule
+        // then: the response is a 404
+        client.get().uri("/users/ranking/$ruleId")
+            .exchange()
+            .expectStatus().isNotFound
+    }
+
+    @Test
+    fun `get user stats for an existing user`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random user id
+        val userId = 1
+
+        // when: searching for the stats of a user
+        // then: the response is a 200
+        client.get().uri("/users/stats/$userId")
+            .exchange()
+            .expectStatus().isOk
+    }
+
+    @Test
+    fun `get user stats for a non existing user`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random user id
+        val userId = 100
+
+        // when: searching for the stats of a user
+        // then: the response is a 404
+        client.get().uri("/users/stats/$userId")
+            .exchange()
+            .expectStatus().isNotFound
+    }
+
+    @Test
+    fun `get user rule ranking for an existing user and rule`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random rule id
+        val userId = 1
+        val ruleId = 1
+
+        // when: searching for the ranking of a user and rule
+        // then: the response is a 200
+        client.get().uri("/users/ranking/$userId/$ruleId")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .jsonPath("ruleId").isEqualTo(ruleId)
+            .jsonPath("gamesPlayed").isEqualTo(5)
+            .jsonPath("elo").isEqualTo(1500)
+    }
+
+    @Test
+    fun `get user rule ranking for an existing user but a non existing rule`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random rule id
+        val userId = 1
+        val ruleId = 100
+
+        // when: searching for the ranking of a user and rule
+        // then: the response is a 404
+        client.get().uri("/users/ranking/$userId/$ruleId")
+            .exchange()
+            .expectStatus().isNotFound
+    }
+
+    @Test
+    fun `get user rule ranking for an existing rule but a non existing user`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random rule id
+        val userId = 100
+        val ruleId = 1
+
+        // when: searching for the ranking of a user and rule
+        // then: the response is a 404
+        client.get().uri("/users/ranking/$userId/$ruleId")
+            .exchange()
+            .expectStatus().isNotFound
+    }
+
+    @Test
+    fun `get user rule ranking for a non existing user and rule`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random rule id
+        val userId = 100
+        val ruleId = 1
+
+        // when: searching for the ranking of a user and rule
+        // then: the response is a 404
+        client.get().uri("/users/ranking/$userId/$ruleId")
+            .exchange()
+            .expectStatus().isNotFound
+    }
+
+    @Test
+    fun `get users ranking for an existing user template and rule`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random username template and a rule id
+        val usernameTemplate = "user1"
+        val ruleId = 1
+
+        // when: searching for username template in the ranking of a rule
+        // then: the response is a 200
+        client.get().uri("/users/ranking/$ruleId/search?username=$usernameTemplate")
+            .exchange()
+            .expectStatus().isOk
+    }
+
+    @Test
+    fun `get users ranking for an existing user template and a non existing rule`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random username template and a rule id
+        val usernameTemplate = "user1"
+        val ruleId = 100
+
+        // when: searching for username template in the ranking of a rule
+        // then: the response is 404
+        client.get().uri("/users/ranking/$ruleId/search?username=$usernameTemplate")
+            .exchange()
+            .expectStatus().isNotFound
+    }
+
+    @Test
+    fun `get users ranking for a non existing user template and an existing rule`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random username template and a rule id
+        val usernameTemplate = "abc"
+        val ruleId = 1
+
+        // when: searching for username template in the ranking of a rule
+        // then: the response is 200 but with an empty list
+        client.get().uri("/users/ranking/$ruleId/search?username=$usernameTemplate")
+            .exchange()
+            .expectStatus().isOk
+    }
+
+    @Test
+    fun `get user for an existing user id`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random user id
+        val userId = 1
+
+        // when: searching for a user with that user id
+        // then: the response is 200
+        client.get().uri("/users/$userId")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .jsonPath("uuid").isEqualTo(userId)
+            .jsonPath("username").isEqualTo("user1")
+    }
+
+    @Test
+    fun `get user for a non existing user id`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random user id
+        val userId = 100
+
+        // when: searching for a user with that user id
+        // then: the response is 404
+        client.get().uri("/users/$userId")
+            .exchange()
+            .expectStatus().isNotFound
+    }
+
     companion object {
-
-
         private fun newTestUserName() = "User${abs(Random.nextLong())}"
     }
 }
