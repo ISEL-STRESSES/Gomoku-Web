@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.todo
 import kotlin.time.Duration
 
 class GameServiceTests {
@@ -182,6 +183,7 @@ class GameServiceTests {
 
     @Test
     fun `makeMove should set the game state to finished if the move container is full`() {
+        // todo
     }
 
     @Test
