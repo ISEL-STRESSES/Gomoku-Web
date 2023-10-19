@@ -60,7 +60,8 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
      * @return A response entity with a problem
      */
     @ExceptionHandler(Exception::class)
-    fun handleAll(): ResponseEntity<Unit> {
+    fun handleAll(ex: Exception): ResponseEntity<Unit> {
+        log.error("Exception caught: ", ex)
         return ResponseEntity.status(500).build()
     }
 

@@ -44,12 +44,10 @@ class UserController(private val service: UserService) {
      * @return The ranking of the users
      */
     @GetMapping(URIs.Users.RANKING)
-    fun ranking(
-        @PathVariable ruleId: Int,
-        @RequestParam offset: Int = 0,
-        @RequestParam limit: Int = 10
-    ): ResponseEntity<*> {
-        val users = service.getRanking(ruleId, offset, limit)
+    fun ranking(@PathVariable ruleId: Int, @RequestParam offset: Int?, @RequestParam limit: Int?): ResponseEntity<*> {
+
+        val users = service.getRanking(ruleId) ?: return Problem.response(404, Problem.invalidRule)
+
         return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
     }
 
