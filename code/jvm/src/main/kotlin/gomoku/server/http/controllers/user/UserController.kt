@@ -45,7 +45,6 @@ class UserController(private val service: UserService) {
      */
     @GetMapping(URIs.Users.RANKING)
     fun ranking(@PathVariable ruleId: Int, @RequestParam offset: Int?, @RequestParam limit: Int?): ResponseEntity<*> {
-
         val users = service.getRanking(ruleId) ?: return Problem.response(404, Problem.invalidRule)
 
         return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
@@ -73,10 +72,7 @@ class UserController(private val service: UserService) {
      * @return The ranking of the user or a problem if the user does not exist
      */
     @GetMapping(URIs.Users.USER_RANKING)
-    fun userRanking(
-        @PathVariable userId: Int,
-        @PathVariable ruleId: Int
-    ): ResponseEntity<*> {
+    fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> {
         val userRuleStats = service.getUserRanking(userId, ruleId)
         return if (userRuleStats == null) {
             Problem.response(404, Problem.userNotFound)
@@ -156,9 +152,9 @@ class UserController(private val service: UserService) {
      */
     @PostMapping(URIs.Users.LOGOUT)
     fun logout(@RequestHeader("Authorization") token: String) {
-        //println(token)
-        if (!service.revokeToken(token.split(" ")[1]))
+        if (!service.revokeToken(token.trim().split(" ")[1])) {
             Problem.response(500, Problem.tokenNotRevoked)
+        }
     }
 
     /**
@@ -166,7 +162,7 @@ class UserController(private val service: UserService) {
      * @param authenticatedUser The authenticated user
      */
     @GetMapping(URIs.Users.HOME)
-    fun home(authenticatedUser: AuthenticatedUser): UserHomeOutputModel { // TODO test is failing here
+    fun home(authenticatedUser: AuthenticatedUser): UserHomeOutputModel {
         return UserHomeOutputModel(
             id = authenticatedUser.user.uuid,
             username = authenticatedUser.user.username

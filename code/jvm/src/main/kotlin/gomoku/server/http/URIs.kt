@@ -28,15 +28,15 @@ object URIs {
         const val USER_STATS = "/stats/{userId}"
         const val RANKING_SEARCH = "/ranking/{ruleId}/search"
 
-        fun byID(id: Int) = UriTemplate(ROOT+GET_BY_ID).expand(id)
+        fun byID(id: Int) = UriTemplate(ROOT + GET_BY_ID).expand(id)
         fun home() = URI(HOME)
         fun login() = URI(TOKEN)
         fun register() = URI(CREATE)
         fun logout() = URI(LOGOUT)
-        fun ranking(ruleId: Int) = UriTemplate(ROOT+RANKING).expand(ruleId)
-        fun userRanking(userId: Int, ruleId: Int) = UriTemplate(ROOT+USER_RANKING).expand(userId, ruleId)
-        fun userStats(userId: Int) = UriTemplate(ROOT+USER_STATS).expand(userId)
-        fun rankingSearch(ruleId: Int) = UriTemplate(ROOT+RANKING_SEARCH).expand(ruleId)
+        fun ranking(ruleId: Int) = UriTemplate(ROOT + RANKING).expand(ruleId)
+        fun userRanking(userId: Int, ruleId: Int) = UriTemplate(ROOT + USER_RANKING).expand(userId, ruleId)
+        fun userStats(userId: Int) = UriTemplate(ROOT + USER_STATS).expand(userId)
+        fun rankingSearch(ruleId: Int) = UriTemplate(ROOT + RANKING_SEARCH).expand(ruleId)
     }
 
     /**
@@ -54,10 +54,10 @@ object URIs {
         const val LEAVE_LOBBY = "{lobbyId}/leave"
 
         fun hub() = URI(HUB)
-        fun byId(id: Int) = UriTemplate(ROOT +GET_BY_ID).expand(id)
-        fun joinLobby(rulesId: Int) = UriTemplate(ROOT +MATCH_MAKE).expand(rulesId)
-        fun leaveLobby(lobbyId: Int) = UriTemplate(ROOT +LEAVE_LOBBY).expand(lobbyId)
-        fun leaveGame(gameID: Int) = UriTemplate(ROOT +LEAVE_GAME).expand(gameID)
-        fun play(gameId: Int) = UriTemplate(ROOT +MAKE_PLAY).expand(gameId)
+        fun byId(id: Int) = UriTemplate(ROOT + GET_BY_ID).expand(id)
+        fun joinLobby(rulesId: Int) = UriTemplate(ROOT + MATCH_MAKE).expand(rulesId)
+        fun leaveLobby(lobbyId: Int) = UriTemplate(ROOT + LEAVE_LOBBY).expand(lobbyId)
+        fun leaveGame(gameID: Int) = UriTemplate(ROOT + LEAVE_GAME).expand(gameID)
+        fun play(gameId: Int) = UriTemplate(ROOT + MAKE_PLAY).expand(gameId)
     }
 }

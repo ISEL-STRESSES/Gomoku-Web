@@ -36,7 +36,6 @@ class UserTests {
                 )
             )
             .exchange()
-
             .expectStatus().isCreated
             .expectHeader().value("Location") {
                 assertTrue(it.startsWith("/api/users/"))

@@ -176,7 +176,7 @@ class UserService(
      * @param token The token to revoke.
      * @return True if the token was revoked, false otherwise.
      */
-    fun revokeToken(token: String) : Boolean {
+    fun revokeToken(token: String): Boolean {
         val tokenValidationInfo = usersDomain.createTokenValidationInfo(token)
         return transactionManager.run {
             it.usersRepository.removeTokenByTokenValidationInfo(tokenValidationInfo) == 1

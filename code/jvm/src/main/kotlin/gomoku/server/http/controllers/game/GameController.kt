@@ -26,18 +26,12 @@ class GameController(private val gameService: GameService) {
 
     /**
      * Gets the list of games
-     * @param offset The offset
-     * @param limit The limit
      * @param authenticatedUser The authenticated user
      * @return The list of games
      */
     @GetMapping(URIs.Game.HUB)
-    fun games(
-        @RequestParam offset: Int = 0,
-        @RequestParam limit: Int = 10,
-        @RequestParam authenticatedUser: AuthenticatedUser
-    ): ResponseEntity<*> {
-        val matches = gameService.getUserFinishedMatches(offset, limit, authenticatedUser.user.uuid)
+    fun games(@RequestParam authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val matches = gameService.getUserFinishedMatches(userId = authenticatedUser.user.uuid)
         return ResponseEntity.ok(matches)
     }
 

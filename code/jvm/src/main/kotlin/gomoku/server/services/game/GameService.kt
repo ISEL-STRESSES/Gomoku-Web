@@ -197,11 +197,11 @@ class GameService(private val transactionManager: TransactionManager) {
      * @param matchId id of the match
      * @return the id of the player that has the turn, or null if the match doesn't exist
      */
-    fun getCurrentTurnPlayerId(matchId: Int): Int? { //TODO: ADD RESULT TO DISTINGUISH FROM MATCH NOT FOUND OR NO TURN (GAME IS FINISHED)
+    fun getCurrentTurnPlayerId(matchId: Int): Int? { // TODO: ADD RESULT TO DISTINGUISH FROM MATCH NOT FOUND OR NO TURN (GAME IS FINISHED)
         return transactionManager.run {
             val currentColor = it.matchRepository.getTurn(matchId) ?: return@run null
             val players = it.matchRepository.getMatchPlayers(matchId) ?: return@run null
-            when(currentColor) {
+            when (currentColor) {
                 Color.BLACK -> players.first
                 Color.WHITE -> players.second
             }
@@ -215,7 +215,7 @@ class GameService(private val transactionManager: TransactionManager) {
      * @param userId the id of the user to get the matches from
      * @return the list of [FinishedMatch]
      */
-    fun getUserFinishedMatches(offset: Int, limit: Int, userId: Int): List<FinishedMatch> =
+    fun getUserFinishedMatches(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT, userId: Int): List<FinishedMatch> =
         transactionManager.run {
             it.matchRepository.getUserFinishedMatches(offset, limit, userId)
         }
@@ -229,4 +229,9 @@ class GameService(private val transactionManager: TransactionManager) {
         transactionManager.run {
             it.matchRepository.getMatchById(gameId)
         }
+
+    companion object {
+        private const val DEFAULT_OFFSET = 0
+        private const val DEFAULT_LIMIT = 10
+    }
 }
