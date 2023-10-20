@@ -2,6 +2,7 @@ package gomoku.server.repository.jdbi.mappers
 
 import gomoku.server.domain.game.match.AddMoveError
 import gomoku.server.domain.game.match.FinishedMatch
+import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MoveContainer
 import gomoku.server.domain.game.match.MoveContainer.Companion.buildMoveContainer
 import gomoku.server.domain.game.match.OngoingMatch
@@ -36,7 +37,7 @@ fun getMoveContainerFromRS(rs: ResultSet): MoveContainer {
  * @return The [FinishedMatch] from the result set
  */
 fun getFinishedMatchFromRS(rs: ResultSet, moveContainer: MoveContainer): FinishedMatch = FinishedMatch(
-    matchId = rs.getInt("match_id"),
+    id = rs.getInt("id"),
     playerBlack = rs.getInt("player_black"),
     playerWhite = rs.getInt("player_white"),
     rules = buildRule(
@@ -46,7 +47,7 @@ fun getFinishedMatchFromRS(rs: ResultSet, moveContainer: MoveContainer): Finishe
         openingRuleName = rs.getString("opening_rule")
     ),
     moves = moveContainer,
-    matchOutcome = rs.getString("match_outcome").toMatchOutcome()
+    matchOutcome = MatchOutcome.valueOf(rs.getString("match_outcome"))
 )
 
 /**
@@ -56,7 +57,7 @@ fun getFinishedMatchFromRS(rs: ResultSet, moveContainer: MoveContainer): Finishe
  * @return The [OngoingMatch] from the result set
  */
 fun getOngoingMatchFromRS(rs: ResultSet, moveContainer: MoveContainer): OngoingMatch = OngoingMatch(
-    matchId = rs.getInt("match_id"),
+    id = rs.getInt("id"),
     playerBlack = rs.getInt("player_black"),
     playerWhite = rs.getInt("player_white"),
     rules = buildRule(

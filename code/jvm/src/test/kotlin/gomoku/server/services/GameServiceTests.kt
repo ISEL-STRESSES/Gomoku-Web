@@ -11,6 +11,7 @@ import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.game.GameService
 import gomoku.server.services.user.UserService
+import gomoku.server.successOrNull
 import gomoku.server.testWithTransactionManagerAndRollback
 import gomoku.utils.Failure
 import gomoku.utils.Success
@@ -191,8 +192,13 @@ class GameServiceTests {
             val gameService = GameService(transactionManager)
 
             val result = gameService.makeMove(gameId, userId1, position)
+            assertTrue(result is Success)
+            require(result is Success)
+            assertTrue(result.value is FinishedMatch)
+            require(result.value is FinishedMatch)
+            assertTrue(result.value.moveContainer.isFull())
+            assertTrue((result.value as FinishedMatch).getWinnerIdOrNull() == userId1)
 
-            assertTrue(result is Success && result.value is FinishedMatch && (result.value as FinishedMatch).getWinnerIdOrNull() == userId1)
         }
     }
 
@@ -291,7 +297,7 @@ class GameServiceTests {
             val result = gameService.getGame(gameId)
 
             assertNotNull(result)
-            assertEquals(result.matchId, gameId)
+            assertEquals(result.id, gameId)
             assertEquals(result.playerBlack, 1)
             assertEquals(result.playerWhite, 2)
             assertEquals(result.rules.ruleId, 1)

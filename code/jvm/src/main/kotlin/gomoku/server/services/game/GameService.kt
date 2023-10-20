@@ -11,7 +11,7 @@ import gomoku.server.domain.game.match.OngoingMatch
 import gomoku.server.domain.game.match.Position
 import gomoku.server.domain.game.match.toMatchOutcome
 import gomoku.server.domain.game.rules.MoveError
-import gomoku.server.domain.game.rules.RulesRepresentation
+import gomoku.server.domain.game.rules.Rules
 import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.updateElo
 import gomoku.server.repository.Transaction
@@ -104,28 +104,28 @@ class GameService(private val transactionManager: TransactionManager) {
      */
     private fun resolveValidMove(match: OngoingMatch, move: Move, tr: Transaction): MakeMoveResult {
         if (match.rules.isWinningMove(match.moveContainer, move)) {
-            if (!tr.matchRepository.addToMoveArray(match.matchId, move.position.value)) {
+            if (!tr.matchRepository.addToMoveArray(match.id, move.position.value)) {
                 return failure(MakeMoveError.MakeMoveFailed)
             }
-            tr.matchRepository.setMatchState(match.matchId, MatchState.FINISHED)
-            tr.matchRepository.setMatchOutcome(match.matchId, move.color.toMatchOutcome())
+            tr.matchRepository.setMatchState(match.id, MatchState.FINISHED)
+            tr.matchRepository.setMatchOutcome(match.id, move.color.toMatchOutcome())
 
             val winnerId = if (move.color == Color.BLACK) match.playerBlack else match.playerWhite
             val loserId = if (move.color == Color.BLACK) match.playerWhite else match.playerBlack
 
             updatePlayerStats(winnerId, loserId, match.rules.ruleId, tr, RankingUserData.WIN)
         } else {
-            if (!tr.matchRepository.addToMoveArray(match.matchId, move.position.value)) {
+            if (!tr.matchRepository.addToMoveArray(match.id, move.position.value)) {
                 return failure(MakeMoveError.MakeMoveFailed)
             }
             if (match.moveContainer.isFull()) {
-                tr.matchRepository.setMatchState(match.matchId, MatchState.FINISHED)
-                tr.matchRepository.setMatchOutcome(match.matchId, MatchOutcome.DRAW)
+                tr.matchRepository.setMatchState(match.id, MatchState.FINISHED)
+                tr.matchRepository.setMatchOutcome(match.id, MatchOutcome.DRAW)
 
                 updatePlayerStats(match.playerBlack, match.playerWhite, match.rules.ruleId, tr, RankingUserData.DRAW)
             }
         }
-        val newGame = tr.matchRepository.getMatchById(match.matchId)
+        val newGame = tr.matchRepository.getMatchById(match.id)
             ?: return failure(MakeMoveError.GameNotFound)
         return success(newGame)
     }
@@ -188,7 +188,7 @@ class GameService(private val transactionManager: TransactionManager) {
      * This function doesn't use limit and offset because there are only a limited number of rules that can be delivered at once.
      * @return a list of the available rules
      */
-    fun getAvailableRules(): List<RulesRepresentation> =
+    fun getAvailableRules(): List<Rules> =
         transactionManager.run {
             it.matchRepository.getAllRules()
         }

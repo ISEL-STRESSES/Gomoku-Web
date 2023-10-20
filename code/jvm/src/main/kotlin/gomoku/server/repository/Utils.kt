@@ -1,12 +1,15 @@
 package gomoku.server.repository
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import gomoku.server.domain.game.match.MoveContainer
+import gomoku.server.domain.game.match.MoveContainerMixin
 import gomoku.server.repository.jdbi.mappers.FinishedMatchRowMapper
 import gomoku.server.repository.jdbi.mappers.InstantMapper
 import gomoku.server.repository.jdbi.mappers.LobbyRowMapper
 import gomoku.server.repository.jdbi.mappers.MatchRowMapper
 import gomoku.server.repository.jdbi.mappers.MatchRuleRowMapper
 import gomoku.server.repository.jdbi.mappers.OngoingMatchRowMapper
-import gomoku.server.repository.jdbi.mappers.RulesRepresentationRowMapper
+import gomoku.server.repository.jdbi.mappers.RulesRowMapper
 import gomoku.server.repository.jdbi.mappers.user.PasswordValidationInfoMapper
 import gomoku.server.repository.jdbi.mappers.user.RankingUserDataRowMapper
 import gomoku.server.repository.jdbi.mappers.user.TokenValidationInfoMapper
@@ -36,9 +39,12 @@ fun Jdbi.configureWithAppRequirements(): Jdbi {
     registerRowMapper(MatchRowMapper())
     registerRowMapper(FinishedMatchRowMapper())
     registerRowMapper(OngoingMatchRowMapper())
-    registerRowMapper(RulesRepresentationRowMapper())
+    registerRowMapper(RulesRowMapper())
     registerRowMapper(RankingUserDataRowMapper())
     registerRowMapper(OngoingMatchRowMapper())
 
+    ObjectMapper().apply {
+        addMixIn(MoveContainer::class.java, MoveContainerMixin::class.java)
+    }
     return this
 }

@@ -11,6 +11,7 @@ import gomoku.server.http.controllers.user.models.getUsersData.GetUsersDataOutpu
 import gomoku.server.http.controllers.user.models.userCreate.UserCreateInputModel
 import gomoku.server.http.controllers.user.models.userTokenCreate.UserCreateTokenInputModel
 import gomoku.server.http.controllers.user.models.userTokenCreate.UserTokenCreateOutputModel
+import gomoku.server.repository.user.UserRankingError
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
 import gomoku.server.services.user.UserService
@@ -58,12 +59,18 @@ class UserController(private val service: UserService) {
     @GetMapping(URIs.Users.USER_RANKING)
     fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> { // TODO: TEST THIS FUNCTION
         val userRuleStats = service.getUserRanking(userId, ruleId)
-        return if (userRuleStats == null) {
-            Problem.response(404, Problem.userNotFound)
-        } else {
-            ResponseEntity.ok(UserRuleStatsOutputModel(userRuleStats))
+        return when(userRuleStats){
+            is Success -> ResponseEntity.ok(UserRuleStatsOutputModel(userRuleStats.value))
+            is Failure -> userRuleStats.value.resolveProblem()
         }
     }
+
+    private fun UserRankingServiceError.resolveProblem(): ResponseEntity<*> =
+        when(this){
+            UserRankingServiceError.UserNotFound -> Problem.response(404, Problem.userNotFound)
+            UserRankingServiceError.RuleNotFound -> Problem.response(404, Problem.invalidRule)
+            UserRankingServiceError.UserStatsNotFound -> Problem.response(404, Problem.invalidRule) //TODO: MAKE THIS PROPER PROBLEM
+        }
 
     /**
      * Gets the ranking of the users for a given rule
@@ -155,4 +162,5 @@ class UserController(private val service: UserService) {
             username = authenticatedUser.user.username
         )
     }
+
 }

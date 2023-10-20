@@ -239,9 +239,9 @@ class JDBIMatchRepositoryTests {
 
         val matches = repo.getUserFinishedMatches(0, 10, userId)
 
-        assertTrue(matches.any { it.matchId == finishedMatchId1 })
-        assertTrue(matches.any { it.matchId == finishedMatchId2 })
-        assertFalse(matches.any { it.matchId == ongoingMatchId })
+        assertTrue(matches.any { it.id == finishedMatchId1 })
+        assertTrue(matches.any { it.id == finishedMatchId2 })
+        assertFalse(matches.any { it.id == ongoingMatchId })
     }
 
     @Test
@@ -263,8 +263,8 @@ class JDBIMatchRepositoryTests {
 
         assertEquals(2, matchesPage1.size)
         assertEquals(2, matchesPage2.size)
-        assertTrue(matchesPage1[0].matchId != matchesPage2[0].matchId)
-        assertTrue(matchesPage1[1].matchId != matchesPage2[1].matchId)
+        assertTrue(matchesPage1[0].id != matchesPage2[0].id)
+        assertTrue(matchesPage1[1].id != matchesPage2[1].id)
     }
 }
 

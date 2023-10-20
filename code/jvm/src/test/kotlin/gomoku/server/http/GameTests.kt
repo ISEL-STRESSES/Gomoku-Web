@@ -4,7 +4,7 @@ import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.match.FinishedMatch
 import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.OngoingMatch
-import gomoku.server.domain.game.rules.RulesRepresentation
+import gomoku.server.domain.game.rules.Rules
 import gomoku.server.http.model.TokenResponse
 import gomoku.server.services.errors.game.MakeMoveError
 import org.springframework.boot.test.context.SpringBootTest
@@ -86,15 +86,15 @@ class GameTests {
         // given: an HTTP client
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
 
-        assertTrue(
-            client.get().uri("/game/rules")
-                .exchange()
-                .expectStatus().isOk
-                .expectBody<List<RulesRepresentation>>()
-                .returnResult()
-                .responseBody!!
-                .isNotEmpty()
-        )
+        val rules = client.get().uri("/game/rules")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<List<Rules>>()
+            .returnResult()
+            .responseBody!!
+
+        assertTrue(rules.isNotEmpty())
+        rules.forEach(::println)
     }
 
     @Test

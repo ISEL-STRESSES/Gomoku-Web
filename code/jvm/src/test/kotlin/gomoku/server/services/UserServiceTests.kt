@@ -1,6 +1,7 @@
 package gomoku.server.services
 
 import gomoku.server.TestClock
+import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.Sha256TokenEncoder
 import gomoku.server.domain.user.UsersDomain
 import gomoku.server.domain.user.UsersDomainConfig
@@ -8,6 +9,7 @@ import gomoku.server.jbdiTest
 import gomoku.server.repository.jdbi.JDBITransactionManager
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
+import gomoku.server.services.errors.user.UserRankingServiceError
 import gomoku.server.services.user.UserService
 import gomoku.server.testWithTransactionManagerAndRollback
 import gomoku.utils.Failure
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.random.Random
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -172,9 +175,9 @@ class UserServiceTests {
 
         val result = userService.getUserRanking(userId, ruleId)
 
-        assertNotNull(result)
-        assertEquals(1500, result.elo)
-        assertEquals(5, result.gamesPlayed)
+        assertIs<Success<RankingUserData>>(result)
+        assertEquals(1500, result.value.elo)
+        assertEquals(5, result.value.gamesPlayed)
     }
 
     @Test
@@ -184,7 +187,7 @@ class UserServiceTests {
 
         val result = userService.getUserRanking(invalidUserId, invalidRuleId)
 
-        assertNull(result)
+        assertIs<Failure<UserRankingServiceError>>(result)
     }
 
     @Test

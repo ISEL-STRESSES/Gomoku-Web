@@ -1,17 +1,28 @@
 package gomoku.server.domain.game.match
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import gomoku.server.domain.game.rules.Rules
 
 /**
  * Represents a game.
- * @property matchId The id of the match
+ * @property id The id of the match
  * @property playerBlack The id of the player playing with black stones
  * @property playerWhite The id of the player playing with white stones
  * @property rules The rules of the game
  * @property moveContainer The container of the moves
  */
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type"
+)
+@JsonSubTypes(
+    JsonSubTypes.Type(value = OngoingMatch::class, name = "OngoingMatch"),
+    JsonSubTypes.Type(value = FinishedMatch::class, name = "FinishedMatch")
+)
 sealed class Match(
-    val matchId: Int,
+    val id: Int,
     val playerBlack: Int,
     val playerWhite: Int,
     val rules: Rules,
@@ -23,12 +34,14 @@ sealed class Match(
  * @property turn The color of the player that has to play
  */
 class OngoingMatch(
-    matchId: Int,
+    id: Int,
     playerBlack: Int,
     playerWhite: Int,
     rules: Rules,
     moves: MoveContainer
-) : Match(matchId, playerBlack, playerWhite, rules, moves) {
+) : Match(id, playerBlack, playerWhite, rules, moves) {
+
+    val type = "OngoingMatch"
 
     val turn = (moves.getMoves().size).toColor()
 }
@@ -38,13 +51,15 @@ class OngoingMatch(
  * @property matchOutcome The outcome of the match
  */
 class FinishedMatch(
-    matchId: Int,
+    id: Int,
     playerBlack: Int,
     playerWhite: Int,
     rules: Rules,
     moves: MoveContainer,
     private val matchOutcome: MatchOutcome
-) : Match(matchId, playerBlack, playerWhite, rules, moves) {
+) : Match(id, playerBlack, playerWhite, rules, moves) {
+
+    val type = "FinishedMatch"
 
     /**
      * Gets the winner id or null if the match ended in a draw.
