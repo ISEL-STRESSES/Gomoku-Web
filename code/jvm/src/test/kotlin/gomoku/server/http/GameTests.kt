@@ -29,10 +29,10 @@ class GameTests {
     @Test
     fun `get finished matches`() {
         // given: an HTTP client
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").responseTimeout(Duration.ofHours(1)).build()
 
-        // and a authenticated user
-        val username = "userTest1"
+        // and an authenticated user
+        val username = newTestUserName()
         val password = "ByQYP78&j7Aug2" // Random password that uses a caps, a number and a special character
         client.post().uri("/users/create")
             .bodyValue(
@@ -47,14 +47,29 @@ class GameTests {
                 it.substringAfterLast("/").toInt()
             }
 
-
-        client.get().uri("/games/","username=$username&password=$password")
+        // and a token
+        val userToken = client.post().uri("/users/token")
+            .bodyValue(
+                mapOf(
+                    "username" to username,
+                    "password" to password
+                )
+            )
             .exchange()
             .expectStatus().isOk
-            .expectBody()
-            .jsonPath("$.matches").isArray
-            .jsonPath("$.matches.length()").isEqualTo(0)
-        TODO()
+            .expectBody(TokenResponse::class.java)
+            .returnResult()
+            .responseBody!!
+
+        // assert that a user doesn't have any finished matches
+        assertTrue( client.get().uri("/game/").header("Authorization", "Bearer ${userToken.token}")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<List<Match>>()
+            .returnResult()
+            .responseBody!!
+            .isEmpty()
+        )
     }
 
     @Test
@@ -70,7 +85,15 @@ class GameTests {
         // given: an HTTP client
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
 
-        TODO()
+        assertTrue(
+            client.get().uri("/game/rules")
+                .exchange()
+                .expectStatus().isOk
+                .expectBody<List<Rules>>()
+                .returnResult()
+                .responseBody!!
+                .isNotEmpty()
+        )
     }
 
     @Test
@@ -125,24 +148,48 @@ class GameTests {
     fun `start matchmaking process`() {
         // given: an HTTP client
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-
-        TODO()
+        val ruleId = 2
+        val username = newTestUserName()
+        val password = "ByQYP78&j7Aug2" // Random password that uses a caps, a number and a special character
+        startMatchmakingProcess(client, username, password, ruleId)
     }
 
     @Test
-    fun `start matchmaking process when already in matchmaking process`() {
+    fun `start matchmaking process when already in matchmaking process`() { //TODO Este teste é ótimo, qualquer comportamento não determinístico é impressão do programador.
         // given: an HTTP client
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-
-        TODO()
+        val ruleId = 2
+        val username = newTestUserName()
+        val password = "ByQYP78&j7Aug2"
+        val (_, token) = startMatchmakingProcess(client, username, password, ruleId)
+        client.post().uri("/game/$ruleId")
+            .header("Authorization", "Bearer $token")
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody(Matchmaker::class.java)
+            .returnResult()
+            .responseBody!!
     }
 
     @Test
     fun `leave matchmaking process`() {
         // given: an HTTP client
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+        val username = newTestUserName()
+        val password = "ByQYP78&j7Aug2"
+        val ruleId = 2
 
-        TODO()
+        val (lobbyId, token) = startMatchmakingProcess(client, username, password, ruleId)
+
+        assertTrue(
+            client.post().uri("/game/${lobbyId}/leave")
+            .header("Authorization", "Bearer $token")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Boolean>()
+            .returnResult()
+            .responseBody!!
+        )
     }
 
     @Test
@@ -200,7 +247,7 @@ class GameTests {
         val tokenUser2 = client.post().uri("/users/token")
             .bodyValue(
                 mapOf(
-                    "username" to username1,
+                    "username" to username2,
                     "password" to password
                 )
             )
@@ -279,6 +326,52 @@ class GameTests {
 
         assertEquals(finished.playerBlack, finished.getWinnerIdOrNull())
 
+    }
+
+    private fun startMatchmakingProcess(client : WebTestClient, username: String, password: String, ruleId : Int) : Pair<Int, String> {
+        client.post().uri("/users/create")
+            .bodyValue(
+                mapOf(
+                    "username" to username,
+                    "password" to password
+                )
+            )
+            .exchange()
+            .expectStatus().isCreated
+
+        val tokenUser = client.post().uri("/users/token")
+            .bodyValue(
+                mapOf(
+                    "username" to username,
+                    "password" to password
+                )
+            )
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(TokenResponse::class.java)
+            .returnResult()
+            .responseBody!!
+
+        val lobby = client.post().uri("/game/$ruleId")
+            .header("Authorization", "Bearer ${tokenUser.token}")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(Matchmaker::class.java)
+            .returnResult()
+            .responseBody!!
+
+        assertFalse(lobby.isMatch)
+
+        return lobby.id to tokenUser.token
+    }
+
+    private fun <T: Any>makeMove(client : WebTestClient, gameId: Int, pos: Int, token: String, expectedType: Class<T>) : T{
+        return client.post().uri("/game/$gameId/play?pos=$pos")
+            .header("Authorization", "Bearer $token")
+            .exchange()
+            .expectBody(expectedType)
+            .returnResult()
+            .responseBody!!
     }
 
     companion object {

@@ -55,10 +55,10 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     override fun getLobbyByUserId(userId: Int): Lobby? =
         handle.createQuery(
             """
-            SELECT rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id            
+            SELECT lobby.id ,rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id            
             FROM lobby join rules 
             on rules.id = lobby.rules_id
-            where lobby.user_id= :userId
+            where lobby.user_id = :userId
             """.trimIndent()
         )
             .bind("userId", userId)

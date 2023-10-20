@@ -28,7 +28,6 @@ class RequestTokenProcessor(val userService: UserService) {
             return null
         }
         return userService.getUserByToken(parts[1])?.let {
-            println(parts[1])
             AuthenticatedUser(it, parts[1])
         }
     }

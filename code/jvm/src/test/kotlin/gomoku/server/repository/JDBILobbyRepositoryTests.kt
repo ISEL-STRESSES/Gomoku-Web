@@ -1,9 +1,12 @@
 package gomoku.server.repository
 
+import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.repository.lobby.JDBILobbyRepository
+import gomoku.server.repository.user.JDBIUserRepository
 import gomoku.server.testWithHandleAndRollback
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -49,8 +52,9 @@ class JDBILobbyRepositoryTests {
 
     @Test
     fun `getLobbies should return list of lobbies`() = testWithHandleAndRollback { handle ->
-        val repo = JDBILobbyRepository(handle)
-        val lobbies = repo.getLobbies()
+        val lobbyRepo = JDBILobbyRepository(handle)
+        val userRepo = JDBIUserRepository(handle)
+
 
         val user1Username = "User" + Random.nextLong()
         val user1Password = "!Kz9iYG$%2TcB7f"
@@ -78,7 +82,7 @@ class JDBILobbyRepositoryTests {
 
         val lobby1 = lobbies2[0]
         assertEquals(1, lobby1.rule.ruleId)
-        assertEquals(1, lobby1.userId)
+        assertEquals(newUser1, lobby1.userId)
 
         val lobby2 = lobbies2[1]
         assertEquals(2, lobby2.rule.ruleId)
@@ -87,13 +91,18 @@ class JDBILobbyRepositoryTests {
 
     @Test
     fun `getLobbyByUserId should return correct lobby`() = testWithHandleAndRollback { handle ->
-        val repo = JDBILobbyRepository(handle)
-        val userId = 1
-
-        val lobby = repo.getLobbyByUserId(userId)
+        val lobbyRepo = JDBILobbyRepository(handle)
+        val userRepo = JDBIUserRepository(handle)
+        val newUsername = "User" + Random.nextLong()
+        val newPassword = "!Kz9iYG$%2TcB7f"
+        val newUser = userRepo.storeUser(newUsername, PasswordValidationInfo(newPassword))
+        val lobbyId = lobbyRepo.createLobby(1, newUser)
+        val lobby = lobbyRepo.getLobbyByUserId(newUser)
 
         assertNotNull(lobby)
-        assertEquals(userId, lobby.userId)
+        assertEquals(newUser, lobby.userId)
+        assertEquals(1, lobby.rule.ruleId)
+        assertEquals(lobbyId, lobby.id)
     }
 
     @Test
@@ -167,8 +176,7 @@ class JDBILobbyRepositoryTests {
         assertTrue(repo.getLobbies().isNotEmpty())
         val result = repo.leaveLobby(newUser)
         assertTrue(result)
-
-        val lobby = repo.getLobbyByUserId(userId)
+        val lobby = repo.getLobbyByUserId(newUser)
         assertNull(lobby)
         assertTrue(repo.getLobbies().isEmpty())
     }

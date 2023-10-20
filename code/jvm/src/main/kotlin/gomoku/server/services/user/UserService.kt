@@ -117,7 +117,7 @@ class UserService(
     fun searchRanking(ruleId: Int, username: String?, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<RankingUserData>? =
         transactionManager.run {
             val availableRules = it.matchRepository.getAllRules()
-
+            println(availableRules)
             if (availableRules.any { rule -> rule.ruleId == ruleId }) {
                     return@run it.usersRepository.searchRanking(ruleId,username ?: "",  offset, limit)
             } else {

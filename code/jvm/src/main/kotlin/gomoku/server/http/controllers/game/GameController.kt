@@ -30,7 +30,7 @@ class GameController(private val gameService: GameService) {
      * @return The list of games
      */
     @GetMapping(URIs.Game.HUB)
-    fun games(@RequestParam authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+    fun games(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val matches = gameService.getUserFinishedMatches(userId = authenticatedUser.user.uuid)
         return ResponseEntity.ok(matches)
     }
@@ -42,7 +42,7 @@ class GameController(private val gameService: GameService) {
      * @return The details of the game
      */
     @GetMapping(URIs.Game.GET_BY_ID)
-    fun gameDetails(@PathVariable id: Int, @RequestParam authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+    fun gameDetails(@PathVariable id: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val game = gameService.getGame(id)
         return if (game != null) {
             ResponseEntity.ok(game)
@@ -104,7 +104,7 @@ class GameController(private val gameService: GameService) {
      * @return The result of leaving the lobby
      */
     @PostMapping(URIs.Game.LEAVE_LOBBY)
-    fun leaveLobby(@PathVariable lobbyId: Int, @RequestParam authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+    fun leaveLobby(@PathVariable lobbyId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val leftLobby = gameService.leaveLobby(authenticatedUser.user.uuid)
         return if (!leftLobby) {
             Problem.response(404, Problem.lobbyNotFound)
