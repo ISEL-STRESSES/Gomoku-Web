@@ -14,6 +14,7 @@ import gomoku.server.http.controllers.user.models.userTokenCreate.UserTokenCreat
 import gomoku.server.repository.user.UserRankingError
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
+import gomoku.server.services.errors.user.UserRankingServiceError
 import gomoku.server.services.user.UserService
 import gomoku.utils.Failure
 import gomoku.utils.Success

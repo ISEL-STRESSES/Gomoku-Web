@@ -153,7 +153,4 @@ class GameController(private val gameService: GameService) {
             MatchmakingError.SamePlayer -> Problem.response(400, Problem.samePlayer)
             MatchmakingError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
         }
-
-    // TODO: MAKE THE OTHER RESOLVE PROBLEM FUNCTIONS
-    // TODO: Make all user functions return a Result and resolve error on controller layer?????
 }
