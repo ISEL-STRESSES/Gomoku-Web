@@ -19,6 +19,7 @@ sealed class MoveError {
     object ImpossiblePosition : MoveError()
     object AlreadyOccupied : MoveError()
     object InvalidTurn : MoveError()
+    object InvalidMove : MoveError()
 }
 
 /**
