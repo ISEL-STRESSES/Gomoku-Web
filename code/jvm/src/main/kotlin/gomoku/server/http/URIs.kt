@@ -26,7 +26,6 @@ object URIs {
         const val RANKING = "/ranking/{ruleId}"
         const val USER_RANKING = "/ranking/{userId}/{ruleId}"
         const val USER_STATS = "/stats/{userId}"
-        const val RANKING_SEARCH = "/ranking/{ruleId}/search"
 
         fun byID(id: Int) = UriTemplate(ROOT + GET_BY_ID).expand(id)
         fun home() = URI(HOME)
@@ -36,7 +35,6 @@ object URIs {
         fun ranking(ruleId: Int) = UriTemplate(ROOT + RANKING).expand(ruleId)
         fun userRanking(userId: Int, ruleId: Int) = UriTemplate(ROOT + USER_RANKING).expand(userId, ruleId)
         fun userStats(userId: Int) = UriTemplate(ROOT + USER_STATS).expand(userId)
-        fun rankingSearch(ruleId: Int) = UriTemplate(ROOT + RANKING_SEARCH).expand(ruleId)
     }
 
     /**
@@ -57,7 +55,7 @@ object URIs {
         fun byId(id: Int) = UriTemplate(ROOT + GET_BY_ID).expand(id)
         fun joinLobby(rulesId: Int) = UriTemplate(ROOT + MATCH_MAKE).expand(rulesId)
         fun leaveLobby(lobbyId: Int) = UriTemplate(ROOT + LEAVE_LOBBY).expand(lobbyId)
-        fun leaveGame(gameID: Int) = UriTemplate(ROOT + LEAVE_GAME).expand(gameID)
+        fun forfeitGame(gameID: Int) = UriTemplate(ROOT + FORFEIT_GAME).expand(gameID)
         fun play(gameId: Int) = UriTemplate(ROOT + MAKE_PLAY).expand(gameId)
     }
 }

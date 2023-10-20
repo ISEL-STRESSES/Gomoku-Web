@@ -5,8 +5,9 @@ import gomoku.server.repository.jdbi.mappers.InstantMapper
 import gomoku.server.repository.jdbi.mappers.LobbyRowMapper
 import gomoku.server.repository.jdbi.mappers.MatchRowMapper
 import gomoku.server.repository.jdbi.mappers.MatchRuleRowMapper
-import gomoku.server.repository.jdbi.mappers.user.ListUserRowMapper
+import gomoku.server.repository.jdbi.mappers.RulesRepresentationRowMapper
 import gomoku.server.repository.jdbi.mappers.user.PasswordValidationInfoMapper
+import gomoku.server.repository.jdbi.mappers.user.RankingUserDataRowMapper
 import gomoku.server.repository.jdbi.mappers.user.TokenValidationInfoMapper
 import gomoku.server.repository.jdbi.mappers.user.UserDataRowMapper
 import gomoku.server.repository.jdbi.mappers.user.UserRowMapper
@@ -27,13 +28,14 @@ fun Jdbi.configureWithAppRequirements(): Jdbi {
     registerColumnMapper(TokenValidationInfoMapper())
     registerColumnMapper(InstantMapper())
     registerRowMapper(UserRowMapper())
-    registerRowMapper(ListUserRowMapper())
     registerRowMapper(UserDataRowMapper())
     registerRowMapper(UserRuleStatsRowMapper())
     registerRowMapper(MatchRuleRowMapper())
     registerRowMapper(LobbyRowMapper())
     registerRowMapper(MatchRowMapper())
     registerRowMapper(FinishedMatchRowMapper())
+    registerRowMapper(RulesRepresentationRowMapper())
+    registerRowMapper(RankingUserDataRowMapper())
 
     return this
 }

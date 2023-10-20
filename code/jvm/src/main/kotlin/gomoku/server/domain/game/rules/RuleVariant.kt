@@ -8,16 +8,3 @@ package gomoku.server.domain.game.rules
 enum class RuleVariant {
     STANDARD
 }
-
-/**
- * Helper function to deserialize a rule variant from a string
- * @receiver the string to deserialize
- * @return the rule variant
- * @throws IllegalArgumentException if the string is not a valid rule variant
- */
-fun String.toRuleVariant(): RuleVariant {
-    return when (this.uppercase()) {
-        "STANDARD" -> RuleVariant.STANDARD
-        else -> throw IllegalArgumentException("Invalid rule variant")
-    }
-}

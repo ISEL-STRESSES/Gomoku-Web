@@ -253,7 +253,7 @@ class UserTests {
 
         // when: searching for username template in the ranking of a rule
         // then: the response is a 200
-        client.get().uri("/users/ranking/$ruleId/search?username=$usernameTemplate")
+        client.get().uri("/users/ranking/$ruleId?username=$usernameTemplate")
             .exchange()
             .expectStatus().isOk
     }
@@ -269,7 +269,7 @@ class UserTests {
 
         // when: searching for username template in the ranking of a rule
         // then: the response is 404
-        client.get().uri("/users/ranking/$ruleId/search?username=$usernameTemplate")
+        client.get().uri("/users/ranking/$ruleId?username=$usernameTemplate")
             .exchange()
             .expectStatus().isNotFound
     }
@@ -285,7 +285,7 @@ class UserTests {
 
         // when: searching for username template in the ranking of a rule
         // then: the response is 200 but with an empty list
-        client.get().uri("/users/ranking/$ruleId/search?username=$usernameTemplate")
+        client.get().uri("/users/ranking/$ruleId?username=$usernameTemplate")
             .exchange()
             .expectStatus().isOk
     }
@@ -314,8 +314,7 @@ class UserTests {
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
 
         // and: a random user id
-        val userId = 100
-
+        val userId = abs(Random.nextInt(1000, 100000))
         // when: searching for a user with that user id
         // then: the response is 404
         client.get().uri("/users/$userId")

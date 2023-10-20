@@ -121,12 +121,12 @@ class UserServiceTests {
     }
 
     @Test
-    fun `getRanking should return user stats for a specific rule with valid offset and limit`() {
+    fun `searchRanking without username should return user stats for a specific rule with valid offset and limit`() {
         val ruleId = 1
         val offset = 0
         val limit = 10
 
-        val result = userService.getRanking(ruleId, offset, limit)
+        val result = userService.searchRanking(ruleId, null, offset, limit)
 
         assertNotNull(result)
         assertEquals(10, result.size)
@@ -135,12 +135,13 @@ class UserServiceTests {
     }
 
     @Test
-    fun `getRanking should return user stats with default offset and limit`() {
+    fun `searchRanking without username should return user stats with default offset and limit`() {
         val ruleId = 2
 
-        val result = userService.getRanking(ruleId)
+        val result = userService.searchRanking(ruleId, null)
 
         assertNotNull(result)
+        println(result)
         assertEquals(10, result.size)
     }
 

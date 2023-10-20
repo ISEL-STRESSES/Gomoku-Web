@@ -234,6 +234,8 @@ class GameServiceTests {
 
             assertTrue(result.isNotEmpty())
             assertEquals(3, result.size)
+
+            println(result)
         }
     }
 

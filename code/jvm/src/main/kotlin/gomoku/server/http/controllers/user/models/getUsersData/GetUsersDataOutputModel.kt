@@ -1,6 +1,6 @@
 package gomoku.server.http.controllers.user.models.getUsersData
 
-import gomoku.server.http.controllers.user.models.UserDataOutputModel
+import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
 
 /**
  * Represents a list of users with their statistics
@@ -8,5 +8,5 @@ import gomoku.server.http.controllers.user.models.UserDataOutputModel
  * @property userData list of users with their statistics
  */
 data class GetUsersDataOutputModel(
-    val userData: List<UserDataOutputModel>
+    val userData: List<UserRuleStatsOutputModel>
 )

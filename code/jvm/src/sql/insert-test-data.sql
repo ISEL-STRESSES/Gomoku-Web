@@ -57,9 +57,4 @@ DO $$
 insert into matches(rules_id, player_black, player_white, match_outcome, match_state) values (1, 1, 2, NULL, 'ONGOING');
 UPDATE matches set moves = '{0, 10, 1, 20, 2, 30, 3, 31}' where id = 11;
 
-
--- Inserting data into 'lobby' table for tests
-INSERT INTO lobby (user_id, rules_id, created_at) VALUES (1, 1, 18102023);
-INSERT INTO lobby (user_id, rules_id, created_at) VALUES (2, 3, 18102023);
-
 COMMIT;

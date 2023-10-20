@@ -1,10 +1,9 @@
 package gomoku.server.services.user
 
-import gomoku.server.domain.user.ListUserData
+import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.User
-import gomoku.server.domain.user.UserData
-import gomoku.server.domain.user.UserRuleStats
+import gomoku.server.domain.user.UserStats
 import gomoku.server.domain.user.UsersDomain
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.user.TokenCreationError
@@ -87,24 +86,11 @@ class UserService(
     }
 
     /**
-     * Gets the stats of the users that have played a game with the given rule.
-     * @param ruleId The id of the rule.
-     * @param offset The offset of the results.
-     * @param limit The limit of the results.
-     * @return The list of users.
-     */
-    fun getRanking(ruleId: Int, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<ListUserData>? =
-        transactionManager.run {
-            val statsFound = it.usersRepository.getRanking(ruleId, offset, limit)
-            statsFound.ifEmpty { null }
-        }
-
-    /**
      * Gets the stats of the user for every rule.
      * @param userId The id of the user.
      * @return The stats of the user for every rule, or null if the user doesn't exist.
      */
-    fun getUserStats(userId: Int): UserData? =
+    fun getUserStats(userId: Int): UserStats? =
         transactionManager.run {
             it.usersRepository.getUserStats(userId)
         }
@@ -115,7 +101,7 @@ class UserService(
      * @param ruleId The id of the rule.
      * @return The stats of the user for the given rule, or null if the user doesn't exist.
      */
-    fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats? = // TODO: Return result, rule can be invalid or user can be invalid
+    fun getUserRanking(userId: Int, ruleId: Int): RankingUserData? = // TODO: Return result, rule can be invalid or user can be invalid
         transactionManager.run {
             it.usersRepository.getUserRanking(userId, ruleId)
         }
@@ -126,14 +112,14 @@ class UserService(
      * @param username The username of the users.
      * @param offset The offset of the first user to get.
      * @param limit The maximum number of users to get.
-     * @return A list of [UserData] objects, containing all the stats related to the users, or null if the ruleId is invalid.
+     * @return A list of [UserStats] objects, containing all the stats related to the users, or null if the ruleId is invalid.
      */
-    fun searchRanking(ruleId: Int, username: String, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<UserData>? =
+    fun searchRanking(ruleId: Int, username: String?, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<RankingUserData>? =
         transactionManager.run {
             val availableRules = it.matchRepository.getAllRules()
 
             if (availableRules.any { rule -> rule.ruleId == ruleId }) {
-                it.usersRepository.searchRankingByUsername(username, ruleId, offset, limit)
+                    return@run it.usersRepository.searchRanking(ruleId,username ?: "",  offset, limit)
             } else {
                 null
             }

@@ -1,6 +1,6 @@
 package gomoku.server.http.controllers.user.models
 
-import gomoku.server.domain.user.UserRuleStats
+import gomoku.server.domain.user.UserStats
 
 /**
  * Represents the User with its statistics
@@ -12,5 +12,11 @@ import gomoku.server.domain.user.UserRuleStats
 data class UserStatsOutputModel(
     val userId: Int,
     val username: String,
-    val userRuleStats: List<UserRuleStats>
-)
+    val userRuleStats: List<RuleStatsOutputModel>
+){
+    constructor(userStats: UserStats) : this(
+        userId = userStats.uuid,
+        username = userStats.username,
+        userRuleStats = userStats.userRuleStats.map { RuleStatsOutputModel(it.ruleId, it.gamesPlayed, it.elo) }
+    )
+}

@@ -137,7 +137,7 @@ class JDBIUserRepositoryTests {
         // given: a UsersRepository
         val repo = JDBIUserRepository(handle)
         // and: a rule
-        val usersStats = repo.getRanking(2, 0, 10)
+        val usersStats = repo.searchRanking(2, "", 0, 10)
         println("----- USERS STATS -----")
         usersStats.forEach(::println)
         // then: users stats are retrieved

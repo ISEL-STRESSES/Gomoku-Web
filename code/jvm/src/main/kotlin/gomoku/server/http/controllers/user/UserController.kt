@@ -4,7 +4,6 @@ import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
 import gomoku.server.http.controllers.media.Problem
 import gomoku.server.http.controllers.user.models.UserByIdOutputModel
-import gomoku.server.http.controllers.user.models.UserDataOutputModel
 import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
 import gomoku.server.http.controllers.user.models.UserStatsOutputModel
 import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -37,20 +35,6 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(private val service: UserService) {
 
     /**
-     * Gets the ranking of the users for a given rule
-     * @param ruleId The id of the rule
-     * @param offset The offset
-     * @param limit The limit
-     * @return The ranking of the users
-     */
-    @GetMapping(URIs.Users.RANKING)
-    fun ranking(@PathVariable ruleId: Int, @RequestParam offset: Int?, @RequestParam limit: Int?): ResponseEntity<*> {
-        val users = service.getRanking(ruleId) ?: return Problem.response(404, Problem.invalidRule)
-
-        return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
-    }
-
-    /**
      * Gets the stats of a user
      * @param userId The id of the user
      * @return The stats of the user or a problem if the user does not exist
@@ -61,7 +45,7 @@ class UserController(private val service: UserService) {
         return if (userStats == null) {
             Problem.response(404, Problem.userNotFound)
         } else {
-            ResponseEntity.ok(UserStatsOutputModel(userStats.uuid, userStats.username, userStats.userRuleStats))
+            ResponseEntity.ok(UserStatsOutputModel(userStats))
         }
     }
 
@@ -72,7 +56,7 @@ class UserController(private val service: UserService) {
      * @return The ranking of the user or a problem if the user does not exist
      */
     @GetMapping(URIs.Users.USER_RANKING)
-    fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> {
+    fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> { //TODO: TEST THIS FUNCTION
         val userRuleStats = service.getUserRanking(userId, ruleId)
         return if (userRuleStats == null) {
             Problem.response(404, Problem.userNotFound)
@@ -87,10 +71,10 @@ class UserController(private val service: UserService) {
      * @param username The username to search
      * @return The ranking of the users or a [Problem] if the rule does not exist
      */
-    @GetMapping(URIs.Users.RANKING_SEARCH)
-    fun searchRanking(@PathVariable ruleId: Int, @RequestParam username: String): ResponseEntity<*> {
+    @GetMapping(URIs.Users.RANKING)
+    fun searchRanking(@PathVariable ruleId: Int, @RequestParam username: String?, @RequestParam offset: Int?, @RequestParam limit: Int?): ResponseEntity<*> {
         val users = service.searchRanking(ruleId, username) ?: return Problem.response(404, Problem.invalidRule)
-        return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserDataOutputModel)))
+        return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserRuleStatsOutputModel)))
     }
 
     /**
@@ -129,7 +113,7 @@ class UserController(private val service: UserService) {
     }
 
     /**
-     * Creates a token for a user given its username and password
+     * Creates a token for a user given its username and password, for example to login
      * @param userInput The user input
      * @return The created token or if not a [Problem]
      */
@@ -148,13 +132,11 @@ class UserController(private val service: UserService) {
 
     /**
      * Logs out a user given its token
-     * @param token The token of the user
+     * @param authenticatedUser The authenticated user
      */
     @PostMapping(URIs.Users.LOGOUT)
-    fun logout(@RequestHeader("Authorization") token: String) {
-        if (!service.revokeToken(token.trim().split(" ")[1])) {
-            Problem.response(500, Problem.tokenNotRevoked)
-        }
+    fun logout(authenticatedUser: AuthenticatedUser) {
+        service.revokeToken(authenticatedUser.token)
     }
 
     /**

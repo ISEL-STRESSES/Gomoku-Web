@@ -16,11 +16,15 @@ class JDBILobbyRepositoryTests {
     fun `getLobbyByRuleId should return correct lobby`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val ruleId = 1
+        val userId = 1
 
+        val lobbyId = repo.createLobby(ruleId, userId)
         val lobby = repo.getLobbyByRuleId(ruleId)
 
         assertNotNull(lobby)
-        assertEquals(1, lobby.rule.ruleId)
+        assertEquals(ruleId, lobby.rule.ruleId)
+        assertEquals(userId, lobby.userId)
+        assertEquals(lobbyId, lobby.id)
     }
 
     @Test
@@ -48,16 +52,37 @@ class JDBILobbyRepositoryTests {
         val repo = JDBILobbyRepository(handle)
         val lobbies = repo.getLobbies()
 
-        assertTrue(lobbies.isNotEmpty())
-        assertEquals(2, lobbies.size)
+        val user1Username = "User" + Random.nextLong()
+        val user1Password = "!Kz9iYG$%2TcB7f"
+        val user2Username = "User" + Random.nextLong()
+        val user2Password = "!Kz9iYG$%2TcB7f"
 
-        val lobby1 = lobbies[0]
+        val newUser1 = userRepo.storeUser(user1Username, PasswordValidationInfo(user1Password))
+        val newUser2 = userRepo.storeUser(user2Username, PasswordValidationInfo(user2Password))
+
+        assertTrue(lobbyRepo.getLobbies().isEmpty())
+
+        lobbyRepo.createLobby(1, newUser1)
+
+        val lobbies1 = lobbyRepo.getLobbies()
+
+        assertTrue(lobbies1.isNotEmpty())
+        assertEquals(1, lobbies1.size)
+
+        lobbyRepo.createLobby(2, newUser2)
+
+        val lobbies2 = lobbyRepo.getLobbies()
+
+        assertTrue(lobbies2.isNotEmpty())
+        assertEquals(2, lobbies2.size)
+
+        val lobby1 = lobbies2[0]
         assertEquals(1, lobby1.rule.ruleId)
         assertEquals(1, lobby1.userId)
 
-        val lobby2 = lobbies[1]
-        assertEquals(3, lobby2.rule.ruleId)
-        assertEquals(2, lobby2.userId)
+        val lobby2 = lobbies2[1]
+        assertEquals(2, lobby2.rule.ruleId)
+        assertEquals(newUser2, lobby2.userId)
     }
 
     @Test
@@ -132,14 +157,20 @@ class JDBILobbyRepositoryTests {
     @Test
     fun `leaveLobby should remove user from existing lobby`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
-        val userId = 1
+        val userRepo = JDBIUserRepository(handle)
+        val newUsername = "User" + Random.nextLong()
+        val newPassword = "!Kz9iYG$%2TcB7f"
+        val newUser = userRepo.storeUser(newUsername, PasswordValidationInfo(newPassword))
 
-        val result = repo.leaveLobby(userId)
-
+        assertTrue(repo.getLobbies().isEmpty())
+        repo.createLobby(1, newUser)
+        assertTrue(repo.getLobbies().isNotEmpty())
+        val result = repo.leaveLobby(newUser)
         assertTrue(result)
 
         val lobby = repo.getLobbyByUserId(userId)
         assertNull(lobby)
+        assertTrue(repo.getLobbies().isEmpty())
     }
 
     @Test

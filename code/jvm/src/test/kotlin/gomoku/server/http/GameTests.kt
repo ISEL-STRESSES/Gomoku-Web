@@ -1,13 +1,23 @@
 package gomoku.server.http
 
 import gomoku.server.domain.game.Matchmaker
+import gomoku.server.domain.game.match.FinishedMatch
+import gomoku.server.domain.game.match.Match
+import gomoku.server.domain.game.match.OngoingMatch
+import gomoku.server.domain.game.rules.Rules
 import gomoku.server.http.model.TokenResponse
+import gomoku.server.services.errors.game.MakeMoveError
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.expectBody
+import java.time.Duration
 import kotlin.math.abs
 import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GameTests {
@@ -31,7 +41,11 @@ class GameTests {
                     "password" to password
                 )
             )
-            .exchange().returnResult(Int::class.java)
+            .exchange()
+            .expectHeader().value("Location") {
+                assertTrue(it.startsWith("/api/users/"))
+                it.substringAfterLast("/").toInt()
+            }
 
 
         client.get().uri("/games/","username=$username&password=$password")
@@ -142,7 +156,7 @@ class GameTests {
     @Test
     fun `create two users, going to matchmaking, begin the match, make moves, see who won`() {
         // given: an HTTP client
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").responseTimeout(Duration.ofHours(1)).build()
 
         val ruleId = 2
 
@@ -213,24 +227,59 @@ class GameTests {
             .header("Authorization", "Bearer ${tokenUser1.token}")
             .exchange()
             .expectStatus().isOk
+            .expectBody<Boolean>()
+            .returnResult()
+            .responseBody!!
 
-        val lobby2 = client.post().uri("/game/match/$ruleId?userId=" + 82)
+        assertTrue(didLeave)
+
+        val lobby2 = client.post().uri("/game/$ruleId")
+            .header("Authorization", "Bearer ${tokenUser2.token}")
             .exchange()
             .expectStatus().isOk
             .expectBody(Matchmaker::class.java)
             .returnResult()
             .responseBody!!
 
-        assert(!lobby2.isMatch)
+        assertTrue(!lobby2.isMatch)
 
-        val game = client.post().uri("/game/match/$ruleId?userId=" + 81)
+        val game = client.post().uri("/game/$ruleId")
+            .header("Authorization", "Bearer ${tokenUser1.token}")
             .exchange()
             .expectStatus().isOk
             .expectBody(Matchmaker::class.java)
             .returnResult()
             .responseBody!!
 
-        assert(game.isMatch)
+        assertTrue(game.isMatch)
+
+        makeMove(client, game.id, 0, tokenUser1.token, MakeMoveError.InvalidTurn::class.java)
+
+        val validMove1 = makeMove(client, game.id, 0, tokenUser2.token, OngoingMatch::class.java)
+
+        assertTrue(validMove1.moveContainer.getMoves().size == 1)
+
+        val validMove2 = makeMove(client, game.id, 10, tokenUser1.token, OngoingMatch::class.java)
+
+        assertTrue(validMove2.moveContainer.getMoves().size == 2)
+
+        makeMove(client, game.id, 1, tokenUser2.token, OngoingMatch::class.java)
+
+        makeMove(client, game.id, 20, tokenUser1.token, OngoingMatch::class.java)
+
+        makeMove(client, game.id, 2, tokenUser2.token, OngoingMatch::class.java)
+
+        makeMove(client, game.id, 15, tokenUser1.token, OngoingMatch::class.java)
+
+        makeMove(client, game.id, 3, tokenUser2.token, OngoingMatch::class.java)
+
+        makeMove(client, game.id, 16, tokenUser1.token, OngoingMatch::class.java)
+
+        makeMove(client, game.id, 2, tokenUser2.token, MakeMoveError.AlreadyOccupied::class.java)
+
+        val finished = makeMove(client, game.id, 4, tokenUser2.token, FinishedMatch::class.java)
+
+        assertEquals(finished.playerBlack, finished.getWinnerIdOrNull())
 
     }
 

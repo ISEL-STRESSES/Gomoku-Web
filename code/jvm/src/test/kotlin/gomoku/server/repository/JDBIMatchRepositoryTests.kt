@@ -124,7 +124,7 @@ class JDBIMatchRepositoryTests {
     }
 
     @Test
-    fun `create rule and check if exists`() = testWithHandleAndRollback { handle ->
+    fun `getRuleById gets correctly and doesn't get non-existing, and getAllRules`() = testWithHandleAndRollback { handle ->
 
         val repo = JDBIMatchRepository(handle)
 
@@ -135,6 +135,7 @@ class JDBIMatchRepositoryTests {
         assertNull(rule4)
 
         val rules = repo.getAllRules()
+        println(rules)
         assertNotNull(rules)
         assertEquals(3, rules.size)
     }

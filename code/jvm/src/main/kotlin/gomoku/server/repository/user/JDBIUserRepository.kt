@@ -1,12 +1,11 @@
 package gomoku.server.repository.user
 
-import gomoku.server.domain.user.ListUserData
 import gomoku.server.domain.user.PasswordValidationInfo
+import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
 import gomoku.server.domain.user.User
-import gomoku.server.domain.user.UserData
-import gomoku.server.domain.user.UserRuleStats
+import gomoku.server.domain.user.UserStats
 import kotlinx.datetime.Instant
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
@@ -173,39 +172,11 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
 
     // stats
     /**
-     * Gets the ranking of the users for a given rule.
-     * @param rulesId The id of the rule.
-     * @param offset The offset of the first user to get.
-     * @param limit The maximum number of users to get.
-     * @return A list of [ListUserData] objects, containing all the stats related to the users.
-     */
-    override fun getRanking(rulesId: Int, offset: Int, limit: Int): List<ListUserData> =
-        handle.createQuery(
-            """
-            select users.id as user_id, rules.id as rule_id, users.username, user_stats.games_played, user_stats.elo
-            from users
-            inner join user_stats
-            on users.id = user_stats.user_id
-            inner join rules
-            on user_stats.rules_id = rules.id
-            where rules.id = :rules_id
-            order by users.id
-            offset :offset
-            limit :limit
-            """.trimIndent()
-        )
-            .bind("rules_id", rulesId)
-            .bind("offset", offset)
-            .bind("limit", limit)
-            .mapTo<ListUserData>()
-            .list()
-
-    /**
      * Retrieves the stats of a user for every rule.
      * @param userId The id of the user.
      * @return The stats of the user for every rule, or null if the user doesn't exist.
      */
-    override fun getUserStats(userId: Int): UserData? =
+    override fun getUserStats(userId: Int): UserStats? =
         handle.createQuery(
             """
             select users.id as user_id, rules.id as rule_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
@@ -218,33 +189,29 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             """.trimIndent()
         )
             .bind("user_id", userId)
-            .mapTo<UserData>()
+            .mapTo<UserStats>()
             .singleOrNull()
 
-    /**
-     * Retrieves the stats of a user for a given rule.
-     * @param userId The id of the user.
-     * @param ruleId The id of the rule.
-     * @return The stats of the user for the given rule.
-     */
-    override fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats? =
+    override fun getUserRanking(userId: Int, ruleId: Int): RankingUserData? =
         handle.createQuery(
             """
-            select * from user_stats
-            where user_id = :user_id and rules_id = :rule_id
+            select us.user_id, u.username, us.rules_id as rule_id, us.games_played, us.elo, u.username from user_stats us
+            join users u on us.user_id = u.id
+            where u.id = :user_id
+            and us.rules_id = :rules_id
             """.trimIndent()
         )
             .bind("user_id", userId)
-            .bind("rule_id", ruleId)
-            .mapTo<UserRuleStats>()
+            .bind("rules_id", ruleId)
+            .mapTo<RankingUserData>()
             .singleOrNull()
 
     /**
      * Sets the stats of a user for a given rule.
      * @param userId The id of the user.
-     * @param userStatsData The stats of the user for the given rule.
+     * @param rankingUserData The stats of the user for the given rule.
      */
-    override fun setUserRanking(userId: Int, userStatsData: UserRuleStats) {
+    override fun setUserRanking(userId: Int, rankingUserData: RankingUserData) {
         handle.createUpdate(
             """
             update user_stats set games_played = :games_played, elo = :elo
@@ -252,9 +219,9 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             """.trimIndent()
         )
             .bind("user_id", userId)
-            .bind("rules_id", userStatsData.ruleId)
-            .bind("games_played", userStatsData.gamesPlayed)
-            .bind("elo", userStatsData.elo)
+            .bind("rules_id", rankingUserData.ruleId)
+            .bind("games_played", rankingUserData.gamesPlayed)
+            .bind("elo", rankingUserData.elo)
             .execute()
     }
 
@@ -264,9 +231,9 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
      * @param rulesId The id of the rule.
      * @param offset The offset of the user list.
      * @param limit The limit of the user list.
-     * @return The list of [UserData] with the given username
+     * @return The list of [UserStats] with the given username
      */
-    override fun searchRankingByUsername(username: String, rulesId: Int, offset: Int, limit: Int): List<UserData> =
+    override fun searchRanking(rulesId: Int, username: String, offset: Int, limit: Int): List<RankingUserData> =
         handle.createQuery(
             """
             select us.user_id, us.rules_id as rule_id, us.games_played, us.elo, u.username from user_stats us
@@ -281,7 +248,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .bind("rulesId", rulesId)
             .bind("offset", offset)
             .bind("limit", limit)
-            .mapTo<UserData>()
+            .mapTo<RankingUserData>()
             .list()
 
     /**

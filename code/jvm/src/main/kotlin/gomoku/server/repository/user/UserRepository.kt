@@ -1,12 +1,11 @@
 package gomoku.server.repository.user
 
-import gomoku.server.domain.user.ListUserData
 import gomoku.server.domain.user.PasswordValidationInfo
+import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.TokenValidationInfo
 import gomoku.server.domain.user.User
-import gomoku.server.domain.user.UserData
-import gomoku.server.domain.user.UserRuleStats
+import gomoku.server.domain.user.UserStats
 import kotlinx.datetime.Instant
 
 /**
@@ -82,20 +81,11 @@ interface UserRepository {
 
     // stats
     /**
-     * Gets all the stats related to the users, with pagination, by rule.
-     * @param rulesId The id of the rules.
-     * @param offset The offset of the first user to get.
-     * @param limit The maximum number of users to get.
-     * @return A list of [UserData] objects, containing all the stats related to the users.
-     */
-    fun getRanking(rulesId: Int, offset: Int, limit: Int): List<ListUserData>
-
-    /**
      * Retrieves the stats of a user for every rule.
      * @param userId The id of the user.
      * @return The stats of the user for every rule, or null if the user doesn't exist.
      */
-    fun getUserStats(userId: Int): UserData?
+    fun getUserStats(userId: Int): UserStats?
 
     /**
      * Retrieves the stats of a user for a given rule.
@@ -103,20 +93,22 @@ interface UserRepository {
      * @param ruleId The id of the rule.
      * @return The stats of the user for the given rule, or null if the user doesn't exist.
      */
-    fun getUserRanking(userId: Int, ruleId: Int): UserRuleStats? // TODO add result cause user adn rule not found
+    fun getUserRanking(userId: Int, ruleId: Int): RankingUserData?
 
     /**
      * Sets the stats of a user for a given rule.
      * @param userId The id of the user.
-     * @param userStatsData The stats of the user for the given rule.
+     * @param rankingUserData The stats of the user for the given rule.
      */
-    fun setUserRanking(userId: Int, userStatsData: UserRuleStats)
+    fun setUserRanking(userId: Int, rankingUserData: RankingUserData)
 
     /**
      * Retrieves a list of users with the given username.
-     * @param username The username of the users.
      * @param rulesId The id of the rules.
+     * @param username The username of the users.
+     * @param offset The offset of the first user to get.
+     * @param limit The maximum number of users to get.
      * @return The list of users.
      */
-    fun searchRankingByUsername(username: String, rulesId: Int, offset: Int, limit: Int): List<UserData>
+    fun searchRanking(rulesId: Int, username: String, offset: Int, limit: Int): List<RankingUserData>
 }

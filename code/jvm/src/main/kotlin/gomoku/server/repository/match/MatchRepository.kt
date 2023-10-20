@@ -7,6 +7,7 @@ import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.rules.Rules
+import gomoku.server.domain.game.rules.RulesRepresentation
 
 typealias GamePlayers = Pair<Int, Int> // black, white
 
@@ -27,7 +28,7 @@ interface MatchRepository {
      * Gets all the rules.
      * @return list of rules
      */
-    fun getAllRules(): List<Rules>
+    fun getAllRules(): List<RulesRepresentation>
 
     /**
      * Checks if a rule with the given id is stored in the database.

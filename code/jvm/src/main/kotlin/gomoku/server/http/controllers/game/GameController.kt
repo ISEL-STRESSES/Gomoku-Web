@@ -85,15 +85,15 @@ class GameController(private val gameService: GameService) {
      * Starts the matchmaking process for a game, either
      * by creating a new lobby or joining a match
      * @param rulesId The id of the rule
-     * @param userId The id of the user
+     * @param authenticatedUser The authenticated user
      * @return The result of the matchmaking process
      */
     @PostMapping(URIs.Game.MATCH_MAKE)
-    fun startMatchmaking(@PathVariable rulesId: Int, @RequestParam userId: Int): ResponseEntity<*> {
-        val matchmaker = gameService.startMatchmakingProcess(rulesId, userId)
+    fun startMatchmaking(@PathVariable rulesId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val matchmaker = gameService.startMatchmakingProcess(rulesId, authenticatedUser.user.uuid)
         return when (matchmaker) {
             is Failure -> matchmaker.value.resolveProblem()
-            is Success -> ResponseEntity.ok(matchmaker)
+            is Success -> ResponseEntity.ok(matchmaker.value)
         }
     }
 

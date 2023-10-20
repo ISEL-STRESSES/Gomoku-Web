@@ -8,6 +8,7 @@ import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.match.toColor
 import gomoku.server.domain.game.rules.Rules
+import gomoku.server.domain.game.rules.RulesRepresentation
 import gomoku.server.repository.jdbi.mappers.MovesRowMapper
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
@@ -35,9 +36,9 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * Gets all the rules.
      * @return list of rules
      */
-    override fun getAllRules(): List<Rules> =
+    override fun getAllRules(): List<RulesRepresentation> =
         handle.createQuery("select * from rules")
-            .mapTo<Rules>()
+            .mapTo<RulesRepresentation>()
             .list()
 
     /**

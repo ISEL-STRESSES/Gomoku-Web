@@ -21,6 +21,7 @@ class LobbyRowMapper : RowMapper<Lobby> {
      */
     override fun map(rs: ResultSet, ctx: StatementContext?): Lobby {
         return Lobby(
+            id = rs.getInt("id"),
             rule = buildRule(
                 ruleId = rs.getInt("rules_id"),
                 boardMaxSize = rs.getInt("board_size"),

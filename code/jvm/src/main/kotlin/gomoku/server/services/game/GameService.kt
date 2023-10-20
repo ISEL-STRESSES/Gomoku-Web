@@ -11,8 +11,8 @@ import gomoku.server.domain.game.match.OngoingMatch
 import gomoku.server.domain.game.match.Position
 import gomoku.server.domain.game.match.toMatchOutcome
 import gomoku.server.domain.game.rules.MoveError
-import gomoku.server.domain.game.rules.Rules
-import gomoku.server.domain.user.UserRuleStats
+import gomoku.server.domain.game.rules.RulesRepresentation
+import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.updateElo
 import gomoku.server.repository.Transaction
 import gomoku.server.repository.TransactionManager
@@ -113,7 +113,7 @@ class GameService(private val transactionManager: TransactionManager) {
             val winnerId = if (move.color == Color.BLACK) match.playerBlack else match.playerWhite
             val loserId = if (move.color == Color.BLACK) match.playerWhite else match.playerBlack
 
-            updatePlayerStats(winnerId, loserId, match.rules.ruleId, tr, UserRuleStats.WIN)
+            updatePlayerStats(winnerId, loserId, match.rules.ruleId, tr, RankingUserData.WIN)
         } else {
             if (!tr.matchRepository.addToMoveArray(match.matchId, move.position.value)) {
                 return failure(MakeMoveError.MakeMoveFailed)
@@ -122,7 +122,7 @@ class GameService(private val transactionManager: TransactionManager) {
                 tr.matchRepository.setMatchState(match.matchId, MatchState.FINISHED)
                 tr.matchRepository.setMatchOutcome(match.matchId, MatchOutcome.DRAW)
 
-                updatePlayerStats(match.playerBlack, match.playerWhite, match.rules.ruleId, tr, UserRuleStats.DRAW)
+                updatePlayerStats(match.playerBlack, match.playerWhite, match.rules.ruleId, tr, RankingUserData.DRAW)
             }
         }
         val newGame = tr.matchRepository.getMatchById(match.matchId)
@@ -145,19 +145,19 @@ class GameService(private val transactionManager: TransactionManager) {
         tr: Transaction,
         player1Score: Double
     ) {
-        val statsPlayer1 = tr.usersRepository.getUserRanking(player1Id, ruleId) ?: UserRuleStats(ruleId)
-        val statsPlayer2 = tr.usersRepository.getUserRanking(player2Id, ruleId) ?: UserRuleStats(ruleId) // TODO: NOT SURE IF THIS IS CORRECT
+        val statsPlayer1 = tr.usersRepository.getUserRanking(player1Id, ruleId) ?: RankingUserData(player1Id, "User1", ruleId)
+        val statsPlayer2 = tr.usersRepository.getUserRanking(player2Id, ruleId) ?: RankingUserData(player2Id, "User2", ruleId)
 
         val newPlayer1Elo = updateElo(statsPlayer1.elo.toDouble(), statsPlayer2.elo.toDouble(), player1Score)
         val newPlayer2Elo = updateElo(statsPlayer2.elo.toDouble(), statsPlayer1.elo.toDouble(), 1 - player1Score)
 
         tr.usersRepository.setUserRanking(
             userId = player1Id,
-            userStatsData = statsPlayer1.copy(gamesPlayed = statsPlayer1.gamesPlayed + 1, elo = newPlayer1Elo.toInt())
+            rankingUserData = statsPlayer1.copy(gamesPlayed = statsPlayer1.gamesPlayed + 1, elo = newPlayer1Elo.toInt())
         )
         tr.usersRepository.setUserRanking(
             userId = player2Id,
-            userStatsData = statsPlayer2.copy(gamesPlayed = statsPlayer2.gamesPlayed + 1, elo = newPlayer2Elo.toInt())
+            rankingUserData = statsPlayer2.copy(gamesPlayed = statsPlayer2.gamesPlayed + 1, elo = newPlayer2Elo.toInt())
         )
     }
 
@@ -187,7 +187,7 @@ class GameService(private val transactionManager: TransactionManager) {
      * This function doesn't use limit and offset because there are only a limited number of rules that can be delivered at once.
      * @return a list of the available rules
      */
-    fun getAvailableRules(): List<Rules> =
+    fun getAvailableRules(): List<RulesRepresentation> =
         transactionManager.run {
             it.matchRepository.getAllRules()
         }

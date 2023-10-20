@@ -1,14 +1,15 @@
 package gomoku.server.domain.user
 
+import gomoku.server.domain.user.RankingUserData.Companion.K_FACTOR
 import kotlin.math.pow
 
-/**
- * Represents the statistics of a rule
- * @property ruleId id of the rule
- * @property gamesPlayed number of games played with this rule
- * @property elo elo of the rule (0-4000)
- */
-data class UserRuleStats(val ruleId: Int, val gamesPlayed: Int = 1, val elo: Int = DEFAULT_ELO) {
+data class RankingUserData(
+    val uuid: Int,
+    val username: String,
+    val ruleId: Int,
+    val gamesPlayed: Int = 1,
+    val elo: Int = DEFAULT_ELO
+) {
     init {
         require(gamesPlayed >= 0) { "gamesPlayed must be positive" }
         require(elo in 0..4000) { "elo must be between 0 and 4000" }
@@ -42,5 +43,5 @@ fun expectedScore(ratingPA: Double, ratingPB: Double): Double {
  */
 fun updateElo(ratingPA: Double, ratingPB: Double, playerAScore: Double): Double {
     val expectedScore = expectedScore(ratingPA, ratingPB)
-    return ratingPA + UserRuleStats.K_FACTOR * (playerAScore - expectedScore)
+    return ratingPA + K_FACTOR * (playerAScore - expectedScore)
 }
