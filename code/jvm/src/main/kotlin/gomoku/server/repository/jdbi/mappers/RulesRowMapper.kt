@@ -1,10 +1,7 @@
 package gomoku.server.repository.jdbi.mappers
 
-import gomoku.server.domain.game.rules.OpeningRule
-import gomoku.server.domain.game.rules.RuleVariant
 import gomoku.server.domain.game.rules.Rules
 import gomoku.server.domain.game.rules.buildRule
-import gomoku.server.domain.game.rules.toBoardSize
 import org.jdbi.v3.core.mapper.RowMapper
 import org.jdbi.v3.core.statement.StatementContext
 import java.sql.ResultSet

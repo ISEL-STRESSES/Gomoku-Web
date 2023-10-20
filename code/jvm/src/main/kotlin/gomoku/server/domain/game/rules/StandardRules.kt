@@ -15,6 +15,7 @@ import gomoku.utils.success
 data class StandardRules(override val ruleId: Int, override val boardSize: BoardSize) : Rules() {
     @JsonIgnore
     override val variant: RuleVariant = RuleVariant.STANDARD
+
     @JsonIgnore
     override val openingRule: OpeningRule = OpeningRule.FREE
 

@@ -11,7 +11,6 @@ import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.game.GameService
 import gomoku.server.services.user.UserService
-import gomoku.server.successOrNull
 import gomoku.server.testWithTransactionManagerAndRollback
 import gomoku.utils.Failure
 import gomoku.utils.Success
@@ -198,7 +197,6 @@ class GameServiceTests {
             require(result.value is FinishedMatch)
             assertTrue(result.value.moveContainer.isFull())
             assertTrue((result.value as FinishedMatch).getWinnerIdOrNull() == userId1)
-
         }
     }
 

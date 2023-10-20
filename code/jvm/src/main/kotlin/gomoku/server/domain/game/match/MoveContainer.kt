@@ -40,6 +40,7 @@ class MoveContainer private constructor(
 ) {
 
     private val maxAmountOfMoves = boardSize * boardSize
+
     @JsonIgnore
     val maxIndex = maxAmountOfMoves - 1
 

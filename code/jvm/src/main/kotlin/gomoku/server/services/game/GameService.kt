@@ -16,6 +16,7 @@ import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.updateElo
 import gomoku.server.repository.Transaction
 import gomoku.server.repository.TransactionManager
+import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.utils.Failure
@@ -198,13 +199,13 @@ class GameService(private val transactionManager: TransactionManager) {
      * @param matchId id of the match
      * @return the id of the player that has the turn, or null if the match doesn't exist
      */
-    fun getCurrentTurnPlayerId(matchId: Int): Int? { // TODO: ADD RESULT TO DISTINGUISH FROM MATCH NOT FOUND OR NO TURN (GAME IS FINISHED)
+    fun getCurrentTurnPlayerId(matchId: Int): CurrentTurnPlayerResult {
         return transactionManager.run {
-            val currentColor = it.matchRepository.getTurn(matchId) ?: return@run null
-            val players = it.matchRepository.getMatchPlayers(matchId) ?: return@run null
+            val currentColor = it.matchRepository.getTurn(matchId) ?: return@run failure(CurrentTurnPlayerError.NoTurn)
+            val players = it.matchRepository.getMatchPlayers(matchId) ?: return@run failure(CurrentTurnPlayerError.MatchNotFound)
             when (currentColor) {
-                Color.BLACK -> players.first
-                Color.WHITE -> players.second
+                Color.BLACK -> success(players.first)
+                Color.WHITE -> success(players.second)
             }
         }
     }

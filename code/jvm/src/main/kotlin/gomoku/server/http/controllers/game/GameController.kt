@@ -3,6 +3,7 @@ package gomoku.server.http.controllers.game
 import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
 import gomoku.server.http.controllers.media.Problem
+import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.game.GameService
@@ -122,8 +123,8 @@ class GameController(private val gameService: GameService) {
     fun currentTurnPlayerId(@PathVariable id: Int): ResponseEntity<*> {
         val currentTurnPlayerId = gameService.getCurrentTurnPlayerId(id)
         return when (currentTurnPlayerId) {
-            null -> Problem.response(404, Problem.gameNotFound)
-            else -> ResponseEntity.ok(currentTurnPlayerId)
+            is Failure -> currentTurnPlayerId.value.resolveProblem()
+            is Success -> ResponseEntity.ok(currentTurnPlayerId)
         }
     }
 
@@ -152,5 +153,16 @@ class GameController(private val gameService: GameService) {
         when (this) {
             MatchmakingError.SamePlayer -> Problem.response(400, Problem.samePlayer)
             MatchmakingError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
+        }
+
+    /**
+     * Translates the errors of a Current turn player action into a response
+     * @receiver The error
+     * @return The response
+     */
+    private fun CurrentTurnPlayerError.resolveProblem(): ResponseEntity<*> =
+        when (this) {
+            CurrentTurnPlayerError.NoTurn -> Problem.response(400, Problem.samePlayer)
+            CurrentTurnPlayerError.MatchNotFound -> Problem.response(404, Problem.gameNotFound)
         }
 }

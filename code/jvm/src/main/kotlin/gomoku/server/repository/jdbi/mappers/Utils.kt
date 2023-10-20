@@ -6,7 +6,6 @@ import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MoveContainer
 import gomoku.server.domain.game.match.MoveContainer.Companion.buildMoveContainer
 import gomoku.server.domain.game.match.OngoingMatch
-import gomoku.server.domain.game.match.toMatchOutcome
 import gomoku.server.domain.game.rules.buildRule
 import gomoku.utils.Failure
 import gomoku.utils.Success

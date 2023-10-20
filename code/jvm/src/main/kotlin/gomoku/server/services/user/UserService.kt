@@ -8,12 +8,11 @@ import gomoku.server.domain.user.UsersDomain
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
+import gomoku.server.services.errors.user.UserRankingServiceError
 import gomoku.utils.failure
 import gomoku.utils.success
 import kotlinx.datetime.Clock
 import org.springframework.stereotype.Service
-
-import gomoku.server.services.errors.user.UserRankingServiceError
 
 /**
  * Service for user-related operations
@@ -105,18 +104,19 @@ class UserService(
      */
     fun getUserRanking(userId: Int, ruleId: Int): UserRankingResult =
         transactionManager.run {
-            if (!it.usersRepository.isUserStoredById(userId))
+            if (!it.usersRepository.isUserStoredById(userId)) {
                 return@run failure(UserRankingServiceError.UserNotFound)
-            if (it.matchRepository.getRuleById(ruleId) == null)
+            }
+            if (it.matchRepository.getRuleById(ruleId) == null) {
                 return@run failure(UserRankingServiceError.RuleNotFound)
+            }
             val stats = it.usersRepository.getUserRanking(userId, ruleId)
-            if (stats == null)
+            if (stats == null) {
                 return@run failure(UserRankingServiceError.UserStatsNotFound)
-            else return@run success(stats)
+            } else {
+                return@run success(stats)
+            }
         }
-
-
-
 
     /**
      * Searches for users stats by their username in a specific rule.

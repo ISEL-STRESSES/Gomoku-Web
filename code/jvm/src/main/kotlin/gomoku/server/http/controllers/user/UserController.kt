@@ -60,18 +60,11 @@ class UserController(private val service: UserService) {
     @GetMapping(URIs.Users.USER_RANKING)
     fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> { // TODO: TEST THIS FUNCTION
         val userRuleStats = service.getUserRanking(userId, ruleId)
-        return when(userRuleStats){
+        return when (userRuleStats) {
             is Success -> ResponseEntity.ok(UserRuleStatsOutputModel(userRuleStats.value))
             is Failure -> userRuleStats.value.resolveProblem()
         }
     }
-
-    private fun UserRankingServiceError.resolveProblem(): ResponseEntity<*> =
-        when(this){
-            UserRankingServiceError.UserNotFound -> Problem.response(404, Problem.userNotFound)
-            UserRankingServiceError.RuleNotFound -> Problem.response(404, Problem.invalidRule)
-            UserRankingServiceError.UserStatsNotFound -> Problem.response(404, Problem.invalidRule) //TODO: MAKE THIS PROPER PROBLEM
-        }
 
     /**
      * Gets the ranking of the users for a given rule
@@ -164,4 +157,14 @@ class UserController(private val service: UserService) {
         )
     }
 
+    /**
+     * Resolves a [UserRankingError] to a [ResponseEntity]
+     * @return A translated [Problem] based on the [UserRankingError]
+     */
+    private fun UserRankingServiceError.resolveProblem(): ResponseEntity<*> =
+        when (this) {
+            UserRankingServiceError.UserNotFound -> Problem.response(404, Problem.userNotFound)
+            UserRankingServiceError.RuleNotFound -> Problem.response(404, Problem.invalidRule)
+            UserRankingServiceError.UserStatsNotFound -> Problem.response(404, Problem.userStatsNotFound)
+        }
 }

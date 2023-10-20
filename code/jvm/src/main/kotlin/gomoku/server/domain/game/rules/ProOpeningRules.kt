@@ -15,6 +15,7 @@ import kotlin.math.abs
 data class ProOpeningRules(override val ruleId: Int, override val boardSize: BoardSize) : Rules() {
     @JsonIgnore
     override val variant: RuleVariant = RuleVariant.STANDARD
+
     @JsonIgnore
     override val openingRule: OpeningRule = OpeningRule.PRO
 
@@ -33,18 +34,21 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
 
         when (moveContainer.getMoves().size) {
             0 -> {
-                if (turn != Color.BLACK || move.position != center)
+                if (turn != Color.BLACK || move.position != center) {
                     return failure(MoveError.InvalidMove)
+                }
             }
             1 -> { // White's first move anywhere becides center
-                if (turn != move.color)
+                if (turn != move.color) {
                     return failure(MoveError.InvalidTurn)
+                }
             }
             2 -> {
                 if (turn != move.color) return failure(MoveError.InvalidTurn)
                 val blackFirstMove = moveContainer.getMoves()[0].position
-                if (!isTwoSquaresAway(blackFirstMove, move.position))
+                if (!isTwoSquaresAway(blackFirstMove, move.position)) {
                     return failure(MoveError.InvalidMove)
+                }
             }
             else -> {
                 if (turn != move.color) return failure(MoveError.InvalidTurn)
@@ -62,7 +66,6 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
         val dy = abs(pos1.value / boardSize.value - pos2.value / boardSize.value)
         return (dx >= 2 && dy == 0) || (dx == 0 && dy >= 2) || (dx >= 2 && dy >= 2)
     }
-
 
     /**
      * Returns the possible moves according to the Pro rule set.
