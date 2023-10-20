@@ -48,8 +48,8 @@ object URIs {
         const val GAME_RULES = "/rules"
         const val MATCH_MAKE = "/{rulesId}"
         const val JOIN = "/{id}/join"
-        const val LEAVE_GAME = "/{id}/leave"
-        const val LEAVE_LOBBY = "{lobbyId}/leave"
+        const val FORFEIT_GAME = "/{id}/forfeit"
+        const val LEAVE_LOBBY = "/{lobbyId}/leave"
 
         fun hub() = URI(HUB)
         fun byId(id: Int) = UriTemplate(ROOT + GET_BY_ID).expand(id)

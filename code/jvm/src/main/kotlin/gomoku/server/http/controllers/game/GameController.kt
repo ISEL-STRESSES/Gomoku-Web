@@ -73,8 +73,8 @@ class GameController(private val gameService: GameService) {
      * @return The result of the move
      */
     @PostMapping(URIs.Game.MAKE_PLAY)
-    fun makePlay(@PathVariable id: Int, @RequestParam userId: Int, @RequestParam pos: Int): ResponseEntity<*> {
-        val moveResult = gameService.makeMove(id, userId, pos)
+    fun makePlay(@PathVariable id: Int, authenticatedUser: AuthenticatedUser, @RequestParam pos: Int): ResponseEntity<*> {
+        val moveResult = gameService.makeMove(id, authenticatedUser.user.uuid, pos)
         return when (moveResult) {
             is Failure -> moveResult.value.resolveProblem()
             is Success -> ResponseEntity.ok(moveResult)

@@ -163,7 +163,7 @@ class GameTests {
         // and an authenticated user
         val username1 = newTestUserName()
         val password = "ByQYP78&j7Aug2" // Random password that uses a caps, a number and a special character
-        val userId1 = client.post().uri("/users/create")
+        client.post().uri("/users/create")
             .bodyValue(
                 mapOf(
                     "username" to username1,
@@ -187,7 +187,7 @@ class GameTests {
             .responseBody!!
 
         val username2 = newTestUserName()
-        val userId2 = client.post().uri("/users/create")
+        client.post().uri("/users/create")
             .bodyValue(
                 mapOf(
                     "username" to username2,
@@ -211,19 +211,17 @@ class GameTests {
             .responseBody!!
 
         // and a game
-        val lobby1 = client.post().uri("/game/match/$ruleId?userId=" + 81)
+        val lobby1 = client.post().uri("/game/$ruleId")
+            .header("Authorization", "Bearer ${tokenUser1.token}")
             .exchange()
             .expectStatus().isOk
             .expectBody(Matchmaker::class.java)
             .returnResult()
             .responseBody!!
 
-        println(lobby1.id)
-        println(lobby1.isMatch)
+        assertTrue(!lobby1.isMatch)
 
-        assert(false)
-
-        client.post().uri("/${lobby1}}/leave")
+        val didLeave = client.post().uri("/game/${lobby1.id}/leave")
             .header("Authorization", "Bearer ${tokenUser1.token}")
             .exchange()
             .expectStatus().isOk
