@@ -5,6 +5,7 @@ import gomoku.server.repository.jdbi.mappers.InstantMapper
 import gomoku.server.repository.jdbi.mappers.LobbyRowMapper
 import gomoku.server.repository.jdbi.mappers.MatchRowMapper
 import gomoku.server.repository.jdbi.mappers.MatchRuleRowMapper
+import gomoku.server.repository.jdbi.mappers.OngoingMatchRowMapper
 import gomoku.server.repository.jdbi.mappers.RulesRepresentationRowMapper
 import gomoku.server.repository.jdbi.mappers.user.PasswordValidationInfoMapper
 import gomoku.server.repository.jdbi.mappers.user.RankingUserDataRowMapper
@@ -34,8 +35,10 @@ fun Jdbi.configureWithAppRequirements(): Jdbi {
     registerRowMapper(LobbyRowMapper())
     registerRowMapper(MatchRowMapper())
     registerRowMapper(FinishedMatchRowMapper())
+    registerRowMapper(OngoingMatchRowMapper())
     registerRowMapper(RulesRepresentationRowMapper())
     registerRowMapper(RankingUserDataRowMapper())
+    registerRowMapper(OngoingMatchRowMapper())
 
     return this
 }

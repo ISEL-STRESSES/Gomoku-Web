@@ -49,6 +49,7 @@ class MoveContainer private constructor(
      * @param move The move to be added.
      * @return [AddMoveResult] which is either an error or a new [MoveContainer] with the move added.
      */
+    @JsonIgnore
     fun addMove(move: Move): AddMoveResult {
         val position = move.position
 
@@ -67,6 +68,7 @@ class MoveContainer private constructor(
      * Gets the last made move.
      * @return The last made move, or null if no move has been made yet.
      */
+    @JsonIgnore
     fun getLastMoveOrNull(): Move? = orderOfMoves.lastOrNull()
 
     /**
@@ -74,6 +76,7 @@ class MoveContainer private constructor(
      * @param position The position to check.
      * @return true if a move exists at the position, false otherwise.
      */
+    @JsonIgnore
     fun hasMove(position: Position): Boolean {
         return board[position.value] != null
     }
@@ -82,6 +85,7 @@ class MoveContainer private constructor(
      * Gets all moves from the board by order of play.
      * @return A list of [Move] in the order they were played.
      */
+    @JsonIgnore
     fun getMoves(): List<Move> {
         return orderOfMoves
     }
@@ -91,6 +95,7 @@ class MoveContainer private constructor(
      * @param position The position to check.
      * @return true if the position is inside the board, false otherwise.
      */
+    @JsonIgnore
     fun isPositionInside(position: Position): Boolean {
         return position.value in 0..maxIndex
     }
@@ -98,6 +103,7 @@ class MoveContainer private constructor(
     /**
      * Returns true if the board is full, false otherwise.
      */
+    @JsonIgnore
     fun isFull(): Boolean {
         return orderOfMoves.size == maxAmountOfMoves
     }
@@ -105,6 +111,7 @@ class MoveContainer private constructor(
     /**
      * Returns true if the board is empty, false otherwise.
      */
+    @JsonIgnore
     fun isEmpty(): Boolean {
         return orderOfMoves.isEmpty()
     }
@@ -128,7 +135,12 @@ class MoveContainer private constructor(
          * @param movesIndexes The list of moves.
          * @return [AddMoveResult] which is either an error or a new [MoveContainer] with the given moves.
          */
-        fun buildMoveContainer(boardSize: Int, movesIndexes: List<Int>): AddMoveResult {
+        @JsonCreator
+        @JvmStatic
+        fun buildMoveContainer(
+            @JsonProperty("boardSize") boardSize: Int,
+            @JsonProperty("movesIndexes") movesIndexes: List<Int>
+        ): AddMoveResult {
             var moveContainer = createEmptyMoveContainer(boardSize)
             for ((index, boardIndex) in movesIndexes.withIndex()) {
                 val position = Position(boardIndex)
