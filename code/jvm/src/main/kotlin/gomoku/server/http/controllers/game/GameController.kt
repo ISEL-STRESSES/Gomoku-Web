@@ -68,7 +68,7 @@ class GameController(private val gameService: GameService) {
     /**
      * Makes a move in the context of a game
      * @param id The id of the game
-     * @param userId The id of the user
+     * @param authenticatedUser The authenticated user
      * @param pos The position of the move
      * @return The result of the move
      */
@@ -76,8 +76,8 @@ class GameController(private val gameService: GameService) {
     fun makePlay(@PathVariable id: Int, authenticatedUser: AuthenticatedUser, @RequestParam pos: Int): ResponseEntity<*> {
         val moveResult = gameService.makeMove(id, authenticatedUser.user.uuid, pos)
         return when (moveResult) {
-            is Failure -> moveResult.value.resolveProblem()
-            is Success -> ResponseEntity.ok(moveResult)
+            is Failure -> moveResult.value.resolveProblem().also { println(it) }
+            is Success -> ResponseEntity.ok(moveResult.value)
         }
     }
 

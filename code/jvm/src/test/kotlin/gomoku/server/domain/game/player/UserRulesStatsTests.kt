@@ -18,7 +18,7 @@ class UserRulesStatsTests {
     @Test
     fun `PlayerRuleStats throws exception for negative gamesPlayed`() {
         assertThrows<IllegalArgumentException> {
-            RankingUserData(1,"",1, -1, 2000)
+            RankingUserData(1, "", 1, -1, 2000)
         }
     }
 

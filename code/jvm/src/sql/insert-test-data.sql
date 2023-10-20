@@ -54,7 +54,21 @@ DO $$
     END $$;
 
 -- Step 3: Make 1 match be 1 move away from being finished
-insert into matches(rules_id, player_black, player_white, match_outcome, match_state) values (1, 1, 2, NULL, 'ONGOING');
-UPDATE matches set moves = '{0, 10, 1, 20, 2, 30, 3, 31}' where id = 11;
+DO $$
+    DECLARE match_id int;
+            user_id1 int;
+            user_id2 int;
+            rule_id int;
+            moves_game int[];
+    BEGIN
+        insert into users (username, password_validation) values ('TestUserDB1', 'ByQYP78&j7Aug2') returning id into user_id1;
+        insert into users (username, password_validation) values ('TestUserDB2', 'ByQYP78&j7Aug2') returning id into user_id2;
+        select id into rule_id from rules where board_size = 15 and opening_rule = 'FREE' and variant = 'STANDARD';
+        if(rule_id IS NULL) then
+            insert into rules(board_size, opening_rule, variant) values (15, 'FREE', 'STANDARD') returning id into rule_id;
+        end if;
+        insert into matches(rules_id, player_black, player_white, match_outcome, match_state) values (rule_id, user_id1, user_id2, NULL, 'ONGOING') returning id into match_id;
+        UPDATE matches set moves = '{0, 10, 1, 20, 2, 30, 3, 31}' where id = match_id returning moves into moves_game;
+    END $$;
 
 COMMIT;

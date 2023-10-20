@@ -55,7 +55,6 @@ class JDBILobbyRepositoryTests {
         val lobbyRepo = JDBILobbyRepository(handle)
         val userRepo = JDBIUserRepository(handle)
 
-
         val user1Username = "User" + Random.nextLong()
         val user1Password = "!Kz9iYG$%2TcB7f"
         val user2Username = "User" + Random.nextLong()

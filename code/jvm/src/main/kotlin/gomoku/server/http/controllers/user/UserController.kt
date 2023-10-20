@@ -56,7 +56,7 @@ class UserController(private val service: UserService) {
      * @return The ranking of the user or a problem if the user does not exist
      */
     @GetMapping(URIs.Users.USER_RANKING)
-    fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> { //TODO: TEST THIS FUNCTION
+    fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> { // TODO: TEST THIS FUNCTION
         val userRuleStats = service.getUserRanking(userId, ruleId)
         return if (userRuleStats == null) {
             Problem.response(404, Problem.userNotFound)
@@ -94,8 +94,10 @@ class UserController(private val service: UserService) {
      * @return The created user or if not a [Problem]
      */
     @PostMapping(URIs.Users.CREATE)
-    fun create(@Valid @RequestBody userInput: UserCreateInputModel): ResponseEntity<*> {
-
+    fun create(
+        @Valid @RequestBody
+        userInput: UserCreateInputModel
+    ): ResponseEntity<*> {
         val res = service.createUser(username = userInput.username, password = userInput.password)
         return when (res) {
             is Success -> ResponseEntity.status(201)
@@ -118,7 +120,10 @@ class UserController(private val service: UserService) {
      * @return The created token or if not a [Problem]
      */
     @PostMapping(URIs.Users.TOKEN)
-    fun token(@Valid @RequestBody userInput: UserCreateTokenInputModel): ResponseEntity<*> {
+    fun token(
+        @Valid @RequestBody
+        userInput: UserCreateTokenInputModel
+    ): ResponseEntity<*> {
         val res = service.createToken(username = userInput.username, password = userInput.password)
         return when (res) {
             is Success -> ResponseEntity.status(200)

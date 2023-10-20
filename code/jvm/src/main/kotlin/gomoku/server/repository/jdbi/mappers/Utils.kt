@@ -36,7 +36,7 @@ fun getMoveContainerFromRS(rs: ResultSet): MoveContainer {
  * @return The [FinishedMatch] from the result set
  */
 fun getFinishedMatchFromRS(rs: ResultSet, moveContainer: MoveContainer): FinishedMatch = FinishedMatch(
-    matchId = rs.getInt("id"),
+    matchId = rs.getInt("match_id"),
     playerBlack = rs.getInt("player_black"),
     playerWhite = rs.getInt("player_white"),
     rules = buildRule(
@@ -56,7 +56,7 @@ fun getFinishedMatchFromRS(rs: ResultSet, moveContainer: MoveContainer): Finishe
  * @return The [OngoingMatch] from the result set
  */
 fun getOngoingMatchFromRS(rs: ResultSet, moveContainer: MoveContainer): OngoingMatch = OngoingMatch(
-    matchId = rs.getInt("id"),
+    matchId = rs.getInt("match_id"),
     playerBlack = rs.getInt("player_black"),
     playerWhite = rs.getInt("player_white"),
     rules = buildRule(

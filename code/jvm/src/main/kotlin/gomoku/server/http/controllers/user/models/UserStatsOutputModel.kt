@@ -13,7 +13,7 @@ data class UserStatsOutputModel(
     val userId: Int,
     val username: String,
     val userRuleStats: List<RuleStatsOutputModel>
-){
+) {
     constructor(userStats: UserStats) : this(
         userId = userStats.uuid,
         username = userStats.username,

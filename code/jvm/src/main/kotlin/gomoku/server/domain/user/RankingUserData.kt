@@ -3,6 +3,14 @@ package gomoku.server.domain.user
 import gomoku.server.domain.user.RankingUserData.Companion.K_FACTOR
 import kotlin.math.pow
 
+/**
+ * Represents the data of a user for the ranking system.
+ * @property uuid The uuid of the user.
+ * @property username The username of the user.
+ * @property ruleId The id of the rule the user is playing.
+ * @property gamesPlayed The number of games played by the user.
+ * @property elo The elo of the user.
+ */
 data class RankingUserData(
     val uuid: Int,
     val username: String,

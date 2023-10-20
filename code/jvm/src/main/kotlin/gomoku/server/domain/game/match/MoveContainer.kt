@@ -1,5 +1,8 @@
 package gomoku.server.domain.game.match
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import gomoku.utils.Either
 import gomoku.utils.Failure
 import gomoku.utils.Success
@@ -112,7 +115,9 @@ class MoveContainer private constructor(
          * @param boardSize The size of the board.
          * @return A new empty [MoveContainer].
          */
-        fun createEmptyMoveContainer(boardSize: Int): MoveContainer {
+        @JsonCreator
+        @JvmStatic
+        fun createEmptyMoveContainer(@JsonProperty("boardSize") boardSize: Int): MoveContainer {
             val moveContainer = Array<Color?>(boardSize * boardSize) { null }
             return MoveContainer(boardSize, emptyList(), moveContainer)
         }

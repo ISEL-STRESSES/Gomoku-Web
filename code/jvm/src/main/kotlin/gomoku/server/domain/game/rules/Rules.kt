@@ -1,5 +1,7 @@
 package gomoku.server.domain.game.rules
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import gomoku.server.domain.game.match.Color
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.match.MoveContainer

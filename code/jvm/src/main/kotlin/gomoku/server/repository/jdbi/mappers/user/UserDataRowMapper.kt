@@ -1,6 +1,5 @@
 package gomoku.server.repository.jdbi.mappers.user
 
-import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.RuleStats
 import gomoku.server.domain.user.UserStats
 import org.jdbi.v3.core.mapper.RowMapper

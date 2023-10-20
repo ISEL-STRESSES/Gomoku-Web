@@ -119,7 +119,7 @@ class UserService(
             val availableRules = it.matchRepository.getAllRules()
             println(availableRules)
             if (availableRules.any { rule -> rule.ruleId == ruleId }) {
-                    return@run it.usersRepository.searchRanking(ruleId,username ?: "",  offset, limit)
+                return@run it.usersRepository.searchRanking(ruleId, username ?: "", offset, limit)
             } else {
                 null
             }
