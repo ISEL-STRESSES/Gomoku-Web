@@ -28,6 +28,11 @@ sealed class MoveError {
  * @property variant variant of the rule
  * @property openingRule opening rule
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = StandardRules::class, name = "StandardRules"),
+    JsonSubTypes.Type(value = ProOpeningRules::class, name = "ProOpeningRules")
+)
 sealed class Rules {
     abstract val ruleId: Int
     abstract val boardSize: BoardSize

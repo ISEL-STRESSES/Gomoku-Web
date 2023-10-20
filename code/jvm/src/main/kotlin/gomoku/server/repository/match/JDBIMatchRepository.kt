@@ -253,7 +253,9 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
     override fun getTurn(matchId: Int): Color? =
         handle.createQuery(
             """
-            select array_length(matches.moves, 1) from matches where id = :matchId and match_state = 'ONGOING'
+            SELECT COALESCE(array_length(matches.moves, 1), 0) as array_length
+            FROM matches
+            WHERE id = :matchId AND match_state = 'ONGOING';
             """.trimIndent()
         )
             .bind("matchId", matchId)

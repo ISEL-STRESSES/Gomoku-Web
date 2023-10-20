@@ -47,7 +47,7 @@ object URIs {
         const val MAKE_PLAY = "/{id}/play" // try to make a move
         const val GAME_RULES = "/rules"
         const val MATCH_MAKE = "/{rulesId}"
-        const val JOIN = "/{id}/join"
+        const val TURN = "/{id}/turn"
         const val FORFEIT_GAME = "/{id}/forfeit"
         const val LEAVE_LOBBY = "/{lobbyId}/leave"
 
@@ -55,6 +55,7 @@ object URIs {
         fun byId(id: Int) = UriTemplate(ROOT + GET_BY_ID).expand(id)
         fun joinLobby(rulesId: Int) = UriTemplate(ROOT + MATCH_MAKE).expand(rulesId)
         fun leaveLobby(lobbyId: Int) = UriTemplate(ROOT + LEAVE_LOBBY).expand(lobbyId)
+        fun turn(gameID: Int) = UriTemplate(ROOT + TURN).expand(gameID)
         fun forfeitGame(gameID: Int) = UriTemplate(ROOT + FORFEIT_GAME).expand(gameID)
         fun play(gameId: Int) = UriTemplate(ROOT + MAKE_PLAY).expand(gameId)
     }

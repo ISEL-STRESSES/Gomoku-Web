@@ -118,7 +118,7 @@ class GameController(private val gameService: GameService) {
      * @param id The id of the match
      * @return The current turn player id
      */
-    @GetMapping(URIs.Game.JOIN)
+    @GetMapping(URIs.Game.TURN)
     fun currentTurnPlayerId(@PathVariable id: Int): ResponseEntity<*> {
         val currentTurnPlayerId = gameService.getCurrentTurnPlayerId(id)
         return when (currentTurnPlayerId) {
