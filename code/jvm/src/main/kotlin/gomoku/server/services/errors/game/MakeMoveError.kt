@@ -9,5 +9,6 @@ sealed class MakeMoveError {
     object ImpossiblePosition : MakeMoveError()
     object GameNotFound : MakeMoveError()
     object GameFinished : MakeMoveError()
+    object InvalidMove : MakeMoveError()
     object MakeMoveFailed : MakeMoveError()
 }

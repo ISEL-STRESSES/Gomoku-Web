@@ -139,6 +139,7 @@ class GameController(private val gameService: GameService) {
             MakeMoveError.AlreadyOccupied -> Problem.response(400, Problem.positionOccupied)
             MakeMoveError.ImpossiblePosition -> Problem.response(400, Problem.impossiblePosition)
             MakeMoveError.InvalidTurn -> Problem.response(400, Problem.notYourTurn)
+            MakeMoveError.InvalidMove -> Problem.response(400, Problem.invalidMove)
             MakeMoveError.MakeMoveFailed -> Problem.response(500, Problem.makeMoveFailed)
         }
 

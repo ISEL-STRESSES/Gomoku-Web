@@ -52,6 +52,8 @@ class Problem(typeUri: URI) {
 
         val impossiblePosition = Problem(URI(PROBLEM_BASE_URL + "impossible-position"))
 
+        val invalidMove = Problem(URI(PROBLEM_BASE_URL + "invalid-move"))
+
         val makeMoveFailed = Problem(URI(PROBLEM_BASE_URL + "make-move-failed"))
 
         val samePlayer = Problem(URI(PROBLEM_BASE_URL + "same-player"))
