@@ -33,7 +33,7 @@ class GameServiceTests {
     private val clock = TestClock()
 
     @Test
-    fun `startMatchmakingProcess should start a new lobby if no existing lobbies with the same ruleId exist`() {
+    fun `startMatchmakingProcess should start a new lobby if no existing lobbies with the same ruleId exist`() { // TODO: fix this test
         val ruleId = 2
         val userId = 1 // Some random user
 
@@ -47,7 +47,7 @@ class GameServiceTests {
     }
 
     @Test
-    fun `startMatchmakingProcess should return SamePlayer error if user tries to match with themselves`() {
+    fun `startMatchmakingProcess should return SamePlayer error if user tries to match with themselves`() { // TODO: fix this test
         val ruleId = 2
         val userId = 3
 
@@ -65,7 +65,7 @@ class GameServiceTests {
     }
 
     @Test
-    fun `startMatchmakingProcess should handle the case where the user is matched into a game`() {
+    fun `startMatchmakingProcess should handle the case where the user is matched into a game`() { // TODO: fix this test
         val ruleId = 2
 
         testWithTransactionManagerAndRollback { transactionManager ->
@@ -182,7 +182,7 @@ class GameServiceTests {
     }
 
     @Test
-    fun `makeMove should set the game state to finished if the move container is full`() {
+    fun `makeMove should set the game state to finished if the move container is full`() { // TODO: fix this test
         val gameId = 11
         val userId1 = 1
         val position = 4
@@ -201,7 +201,7 @@ class GameServiceTests {
     }
 
     @Test
-    fun `leaveLobby should be true if the user was on it`() {
+    fun `leaveLobby should be true if the user was on it`() { // TODO: fix this test
         val ruleId = 2
         val userId = 3
 
@@ -244,7 +244,7 @@ class GameServiceTests {
     }
 
     @Test
-    fun `getCurrentTurnPlayerId should return the id of the player whose turn it is`() {
+    fun `getCurrentTurnPlayerId should return the id of the player whose turn it is`() { // TODO: fix this test
         val gameId = 1
 
         testWithTransactionManagerAndRollback { transactionManager ->
@@ -257,7 +257,7 @@ class GameServiceTests {
     }
 
     @Test
-    fun `getCurrentTurnPlayerId should return null if the game doesn't exist`() {
+    fun `getCurrentTurnPlayerId should return null if the game doesn't exist`() { // TODO: fix this test
         val gameId = 100
 
         testWithTransactionManagerAndRollback { transactionManager ->
@@ -270,7 +270,7 @@ class GameServiceTests {
     }
 
     @Test
-    fun `getCurrentTurnPlayerId should return null if the game is finished`() {
+    fun `getCurrentTurnPlayerId should return null if the game is finished`() { // TODO: fix this test
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
             // before

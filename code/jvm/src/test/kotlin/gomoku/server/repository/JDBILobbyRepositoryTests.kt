@@ -31,7 +31,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `getLobbyByRuleId should return null for non-existing ruleId`() = testWithHandleAndRollback { handle ->
+    fun `getLobbyByRuleId should return null for non-existing ruleId`() = testWithHandleAndRollback { handle -> // TODO: fix this test
         val repo = JDBILobbyRepository(handle)
         val ruleId = 2
 
@@ -51,7 +51,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `getLobbies should return list of lobbies`() = testWithHandleAndRollback { handle ->
+    fun `getLobbies should return list of lobbies`() = testWithHandleAndRollback { handle -> // TODO: fix this test
         val lobbyRepo = JDBILobbyRepository(handle)
         val userRepo = JDBIUserRepository(handle)
 
@@ -125,9 +125,9 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `createLobby should create a lobby for valid ruleId and userId`() = testWithHandleAndRollback { handle ->
+    fun `createLobby should create a lobby for valid ruleId and userId`() = testWithHandleAndRollback { handle -> // TODO: fix this test
         val repo = JDBILobbyRepository(handle)
-        val ruleId = 2
+        val ruleId = 3
         val userId = 3
 
         val lobbyId = repo.createLobby(ruleId, userId)
@@ -163,7 +163,7 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `leaveLobby should remove user from existing lobby`() = testWithHandleAndRollback { handle ->
+    fun `leaveLobby should remove user from existing lobby`() = testWithHandleAndRollback { handle -> // TODO: fix this test
         val repo = JDBILobbyRepository(handle)
         val userRepo = JDBIUserRepository(handle)
         val newUsername = "User" + Random.nextLong()

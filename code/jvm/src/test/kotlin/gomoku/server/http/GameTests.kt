@@ -212,7 +212,7 @@ class GameTests {
     }
 
     @Test
-    fun `create two users, going to matchmaking, begin the match, make moves, see who won`() {
+    fun `create two users, going to matchmaking, begin the match, make moves, see who won`() { // TODO: fix this test
         // given: an HTTP client
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").responseTimeout(Duration.ofHours(1)).build()
 
