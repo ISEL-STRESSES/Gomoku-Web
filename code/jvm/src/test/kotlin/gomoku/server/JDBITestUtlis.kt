@@ -99,7 +99,7 @@ fun deleteLobbies(handle: Handle) {
  * @param transactionManager the transaction manager
  * TODO: not a good way to do this, but it works for now
  */
-fun deleteLobbies(transactionManager: TransactionManager){
+fun deleteLobbies(transactionManager: TransactionManager) {
     transactionManager.run { transaction ->
         transaction.run {
             jdbi.useTransaction<Exception> { handle ->
