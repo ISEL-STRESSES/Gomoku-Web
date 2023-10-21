@@ -124,7 +124,7 @@ class GameController(private val gameService: GameService) {
         val currentTurnPlayerId = gameService.getCurrentTurnPlayerId(id)
         return when (currentTurnPlayerId) {
             is Failure -> currentTurnPlayerId.value.resolveProblem()
-            is Success -> ResponseEntity.ok(currentTurnPlayerId)
+            is Success -> ResponseEntity.ok(currentTurnPlayerId.value)
         }
     }
 

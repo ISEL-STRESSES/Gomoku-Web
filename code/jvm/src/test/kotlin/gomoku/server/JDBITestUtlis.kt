@@ -108,3 +108,9 @@ fun deleteLobbies(transactionManager: TransactionManager) {
         }
     }
 }
+
+fun deleteLobbies() {
+    jdbi.useTransaction<Exception> { handle ->
+        deleteLobbies(handle)
+    }
+}

@@ -1,5 +1,6 @@
 package gomoku.server.http
 
+import gomoku.server.deleteLobbies
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.match.FinishedMatch
 import gomoku.server.domain.game.match.Match
@@ -213,12 +214,15 @@ class GameTests {
 
     @Test
     fun `create two users, going to matchmaking, begin the match, make moves, see who won`() { // TODO: fix this test
+        // before
+        deleteLobbies()
+
         // given: an HTTP client
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").responseTimeout(Duration.ofHours(1)).build()
 
         val ruleId = 2
 
-        // and an authenticated user
+        // and 2 authenticated users
         val username1 = newTestUserName()
         val password = "ByQYP78&j7Aug2" // Random password that uses a caps, a number and a special character
         var userId1: Int? = null
@@ -288,7 +292,7 @@ class GameTests {
             .header("Authorization", "Bearer ${tokenUser1.token}")
             .exchange()
             .expectStatus().isOk
-            .expectBody(Matchmaker::class.java)
+            .expectBody(Matchmaker::class.java).also { println("lobby :" + it.returnResult().responseBody) }
             .returnResult()
             .responseBody!!
 
@@ -308,7 +312,7 @@ class GameTests {
             .header("Authorization", "Bearer ${tokenUser2.token}")
             .exchange()
             .expectStatus().isOk
-            .expectBody(Matchmaker::class.java)
+            .expectBody(Matchmaker::class.java).also { println("Actual lobby :" + it.returnResult().responseBody) }
             .returnResult()
             .responseBody!!
 
@@ -318,7 +322,7 @@ class GameTests {
             .header("Authorization", "Bearer ${tokenUser1.token}")
             .exchange()
             .expectStatus().isOk
-            .expectBody(Matchmaker::class.java) // .also { println("game details" + it.returnResult()) }
+            .expectBody(Matchmaker::class.java).also { println("Game details :" + it.returnResult().responseBody) }
             .returnResult()
             .responseBody!!
 
@@ -329,8 +333,13 @@ class GameTests {
             .returnResult()
             .responseBody!!
 
+        println("turn : $turn")
+
         val getPlayerBlack = if (turn == userId1) tokenUser1.token else tokenUser2.token
         val getPlayerWhite = if (turn == userId1) tokenUser2.token else tokenUser1.token
+
+        println("token player black: $getPlayerBlack")
+        println("token player white: $getPlayerWhite")
 
         assertTrue(game.isMatch)
 
@@ -404,7 +413,7 @@ class GameTests {
         return client.post().uri("/game/$gameId/play?pos=$pos")
             .header("Authorization", "Bearer $token")
             .exchange()
-            .expectBody(expectedType)
+            .expectBody(expectedType).also { println("make move: " + it.returnResult().responseBody) }
             .returnResult()
             .responseBody!!
     }
