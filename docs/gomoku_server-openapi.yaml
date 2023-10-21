@@ -1,338 +1,502 @@
-openapi: "3.0.3"
+openapi: 3.0.3
 info:
-  title: "gomoku_server API"
-  description: "gomoku_server API"
-  version: "1.0.0"
+  title: Gomoku API
+  description: Web-based system that allows multiple players to play the Battleship game
+  version: 0.1.0
 servers:
-  - url: "https://gomoku_server"
+  - url: http://localhost:8888
+    description: Local server
+
+tags:
+  - name: Home
+    description: Home page
+
+  - name: Users
+    description: Operations about users
+
+  - name: Games
+    description: Operations about games
+
 paths:
   /api/:
     get:
-      summary: "GET api/"
-      operationId: "getHome"
+      tags:
+        - Home
+      summary: Home page
+      operationId: getHome
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: Home page
           content:
-            '*/*':
+            'application/json':
               schema:
-                $ref: "#/components/schemas/ServerInfo"
+                $ref: '#/components/schemas/ServerInfo'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
   /api/users/create:
     post:
-      summary: "POST api/users/create"
-      operationId: "create"
+      tags:
+        - Users
+      summary: Create a new user
+      operationId: create
       requestBody:
+        description: User data Information
+        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserCreateInputModel"
-        required: true
+              $ref: '#/components/schemas/UserCreateInputModel'
       responses:
-        "200":
-          description: "OK"
+        201:
+          description: User was created
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        400:
+          $ref: '#/components/responses/BadRequest'
+        409:
+          $ref: '#/components/responses/Conflict'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/users/logout:
     post:
-      summary: "POST api/users/logout"
-      operationId: "logout"
+      tags:
+        - Users
+      summary: Logs a user out
+      operationId: logout
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: User was logged out
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/users/me:
     get:
-      summary: "GET api/users/me"
-      operationId: "home"
+      tags:
+        - Users
+      summary: Gets user home page
+      operationId: home
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: User home page
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/UserHomeOutputModel"
+                $ref: '#/components/schemas/UserHomeOutputModel'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/users/ranking/{ruleId}:
     get:
-      summary: "GET api/users/ranking/{ruleId}"
-      operationId: "searchRanking"
+      tags:
+        - Users
+      summary: Gets the ranking of the users for a given rule
+      operationId: searchRanking
       parameters:
-        - name: "ruleId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int32"
-        - name: "username"
-          in: "query"
-          required: true
-          schema:
-            type: "string"
-        - name: "offset"
-          in: "query"
-          required: true
-          schema:
-            type: "integer"
-            format: "int32"
-        - name: "limit"
-          in: "query"
-          required: true
-          schema:
-            type: "integer"
-            format: "int32"
+        - $ref: '#/components/parameters/ruleIdParam'
+        - $ref : '#/components/parameters/usernameParam'
+        - $ref: '#/components/parameters/offsetParam'
+        - $ref: '#/components/parameters/limitParam'
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/users/ranking/{userId}/{ruleId}:
     get:
-      summary: "GET api/users/ranking/{userId}/{ruleId}"
-      operationId: "userRanking"
+      tags:
+        - Users
+      summary: Gets the ranking of a user for a given rule
+      operationId: userRanking
       parameters:
-        - name: "userId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int32"
-        - name: "ruleId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int32"
+        - $ref: '#/components/parameters/userIdParam'
+        - $ref: '#/components/parameters/ruleIdParam'
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/users/stats/{userId}:
     get:
-      summary: "GET api/users/stats/{userId}"
-      operationId: "userStats"
+      tags:
+        - Users
+      summary: Gets the whole stats of a user
+      operationId: userStats
       parameters:
-        - name: "userId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int32"
+        - $ref: '#/components/parameters/userIdParam'
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/users/token:
     post:
-      summary: "POST api/users/token"
-      operationId: "token"
+      tags:
+        - Users
+      summary: Creates a token for a user
+      operationId: token
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserCreateTokenInputModel"
+              $ref: '#/components/schemas/UserCreateTokenInputModel'
         required: true
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/users/{id}:
     get:
-      summary: "GET api/users/{id}"
-      operationId: "getById"
+      tags:
+        - Users
+      summary: Gets the user with the given id
+      operationId: getById
       parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int32"
+        - $ref: '#/components/parameters/userIdParam'
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/game/:
     get:
-      summary: "GET api/game/"
-      operationId: "finishedGames"
+      tags:
+        - Games
+      summary: GET api/game/
+      operationId: finishedGames
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/game/rules:
     get:
-      summary: "GET api/game/rules"
-      operationId: "rules"
+      tags:
+        - Games
+      summary: GET api/game/rules
+      operationId: rules
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/game/{id}:
     get:
-      summary: "GET api/game/{id}"
-      operationId: "gameDetails"
+      tags:
+        - Games
+      summary: GET api/game/{id}
+      operationId: gameDetails
       parameters:
-        - name: "id"
-          in: "path"
+        - name: 'id'
+          in: 'path'
           required: true
           schema:
-            type: "integer"
-            format: "int32"
+            type: integer
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/game/{id}/play:
     post:
-      summary: "POST api/game/{id}/play"
-      operationId: "makePlay"
+      tags:
+        - Games
+      summary: POST api/game/{id}/play
+      operationId: makePlay
       parameters:
-        - name: "id"
-          in: "path"
+        - name: 'id'
+          in: 'path'
           required: true
           schema:
-            type: "integer"
-            format: "int32"
-        - name: "pos"
-          in: "query"
+            type: integer
+        - name: 'pos'
+          in: 'query'
           required: true
           schema:
-            type: "integer"
-            format: "int32"
+            type: integer
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/game/{id}/turn:
     get:
-      summary: "GET api/game/{id}/turn"
-      operationId: "currentTurnPlayerId"
+      tags:
+        - Games
+      summary: GET api/game/{id}/turn
+      operationId: currentTurnPlayerId
       parameters:
-        - name: "id"
-          in: "path"
+        - name: 'id'
+          in: 'path'
           required: true
           schema:
-            type: "integer"
-            format: "int32"
+            type: integer
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/game/{lobbyId}/leave:
     post:
-      summary: "POST api/game/{lobbyId}/leave"
-      operationId: "leaveLobby"
+      tags:
+        - Games
+      summary: POST api/game/{lobbyId}/leave
+      operationId: leaveLobby
       parameters:
-        - name: "lobbyId"
-          in: "path"
+        - name: 'lobbyId'
+          in: 'path'
           required: true
           schema:
-            type: "integer"
-            format: "int32"
+            type: integer
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /api/game/{rulesId}:
     post:
-      summary: "POST api/game/{rulesId}"
-      operationId: "startMatchmaking"
+      tags:
+        - Games
+      summary: POST api/game/{rulesId}
+      operationId: startMatchmaking
       parameters:
-        - name: "rulesId"
-          in: "path"
+        - name: 'rulesId'
+          in: 'path'
           required: true
           schema:
-            type: "integer"
-            format: "int32"
+            type: integer
       responses:
-        "200":
-          description: "OK"
+        200:
+          description: 'OK'
           content:
             '*/*':
               schema:
-                type: "object"
+                type: object
+        500:
+          $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
     Socials:
-      type: "object"
+      type: object
       properties:
         name:
-          type: "string"
+          type: string
+          example: 'github'
         url:
-          type: "string"
+          type: string
+          example: 'https://github.com'
     Author:
-      type: "object"
+      type: object
       properties:
         studentID:
-          type: "integer"
-          format: "int32"
+          type: integer
+          example: 12345
         name:
-          type: "string"
+          type: string
+          example: 'John Doe'
         email:
-          type: "string"
+          type: string
+          example: 'john@doe.org'
         socials:
-          type: "array"
+          type: array
           items:
-            $ref: "#/components/schemas/Socials"
+            $ref: '#/components/schemas/Socials'
     ServerInfo:
-      type: "object"
+      type: object
       properties:
         version:
-          type: "string"
+          type: string
+          example: 0.1.0
         authors:
-          type: "array"
+          type: array
           items:
-            $ref: "#/components/schemas/Author"
+            $ref: '#/components/schemas/Author'
     UserCreateInputModel:
-      type: "object"
+      type: object
       properties:
         username:
-          type: "string"
+          type: string
         password:
-          type: "string"
+          type: string
     UserHomeOutputModel:
-      type: "object"
+      type: object
       properties:
         id:
-          type: "integer"
-          format: "int32"
+          type: integer
         username:
-          type: "string"
+          type: string
     UserCreateTokenInputModel:
-      type: "object"
+      type: object
       properties:
         username:
-          type: "string"
+          type: string
         password:
-          type: "string"
+          type: string
+    ErrorModel:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        status:
+          type: integer
+        error:
+          type: string
+        path:
+          type: string
+
+  parameters:
+    offsetParam:
+      name: offset
+      in: query
+      description: The offset to start from
+      required: false
+      schema:
+        type: integer
+
+    limitParam:
+      name: limit
+      in: query
+      description: The number of items to return
+      required: false
+      schema:
+        type: integer
+
+    gameIdParam:
+      name: gameId
+      in: path
+      description: The id of the game
+      required: true
+      schema:
+        type: integer
+        example: 1
+
+    usernameParam:
+      name: username
+      in: path
+      description: The username of the user
+      required: true
+      schema:
+        type: string
+        example: 'bob'
+
+    userIdParam:
+      name: userId
+      in: path
+      description: The id of the user
+      required: true
+      schema:
+        type: integer
+        example: 1
+
+    ruleIdParam:
+      name: ruleId
+      in: path
+      description: The id of the rule
+      required: true
+      schema:
+        type: integer
+        example: 1
+
+  responses:
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorModel'
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
