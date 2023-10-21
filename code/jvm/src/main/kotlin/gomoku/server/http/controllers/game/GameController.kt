@@ -31,7 +31,7 @@ class GameController(private val gameService: GameService) {
      * @return The list of games
      */
     @GetMapping(URIs.Game.HUB)
-    fun games(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+    fun finishedGames(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val matches = gameService.getUserFinishedMatches(userId = authenticatedUser.user.uuid)
         return ResponseEntity.ok(matches)
     }
