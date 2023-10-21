@@ -1,0 +1,338 @@
+openapi: "3.0.3"
+info:
+  title: "gomoku_server API"
+  description: "gomoku_server API"
+  version: "1.0.0"
+servers:
+  - url: "https://gomoku_server"
+paths:
+  /api/:
+    get:
+      summary: "GET api/"
+      operationId: "getHome"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServerInfo"
+  /api/users/create:
+    post:
+      summary: "POST api/users/create"
+      operationId: "create"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateInputModel"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/users/logout:
+    post:
+      summary: "POST api/users/logout"
+      operationId: "logout"
+      responses:
+        "200":
+          description: "OK"
+  /api/users/me:
+    get:
+      summary: "GET api/users/me"
+      operationId: "home"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserHomeOutputModel"
+  /api/users/ranking/{ruleId}:
+    get:
+      summary: "GET api/users/ranking/{ruleId}"
+      operationId: "searchRanking"
+      parameters:
+        - name: "ruleId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "username"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+        - name: "offset"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "limit"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/users/ranking/{userId}/{ruleId}:
+    get:
+      summary: "GET api/users/ranking/{userId}/{ruleId}"
+      operationId: "userRanking"
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "ruleId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/users/stats/{userId}:
+    get:
+      summary: "GET api/users/stats/{userId}"
+      operationId: "userStats"
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/users/token:
+    post:
+      summary: "POST api/users/token"
+      operationId: "token"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateTokenInputModel"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/users/{id}:
+    get:
+      summary: "GET api/users/{id}"
+      operationId: "getById"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/game/:
+    get:
+      summary: "GET api/game/"
+      operationId: "finishedGames"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/game/rules:
+    get:
+      summary: "GET api/game/rules"
+      operationId: "rules"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/game/{id}:
+    get:
+      summary: "GET api/game/{id}"
+      operationId: "gameDetails"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/game/{id}/play:
+    post:
+      summary: "POST api/game/{id}/play"
+      operationId: "makePlay"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+        - name: "pos"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/game/{id}/turn:
+    get:
+      summary: "GET api/game/{id}/turn"
+      operationId: "currentTurnPlayerId"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/game/{lobbyId}/leave:
+    post:
+      summary: "POST api/game/{lobbyId}/leave"
+      operationId: "leaveLobby"
+      parameters:
+        - name: "lobbyId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/game/{rulesId}:
+    post:
+      summary: "POST api/game/{rulesId}"
+      operationId: "startMatchmaking"
+      parameters:
+        - name: "rulesId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int32"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+components:
+  schemas:
+    Socials:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        url:
+          type: "string"
+    Author:
+      type: "object"
+      properties:
+        studentID:
+          type: "integer"
+          format: "int32"
+        name:
+          type: "string"
+        email:
+          type: "string"
+        socials:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Socials"
+    ServerInfo:
+      type: "object"
+      properties:
+        version:
+          type: "string"
+        authors:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Author"
+    UserCreateInputModel:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        password:
+          type: "string"
+    UserHomeOutputModel:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int32"
+        username:
+          type: "string"
+    UserCreateTokenInputModel:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        password:
+          type: "string"
