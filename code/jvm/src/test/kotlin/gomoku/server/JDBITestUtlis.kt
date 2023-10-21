@@ -87,8 +87,8 @@ fun <L, R> Either<L, R>.failureOrNull(): L? =
 
 /**
  * Deletes all lobbies from the database before running the test
+ * (for repositories that use the [Handle] directly)
  * @param handle the database handle
- * TODO: not a good way to do this, but it works for now
  */
 fun deleteLobbies(handle: Handle) {
     handle.execute("DELETE FROM lobby")
@@ -96,8 +96,8 @@ fun deleteLobbies(handle: Handle) {
 
 /**
  * Deletes all lobbies from the database before running the test
+ * (for services that use the [TransactionManager])
  * @param transactionManager the transaction manager
- * TODO: not a good way to do this, but it works for now
  */
 fun deleteLobbies(transactionManager: TransactionManager) {
     transactionManager.run { transaction ->
@@ -109,6 +109,11 @@ fun deleteLobbies(transactionManager: TransactionManager) {
     }
 }
 
+/**
+ * Deletes all lobbies from the database before running the test
+ * (for controllers that don't use neither the[TransactionManager]
+ * or the [Handle])
+ */
 fun deleteLobbies() {
     jdbi.useTransaction<Exception> { handle ->
         deleteLobbies(handle)

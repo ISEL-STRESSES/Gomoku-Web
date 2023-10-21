@@ -11,7 +11,7 @@ import kotlin.random.Random
 import kotlin.test.assertTrue
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class UserTests {
+class UserControllerTests {
 
     // One of the very few places where we use property injection
     @LocalServerPort

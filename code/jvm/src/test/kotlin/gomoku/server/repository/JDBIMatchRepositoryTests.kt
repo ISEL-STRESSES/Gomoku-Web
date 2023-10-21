@@ -21,7 +21,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class JDBIMatchRepositoryTests {
-
     @Test
     fun `createMatch persists new match correctly`() = testWithHandleAndRollback { handle ->
         val repo = JDBIMatchRepository(handle)

@@ -205,7 +205,6 @@ class GameServiceTests {
             require(result is Success)
             assertTrue(result.value is FinishedMatch)
             require(result.value is FinishedMatch)
-            // assertTrue(result.value.moveContainer.isFull()) // todo wrong cause move container doesnt have winning condition
             assertTrue((result.value as FinishedMatch).getWinnerIdOrNull() == userId1)
         }
     }

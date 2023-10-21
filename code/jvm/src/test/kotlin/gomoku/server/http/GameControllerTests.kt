@@ -21,7 +21,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class GameTests {
+class GameControllerTests {
 
     // One of the very few places where we use property injection
     @LocalServerPort
@@ -40,7 +40,7 @@ class GameTests {
         val rules = getRules(client)
 
         // then: assert that there are rules
-        assertTrue(rules.isNotEmpty().also { println(it) })
+        assertTrue(rules.isNotEmpty())
     }
 
     @Test
@@ -66,59 +66,204 @@ class GameTests {
     }
 
     @Test
-    fun `get game details`() {
+    fun `get game details`() { // TODO: fix this test
         // given: an HTTP client
-//        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-//
-//        TODO()
+        val client = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofHours(1))
+            .build()
+
+        // and an empty lobby
+        deleteLobbies()
+
+        // and information to create 2 users
+        val username1 = newTestUserName()
+        val userId1 = createUserAndGetId(client, username1)
+        val tokenUser1 = getToken(client, username1).token
+
+        val username2 = newTestUserName()
+        val userId2 = createUserAndGetId(client, username2)
+        val tokenUser2 = getToken(client, username2).token
+
+        // and a ruleId
+        val ruleId = 2
+
+        // and a game
+        startMatchmakingProcess(client, ruleId, tokenUser1)
+        val game = startMatchmakingProcess(client, ruleId, tokenUser2)
+
+        // when: the user tries to get the game details
+        val gameDetails = getGameDetails(client, game.id, tokenUser1) // AQUI
+
+        // then: assert that the game details are correct
+        assertEquals(gameDetails.rules.ruleId, ruleId)
+        assertEquals(gameDetails.playerBlack, userId1 or userId2)
+        assertEquals(gameDetails.playerWhite, userId1 or userId2)
+        assertTrue(gameDetails.moveContainer.isEmpty())
     }
 
     @Test
-    fun `make valid move`() {
+    fun `make valid move`() { // TODO: fix this test
         // given: an HTTP client
-        // val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+        val client = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofHours(1))
+            .build()
 
-        // TODO()
+        // and an empty lobby
+        deleteLobbies()
+
+        // and information to create 2 users
+        val username1 = newTestUserName()
+        val userId1 = createUserAndGetId(client, username1)
+        val tokenUser1 = getToken(client, username1).token
+
+        val username2 = newTestUserName()
+        val userId2 = createUserAndGetId(client, username2)
+        val tokenUser2 = getToken(client, username2).token
+
+        // and a ruleId
+        val ruleId = 2
+
+        // and a game
+        startMatchmakingProcess(client, ruleId, tokenUser1)
+        val game = startMatchmakingProcess(client, ruleId, tokenUser2)
+
+        // when: the user tries to make a valid move
+        val validMove = makeMove(client, game.id, 0, tokenUser1, OngoingMatch::class.java) // AQUI
+
+        // then: assert that the move is valid
+        assertTrue(validMove.moveContainer.getMoves().size == 1)
     }
 
     @Test
-    fun `make already occupied move`() {
+    fun `make already occupied move`() { // TODO: fix this test
         // given: an HTTP client
-//        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-//
-//        TODO()
+        val client = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofHours(1))
+            .build()
+
+        // and an empty lobby
+        deleteLobbies()
+
+        // and information to create 2 users
+        val username1 = newTestUserName()
+        val userId1 = createUserAndGetId(client, username1)
+        val tokenUser1 = getToken(client, username1).token
+
+        val username2 = newTestUserName()
+        val userId2 = createUserAndGetId(client, username2)
+        val tokenUser2 = getToken(client, username2).token
+
+        // and a ruleId
+        val ruleId = 2
+
+        // and a game
+        startMatchmakingProcess(client, ruleId, tokenUser1)
+        val game = startMatchmakingProcess(client, ruleId, tokenUser2)
+
+        // and a valid move
+        makeMove(client, game.id, 0, tokenUser1, OngoingMatch::class.java) // AQUI
+
+        // when: the user tries to make an already occupied move
+        // then: assert that the move is already occupied
+        makeMove(client, game.id, 0, tokenUser2, MakeMoveError.AlreadyOccupied::class.java)
     }
 
     @Test
     fun `make move out of bounds`() {
         // given: an HTTP client
-//        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-//
-//        TODO()
+        val client = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofHours(1))
+            .build()
+
+        // and an empty lobby
+        deleteLobbies()
+
+        // and information to create 2 users
+        val username1 = newTestUserName()
+        val userId1 = createUserAndGetId(client, username1)
+        val tokenUser1 = getToken(client, username1).token
+
+        val username2 = newTestUserName()
+        val userId2 = createUserAndGetId(client, username2)
+        val tokenUser2 = getToken(client, username2).token
+
+        // and a ruleId
+        val ruleId = 2
+
+        // and a game
+        startMatchmakingProcess(client, ruleId, tokenUser1)
+        val game = startMatchmakingProcess(client, ruleId, tokenUser2)
+
+        // when: the user tries to make a move out of bounds
+        // then: assert that the move is out of bounds
+        makeMove(client, game.id, 1000, tokenUser1, MakeMoveError.ImpossiblePosition::class.java)
     }
 
     @Test
     fun `make move when not your turn`() {
         // given: an HTTP client
-//        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-//
-//        TODO()
-    }
+        val client = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofHours(1))
+            .build()
 
-    @Test
-    fun `make move when game is finished`() {
-        // given: an HTTP client
-//        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-//
-//        TODO()
+        // and an empty lobby
+        deleteLobbies()
+
+        // and information to create 2 users
+        val username1 = newTestUserName()
+        val userId1 = createUserAndGetId(client, username1)
+        val tokenUser1 = getToken(client, username1).token
+
+        val username2 = newTestUserName()
+        val userId2 = createUserAndGetId(client, username2)
+        val tokenUser2 = getToken(client, username2).token
+
+        // and a ruleId
+        val ruleId = 2
+
+        // and a game
+        startMatchmakingProcess(client, ruleId, tokenUser1)
+        val game = startMatchmakingProcess(client, ruleId, tokenUser2)
+
+        // when: the user tries to make a move when it's not his turn
+        // then: assert that the move is invalid
+        makeMove(client, game.id, 0, tokenUser2, MakeMoveError.InvalidTurn::class.java)
     }
 
     @Test
     fun `make a move on a non existing game`() {
         // given: an HTTP client
-//        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-//
-//        TODO()
+        val client = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofHours(1))
+            .build()
+
+        // and an empty lobby
+        deleteLobbies()
+
+        // and information to create 2 users
+        val username1 = newTestUserName()
+        val userId1 = createUserAndGetId(client, username1)
+        val tokenUser1 = getToken(client, username1).token
+
+        val username2 = newTestUserName()
+        val userId2 = createUserAndGetId(client, username2)
+        val tokenUser2 = getToken(client, username2).token
+
+        // when: the user tries to make a move on a non existing game
+        // then: assert that the move is invalid
+        makeMove(client, 1000, 0, tokenUser1, MakeMoveError.GameNotFound::class.java)
     }
 
     @Test
@@ -190,18 +335,45 @@ class GameTests {
     }
 
     @Test
-    fun `get current turn player id`() {
+    fun `get current turn player id`() { // TODO: fix this test
         // given: an HTTP client
-//        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-//
-//        TODO()
+        val client = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofMinutes(1))
+            .build()
+
+        // and an empty lobby
+        deleteLobbies()
+
+        // and information to create 2 users
+        val username1 = newTestUserName()
+        val userId1 = createUserAndGetId(client, username1)
+        val tokenUser1 = getToken(client, username1).token
+
+        val username2 = newTestUserName()
+        val userId2 = createUserAndGetId(client, username2)
+        val tokenUser2 = getToken(client, username2).token
+
+        // and a ruleId
+        val ruleId = 2
+
+        // and a game
+        startMatchmakingProcess(client, ruleId, tokenUser1)
+        val game = startMatchmakingProcess(client, ruleId, tokenUser2)
+
+        // when: the user tries to get the current turn player id
+        val currentTurnPlayerId = getTurnFromMatch(client, game.id)
+
+        // then: assert that the current turn player id is on the match
+        assertEquals(currentTurnPlayerId, userId1 or userId2)
+
+        // and the turn is for player black
+        assertEquals(currentTurnPlayerId, getGameDetails(client, game.id, tokenUser1).playerBlack) // AQUI
     }
 
     @Test
     fun `create two users, going to matchmaking, begin the match, make moves, see who won`() { // TODO: fix this test
-        // before
-        deleteLobbies()
-
         // given: an HTTP client
         val client = WebTestClient
             .bindToServer()
@@ -209,8 +381,8 @@ class GameTests {
             .responseTimeout(Duration.ofHours(1))
             .build()
 
-        // and a ruleId
-        val ruleId = 2
+        // and an empty lobby
+        deleteLobbies()
 
         // and 2 authenticated users
         val username1 = newTestUserName()
@@ -221,54 +393,92 @@ class GameTests {
         val userId2 = createUserAndGetId(client, username2)
         val tokenUser2 = getToken(client, username2)
 
-        // and a lobby
-        val lobby1 = startMatchmakingProcess(client, ruleId, tokenUser1.token)
-        assertTrue(!lobby1.isMatch)
+        // and a ruleId
+        val ruleId = 2
 
-        val didLeave = leaveLobby(client, lobby1.id, tokenUser1.token)
-        assertTrue(didLeave)
-
-        val lobby2 = startMatchmakingProcess(client, ruleId, tokenUser2.token)
-        assertTrue(!lobby2.isMatch)
-
-        val game = startMatchmakingProcess(client, ruleId, tokenUser1.token)
+        // and a game
+        startMatchmakingProcess(client, ruleId, tokenUser1.token)
+        val game = startMatchmakingProcess(client, ruleId, tokenUser2.token)
         assertTrue(game.isMatch)
 
+        // and a turn
         val turn = getTurnFromMatch(client, game.id)
 
+        // and player Black and player White
         val getPlayerBlack = if (turn == userId1) tokenUser1.token else tokenUser2.token
         val getPlayerWhite = if (turn == userId1) tokenUser2.token else tokenUser1.token
 
-        println("token player black: $getPlayerBlack")
-        println("token player white: $getPlayerWhite")
-
+        // when: the user tries to make a move when it's not his turn
+        // then: assert that the move is invalid
         makeMove(client, game.id, 9, getPlayerWhite, MakeMoveError.InvalidTurn::class.java)
 
+        // when: the user tries to make a valid move
         val validMove1 = makeMove(client, game.id, 0, getPlayerBlack, OngoingMatch::class.java) // AQUI
-
+        // then: assert that the move is valid
         assertTrue(validMove1.moveContainer.getMoves().size == 1)
 
+        // when: the user tries to make a valid move
         val validMove2 = makeMove(client, game.id, 10, getPlayerWhite, OngoingMatch::class.java)
-
+        // then: assert that the move is valid
         assertTrue(validMove2.moveContainer.getMoves().size == 2)
 
+        // when: the users play valid moves till 'almost' the end of the game
         makeMove(client, game.id, 1, getPlayerBlack, OngoingMatch::class.java)
-
         makeMove(client, game.id, 20, getPlayerWhite, OngoingMatch::class.java)
-
         makeMove(client, game.id, 2, getPlayerBlack, OngoingMatch::class.java)
-
         makeMove(client, game.id, 15, getPlayerWhite, OngoingMatch::class.java)
-
         makeMove(client, game.id, 3, getPlayerBlack, OngoingMatch::class.java)
-
         makeMove(client, game.id, 16, getPlayerWhite, OngoingMatch::class.java)
 
-        makeMove(client, game.id, 2, getPlayerBlack, MakeMoveError.AlreadyOccupied::class.java)
-
+        // when: the user tries to make a valid winning move
         val finished = makeMove(client, game.id, 4, getPlayerBlack, FinishedMatch::class.java)
 
+        // then: assert that was a winning move and the winner is the player black
         assertEquals(finished.playerBlack, finished.getWinnerIdOrNull())
+    }
+
+    @Test
+    fun `make move when game is finished`() { // TODO: fix this test
+        // given: an HTTP client
+        val client = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofHours(1))
+            .build()
+
+        // and an empty lobby
+        deleteLobbies()
+
+        // and 2 authenticated users
+        val username1 = newTestUserName()
+        val userId1 = createUserAndGetId(client, username1)
+        val tokenUser1 = getToken(client, username1).token
+
+        val username2 = newTestUserName()
+        val userId2 = createUserAndGetId(client, username2)
+        val tokenUser2 = getToken(client, username2).token
+
+        // and a ruleId
+        val ruleId = 2
+
+        // and a game
+        startMatchmakingProcess(client, ruleId, tokenUser1)
+        val game = startMatchmakingProcess(client, ruleId, tokenUser2)
+
+        // and a valid finished game
+        makeMove(client, game.id, 0, tokenUser1, OngoingMatch::class.java) // AQUI
+        makeMove(client, game.id, 10, tokenUser2, OngoingMatch::class.java)
+        makeMove(client, game.id, 1, tokenUser1, OngoingMatch::class.java)
+        makeMove(client, game.id, 11, tokenUser2, OngoingMatch::class.java)
+        makeMove(client, game.id, 2, tokenUser1, OngoingMatch::class.java)
+        makeMove(client, game.id, 12, tokenUser2, OngoingMatch::class.java)
+        makeMove(client, game.id, 3, tokenUser1, OngoingMatch::class.java)
+        makeMove(client, game.id, 13, tokenUser2, OngoingMatch::class.java)
+        makeMove(client, game.id, 4, tokenUser1, FinishedMatch::class.java)
+
+        // when: the user tries to make a move when the game is finished
+        // then: assert that the move is invalid
+        makeMove(client, game.id, 17, tokenUser2, MakeMoveError.GameFinished::class.java)
     }
 
     /**
@@ -405,6 +615,15 @@ class GameTests {
             .exchange()
             .expectStatus().isOk
             .expectBody<Boolean>()
+            .returnResult()
+            .responseBody!!
+
+    private fun getGameDetails(client: WebTestClient, gameId: Int, token: String) =
+        client.get().uri("/game/$gameId")
+            .header("Authorization", "Bearer $token")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Match>()
             .returnResult()
             .responseBody!!
 
