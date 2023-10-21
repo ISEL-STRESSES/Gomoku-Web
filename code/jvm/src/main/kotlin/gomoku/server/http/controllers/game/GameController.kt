@@ -1,7 +1,11 @@
 package gomoku.server.http.controllers.game
 
+import gomoku.server.domain.game.match.FinishedMatch
+import gomoku.server.domain.game.match.OngoingMatch
 import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
+import gomoku.server.http.controllers.game.models.FinishedMatchOutputModel
+import gomoku.server.http.controllers.game.models.OngoingMatchOutputModel
 import gomoku.server.http.controllers.media.Problem
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.MakeMoveError
@@ -46,7 +50,10 @@ class GameController(private val gameService: GameService) {
     fun gameDetails(@PathVariable id: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val game = gameService.getGame(id)
         return if (game != null) {
-            ResponseEntity.ok(game)
+            when (game) {
+                is OngoingMatch -> ResponseEntity.ok(OngoingMatchOutputModel.fromMatch(game))
+                is FinishedMatch -> ResponseEntity.ok(FinishedMatchOutputModel.fromMatch(game))
+            }
         } else {
             Problem.response(404, Problem.gameNotFound)
         }
@@ -78,7 +85,10 @@ class GameController(private val gameService: GameService) {
         val moveResult = gameService.makeMove(id, authenticatedUser.user.uuid, pos)
         return when (moveResult) {
             is Failure -> moveResult.value.resolveProblem().also { println(it) }
-            is Success -> ResponseEntity.ok(moveResult.value)
+            is Success -> when (moveResult.value) {
+                is OngoingMatch -> ResponseEntity.ok(OngoingMatchOutputModel.fromMatch(moveResult.value))
+                is FinishedMatch -> ResponseEntity.ok(FinishedMatchOutputModel.fromMatch(moveResult.value))
+            }
         }
     }
 

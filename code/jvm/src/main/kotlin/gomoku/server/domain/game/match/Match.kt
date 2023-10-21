@@ -56,7 +56,7 @@ class FinishedMatch(
     playerWhite: Int,
     rules: Rules,
     moves: MoveContainer,
-    private val matchOutcome: MatchOutcome
+    val matchOutcome: MatchOutcome
 ) : Match(id, playerBlack, playerWhite, rules, moves) {
 
     val type = "FinishedMatch"
