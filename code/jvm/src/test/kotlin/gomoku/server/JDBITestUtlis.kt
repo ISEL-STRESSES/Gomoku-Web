@@ -84,3 +84,27 @@ fun <L, R> Either<L, R>.failureOrNull(): L? =
         is Failure -> this.value
         else -> null
     }
+
+/**
+ * Deletes all lobbies from the database before running the test
+ * @param handle the database handle
+ * TODO: not a good way to do this, but it works for now
+ */
+fun deleteLobbies(handle: Handle) {
+    handle.execute("DELETE FROM lobby")
+}
+
+/**
+ * Deletes all lobbies from the database before running the test
+ * @param transactionManager the transaction manager
+ * TODO: not a good way to do this, but it works for now
+ */
+fun deleteLobbies(transactionManager: TransactionManager){
+    transactionManager.run { transaction ->
+        transaction.run {
+            jdbi.useTransaction<Exception> { handle ->
+                deleteLobbies(handle)
+            }
+        }
+    }
+}

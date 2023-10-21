@@ -192,7 +192,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .mapTo<UserStats>()
             .singleOrNull()
 
-    override fun getUserRanking(userId: Int, ruleId: Int): RankingUserData =
+    override fun getUserRanking(userId: Int, ruleId: Int): RankingUserData? =
         handle.createQuery(
             """
             select us.user_id, u.username, us.rules_id as rule_id, us.games_played, us.elo, u.username from user_stats us
@@ -204,7 +204,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .bind("user_id", userId)
             .bind("rules_id", ruleId)
             .mapTo<RankingUserData>()
-            .single()
+            .singleOrNull()
 
     /**
      * Sets the stats of a user for a given rule.

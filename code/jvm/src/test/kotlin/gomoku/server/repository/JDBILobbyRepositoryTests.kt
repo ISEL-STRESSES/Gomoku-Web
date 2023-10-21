@@ -1,5 +1,6 @@
 package gomoku.server.repository
 
+import gomoku.server.deleteLobbies
 import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.repository.lobby.JDBILobbyRepository
 import gomoku.server.repository.user.JDBIUserRepository
@@ -31,7 +32,10 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `getLobbyByRuleId should return null for non-existing ruleId`() = testWithHandleAndRollback { handle -> // TODO: fix this test
+    fun `getLobbyByRuleId should return null for non-existing ruleId`() = testWithHandleAndRollback { handle ->
+        // before
+        deleteLobbies(handle)
+        // test
         val repo = JDBILobbyRepository(handle)
         val ruleId = 2
 
@@ -51,7 +55,10 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `getLobbies should return list of lobbies`() = testWithHandleAndRollback { handle -> // TODO: fix this test
+    fun `getLobbies should return list of lobbies`() = testWithHandleAndRollback { handle ->
+        // before
+        deleteLobbies(handle)
+        // test
         val lobbyRepo = JDBILobbyRepository(handle)
         val userRepo = JDBIUserRepository(handle)
 
@@ -125,7 +132,10 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `createLobby should create a lobby for valid ruleId and userId`() = testWithHandleAndRollback { handle -> // TODO: fix this test
+    fun `createLobby should create a lobby for valid ruleId and userId`() = testWithHandleAndRollback { handle ->
+        // before
+        deleteLobbies(handle)
+        // test
         val repo = JDBILobbyRepository(handle)
         val ruleId = 3
         val userId = 3
@@ -163,7 +173,10 @@ class JDBILobbyRepositoryTests {
     }
 
     @Test
-    fun `leaveLobby should remove user from existing lobby`() = testWithHandleAndRollback { handle -> // TODO: fix this test
+    fun `leaveLobby should remove user from existing lobby`() = testWithHandleAndRollback { handle ->
+        // before
+        deleteLobbies(handle)
+        // test
         val repo = JDBILobbyRepository(handle)
         val userRepo = JDBIUserRepository(handle)
         val newUsername = "User" + Random.nextLong()

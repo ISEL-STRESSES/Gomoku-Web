@@ -146,8 +146,12 @@ class GameService(private val transactionManager: TransactionManager) {
         tr: Transaction,
         player1Score: Double
     ) {
-        val statsPlayer1 = tr.usersRepository.getUserRanking(player1Id, ruleId) ?: RankingUserData(player1Id, "User1", ruleId)
-        val statsPlayer2 = tr.usersRepository.getUserRanking(player2Id, ruleId) ?: RankingUserData(player2Id, "User2", ruleId)
+        val player1 = tr.usersRepository.getUserById(player1Id) ?: return // should never return because the user exists
+        val player2 = tr.usersRepository.getUserById(player2Id) ?: return // should never return because the user exists
+        val statsPlayer1 = tr.usersRepository.getUserRanking(player1Id, ruleId)
+            ?: RankingUserData(player1Id, player1.username, ruleId)
+        val statsPlayer2 = tr.usersRepository.getUserRanking(player2Id, ruleId)
+            ?: RankingUserData(player2Id, player2.username, ruleId)
 
         val newPlayer1Elo = updateElo(statsPlayer1.elo.toDouble(), statsPlayer2.elo.toDouble(), player1Score)
         val newPlayer2Elo = updateElo(statsPlayer2.elo.toDouble(), statsPlayer1.elo.toDouble(), 1 - player1Score)
