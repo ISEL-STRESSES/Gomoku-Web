@@ -171,4 +171,24 @@ class GameController(private val gameService: GameService) {
             CurrentTurnPlayerError.NoTurn -> Problem.response(400, Problem.samePlayer)
             CurrentTurnPlayerError.MatchNotFound -> Problem.response(404, Problem.gameNotFound)
         }
+
+    /**
+     * TODO
+     */
+    private fun GetMatchError.resolveProblem(): ResponseEntity<*> =
+        when (this) {
+            GetMatchError.MatchNotFound -> Problem.response(404, Problem.gameNotFound)
+            GetMatchError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
+            GetMatchError.PlayerNotInMatch -> Problem.response(401, Problem.playerNotInMatch)
+        }
+
+    /**
+     * TODO
+     */
+    private fun LeaveLobbyError.resolveProblem() : ResponseEntity<*> =
+        when(this) {
+            LeaveLobbyError.LobbyNotFound -> Problem.response(404, Problem.lobbyNotFound)
+            LeaveLobbyError.UserNotInLobby -> Problem.response(404, Problem.userNotFound)
+            LeaveLobbyError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
+        }
 }

@@ -494,7 +494,7 @@ class GameTests {
 
         // and 2 authenticated users
         val username1 = newTestUserName()
-        createUserAndGetId(client, username1) // userId is not needed
+        val userId1 = createUserAndGetId(client, username1)
         val tokenUser1 = getToken(client, username1).token
 
         val username2 = newTestUserName()
@@ -507,6 +507,11 @@ class GameTests {
         // and a game
         startMatchmakingProcess(client, ruleId, tokenUser1)
         val game = startMatchmakingProcess(client, ruleId, tokenUser2)
+
+        val turn = getTurnFromMatch(client, game.id)
+
+        val playerBlack = if (turn == userId1) tokenUser1 else tokenUser2
+        val playerWhite = if (turn == userId1) tokenUser2 else tokenUser1
 
         // and a valid finished game
         makeMove(client, game.id, 0, playerBlack, MatchOutputModel::class.java)
@@ -523,7 +528,8 @@ class GameTests {
 
         // when: the user tries to make a move when the game is finished
         // then: assert that the move is invalid
-        makeMove(client, game.id, 17, tokenUser2, MakeMoveError.GameFinished::class.java)
+        makeMove(client, game.id, 17, playerWhite, MakeMoveError.GameFinished::class.java)
+        makeMove(client, game.id, 17, playerBlack, MakeMoveError.GameFinished::class.java)
     }
 
     /**

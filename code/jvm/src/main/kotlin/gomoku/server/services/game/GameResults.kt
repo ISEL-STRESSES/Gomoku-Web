@@ -3,6 +3,8 @@ package gomoku.server.services.game
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.match.Match
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
+import gomoku.server.services.errors.game.GetMatchError
+import gomoku.server.services.errors.game.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.utils.Either
@@ -27,3 +29,11 @@ typealias MakeMoveResult = Either<MakeMoveError, Match>
  * @see Match
  */
 typealias CurrentTurnPlayerResult = Either<CurrentTurnPlayerError, Int>
+
+typealias LeaveLobbyResult = Either<LeaveLobbyError, Unit>
+
+/**
+ * Result for getting a match
+ * @see GetMatchError
+ */
+typealias GetMatchResult = Either<GetMatchError, Match>

@@ -243,6 +243,25 @@ class GameServiceTests {
     }
 
     @Test
+    fun `leaveLobby should be UserNotInLobby if the user is not in the lobby`() {
+        val userId = 2
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+            val dummyLobby = transactionManager.run {
+                deleteLobbies(transactionManager)
+                it.lobbyRepository.createLobby(1,4)
+            }
+
+            val result = gameService.leaveLobby(dummyLobby, userId)
+
+            assertTrue(result is Failure)
+
+            assertTrue(result.failureOrNull() == LeaveLobbyError.UserNotInLobby)
+        }
+    }
+
+    @Test
     fun `getAvailableRules `() {
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)

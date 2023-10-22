@@ -37,6 +37,14 @@ interface MatchRepository {
     fun isRuleStoredById(ruleId: Int): Boolean
 
     // Match
+
+    /**
+     * Verifies if the match is stored based on the [matchId]
+     * @param matchId id of the match
+     * @return true if the match is stored, false otherwise
+     */
+    fun isMatchStoredById(matchId: Int) : Boolean
+
     /**
      * Creates a new match, with the given rule and users ids
      * setting the match state to [MatchState.ONGOING]

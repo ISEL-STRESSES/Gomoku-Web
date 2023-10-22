@@ -236,11 +236,24 @@ class GameService(private val transactionManager: TransactionManager) {
     /**
      * Gets the details of a game.
      * @param gameId The id of the game.
-     * @return The details of the game, or null if the game doesn't exist.
+     * @param userId The id of the user.
+     * @return The details of the game, or an error.
      */
-    fun getGame(gameId: Int): Match? =
+    fun getGame(gameId: Int, userId :Int): GetMatchResult =
         transactionManager.run {
-            it.matchRepository.getMatchById(gameId)
+            if(!it.usersRepository.isUserStoredById(userId))
+                return@run failure(GetMatchError.PlayerNotFound)
+
+            if(!it.matchRepository.isMatchStoredById(gameId))
+                return@run failure(GetMatchError.MatchNotFound)
+
+            val gamePlayers = it.matchRepository.getMatchPlayers(gameId)
+                ?: return@run failure(GetMatchError.MatchNotFound)
+
+            if(gamePlayers.first != userId && gamePlayers.second != userId)
+                return@run failure(GetMatchError.PlayerNotInMatch)
+
+            success(it.matchRepository.getMatchById(gameId)!!)
         }
 
     companion object {
