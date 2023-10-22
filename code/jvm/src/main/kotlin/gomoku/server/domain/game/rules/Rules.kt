@@ -2,25 +2,10 @@ package gomoku.server.domain.game.rules
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import gomoku.server.domain.game.IsValidMoveResult
 import gomoku.server.domain.game.match.Color
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.match.MoveContainer
-import gomoku.utils.Either
-
-typealias IsValidMoveResult = Either<MoveError, Unit>
-
-/**
- * Represents an error that can occur when trying to play a move
- * @property ImpossiblePosition the position is outside the board
- * @property AlreadyOccupied the position is already occupied
- * @property InvalidTurn the player is trying to play out of turn
- */
-sealed class MoveError {
-    object ImpossiblePosition : MoveError()
-    object AlreadyOccupied : MoveError()
-    object InvalidTurn : MoveError()
-    object InvalidMove : MoveError()
-}
 
 /**
  * Represents a rule

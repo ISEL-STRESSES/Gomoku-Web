@@ -134,7 +134,6 @@ class JDBIMatchRepositoryTests {
         assertNull(rule4)
 
         val rules = repo.getAllRules()
-        println(rules)
         assertNotNull(rules)
         assertEquals(3, rules.size)
     }

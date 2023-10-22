@@ -1,6 +1,8 @@
 package gomoku.server.domain.game.rules
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import gomoku.server.domain.game.IsValidMoveResult
+import gomoku.server.domain.game.errors.MoveError
 import gomoku.server.domain.game.match.Color
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.match.MoveContainer

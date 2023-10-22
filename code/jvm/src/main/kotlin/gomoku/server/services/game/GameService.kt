@@ -1,6 +1,7 @@
 package gomoku.server.services.game
 
 import gomoku.server.domain.game.Matchmaker
+import gomoku.server.domain.game.errors.MoveError
 import gomoku.server.domain.game.match.Color
 import gomoku.server.domain.game.match.FinishedMatch
 import gomoku.server.domain.game.match.Match
@@ -10,7 +11,6 @@ import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.match.OngoingMatch
 import gomoku.server.domain.game.match.Position
 import gomoku.server.domain.game.match.toMatchOutcome
-import gomoku.server.domain.game.rules.MoveError
 import gomoku.server.domain.game.rules.Rules
 import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.updateElo

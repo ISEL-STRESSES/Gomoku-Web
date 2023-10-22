@@ -55,7 +55,7 @@ class GameTests {
 
         // and an authenticated user
         val username = newTestUserName()
-        val userId = createUserAndGetId(client, username)
+        createUserAndGetId(client, username) // userId is not needed
         // and a token
         val userToken = getToken(client, username)
 
@@ -80,11 +80,11 @@ class GameTests {
 
         // and information to create 2 users
         val username1 = newTestUserName()
-        val userId1 = createUserAndGetId(client, username1)
+        createUserAndGetId(client, username1) // userId is not needed
         val tokenUser1 = getToken(client, username1).token
 
         val username2 = newTestUserName()
-        val userId2 = createUserAndGetId(client, username2)
+        createUserAndGetId(client, username2) // userId is not needed
         val tokenUser2 = getToken(client, username2).token
 
         // and a ruleId
@@ -95,7 +95,7 @@ class GameTests {
         val game = startMatchmakingProcess(client, ruleId, tokenUser2)
 
         // when: the user tries to get the game details
-        val gameDetails = getGameDetails(client, game.id, tokenUser1)
+        val gameDetails = getGameDetails(client, game.id, tokenUser1, OngoingMatchOutputModel::class.java)
 
         // then: assert that the game details are correct
         assertEquals(gameDetails.ruleId, ruleId)
@@ -121,7 +121,7 @@ class GameTests {
         val tokenUser1 = getToken(client, username1).token
 
         val username2 = newTestUserName()
-        val userId2 = createUserAndGetId(client, username2)
+        createUserAndGetId(client, username2) // userId is not needed
         val tokenUser2 = getToken(client, username2).token
 
         // and a ruleId
@@ -131,15 +131,19 @@ class GameTests {
         startMatchmakingProcess(client, ruleId, tokenUser1)
         val game = startMatchmakingProcess(client, ruleId, tokenUser2)
 
+        // and a turn
+        val getTurn = getTurnFromMatch(client, game.id)
+        val currentPlayer = if (getTurn == userId1) tokenUser1 else tokenUser2
+
         // when: the user tries to make a valid move
-        val validMove = makeMove(client, game.id, 0, tokenUser1, OngoingMatchOutputModel::class.java)
+        val validMove = makeMove(client, game.id, 0, currentPlayer, OngoingMatchOutputModel::class.java)
 
         // then: assert that the move is valid
         assertTrue(validMove.moves.size == 1)
     }
 
     @Test
-    fun `make already occupied move`() { // TODO: fix this test
+    fun `make already occupied move`() {
         // given: an HTTP client
         val client = WebTestClient
             .bindToServer()
@@ -156,7 +160,7 @@ class GameTests {
         val tokenUser1 = getToken(client, username1).token
 
         val username2 = newTestUserName()
-        val userId2 = createUserAndGetId(client, username2)
+        createUserAndGetId(client, username2) // userId is not needed
         val tokenUser2 = getToken(client, username2).token
 
         // and a ruleId
@@ -166,12 +170,17 @@ class GameTests {
         startMatchmakingProcess(client, ruleId, tokenUser1)
         val game = startMatchmakingProcess(client, ruleId, tokenUser2)
 
+        // and a turn
+        val getTurn = getTurnFromMatch(client, game.id)
+        val currentPlayer = if (getTurn == userId1) tokenUser1 else tokenUser2
+        val otherPlayer = if (getTurn == userId1) tokenUser2 else tokenUser1
+
         // and a valid move
-        makeMove(client, game.id, 0, tokenUser1, OngoingMatchOutputModel::class.java) // AQUI
+        makeMove(client, game.id, 0, currentPlayer, OngoingMatchOutputModel::class.java)
 
         // when: the user tries to make an already occupied move
         // then: assert that the move is already occupied
-        makeMove(client, game.id, 0, tokenUser2, MakeMoveError.AlreadyOccupied::class.java)
+        makeMove(client, game.id, 0, otherPlayer, MakeMoveError.AlreadyOccupied::class.java)
     }
 
     @Test
@@ -192,7 +201,7 @@ class GameTests {
         val tokenUser1 = getToken(client, username1).token
 
         val username2 = newTestUserName()
-        val userId2 = createUserAndGetId(client, username2)
+        createUserAndGetId(client, username2) // userId is not needed
         val tokenUser2 = getToken(client, username2).token
 
         // and a ruleId
@@ -202,9 +211,13 @@ class GameTests {
         startMatchmakingProcess(client, ruleId, tokenUser1)
         val game = startMatchmakingProcess(client, ruleId, tokenUser2)
 
+        // and a turn
+        val getTurn = getTurnFromMatch(client, game.id)
+        val currentPlayer = if (getTurn == userId1) tokenUser1 else tokenUser2
+
         // when: the user tries to make a move out of bounds
         // then: assert that the move is out of bounds
-        makeMove(client, game.id, 1000, tokenUser1, MakeMoveError.ImpossiblePosition::class.java)
+        makeMove(client, game.id, 1000, currentPlayer, MakeMoveError.ImpossiblePosition::class.java)
     }
 
     @Test
@@ -225,7 +238,7 @@ class GameTests {
         val tokenUser1 = getToken(client, username1).token
 
         val username2 = newTestUserName()
-        val userId2 = createUserAndGetId(client, username2)
+        createUserAndGetId(client, username2) // userId is not needed
         val tokenUser2 = getToken(client, username2).token
 
         // and a ruleId
@@ -235,9 +248,13 @@ class GameTests {
         startMatchmakingProcess(client, ruleId, tokenUser1)
         val game = startMatchmakingProcess(client, ruleId, tokenUser2)
 
+        // and a turn
+        val getTurn = getTurnFromMatch(client, game.id)
+        val otherPlayer = if (getTurn == userId1) tokenUser2 else tokenUser1
+
         // when: the user tries to make a move when it's not his turn
         // then: assert that the move is invalid
-        makeMove(client, game.id, 0, tokenUser2, MakeMoveError.InvalidTurn::class.java)
+        makeMove(client, game.id, 0, otherPlayer, MakeMoveError.InvalidTurn::class.java)
     }
 
     @Test
@@ -254,16 +271,16 @@ class GameTests {
 
         // and information to create 2 users
         val username1 = newTestUserName()
-        val userId1 = createUserAndGetId(client, username1)
+        createUserAndGetId(client, username1) // userId is not needed
         val tokenUser1 = getToken(client, username1).token
 
         val username2 = newTestUserName()
-        val userId2 = createUserAndGetId(client, username2)
-        val tokenUser2 = getToken(client, username2).token
+        createUserAndGetId(client, username2) // userId is not needed
+        getToken(client, username2).token // token is not needed
 
         // when: the user tries to make a move on a non existing game
         // then: assert that the move is invalid
-        makeMove(client, 1000, 0, tokenUser1, MakeMoveError.GameNotFound::class.java)
+        makeMove(client, Int.MAX_VALUE, 0, tokenUser1, MakeMoveError.GameNotFound::class.java)
     }
 
     @Test
@@ -274,12 +291,15 @@ class GameTests {
             .baseUrl("http://localhost:$port/api")
             .responseTimeout(Duration.ofHours(1))
             .build()
+
         // a ruleId
         val ruleId = 1
+
         // information to create a user
         val username = newTestUserName()
-        val userId = createUserAndGetId(client, username)
+        createUserAndGetId(client, username) // userId is not needed
         val tokenUser = getToken(client, username).token
+
         // and an empty lobby
         deleteLobbies()
 
@@ -293,17 +313,25 @@ class GameTests {
     @Test
     fun `start matchmaking process when already in matchmaking process`() {
         // given: an HTTP client
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-        // a ruleId
-        val ruleId = 2
-        // information to create a user
-        val username = newTestUserName()
-        val userId = createUserAndGetId(client, username)
-        val tokenUser = getToken(client, username).token
+        val client = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofMinutes(1))
+            .build()
+
         // and an empty lobby
         deleteLobbies()
+
+        // a ruleId
+        val ruleId = 2
+
+        // information to create a user
+        val username = newTestUserName()
+        createUserAndGetId(client, username) // userId is not needed
+        val tokenUser = getToken(client, username).token
+
         // and the user already started a matchmaking process
-        val lobby = startMatchmakingProcess(client, ruleId, tokenUser)
+        startMatchmakingProcess(client, ruleId, tokenUser) // lobbyId is not needed
 
         // when, then: the user tries to start a matchmaking process again should return a bad request
         client.post().uri("/game/$ruleId")
@@ -318,15 +346,23 @@ class GameTests {
     @Test
     fun `leave matchmaking process`() {
         // given: an HTTP client
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
-        // a ruleId
-        val ruleId = 2
-        // information to create a user
-        val username = newTestUserName()
-        val userId = createUserAndGetId(client, username)
-        val tokenUser = getToken(client, username).token
+        val client = WebTestClient
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofMinutes(1))
+            .build()
+
         // and an empty lobby
         deleteLobbies()
+
+        // a ruleId
+        val ruleId = 2
+
+        // information to create a user
+        val username = newTestUserName()
+        createUserAndGetId(client, username) // userId is not needed
+        val tokenUser = getToken(client, username).token
+
         // and the user already started a matchmaking process
         val lobby = startMatchmakingProcess(client, ruleId, tokenUser)
 
@@ -369,7 +405,7 @@ class GameTests {
         assertTrue((currentTurnPlayerId == userId1) or (currentTurnPlayerId == userId2))
 
         // and the turn is for player black
-        assertEquals(currentTurnPlayerId, getGameDetails(client, game.id, tokenUser1).playerBlack)
+        assertEquals(currentTurnPlayerId, getGameDetails(client, game.id, tokenUser1, OngoingMatchOutputModel::class.java).playerBlack)
     }
 
     @Test
@@ -390,7 +426,7 @@ class GameTests {
         val tokenUser1 = getToken(client, username1)
 
         val username2 = newTestUserName()
-        val userId2 = createUserAndGetId(client, username2)
+        createUserAndGetId(client, username2) // userId is not needed
         val tokenUser2 = getToken(client, username2)
 
         // and a ruleId
@@ -402,11 +438,11 @@ class GameTests {
         assertTrue(game.isMatch)
 
         // and a turn
-        val turn = getTurnFromMatch(client, game.id)
+        val playerBlackId = getTurnFromMatch(client, game.id)
 
         // and player Black and player White
-        val getPlayerBlack = if (turn == userId1) tokenUser1.token else tokenUser2.token
-        val getPlayerWhite = if (turn == userId1) tokenUser2.token else tokenUser1.token
+        val getPlayerBlack = if (playerBlackId == userId1) tokenUser1.token else tokenUser2.token
+        val getPlayerWhite = if (playerBlackId == userId1) tokenUser2.token else tokenUser1.token
 
         // when: the user tries to make a move when it's not his turn
         // then: assert that the move is invalid
@@ -434,7 +470,8 @@ class GameTests {
         val finished = makeMove(client, game.id, 4, getPlayerBlack, FinishedMatchOutputModel::class.java)
 
         // then: assert that was a winning move and the winner is the player black
-        // assertEquals(finished.playerBlack, finished.matchOutcome)
+        assertEquals(finished.matchOutcome,"BLACK_WON")
+        assertEquals(finished.playerBlack, playerBlackId)
     }
 
     @Test
@@ -451,11 +488,11 @@ class GameTests {
 
         // and 2 authenticated users
         val username1 = newTestUserName()
-        val userId1 = createUserAndGetId(client, username1)
+        createUserAndGetId(client, username1) // userId is not needed
         val tokenUser1 = getToken(client, username1).token
 
         val username2 = newTestUserName()
-        val userId2 = createUserAndGetId(client, username2)
+        createUserAndGetId(client, username2) // userId is not needed
         val tokenUser2 = getToken(client, username2).token
 
         // and a ruleId
@@ -515,7 +552,7 @@ class GameTests {
         return client.post().uri("/game/$gameId/play?pos=$pos")
             .header("Authorization", "Bearer $token")
             .exchange()
-            .expectBody(expectedType).also { println("make move: " + it.returnResult().responseBody) }
+            .expectBody(expectedType)
             .returnResult()
             .responseBody!!
     }
@@ -526,7 +563,6 @@ class GameTests {
      * Creates a user and returns its id
      * @param client the web test client
      * @param username The username of the user
-     * @param password The password of the user
      * @return The id of the user
      */
     private fun createUserAndGetId(client: WebTestClient, username: String): Int {
@@ -618,12 +654,12 @@ class GameTests {
             .returnResult()
             .responseBody!!
 
-    private fun getGameDetails(client: WebTestClient, gameId: Int, token: String) =
+    private fun <T : Any>getGameDetails(client: WebTestClient, gameId: Int, token: String, expectedType: Class<T>): T =
         client.get().uri("/game/$gameId")
             .header("Authorization", "Bearer $token")
             .exchange()
             .expectStatus().isOk
-            .expectBody<OngoingMatchOutputModel>()
+            .expectBody(expectedType)
             .returnResult()
             .responseBody!!
 

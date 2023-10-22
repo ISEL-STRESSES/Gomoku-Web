@@ -144,7 +144,6 @@ class UserServiceTests {
         val result = userService.searchRanking(ruleId, null)
 
         assertNotNull(result)
-        println(result)
         assertEquals(10, result.size)
     }
 

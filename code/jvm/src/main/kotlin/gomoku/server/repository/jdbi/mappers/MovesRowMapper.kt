@@ -38,8 +38,8 @@ class MovesRowMapper : RowMapper<List<Move>> {
         return when (moveContainerResult) {
             is Success -> moveContainerResult.value.getMoves()
             is Failure -> when (moveContainerResult.value) {
-                AddMoveError.ImpossiblePosition -> throw ImpossiblePositionException()
-                AddMoveError.AlreadyOccupied -> throw PositionAlreadyOccupiedException()
+                AddMoveError.ImpossiblePosition -> throw ImpossiblePositionException("Failed to Deserialize Moves")
+                AddMoveError.AlreadyOccupied -> throw PositionAlreadyOccupiedException("Failed to Deserialize Moves")
             }
         }
     }

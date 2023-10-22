@@ -1,6 +1,8 @@
 package gomoku.server.domain.game.rules
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import gomoku.server.domain.game.IsValidMoveResult
+import gomoku.server.domain.game.errors.MoveError
 import gomoku.server.domain.game.match.Color
 import gomoku.server.domain.game.match.Move
 import gomoku.server.domain.game.match.MoveContainer
@@ -38,7 +40,7 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
                     return failure(MoveError.InvalidMove)
                 }
             }
-            1 -> { // White's first move anywhere becides center
+            1 -> { // White's first move anywhere besides center
                 if (turn != move.color) {
                     return failure(MoveError.InvalidTurn)
                 }
@@ -61,6 +63,12 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
         return success(Unit)
     }
 
+    /**
+     * Checks if two positions are two squares away from each other.
+     * @param pos1 The first position
+     * @param pos2 The second position
+     * @return true if the positions are two squares away from each other, false otherwise
+     */
     private fun isTwoSquaresAway(pos1: Position, pos2: Position): Boolean {
         val dx = abs(pos1.value % boardSize.value - pos2.value % boardSize.value)
         val dy = abs(pos1.value / boardSize.value - pos2.value / boardSize.value)

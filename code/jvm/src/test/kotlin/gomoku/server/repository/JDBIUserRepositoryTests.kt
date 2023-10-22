@@ -138,8 +138,6 @@ class JDBIUserRepositoryTests {
         val repo = JDBIUserRepository(handle)
         // and: a rule
         val usersStats = repo.searchRanking(2, "", 0, 10)
-        println("----- USERS STATS -----")
-        usersStats.forEach(::println)
         // then: users stats are retrieved
         // Check if the returned list is not null
         assertNotNull(usersStats)
@@ -154,8 +152,6 @@ class JDBIUserRepositoryTests {
         val userStats = repo.getUserStats(1)
         assertNotNull(userStats)
         assertEquals(1, userStats!!.uuid)
-        println("----- USER1 STATS -----")
-        userStats.userRuleStats.forEach(::println)
 
         val userRuleStats = repo.getUserRanking(1, 2)
         assertNotNull(userRuleStats)

@@ -84,7 +84,7 @@ class GameController(private val gameService: GameService) {
     fun makePlay(@PathVariable id: Int, authenticatedUser: AuthenticatedUser, @RequestParam pos: Int): ResponseEntity<*> {
         val moveResult = gameService.makeMove(id, authenticatedUser.user.uuid, pos)
         return when (moveResult) {
-            is Failure -> moveResult.value.resolveProblem().also { println(it) }
+            is Failure -> moveResult.value.resolveProblem()
             is Success -> when (moveResult.value) {
                 is OngoingMatch -> ResponseEntity.ok(OngoingMatchOutputModel.fromMatch(moveResult.value))
                 is FinishedMatch -> ResponseEntity.ok(FinishedMatchOutputModel.fromMatch(moveResult.value))

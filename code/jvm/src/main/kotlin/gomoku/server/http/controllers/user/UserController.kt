@@ -58,7 +58,7 @@ class UserController(private val service: UserService) {
      * @return The ranking of the user or a problem if the user does not exist
      */
     @GetMapping(URIs.Users.USER_RANKING)
-    fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> { // TODO: TEST THIS FUNCTION
+    fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> {
         val userRuleStats = service.getUserRanking(userId, ruleId)
         return when (userRuleStats) {
             is Success -> ResponseEntity.ok(UserRuleStatsOutputModel(userRuleStats.value))
