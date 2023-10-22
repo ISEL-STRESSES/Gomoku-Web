@@ -2,10 +2,9 @@ package gomoku.server.http
 
 import gomoku.server.deleteLobbies
 import gomoku.server.domain.game.Matchmaker
-import gomoku.server.domain.game.match.Match
-import gomoku.server.domain.game.rules.Rules
-import gomoku.server.http.controllers.game.models.FinishedMatchOutputModel
-import gomoku.server.http.controllers.game.models.OngoingMatchOutputModel
+import gomoku.server.http.controllers.game.models.GetFinishedMatchesOutputModel
+import gomoku.server.http.controllers.game.models.GetRulesOutputModel
+import gomoku.server.http.controllers.game.models.MatchOutputModel
 import gomoku.server.http.model.TokenResponse
 import gomoku.server.services.errors.game.MakeMoveError
 import org.springframework.boot.test.context.SpringBootTest
@@ -19,6 +18,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,7 +41,7 @@ class GameTests {
         val rules = getRules(client)
 
         // then: assert that there are rules
-        assertTrue(rules.isNotEmpty())
+        assertTrue(rules.rulesList.isNotEmpty())
     }
 
     @Test
@@ -63,7 +63,7 @@ class GameTests {
         val finishedGames = getFinishedGames(client, userToken.token)
 
         // then: assert that a user doesn't have any finished matches
-        assertTrue(finishedGames.isEmpty())
+        assertTrue(finishedGames.finishedMatches.isEmpty())
     }
 
     @Test
@@ -95,12 +95,13 @@ class GameTests {
         val game = startMatchmakingProcess(client, ruleId, tokenUser2)
 
         // when: the user tries to get the game details
-        val gameDetails = getGameDetails(client, game.id, tokenUser1, OngoingMatchOutputModel::class.java)
+        val gameDetails = getGameDetails(client, game.id, tokenUser1, MatchOutputModel::class.java)
 
         // then: assert that the game details are correct
-        assertEquals(gameDetails.ruleId, ruleId)
+        assertEquals(gameDetails.rule.ruleId, ruleId)
         assertNotEquals(gameDetails.playerWhite, gameDetails.playerBlack)
-        assertTrue(gameDetails.moves.isEmpty())
+        assertTrue(gameDetails.moves.orderOfMoves.isEmpty())
+        assertNull(gameDetails.matchOutcome)
     }
 
     @Test
@@ -136,10 +137,11 @@ class GameTests {
         val currentPlayer = if (getTurn == userId1) tokenUser1 else tokenUser2
 
         // when: the user tries to make a valid move
-        val validMove = makeMove(client, game.id, 0, currentPlayer, OngoingMatchOutputModel::class.java)
+        val gameAfterValidMove = makeMove(client, game.id, 0, currentPlayer, MatchOutputModel::class.java)
 
         // then: assert that the move is valid
-        assertTrue(validMove.moves.size == 1)
+        assertTrue(gameAfterValidMove.moves.orderOfMoves.size == 1)
+        assertNull(gameAfterValidMove.matchOutcome)
     }
 
     @Test
@@ -176,7 +178,7 @@ class GameTests {
         val otherPlayer = if (getTurn == userId1) tokenUser2 else tokenUser1
 
         // and a valid move
-        makeMove(client, game.id, 0, currentPlayer, OngoingMatchOutputModel::class.java)
+        makeMove(client, game.id, 0, currentPlayer, MatchOutputModel::class.java)
 
         // when: the user tries to make an already occupied move
         // then: assert that the move is already occupied
@@ -367,7 +369,7 @@ class GameTests {
         val lobby = startMatchmakingProcess(client, ruleId, tokenUser)
 
         // when, then: the user tries to leave the matchmaking process is successful
-        assertTrue(leaveLobby(client, lobby.id, tokenUser))
+        assertEquals(Unit, leaveLobby(client, lobby.id, tokenUser))
     }
 
     @Test
@@ -405,7 +407,7 @@ class GameTests {
         assertTrue((currentTurnPlayerId == userId1) or (currentTurnPlayerId == userId2))
 
         // and the turn is for player black
-        assertEquals(currentTurnPlayerId, getGameDetails(client, game.id, tokenUser1, OngoingMatchOutputModel::class.java).playerBlack)
+        assertEquals(currentTurnPlayerId, getGameDetails(client, game.id, tokenUser1, MatchOutputModel::class.java).playerBlack)
     }
 
     @Test
@@ -449,29 +451,33 @@ class GameTests {
         makeMove(client, game.id, 9, getPlayerWhite, MakeMoveError.InvalidTurn::class.java)
 
         // when: the user tries to make a valid move
-        val validMove1 = makeMove(client, game.id, 0, getPlayerBlack, OngoingMatchOutputModel::class.java)
+        val validMove1 = makeMove(client, game.id, 0, getPlayerBlack, MatchOutputModel::class.java)
         // then: assert that the move is valid
-        assertTrue(validMove1.moves.size == 1)
+        assertTrue(validMove1.moves.orderOfMoves.size == 1)
+        assertNull(validMove1.matchOutcome)
 
         // when: the user tries to make a valid move
-        val validMove2 = makeMove(client, game.id, 10, getPlayerWhite, OngoingMatchOutputModel::class.java)
+        val validMove2 = makeMove(client, game.id, 10, getPlayerWhite, MatchOutputModel::class.java)
         // then: assert that the move is valid
-        assertTrue(validMove2.moves.size == 2)
+        assertTrue(validMove2.moves.orderOfMoves.size == 2)
+        assertNull(validMove1.matchOutcome)
 
         // when: the users play valid moves till 'almost' the end of the game
-        makeMove(client, game.id, 1, getPlayerBlack, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 20, getPlayerWhite, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 2, getPlayerBlack, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 15, getPlayerWhite, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 3, getPlayerBlack, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 16, getPlayerWhite, OngoingMatchOutputModel::class.java)
+        makeMove(client, game.id, 1, getPlayerBlack, MatchOutputModel::class.java)
+        makeMove(client, game.id, 20, getPlayerWhite, MatchOutputModel::class.java)
+        makeMove(client, game.id, 2, getPlayerBlack, MatchOutputModel::class.java)
+        makeMove(client, game.id, 15, getPlayerWhite, MatchOutputModel::class.java)
+        makeMove(client, game.id, 3, getPlayerBlack, MatchOutputModel::class.java)
+        makeMove(client, game.id, 16, getPlayerWhite, MatchOutputModel::class.java)
 
         // when: the user tries to make a valid winning move
-        val finished = makeMove(client, game.id, 4, getPlayerBlack, FinishedMatchOutputModel::class.java)
+        val gameAfterFinishingMove = makeMove(client, game.id, 4, getPlayerBlack, MatchOutputModel::class.java)
 
         // then: assert that was a winning move and the winner is the player black
-        assertEquals(finished.matchOutcome,"BLACK_WON")
-        assertEquals(finished.playerBlack, playerBlackId)
+        assertEquals(gameAfterFinishingMove.matchOutcome,"BLACK_WON")
+        assertEquals(gameAfterFinishingMove.playerBlack, playerBlackId)
+        assertNull(gameAfterFinishingMove.turn)
+
     }
 
     @Test
@@ -492,7 +498,7 @@ class GameTests {
         val tokenUser1 = getToken(client, username1).token
 
         val username2 = newTestUserName()
-        createUserAndGetId(client, username2) // userId is not needed
+        createUserAndGetId(client, username2)
         val tokenUser2 = getToken(client, username2).token
 
         // and a ruleId
@@ -503,15 +509,17 @@ class GameTests {
         val game = startMatchmakingProcess(client, ruleId, tokenUser2)
 
         // and a valid finished game
-        makeMove(client, game.id, 0, tokenUser1, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 10, tokenUser2, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 1, tokenUser1, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 11, tokenUser2, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 2, tokenUser1, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 12, tokenUser2, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 3, tokenUser1, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 13, tokenUser2, OngoingMatchOutputModel::class.java)
-        makeMove(client, game.id, 4, tokenUser1, FinishedMatchOutputModel::class.java)
+        makeMove(client, game.id, 0, playerBlack, MatchOutputModel::class.java)
+        makeMove(client, game.id, 10, playerWhite, MatchOutputModel::class.java)
+        makeMove(client, game.id, 1, playerBlack, MatchOutputModel::class.java)
+        makeMove(client, game.id, 11, playerWhite, MatchOutputModel::class.java)
+        makeMove(client, game.id, 2, playerBlack, MatchOutputModel::class.java)
+        makeMove(client, game.id, 12, playerWhite, MatchOutputModel::class.java)
+        makeMove(client, game.id, 3, playerBlack, MatchOutputModel::class.java)
+        makeMove(client, game.id, 13, playerWhite, MatchOutputModel::class.java)
+        val finishedGame = makeMove(client, game.id, 4, playerBlack, MatchOutputModel::class.java) // winning move
+        assertEquals(finishedGame.matchOutcome, "BLACK_WON")
+        assertNull(finishedGame.turn)
 
         // when: the user tries to make a move when the game is finished
         // then: assert that the move is invalid
@@ -613,11 +621,11 @@ class GameTests {
      * @param token The token of the user
      * @return The list of finished games
      */
-    private fun getFinishedGames(client: WebTestClient, token: String): List<Match> =
+    private fun getFinishedGames(client: WebTestClient, token: String): GetFinishedMatchesOutputModel =
         client.get().uri("/game/").header("Authorization", "Bearer $token")
             .exchange()
             .expectStatus().isOk
-            .expectBody<List<Match>>()
+            .expectBody<GetFinishedMatchesOutputModel>()
             .returnResult()
             .responseBody!!
 
@@ -628,11 +636,11 @@ class GameTests {
      * @param client the web test client
      * @return The list of rules
      */
-    private fun getRules(client: WebTestClient): List<Rules> =
+    private fun getRules(client: WebTestClient): GetRulesOutputModel =
         client.get().uri("/game/rules")
             .exchange()
             .expectStatus().isOk
-            .expectBody<List<Rules>>()
+            .expectBody<GetRulesOutputModel>()
             .returnResult()
             .responseBody!!
 
@@ -650,7 +658,7 @@ class GameTests {
             .header("Authorization", "Bearer $userToken")
             .exchange()
             .expectStatus().isOk
-            .expectBody<Boolean>()
+            .expectBody<Unit>()
             .returnResult()
             .responseBody!!
 

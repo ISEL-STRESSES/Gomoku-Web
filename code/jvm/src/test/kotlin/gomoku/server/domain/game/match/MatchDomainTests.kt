@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class MatchTests {
+class MatchDomainTests {
 
     private val playerA = 1
     private val playerB = 4

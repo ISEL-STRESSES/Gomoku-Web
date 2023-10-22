@@ -48,6 +48,24 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             .list()
 
     /**
+     * Gets a lobby by its id
+     * @param lobbyId The id of the lobby
+     * @return The lobby or null if no lobby with the given id exists
+     */
+    override fun getLobbyById(lobbyId: Int): Lobby? =
+        handle.createQuery(
+            """
+            SELECT lobby.id, rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id
+            FROM lobby join rules
+            on lobby.rules_id = rules.id 
+            where lobby.id = :lobbyId
+            """.trimIndent()
+        )
+            .bind("lobbyId", lobbyId)
+            .mapTo<Lobby>()
+            .singleOrNull()
+
+    /**
      * Gets a lobby by the id of one of its players
      * @param userId The id of the player
      * @return The lobby or null if no lobby with the given id exists

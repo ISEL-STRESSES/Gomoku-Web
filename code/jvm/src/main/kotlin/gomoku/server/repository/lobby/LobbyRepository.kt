@@ -14,6 +14,13 @@ interface LobbyRepository {
     fun getLobbies(): List<Lobby>
 
     /**
+     * Gets a lobby by its id
+     * @param lobbyId The id of the lobby
+     * @return The lobby or null if no lobby with the given id exists
+     */
+    fun getLobbyById(lobbyId: Int): Lobby?
+
+    /**
      * Gets a lobby by its rules id
      * @param ruleId the rule id of the lobby
      * @return The lobby or null if no lobby with the given rule id exists

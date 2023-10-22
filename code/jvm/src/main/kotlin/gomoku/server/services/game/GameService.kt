@@ -4,7 +4,6 @@ import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.errors.MoveError
 import gomoku.server.domain.game.match.Color
 import gomoku.server.domain.game.match.FinishedMatch
-import gomoku.server.domain.game.match.Match
 import gomoku.server.domain.game.match.MatchOutcome
 import gomoku.server.domain.game.match.MatchState
 import gomoku.server.domain.game.match.Move
@@ -17,6 +16,8 @@ import gomoku.server.domain.user.updateElo
 import gomoku.server.repository.Transaction
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
+import gomoku.server.services.errors.game.GetMatchError
+import gomoku.server.services.errors.game.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.utils.Failure
@@ -180,12 +181,18 @@ class GameService(private val transactionManager: TransactionManager) {
     /**
      * Leaves the matchmaking process.
      * @param userId id of the user
-     * @return true if the user was removed from
-     * the matchmaking process, false otherwise
+     * @return an empty [Success] if the user left the matchmaking process, a [Failure] otherwise
      */
-    fun leaveLobby(userId: Int): Boolean =
+    fun leaveLobby(lobbyId: Int, userId: Int): LeaveLobbyResult =
         transactionManager.run {
-            it.lobbyRepository.leaveLobby(userId)
+            val lobby = it.lobbyRepository.getLobbyById(lobbyId) ?: return@run failure(LeaveLobbyError.LobbyNotFound) //TODO: Create tests for this function
+
+            if(lobby.userId != userId) return@run failure(LeaveLobbyError.UserNotInLobby)
+
+            if(it.lobbyRepository.leaveLobby(userId))
+                return@run success(Unit)
+            else
+                return@run failure(LeaveLobbyError.LeaveLobbyFailed)
         }
 
     /**

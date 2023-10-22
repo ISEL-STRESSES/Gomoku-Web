@@ -46,12 +46,34 @@ class JDBIMatchRepository(private val handle: Handle) : MatchRepository {
      * @return true if the rule is stored, false otherwise
      */
     override fun isRuleStoredById(ruleId: Int): Boolean =
-        handle.createQuery("select id from rules where id = :ruleId")
+        handle.createQuery(
+            """
+        SELECT EXISTS (
+            SELECT 1 FROM rules WHERE id = :ruleId
+        )
+    """
+        )
             .bind("ruleId", ruleId)
-            .mapTo<Int>()
-            .singleOrNull() != null
+            .mapTo<Boolean>()
+            .single()
 
     // match
+    /**
+     * Verifies if the match is stored based on the [matchId]
+     * @param matchId id of the match
+     * @return true if the match is stored, false otherwise
+     */
+    override fun isMatchStoredById(matchId: Int): Boolean =
+        handle.createQuery(
+            """
+                SELECT EXISTS (
+                    SELECT 1 FROM matches WHERE id = :matchId
+                )
+        """)
+            .bind("matchId", matchId)
+            .mapTo<Boolean>()
+            .single()
+
     /**
      * Creates a new match, with the given rule and users ids
      * setting the match state to [MatchState.ONGOING]

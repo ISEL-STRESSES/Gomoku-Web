@@ -7,7 +7,7 @@ import gomoku.server.domain.user.UserStats
  * to be sent from the API
  * @property userId unique identifier of the user
  * @property username username of the user
- * @property userRuleStats list of statistics of the user for each rule
+ * @property userRuleStats statistics of the user for each rule
  */
 data class UserStatsOutputModel(
     val userId: Int,
@@ -17,6 +17,6 @@ data class UserStatsOutputModel(
     constructor(userStats: UserStats) : this(
         userId = userStats.uuid,
         username = userStats.username,
-        userRuleStats = userStats.userRuleStats.map { RuleStatsOutputModel(it.ruleId, it.gamesPlayed, it.elo) }
+        userRuleStats = userStats.userRuleStats.map { RuleStatsOutputModel(it) }
     )
 }

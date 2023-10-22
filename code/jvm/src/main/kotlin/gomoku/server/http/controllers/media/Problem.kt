@@ -9,7 +9,7 @@ import java.net.URI
  */
 class Problem(typeUri: URI) {
 
-    val type: String = typeUri.toASCIIString() // TODO what for?
+    val type: String = typeUri.toASCIIString()
 
     companion object {
         private const val MEDIA_TYPE = "application/problem+json"

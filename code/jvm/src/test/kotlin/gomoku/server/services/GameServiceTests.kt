@@ -8,10 +8,13 @@ import gomoku.server.domain.user.UsersDomain
 import gomoku.server.domain.user.UsersDomainConfig
 import gomoku.server.failureOrNull
 import gomoku.server.repository.createFinishedMatch
+import gomoku.server.services.errors.game.GetMatchError
+import gomoku.server.services.errors.game.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.game.GameService
 import gomoku.server.services.user.UserService
+import gomoku.server.successOrNull
 import gomoku.server.testWithTransactionManagerAndRollback
 import gomoku.utils.Failure
 import gomoku.utils.Success
@@ -20,8 +23,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.test.Test
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.time.Duration
 
 class GameServiceTests {
@@ -122,8 +123,7 @@ class GameServiceTests {
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
-            val game = gameService.getGame(gameId)
-            requireNotNull(game)
+            val game = gameService.getGame(gameId, userId).successOrNull()!!
 
             val finishedGameId = transactionManager.run {
                 it.matchRepository.createFinishedMatch(game.playerBlack, game.playerWhite)
@@ -220,24 +220,25 @@ class GameServiceTests {
             // test
             val gameService = GameService(transactionManager)
 
-            gameService.startMatchmakingProcess(ruleId, userId)
+            val res = gameService.startMatchmakingProcess(ruleId, userId).successOrNull()!!
 
-            val result = gameService.leaveLobby(userId)
+            val result = gameService.leaveLobby(res.id, userId)
 
-            assertTrue(result)
+            assertTrue(result is Success)
         }
     }
 
     @Test
-    fun `leaveLobby should be false if the user was not on it`() {
-        val userId = 16
+    fun `leaveLobby should be LobbyNotFound if the lobby doesn't exist`() {
+        val userId = 2
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
-            val result = gameService.leaveLobby(userId)
+            val result = gameService.leaveLobby(2, userId)
 
-            assertTrue(!result)
+            assertTrue(result is Failure)
+            assertTrue(result.failureOrNull() == LeaveLobbyError.LobbyNotFound)
         }
     }
 
@@ -308,30 +309,61 @@ class GameServiceTests {
     @Test
     fun `getGame should return a Match if the game exists`() {
         val gameId = 1
+        val userId = 2
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
-            val result = gameService.getGame(gameId)
+            val result = gameService.getGame(gameId, userId)
+            assertTrue(result is Success)
 
-            assertNotNull(result)
-            assertEquals(result.id, gameId)
-            assertEquals(result.playerBlack, 1)
-            assertEquals(result.playerWhite, 2)
-            assertEquals(result.rules.ruleId, 1)
+            val match = result.successOrNull()!!
+            assertEquals(match.id, gameId)
+            assertEquals(match.playerBlack, 1)
+            assertEquals(match.playerWhite, 2)
+            assertEquals(match.rules.ruleId, 1)
         }
     }
 
     @Test
-    fun `getGame should return null if the game doesn't exist`() {
+    fun `getGame should return MatchNotFound if the game doesn't exist`() {
         val gameId = 100
+        val userId = 2
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
-            val result = gameService.getGame(gameId)
+            val result = gameService.getGame(gameId, userId)
 
-            assertNull(result)
+            assertTrue(result is Failure && result.failureOrNull() == GetMatchError.MatchNotFound)
+        }
+    }
+
+    @Test
+    fun `getGame should return PlayerNotFound if the game doesn't exist`() {
+        val gameId = 1
+        val userId = 100
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getGame(gameId, userId)
+
+            assertTrue(result is Failure && result.failureOrNull() == GetMatchError.PlayerNotFound)
+        }
+    }
+
+    @Test
+    fun `getGame should return PlayerNotInMatch if the game doesn't exist`() {
+        val gameId = 1
+        val userId = 5
+
+        testWithTransactionManagerAndRollback { transactionManager ->
+            val gameService = GameService(transactionManager)
+
+            val result = gameService.getGame(gameId, userId)
+
+            assertTrue(result is Failure && result.failureOrNull() == GetMatchError.PlayerNotInMatch)
         }
     }
 

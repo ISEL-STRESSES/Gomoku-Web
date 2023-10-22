@@ -68,7 +68,7 @@ class GomokuWebApplication {
     )
 
     /**
-     * Creates a server info.
+     * Creates server info.
      * @return The server info.
      */
     @Bean
