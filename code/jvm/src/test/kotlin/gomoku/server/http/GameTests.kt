@@ -96,6 +96,7 @@ class GameTests {
 
         // when: the user tries to get the game details
         val gameDetails = getGameDetails(client, game.id, tokenUser1, MatchOutputModel::class.java)
+        assertEquals(gameDetails.type, MatchOutputModel.MatchType.ONGOING)
 
         // then: assert that the game details are correct
         assertEquals(gameDetails.rule.ruleId, ruleId)

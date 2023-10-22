@@ -30,6 +30,10 @@ typealias MakeMoveResult = Either<MakeMoveError, Match>
  */
 typealias CurrentTurnPlayerResult = Either<CurrentTurnPlayerError, Int>
 
+/**
+ * Result for leaving a lobby
+ * @see LeaveLobbyError
+ */
 typealias LeaveLobbyResult = Either<LeaveLobbyError, Unit>
 
 /**

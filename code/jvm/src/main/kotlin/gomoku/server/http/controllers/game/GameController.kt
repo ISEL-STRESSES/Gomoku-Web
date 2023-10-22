@@ -173,7 +173,9 @@ class GameController(private val gameService: GameService) {
         }
 
     /**
-     * TODO
+     * Translates the errors of a Get match action into a response
+     * @receiver The error
+     * @return The response
      */
     private fun GetMatchError.resolveProblem(): ResponseEntity<*> =
         when (this) {
@@ -183,7 +185,9 @@ class GameController(private val gameService: GameService) {
         }
 
     /**
-     * TODO
+     * Translates the errors of a Leave lobby action into a response
+     * @receiver The error
+     * @return The response
      */
     private fun LeaveLobbyError.resolveProblem() : ResponseEntity<*> =
         when(this) {
