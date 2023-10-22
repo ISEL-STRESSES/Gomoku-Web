@@ -211,7 +211,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref : '#/components/schemas/GetFinishedMatchesOutputModel'
+                $ref : '#/components/schemas/GetFinishedGamesOutputModel'
         500:
           $ref: '#/components/responses/InternalServerError'
 
@@ -251,7 +251,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MatchOutputModel'
+                $ref: '#/components/schemas/GameOutputModel'
         401:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -281,7 +281,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MatchOutputModel'
+                $ref: '#/components/schemas/GameOutputModel'
         400:
           $ref: '#/components/responses/BadRequest'
         404:
@@ -509,12 +509,12 @@ components:
       enum:
         - 'BLACK'
         - 'WHITE'
-    MatchType:
+    GameType:
       type: string
       enum:
         - 'ONGOING'
         - 'FINISHED'
-    MatchOutputModel:
+    GameOutputModel:
       type: object
       properties:
         id:
@@ -527,20 +527,20 @@ components:
           $ref: '#/components/schemas/RuleOutputModel'
         moves:
           $ref: '#/components/schemas/MoveContainerOutputModel'
-        matchOutcome:
+        GameOutcome:
           type: string
         turn:
           $ref: '#/components/schemas/color'
         type:
-          $ref: '#/components/schemas/MatchType'
+          $ref: '#/components/schemas/GameType'
 
-    GetFinishedMatchesOutputModel:
+    GetFinishedGamesOutputModel:
       type: object
       properties:
-        finishedMatches:
+        finishedGames:
           type: array
           items:
-            $ref: '#/components/schemas/MatchOutputModel'
+            $ref: '#/components/schemas/GameOutputModel'
 
     GetRulesOutputModel:
       type: object
@@ -552,7 +552,7 @@ components:
     MatchMakerOutputModel:
       type: object
       properties:
-        isMatch:
+        isGame:
           type: boolean
         id:
           type: integer
