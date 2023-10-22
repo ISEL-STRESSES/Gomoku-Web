@@ -107,11 +107,7 @@ class UserController(private val service: UserService) {
                     URIs.Users.byID(res.value).toASCIIString()
                 ).build<Unit>()
 
-            is Failure -> when (res.value) {
-                UserCreationError.InvalidUsername -> Problem.response(400, Problem.invalidUsername)
-                UserCreationError.InvalidPassword -> Problem.response(400, Problem.insecurePassword)
-                UserCreationError.UsernameAlreadyExists -> Problem.response(409, Problem.userAlreadyExists)
-            }
+            is Failure -> res.value.resolveProblem()
         }
     }
 
@@ -156,6 +152,18 @@ class UserController(private val service: UserService) {
             username = authenticatedUser.user.username
         )
     }
+
+    /**
+     * Resolves a [UserCreationError] to a [ResponseEntity]
+     * @return A translated [Problem] based on the [UserCreationError]
+     */
+    private fun UserCreationError.resolveProblem() =
+        when (this) {
+            UserCreationError.InvalidUsername -> Problem.response(400, Problem.invalidUsername)
+            UserCreationError.InvalidPassword -> Problem.response(400, Problem.insecurePassword)
+            UserCreationError.UsernameAlreadyExists -> Problem.response(409, Problem.userAlreadyExists)
+        }
+
 
     /**
      * Resolves a [UserRankingError] to a [ResponseEntity]

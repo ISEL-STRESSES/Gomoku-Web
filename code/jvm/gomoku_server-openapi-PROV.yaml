@@ -193,7 +193,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/UserByIdOutputModel'
         404:
           $ref: '#/components/responses/NotFound'
         500:
@@ -211,7 +211,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref : '#/components/schemas/MatchOutputModel' # TODO
+                $ref : '#/components/schemas/GetFinishedMatchesOutputModel'
         500:
           $ref: '#/components/responses/InternalServerError'
 
@@ -251,8 +251,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MatchOutputModel'
-
+                $ref: '#/components/schemas/MatchOutputModel' # TODO: either finished or ongoing but how
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+            $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
   /api/game/{id}/play:
@@ -278,9 +281,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/MatchOutputModel' # TODO: either finished or ongoing but how
+        400:
+            $ref: '#/components/responses/BadRequest'
+        404:
+            $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/game/{id}/turn:
     get:
       tags:
@@ -299,7 +307,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: integer
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
   /api/game/{lobbyId}/leave:
@@ -317,10 +329,8 @@ paths:
       responses:
         200:
           description: OK
-          content:
-            application/json:
-              schema:
-                type: object
+        404:
+          $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
   /api/game/{rulesId}:
@@ -341,7 +351,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/MatchMakerOutputModel'
+        400:
+          $ref: '#/components/responses/BadRequest'
         500:
           $ref: '#/components/responses/InternalServerError'
 components:
@@ -381,6 +393,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Author'
+    PasswordValidationInfo:
+      type: object
+      properties:
+        validationInfo:
+          type: string
+    UserByIdOutputModel:
+      type: object
+      properties:
+        uuid:
+          type: integer
+        username:
+          type: string
+        passwordValidationInfo:
+          $ref: '#/components/schemas/PasswordValidationInfo'
+
     UserTokenCreateOutputModel:
       type: object
       properties:
@@ -447,6 +474,87 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GetUsersDataOutputModel'
+
+    RuleOutputModel:
+      type: object
+      properties:
+        ruleId:
+          type: integer
+        boardSize:
+          type: integer
+        variant:
+          type: string
+        openingRule:
+          type: string
+
+    MoveOutputModel:
+      type: object
+      properties:
+        pos:
+          type: integer
+        color:
+          type: string
+    MoveContainerOutputModel:
+      type: object
+      properties:
+        boardSize:
+          type: integer
+        orderOfMoves:
+          type: array
+          items:
+            $ref: '#/components/schemas/MoveOutputModel'
+    color:
+      type: string
+      enum:
+        - 'BLACK'
+        - 'WHITE'
+    MatchType:
+      type: string
+      enum:
+        - 'ONGOING'
+        - 'FINISHED'
+    MatchOutputModel:
+      type: object
+      properties:
+        id:
+          type: integer
+        playerBlack:
+          type: integer
+        playerWhite:
+          type: integer
+        rule:
+          $ref: '#/components/schemas/RuleOutputModel'
+        moves:
+          $ref: '#/components/schemas/MoveContainerOutputModel'
+        matchOutcome:
+          type: string
+        turn:
+          $ref: '#/components/schemas/color'
+        type:
+          $ref: '#/components/schemas/MatchType'
+
+    GetFinishedMatchesOutputModel:
+      type: object
+      properties:
+        finishedMatches:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchOutputModel'
+
+    GetRulesOutputModel:
+      type: object
+      properties:
+        rulesList:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetRulesOutputModel'
+    MatchMakerOutputModel:
+      type: object
+      properties:
+        isMatch:
+          type: boolean
+        id:
+          type: integer
     ErrorModel:
       type: object
       properties:
