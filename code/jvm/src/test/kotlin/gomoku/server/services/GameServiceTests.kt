@@ -2,13 +2,13 @@ package gomoku.server.services
 
 import gomoku.server.TestClock
 import gomoku.server.deleteLobbies
-import gomoku.server.domain.game.match.FinishedMatch
+import gomoku.server.domain.game.game.FinishedGame
 import gomoku.server.domain.user.Sha256TokenEncoder
 import gomoku.server.domain.user.UsersDomain
 import gomoku.server.domain.user.UsersDomainConfig
 import gomoku.server.failureOrNull
-import gomoku.server.repository.createFinishedMatch
-import gomoku.server.services.errors.game.GetMatchError
+import gomoku.server.repository.createFinishedGame
+import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
@@ -47,7 +47,7 @@ class GameServiceTests {
 
             val result = gameService.startMatchmakingProcess(ruleId, userId)
 
-            assertTrue(result is Success && !result.value.isMatch)
+            assertTrue(result is Success && !result.value.isGame)
         }
     }
 
@@ -92,11 +92,11 @@ class GameServiceTests {
 
             val result1 = gameService.startMatchmakingProcess(ruleId, user1Id.value)
 
-            assertFalse(result1 is Success && result1.value.isMatch)
+            assertFalse(result1 is Success && result1.value.isGame)
 
             val result = gameService.startMatchmakingProcess(ruleId, user2Id.value)
 
-            assertTrue(result is Success && result.value.isMatch)
+            assertTrue(result is Success && result.value.isGame)
         }
     }
 
@@ -126,7 +126,7 @@ class GameServiceTests {
             val game = gameService.getGame(gameId, userId).successOrNull()!!
 
             val finishedGameId = transactionManager.run {
-                it.matchRepository.createFinishedMatch(game.playerBlack, game.playerWhite)
+                it.gameRepository.createFinishedGame(game.playerBlack, game.playerWhite)
             }
 
             val result = gameService.makeMove(finishedGameId, userId, position)
@@ -203,9 +203,9 @@ class GameServiceTests {
             val result = gameService.makeMove(gameId, userId1, position)
             assertTrue(result is Success)
             require(result is Success)
-            assertTrue(result.value is FinishedMatch)
-            require(result.value is FinishedMatch)
-            assertTrue((result.value as FinishedMatch).getWinnerIdOrNull() == userId1)
+            assertTrue(result.value is FinishedGame)
+            require(result.value is FinishedGame)
+            assertTrue((result.value as FinishedGame).getWinnerIdOrNull() == userId1)
         }
     }
 
@@ -250,7 +250,7 @@ class GameServiceTests {
             val gameService = GameService(transactionManager)
             val dummyLobby = transactionManager.run {
                 deleteLobbies(transactionManager)
-                it.lobbyRepository.createLobby(1,4)
+                it.lobbyRepository.createLobby(1, 4)
             }
 
             val result = gameService.leaveLobby(dummyLobby, userId)
@@ -313,20 +313,20 @@ class GameServiceTests {
             // before
             deleteLobbies(transactionManager)
             // test before
-            // forcing a finished match
+            // forcing a finished game
             val gameService = GameService(transactionManager)
-            val finishedMatchId = transactionManager.run {
-                it.matchRepository.createFinishedMatch(1, 2)
+            val finishedGameId = transactionManager.run {
+                it.gameRepository.createFinishedGame(1, 2)
             }
             // sut
-            val result = gameService.getCurrentTurnPlayerId(finishedMatchId)
+            val result = gameService.getCurrentTurnPlayerId(finishedGameId)
 
             assertTrue(result is Failure)
         }
     }
 
     @Test
-    fun `getGame should return a Match if the game exists`() {
+    fun `getGame should return a Game if the game exists`() {
         val gameId = 1
         val userId = 2
 
@@ -336,16 +336,16 @@ class GameServiceTests {
             val result = gameService.getGame(gameId, userId)
             assertTrue(result is Success)
 
-            val match = result.successOrNull()!!
-            assertEquals(match.id, gameId)
-            assertEquals(match.playerBlack, 1)
-            assertEquals(match.playerWhite, 2)
-            assertEquals(match.rules.ruleId, 1)
+            val game = result.successOrNull()!!
+            assertEquals(game.id, gameId)
+            assertEquals(game.playerBlack, 1)
+            assertEquals(game.playerWhite, 2)
+            assertEquals(game.rules.ruleId, 1)
         }
     }
 
     @Test
-    fun `getGame should return MatchNotFound if the game doesn't exist`() {
+    fun `getGame should return GameNotFound if the game doesn't exist`() {
         val gameId = 100
         val userId = 2
 
@@ -354,7 +354,7 @@ class GameServiceTests {
 
             val result = gameService.getGame(gameId, userId)
 
-            assertTrue(result is Failure && result.failureOrNull() == GetMatchError.MatchNotFound)
+            assertTrue(result is Failure && result.failureOrNull() == GetGameError.GameNotFound)
         }
     }
 
@@ -368,12 +368,12 @@ class GameServiceTests {
 
             val result = gameService.getGame(gameId, userId)
 
-            assertTrue(result is Failure && result.failureOrNull() == GetMatchError.PlayerNotFound)
+            assertTrue(result is Failure && result.failureOrNull() == GetGameError.PlayerNotFound)
         }
     }
 
     @Test
-    fun `getGame should return PlayerNotInMatch if the game doesn't exist`() {
+    fun `getGame should return PlayerNotInGame if the game doesn't exist`() {
         val gameId = 1
         val userId = 5
 
@@ -382,49 +382,49 @@ class GameServiceTests {
 
             val result = gameService.getGame(gameId, userId)
 
-            assertTrue(result is Failure && result.failureOrNull() == GetMatchError.PlayerNotInMatch)
+            assertTrue(result is Failure && result.failureOrNull() == GetGameError.PlayerNotInGame)
         }
     }
 
     @Test
-    fun `getUserFinishedMatches should return a list of finished matches`() {
+    fun `getUserFinishedGames should return a list of finished games`() {
         val userId = 7
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
             // before
-            // forcing a finished match
+            // forcing a finished game
             transactionManager.run {
-                it.matchRepository.createFinishedMatch(7, 8)
+                it.gameRepository.createFinishedGame(7, 8)
             }
             // sut
-            val result = gameService.getUserFinishedMatches(0, 10, userId)
+            val result = gameService.getUserFinishedGames(0, 10, userId)
 
             assertTrue(result.isNotEmpty())
         }
     }
 
     @Test
-    fun `getUserFinishedMatches should return an empty list if the user has no finished matches`() {
+    fun `getUserFinishedGames should return an empty list if the user has no finished games`() {
         val userId = 2
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
-            val result = gameService.getUserFinishedMatches(0, 10, userId)
+            val result = gameService.getUserFinishedGames(0, 10, userId)
 
             assertTrue(result.isEmpty())
         }
     }
 
     @Test
-    fun `getUserFinishedMatches should return an empty list if the user doesn't exist`() {
+    fun `getUserFinishedGames should return an empty list if the user doesn't exist`() {
         val userId = 100
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
-            val result = gameService.getUserFinishedMatches(0, 10, userId)
+            val result = gameService.getUserFinishedGames(0, 10, userId)
 
             assertTrue(result.isEmpty())
         }

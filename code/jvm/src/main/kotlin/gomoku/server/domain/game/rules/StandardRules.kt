@@ -3,10 +3,10 @@ package gomoku.server.domain.game.rules
 import com.fasterxml.jackson.annotation.JsonIgnore
 import gomoku.server.domain.game.IsValidMoveResult
 import gomoku.server.domain.game.errors.MoveError
-import gomoku.server.domain.game.match.Color
-import gomoku.server.domain.game.match.Move
-import gomoku.server.domain.game.match.MoveContainer
-import gomoku.server.domain.game.match.Position
+import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.move.Move
+import gomoku.server.domain.game.game.move.MoveContainer
+import gomoku.server.domain.game.game.move.Position
 import gomoku.utils.failure
 import gomoku.utils.success
 
@@ -24,8 +24,8 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
     val type = "StandardRules"
 
     /**
-     * Checks if a move is valid based on the rules of the match
-     * @param moveContainer previous moves of the match
+     * Checks if a move is valid based on the rules of the game
+     * @param moveContainer previous moves of the game
      * @param move move to check
      * @param turn color of the player trying to play
      * @return the move result
@@ -40,8 +40,8 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
     }
 
     /**
-     * Returns the possible moves based on the rules of the match
-     * @param moveContainer previous moves of the match
+     * Returns the possible moves based on the rules of the game
+     * @param moveContainer previous moves of the game
      * @param color color of the player
      * @return the possible moves possible in the set of rules
      */
@@ -55,7 +55,7 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
 
     /**
      * Checks if a move is a winning move
-     * @param moveContainer previous moves of the match
+     * @param moveContainer previous moves of the game
      * @param move move to check if it was a winning move
      * @return true if the move is a winning move, false otherwise
      */

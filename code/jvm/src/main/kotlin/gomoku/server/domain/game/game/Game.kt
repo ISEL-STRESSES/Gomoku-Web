@@ -1,12 +1,13 @@
-package gomoku.server.domain.game.match
+package gomoku.server.domain.game.game
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import gomoku.server.domain.game.game.move.MoveContainer
 import gomoku.server.domain.game.rules.Rules
 
 /**
  * Represents a game.
- * @property id The id of the match
+ * @property id The id of the game
  * @property playerBlack The id of the player playing with black stones
  * @property playerWhite The id of the player playing with white stones
  * @property rules The rules of the game
@@ -18,10 +19,10 @@ import gomoku.server.domain.game.rules.Rules
     property = "type"
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(value = OngoingMatch::class, name = "OngoingMatch"),
-    JsonSubTypes.Type(value = FinishedMatch::class, name = "FinishedMatch")
+    JsonSubTypes.Type(value = OngoingGame::class, name = "OngoingGame"),
+    JsonSubTypes.Type(value = FinishedGame::class, name = "FinishedGame")
 )
-sealed class Match(
+sealed class Game(
     val id: Int,
     val playerBlack: Int,
     val playerWhite: Int,
@@ -33,44 +34,44 @@ sealed class Match(
  * Represents a game that is currently being played.
  * @property turn The color of the player that has to play
  */
-class OngoingMatch(
+class OngoingGame(
     id: Int,
     playerBlack: Int,
     playerWhite: Int,
     rules: Rules,
     moves: MoveContainer
-) : Match(id, playerBlack, playerWhite, rules, moves) {
+) : Game(id, playerBlack, playerWhite, rules, moves) {
 
-    val type = "OngoingMatch"
+    val type = "OngoingGame"
 
     val turn = (moves.getMoves().size).toColor()
 }
 
 /**
  * Represents a game that has been finished.
- * @property matchOutcome The outcome of the match
+ * @property gameOutcome The outcome of the game
  */
-class FinishedMatch(
+class FinishedGame(
     id: Int,
     playerBlack: Int,
     playerWhite: Int,
     rules: Rules,
     moves: MoveContainer,
-    val matchOutcome: MatchOutcome
-) : Match(id, playerBlack, playerWhite, rules, moves) {
+    val gameOutcome: GameOutcome
+) : Game(id, playerBlack, playerWhite, rules, moves) {
 
-    val type = "FinishedMatch"
+    val type = "FinishedGame"
 
     /**
-     * Gets the winner id or null if the match ended in a draw.
+     * Gets the winner id or null if the game ended in a draw.
      * @return the winner id or null
      */
     fun getWinnerIdOrNull(): Int? {
-        return matchOutcome.let {
+        return gameOutcome.let {
             when (it) {
-                MatchOutcome.BLACK_WON -> playerBlack
-                MatchOutcome.WHITE_WON -> playerWhite
-                MatchOutcome.DRAW -> null
+                GameOutcome.BLACK_WON -> playerBlack
+                GameOutcome.WHITE_WON -> playerWhite
+                GameOutcome.DRAW -> null
             }
         }
     }

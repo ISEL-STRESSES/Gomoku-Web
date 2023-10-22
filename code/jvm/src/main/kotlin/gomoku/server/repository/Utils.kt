@@ -1,14 +1,14 @@
 package gomoku.server.repository
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import gomoku.server.domain.game.match.MoveContainer
-import gomoku.server.domain.game.match.MoveContainerMixin
-import gomoku.server.repository.jdbi.mappers.FinishedMatchRowMapper
+import gomoku.server.domain.game.game.move.MoveContainer
+import gomoku.server.domain.game.game.move.MoveContainerMixin
+import gomoku.server.repository.jdbi.mappers.FinishedGameRowMapper
+import gomoku.server.repository.jdbi.mappers.GameRowMapper
+import gomoku.server.repository.jdbi.mappers.GameRuleRowMapper
 import gomoku.server.repository.jdbi.mappers.InstantMapper
 import gomoku.server.repository.jdbi.mappers.LobbyRowMapper
-import gomoku.server.repository.jdbi.mappers.MatchRowMapper
-import gomoku.server.repository.jdbi.mappers.MatchRuleRowMapper
-import gomoku.server.repository.jdbi.mappers.OngoingMatchRowMapper
+import gomoku.server.repository.jdbi.mappers.OngoingGameRowMapper
 import gomoku.server.repository.jdbi.mappers.RulesRowMapper
 import gomoku.server.repository.jdbi.mappers.user.PasswordValidationInfoMapper
 import gomoku.server.repository.jdbi.mappers.user.RankingUserDataRowMapper
@@ -34,14 +34,14 @@ fun Jdbi.configureWithAppRequirements(): Jdbi {
     registerRowMapper(UserRowMapper())
     registerRowMapper(UserDataRowMapper())
     registerRowMapper(UserRuleStatsRowMapper())
-    registerRowMapper(MatchRuleRowMapper())
+    registerRowMapper(GameRuleRowMapper())
     registerRowMapper(LobbyRowMapper())
-    registerRowMapper(MatchRowMapper())
-    registerRowMapper(FinishedMatchRowMapper())
-    registerRowMapper(OngoingMatchRowMapper())
+    registerRowMapper(GameRowMapper())
+    registerRowMapper(FinishedGameRowMapper())
+    registerRowMapper(OngoingGameRowMapper())
     registerRowMapper(RulesRowMapper())
     registerRowMapper(RankingUserDataRowMapper())
-    registerRowMapper(OngoingMatchRowMapper())
+    registerRowMapper(OngoingGameRowMapper())
 
     ObjectMapper().apply {
         addMixIn(MoveContainer::class.java, MoveContainerMixin::class.java)

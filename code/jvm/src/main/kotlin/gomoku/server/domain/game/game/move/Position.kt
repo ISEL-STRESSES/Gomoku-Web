@@ -1,4 +1,4 @@
-package gomoku.server.domain.game.match
+package gomoku.server.domain.game.game.move
 
 /**
  * Represents a data point

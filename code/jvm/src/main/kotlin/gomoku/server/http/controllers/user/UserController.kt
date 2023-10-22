@@ -164,7 +164,6 @@ class UserController(private val service: UserService) {
             UserCreationError.UsernameAlreadyExists -> Problem.response(409, Problem.userAlreadyExists)
         }
 
-
     /**
      * Resolves a [UserRankingError] to a [ResponseEntity]
      * @return A translated [Problem] based on the [UserRankingError]

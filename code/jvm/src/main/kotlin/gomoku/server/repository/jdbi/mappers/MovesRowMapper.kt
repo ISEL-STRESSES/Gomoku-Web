@@ -2,9 +2,9 @@ package gomoku.server.repository.jdbi.mappers
 
 import gomoku.server.domain.game.exceptions.ImpossiblePositionException
 import gomoku.server.domain.game.exceptions.PositionAlreadyOccupiedException
-import gomoku.server.domain.game.match.AddMoveError
-import gomoku.server.domain.game.match.Move
-import gomoku.server.domain.game.match.MoveContainer.Companion.buildMoveContainer
+import gomoku.server.domain.game.game.move.AddMoveError
+import gomoku.server.domain.game.game.move.Move
+import gomoku.server.domain.game.game.move.MoveContainer.Companion.buildMoveContainer
 import gomoku.utils.Failure
 import gomoku.utils.Success
 import org.jdbi.v3.core.mapper.RowMapper

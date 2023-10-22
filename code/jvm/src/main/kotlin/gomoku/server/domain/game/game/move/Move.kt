@@ -1,4 +1,6 @@
-package gomoku.server.domain.game.match
+package gomoku.server.domain.game.game.move
+
+import gomoku.server.domain.game.game.Color
 
 /**
  * Represents a move on the board

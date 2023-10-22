@@ -1,5 +1,8 @@
-package gomoku.server.domain.game.match
+package gomoku.server.domain.game.game
 
+import gomoku.server.domain.game.game.move.Move
+import gomoku.server.domain.game.game.move.MoveContainer
+import gomoku.server.domain.game.game.move.Position
 import gomoku.server.domain.game.rules.BoardSize
 import gomoku.server.domain.game.rules.StandardRules
 import gomoku.utils.Failure
@@ -8,7 +11,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class MatchDomainTests {
+class GameDomainTests {
 
     private val playerA = 1
     private val playerB = 4
@@ -16,15 +19,15 @@ class MatchDomainTests {
     private val moves: MoveContainer = MoveContainer.createEmptyMoveContainer(rules.boardSize.value)
 
     @Test
-    fun `OngoingMatch computes correct turn color`() {
+    fun `OngoingGame computes correct turn color`() {
         val newContainerWithMoves1 = moves.addMove(Move(Position(1), Color.BLACK))
         if (newContainerWithMoves1 is Success) {
-            val ongoingMatch1 = OngoingMatch(1, playerA, playerB, rules, newContainerWithMoves1.value)
-            assertEquals(Color.WHITE, ongoingMatch1.turn)
+            val ongoingGame1 = OngoingGame(1, playerA, playerB, rules, newContainerWithMoves1.value)
+            assertEquals(Color.WHITE, ongoingGame1.turn)
             val newContainerWithMoves2 = newContainerWithMoves1.value.addMove(Move(Position(2), Color.WHITE))
             if (newContainerWithMoves2 is Success) {
-                val ongoingMatch2 = OngoingMatch(1, playerA, playerB, rules, newContainerWithMoves2.value)
-                assertEquals(Color.BLACK, ongoingMatch2.turn)
+                val ongoingGame2 = OngoingGame(1, playerA, playerB, rules, newContainerWithMoves2.value)
+                assertEquals(Color.BLACK, ongoingGame2.turn)
             } else {
                 assert(false)
             }
@@ -42,22 +45,22 @@ class MatchDomainTests {
 
     @Test
     fun `FinishedGame getWinnerOrNull() returns correct winner`() {
-        val matchOutcomeWinnerA = MatchOutcome.BLACK_WON
-        val finishedMatchA = FinishedMatch(1, playerA, playerB, rules, moves, matchOutcomeWinnerA)
+        val gameOutcomeWinnerA = GameOutcome.BLACK_WON
+        val finishedGameA = FinishedGame(1, playerA, playerB, rules, moves, gameOutcomeWinnerA)
 
-        assertEquals(playerA, finishedMatchA.getWinnerIdOrNull())
+        assertEquals(playerA, finishedGameA.getWinnerIdOrNull())
 
-        val matchOutcomeWinnerB = MatchOutcome.WHITE_WON
-        val finishedMatchB = FinishedMatch(1, playerA, playerB, rules, moves, matchOutcomeWinnerB)
+        val gameOutcomeWinnerB = GameOutcome.WHITE_WON
+        val finishedGameB = FinishedGame(1, playerA, playerB, rules, moves, gameOutcomeWinnerB)
 
-        assertEquals(playerB, finishedMatchB.getWinnerIdOrNull())
+        assertEquals(playerB, finishedGameB.getWinnerIdOrNull())
     }
 
     @Test
     fun `FinishedGame getWinnerOrNull() returns null for draw`() {
-        val matchOutcomeNoWinner = MatchOutcome.DRAW
-        val finishedMatch = FinishedMatch(1, playerA, playerB, rules, moves, matchOutcomeNoWinner)
+        val gameOutcomeNoWinner = GameOutcome.DRAW
+        val finishedGame = FinishedGame(1, playerA, playerB, rules, moves, gameOutcomeNoWinner)
 
-        assertNull(finishedMatch.getWinnerIdOrNull())
+        assertNull(finishedGame.getWinnerIdOrNull())
     }
 }

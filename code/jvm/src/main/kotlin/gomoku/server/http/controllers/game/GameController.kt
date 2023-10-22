@@ -2,14 +2,14 @@ package gomoku.server.http.controllers.game
 
 import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
-import gomoku.server.http.controllers.game.models.GetFinishedMatchesOutputModel
+import gomoku.server.http.controllers.game.models.GameOutputModel
+import gomoku.server.http.controllers.game.models.GetFinishedGamesOutputModel
 import gomoku.server.http.controllers.game.models.GetRulesOutputModel
-import gomoku.server.http.controllers.game.models.MatchOutputModel
 import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
 import gomoku.server.http.controllers.game.models.RuleOutputModel
 import gomoku.server.http.controllers.media.Problem
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
-import gomoku.server.services.errors.game.GetMatchError
+import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
@@ -39,8 +39,8 @@ class GameController(private val gameService: GameService) {
      */
     @GetMapping(URIs.Game.HUB)
     fun finishedGames(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val matches = gameService.getUserFinishedMatches(userId = authenticatedUser.user.uuid)
-        return ResponseEntity.ok(GetFinishedMatchesOutputModel(matches.map { MatchOutputModel(it) }))
+        val games = gameService.getUserFinishedGames(userId = authenticatedUser.user.uuid)
+        return ResponseEntity.ok(GetFinishedGamesOutputModel(games.map { GameOutputModel(it) }))
     }
 
     /**
@@ -52,9 +52,9 @@ class GameController(private val gameService: GameService) {
     @GetMapping(URIs.Game.GET_BY_ID)
     fun gameDetails(@PathVariable id: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val game = gameService.getGame(id, authenticatedUser.user.uuid)
-        return when(game) {
+        return when (game) {
             is Failure -> game.value.resolveProblem()
-            is Success -> ResponseEntity.ok(MatchOutputModel.fromMatch(game.value))
+            is Success -> ResponseEntity.ok(GameOutputModel.fromGame(game.value))
         }
     }
 
@@ -85,13 +85,13 @@ class GameController(private val gameService: GameService) {
         return when (moveResult) {
             is Failure -> moveResult.value.resolveProblem()
             is Success ->
-                ResponseEntity.ok(MatchOutputModel.fromMatch(moveResult.value))
+                ResponseEntity.ok(GameOutputModel.fromGame(moveResult.value))
         }
     }
 
     /**
      * Starts the matchmaking process for a game, either
-     * by creating a new lobby or joining a match
+     * by creating a new lobby or joining a game
      * @param rulesId The id of the rule
      * @param authenticatedUser The authenticated user
      * @return The result of the matchmaking process
@@ -122,7 +122,7 @@ class GameController(private val gameService: GameService) {
 
     /**
      * Gets the current turn player id
-     * @param id The id of the match
+     * @param id The id of the game
      * @return The current turn player id
      */
     @GetMapping(URIs.Game.TURN)
@@ -169,19 +169,19 @@ class GameController(private val gameService: GameService) {
     private fun CurrentTurnPlayerError.resolveProblem(): ResponseEntity<*> =
         when (this) {
             CurrentTurnPlayerError.NoTurn -> Problem.response(400, Problem.samePlayer)
-            CurrentTurnPlayerError.MatchNotFound -> Problem.response(404, Problem.gameNotFound)
+            CurrentTurnPlayerError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
         }
 
     /**
-     * Translates the errors of a Get match action into a response
+     * Translates the errors of a Get game action into a response
      * @receiver The error
      * @return The response
      */
-    private fun GetMatchError.resolveProblem(): ResponseEntity<*> =
+    private fun GetGameError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            GetMatchError.MatchNotFound -> Problem.response(404, Problem.gameNotFound)
-            GetMatchError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
-            GetMatchError.PlayerNotInMatch -> Problem.response(401, Problem.playerNotInMatch)
+            GetGameError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
+            GetGameError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
+            GetGameError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
         }
 
     /**
@@ -189,8 +189,8 @@ class GameController(private val gameService: GameService) {
      * @receiver The error
      * @return The response
      */
-    private fun LeaveLobbyError.resolveProblem() : ResponseEntity<*> =
-        when(this) {
+    private fun LeaveLobbyError.resolveProblem(): ResponseEntity<*> =
+        when (this) {
             LeaveLobbyError.LobbyNotFound -> Problem.response(404, Problem.lobbyNotFound)
             LeaveLobbyError.UserNotInLobby -> Problem.response(404, Problem.userNotFound)
             LeaveLobbyError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)

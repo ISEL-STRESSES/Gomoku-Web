@@ -11,7 +11,7 @@ import java.sql.ResultSet
  * @see RowMapper
  * @see Rules
  */
-class MatchRuleRowMapper : RowMapper<Rules> {
+class GameRuleRowMapper : RowMapper<Rules> {
 
     /**
      * Maps a row of the result set to a [Rules]

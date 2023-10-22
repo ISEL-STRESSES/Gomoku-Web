@@ -5,5 +5,5 @@ package gomoku.server.services.errors.game
  */
 sealed class CurrentTurnPlayerError {
     object NoTurn : CurrentTurnPlayerError()
-    object MatchNotFound : CurrentTurnPlayerError()
+    object GameNotFound : CurrentTurnPlayerError()
 }

@@ -1,6 +1,6 @@
 package gomoku.server.domain.game.player
 
-import gomoku.server.domain.game.match.Position
+import gomoku.server.domain.game.game.move.Position
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

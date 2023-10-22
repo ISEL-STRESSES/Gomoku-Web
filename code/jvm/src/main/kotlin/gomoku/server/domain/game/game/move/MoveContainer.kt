@@ -1,30 +1,14 @@
-package gomoku.server.domain.game.match
+package gomoku.server.domain.game.game.move
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import gomoku.utils.Either
+import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.toColor
 import gomoku.utils.Failure
 import gomoku.utils.Success
 import gomoku.utils.failure
 import gomoku.utils.success
-
-/**
- * Represents the result of a move addition, using Either concept.
- * @see AddMoveError
- * @see MoveContainer
- */
-typealias AddMoveResult = Either<AddMoveError, MoveContainer>
-
-/**
- * Represents an error that can occur when adding a move to the board.
- * @property ImpossiblePosition the position is outside the board
- * @property AlreadyOccupied the position is already occupied
- */
-sealed class AddMoveError {
-    object ImpossiblePosition : AddMoveError()
-    object AlreadyOccupied : AddMoveError()
-}
 
 /**
  * Represents a container for the moves of a game, that doesn't provide data structure information to the outside.

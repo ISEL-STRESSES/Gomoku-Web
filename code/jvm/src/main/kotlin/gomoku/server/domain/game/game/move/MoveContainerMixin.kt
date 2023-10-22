@@ -1,6 +1,7 @@
-package gomoku.server.domain.game.match
+package gomoku.server.domain.game.game.move
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import gomoku.server.domain.game.game.Color
 
 /**
  * Represents a Mixin for [MoveContainer] to be used by Jackson.

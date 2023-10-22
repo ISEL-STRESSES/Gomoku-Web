@@ -1,9 +1,9 @@
 package gomoku.server.services.game
 
 import gomoku.server.domain.game.Matchmaker
-import gomoku.server.domain.game.match.Match
+import gomoku.server.domain.game.game.Game
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
-import gomoku.server.services.errors.game.GetMatchError
+import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
@@ -19,14 +19,14 @@ typealias MatchmakingResult = Either<MatchmakingError, Matchmaker>
 /**
  * Result for making a move
  * @see MakeMoveError
- * @see Match
+ * @see Game
  */
-typealias MakeMoveResult = Either<MakeMoveError, Match>
+typealias MakeMoveResult = Either<MakeMoveError, Game>
 
 /**
  * Result for getting the current turn player
  * @see CurrentTurnPlayerError
- * @see Match
+ * @see Game
  */
 typealias CurrentTurnPlayerResult = Either<CurrentTurnPlayerError, Int>
 
@@ -37,7 +37,7 @@ typealias CurrentTurnPlayerResult = Either<CurrentTurnPlayerError, Int>
 typealias LeaveLobbyResult = Either<LeaveLobbyError, Unit>
 
 /**
- * Result for getting a match
- * @see GetMatchError
+ * Result for getting a game
+ * @see GetGameError
  */
-typealias GetMatchResult = Either<GetMatchError, Match>
+typealias GetGameResult = Either<GetGameError, Game>

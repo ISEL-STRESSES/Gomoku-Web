@@ -1,7 +1,7 @@
 package gomoku.server.domain.game.rules
 
 /**
- * Represents the possible sizes of a match board
+ * Represents the possible sizes of a game board
  * @property value The maximum value of the x and y coordinates
  * @property X15 A 15x15 board
  * @property X19 A 19x19 board

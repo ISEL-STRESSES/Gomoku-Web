@@ -2,21 +2,21 @@ package gomoku.server.services.game
 
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.errors.MoveError
-import gomoku.server.domain.game.match.Color
-import gomoku.server.domain.game.match.FinishedMatch
-import gomoku.server.domain.game.match.MatchOutcome
-import gomoku.server.domain.game.match.MatchState
-import gomoku.server.domain.game.match.Move
-import gomoku.server.domain.game.match.OngoingMatch
-import gomoku.server.domain.game.match.Position
-import gomoku.server.domain.game.match.toMatchOutcome
+import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.FinishedGame
+import gomoku.server.domain.game.game.GameOutcome
+import gomoku.server.domain.game.game.GameState
+import gomoku.server.domain.game.game.OngoingGame
+import gomoku.server.domain.game.game.move.Move
+import gomoku.server.domain.game.game.move.Position
+import gomoku.server.domain.game.game.toGameOutcome
 import gomoku.server.domain.game.rules.Rules
 import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.updateElo
 import gomoku.server.repository.Transaction
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
-import gomoku.server.services.errors.game.GetMatchError
+import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
@@ -55,8 +55,8 @@ class GameService(private val transactionManager: TransactionManager) {
                 }
                 val playerBlack = if (Random.nextBoolean()) userId else lobby.userId
                 val playerWhite = if (playerBlack == userId) lobby.userId else userId
-                val matchId = it.matchRepository.createMatch(ruleId, playerBlack, playerWhite)
-                return@run success(Matchmaker(true, matchId))
+                val gameId = it.gameRepository.createGame(ruleId, playerBlack, playerWhite)
+                return@run success(Matchmaker(true, gameId))
             } else {
                 return@run success(Matchmaker(false, it.lobbyRepository.createLobby(ruleId, userId)))
             }
@@ -64,8 +64,8 @@ class GameService(private val transactionManager: TransactionManager) {
     }
 
     /**
-     * Makes a move in the given match.
-     * @param gameId id of the match
+     * Makes a move in the given game.
+     * @param gameId id of the game
      * @param userId id of the user that wants to make the move
      * @param pos position of the move
      * @return the result of the move
@@ -73,23 +73,23 @@ class GameService(private val transactionManager: TransactionManager) {
      */
     fun makeMove(gameId: Int, userId: Int, pos: Int): MakeMoveResult {
         return transactionManager.run {
-            val match = it.matchRepository.getMatchById(gameId)
+            val game = it.gameRepository.getGameById(gameId)
                 ?: return@run failure(MakeMoveError.GameNotFound)
-            when (match) {
-                is FinishedMatch -> return@run failure(MakeMoveError.GameFinished)
-                is OngoingMatch -> {
+            when (game) {
+                is FinishedGame -> return@run failure(MakeMoveError.GameFinished)
+                is OngoingGame -> {
                     val currMove = Move(
                         position = Position(pos),
-                        color = if (match.playerBlack == userId) {
+                        color = if (game.playerBlack == userId) {
                             Color.BLACK
                         } else {
                             Color.WHITE
                         }
                     )
-                    val isValidMoveResult = match.rules.isValidMove(match.moveContainer, currMove, match.turn)
+                    val isValidMoveResult = game.rules.isValidMove(game.moveContainer, currMove, game.turn)
                     when (isValidMoveResult) {
                         is Failure -> return@run isValidMoveResult.value.resolveError()
-                        is Success -> return@run resolveValidMove(match, currMove, it)
+                        is Success -> return@run resolveValidMove(game, currMove, it)
                     }
                 }
             }
@@ -98,36 +98,36 @@ class GameService(private val transactionManager: TransactionManager) {
 
     /**
      * Resolves a valid move.
-     * @param match the match
+     * @param game the game
      * @param move the move to be made
      * @param tr the transaction context
      * @return the result of the move
      * @see MakeMoveResult
      */
-    private fun resolveValidMove(match: OngoingMatch, move: Move, tr: Transaction): MakeMoveResult {
-        if (match.rules.isWinningMove(match.moveContainer, move)) {
-            if (!tr.matchRepository.addToMoveArray(match.id, move.position.value)) {
+    private fun resolveValidMove(game: OngoingGame, move: Move, tr: Transaction): MakeMoveResult {
+        if (game.rules.isWinningMove(game.moveContainer, move)) {
+            if (!tr.gameRepository.addToMoveArray(game.id, move.position.value)) {
                 return failure(MakeMoveError.MakeMoveFailed)
             }
-            tr.matchRepository.setMatchState(match.id, MatchState.FINISHED)
-            tr.matchRepository.setMatchOutcome(match.id, move.color.toMatchOutcome())
+            tr.gameRepository.setGameState(game.id, GameState.FINISHED)
+            tr.gameRepository.setGameOutcome(game.id, move.color.toGameOutcome())
 
-            val winnerId = if (move.color == Color.BLACK) match.playerBlack else match.playerWhite
-            val loserId = if (move.color == Color.BLACK) match.playerWhite else match.playerBlack
+            val winnerId = if (move.color == Color.BLACK) game.playerBlack else game.playerWhite
+            val loserId = if (move.color == Color.BLACK) game.playerWhite else game.playerBlack
 
-            updatePlayerStats(winnerId, loserId, match.rules.ruleId, tr, RankingUserData.WIN)
+            updatePlayerStats(winnerId, loserId, game.rules.ruleId, tr, RankingUserData.WIN)
         } else {
-            if (!tr.matchRepository.addToMoveArray(match.id, move.position.value)) {
+            if (!tr.gameRepository.addToMoveArray(game.id, move.position.value)) {
                 return failure(MakeMoveError.MakeMoveFailed)
             }
-            if (match.moveContainer.isFull()) {
-                tr.matchRepository.setMatchState(match.id, MatchState.FINISHED)
-                tr.matchRepository.setMatchOutcome(match.id, MatchOutcome.DRAW)
+            if (game.moveContainer.isFull()) {
+                tr.gameRepository.setGameState(game.id, GameState.FINISHED)
+                tr.gameRepository.setGameOutcome(game.id, GameOutcome.DRAW)
 
-                updatePlayerStats(match.playerBlack, match.playerWhite, match.rules.ruleId, tr, RankingUserData.DRAW)
+                updatePlayerStats(game.playerBlack, game.playerWhite, game.rules.ruleId, tr, RankingUserData.DRAW)
             }
         }
-        val newGame = tr.matchRepository.getMatchById(match.id)
+        val newGame = tr.gameRepository.getGameById(game.id)
             ?: return failure(MakeMoveError.GameNotFound)
         return success(newGame)
     }
@@ -136,9 +136,9 @@ class GameService(private val transactionManager: TransactionManager) {
      * Updates the statistics of two players based on the game outcome.
      * @param player1Id The ID of the first player.
      * @param player2Id The ID of the second player.
-     * @param ruleId The rules set being followed in the match.
+     * @param ruleId The rules set being followed in the game.
      * @param tr The transaction context.
-     * @param player1Score The score/result of the first player after the match.
+     * @param player1Score The score/result of the first player after the game.
      */
     private fun updatePlayerStats(
         player1Id: Int,
@@ -185,14 +185,15 @@ class GameService(private val transactionManager: TransactionManager) {
      */
     fun leaveLobby(lobbyId: Int, userId: Int): LeaveLobbyResult =
         transactionManager.run {
-            val lobby = it.lobbyRepository.getLobbyById(lobbyId) ?: return@run failure(LeaveLobbyError.LobbyNotFound) //TODO: Create tests for this function
+            val lobby = it.lobbyRepository.getLobbyById(lobbyId) ?: return@run failure(LeaveLobbyError.LobbyNotFound) // TODO: Create tests for this function
 
-            if(lobby.userId != userId) return@run failure(LeaveLobbyError.UserNotInLobby)
+            if (lobby.userId != userId) return@run failure(LeaveLobbyError.UserNotInLobby)
 
-            if(it.lobbyRepository.leaveLobby(userId))
+            if (it.lobbyRepository.leaveLobby(userId)) {
                 return@run success(Unit)
-            else
+            } else {
                 return@run failure(LeaveLobbyError.LeaveLobbyFailed)
+            }
         }
 
     /**
@@ -202,18 +203,18 @@ class GameService(private val transactionManager: TransactionManager) {
      */
     fun getAvailableRules(): List<Rules> =
         transactionManager.run {
-            it.matchRepository.getAllRules()
+            it.gameRepository.getAllRules()
         }
 
     /**
-     * Gets the id of the player that has the turn in a given match.
-     * @param matchId id of the match
-     * @return the id of the player that has the turn, or null if the match doesn't exist
+     * Gets the id of the player that has the turn in a given game.
+     * @param gameId id of the game
+     * @return the id of the player that has the turn, or null if the game doesn't exist
      */
-    fun getCurrentTurnPlayerId(matchId: Int): CurrentTurnPlayerResult {
+    fun getCurrentTurnPlayerId(gameId: Int): CurrentTurnPlayerResult {
         return transactionManager.run {
-            val currentColor = it.matchRepository.getTurn(matchId) ?: return@run failure(CurrentTurnPlayerError.NoTurn)
-            val players = it.matchRepository.getMatchPlayers(matchId) ?: return@run failure(CurrentTurnPlayerError.MatchNotFound)
+            val currentColor = it.gameRepository.getTurn(gameId) ?: return@run failure(CurrentTurnPlayerError.NoTurn)
+            val players = it.gameRepository.getGamePlayers(gameId) ?: return@run failure(CurrentTurnPlayerError.GameNotFound)
             when (currentColor) {
                 Color.BLACK -> success(players.first)
                 Color.WHITE -> success(players.second)
@@ -222,15 +223,15 @@ class GameService(private val transactionManager: TransactionManager) {
     }
 
     /**
-     * Gets the finished matches of a user.
-     * @param offset the offset for the matches list
-     * @param limit the limit for the matches list
-     * @param userId the id of the user to get the matches from
-     * @return the list of [FinishedMatch]
+     * Gets the finished games of a user.
+     * @param offset the offset for the games list
+     * @param limit the limit for the games list
+     * @param userId the id of the user to get the games from
+     * @return the list of [FinishedGame]
      */
-    fun getUserFinishedMatches(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT, userId: Int): List<FinishedMatch> =
+    fun getUserFinishedGames(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT, userId: Int): List<FinishedGame> =
         transactionManager.run {
-            it.matchRepository.getUserFinishedMatches(offset, limit, userId)
+            it.gameRepository.getUserFinishedGames(offset, limit, userId)
         }
 
     /**
@@ -239,21 +240,24 @@ class GameService(private val transactionManager: TransactionManager) {
      * @param userId The id of the user.
      * @return The details of the game, or an error.
      */
-    fun getGame(gameId: Int, userId :Int): GetMatchResult =
+    fun getGame(gameId: Int, userId: Int): GetGameResult =
         transactionManager.run {
-            if(!it.usersRepository.isUserStoredById(userId))
-                return@run failure(GetMatchError.PlayerNotFound)
+            if (!it.usersRepository.isUserStoredById(userId)) {
+                return@run failure(GetGameError.PlayerNotFound)
+            }
 
-            if(!it.matchRepository.isMatchStoredById(gameId))
-                return@run failure(GetMatchError.MatchNotFound)
+            if (!it.gameRepository.isGameStoredById(gameId)) {
+                return@run failure(GetGameError.GameNotFound)
+            }
 
-            val gamePlayers = it.matchRepository.getMatchPlayers(gameId)
-                ?: return@run failure(GetMatchError.MatchNotFound)
+            val gamePlayers = it.gameRepository.getGamePlayers(gameId)
+                ?: return@run failure(GetGameError.GameNotFound)
 
-            if(gamePlayers.first != userId && gamePlayers.second != userId)
-                return@run failure(GetMatchError.PlayerNotInMatch)
+            if (gamePlayers.first != userId && gamePlayers.second != userId) {
+                return@run failure(GetGameError.PlayerNotInGame)
+            }
 
-            success(it.matchRepository.getMatchById(gameId)!!)
+            success(it.gameRepository.getGameById(gameId)!!)
         }
 
     companion object {

@@ -3,10 +3,10 @@ package gomoku.server.domain.game.rules
 import com.fasterxml.jackson.annotation.JsonIgnore
 import gomoku.server.domain.game.IsValidMoveResult
 import gomoku.server.domain.game.errors.MoveError
-import gomoku.server.domain.game.match.Color
-import gomoku.server.domain.game.match.Move
-import gomoku.server.domain.game.match.MoveContainer
-import gomoku.server.domain.game.match.Position
+import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.move.Move
+import gomoku.server.domain.game.game.move.MoveContainer
+import gomoku.server.domain.game.game.move.Position
 import gomoku.utils.failure
 import gomoku.utils.success
 import kotlin.math.abs

@@ -64,6 +64,6 @@ class Problem(typeUri: URI) {
 
         val userStatsNotFound = Problem(URI(PROBLEM_BASE_URL + "user-stats-not-found"))
 
-        val playerNotInMatch = Problem(URI(PROBLEM_BASE_URL + "player-not-in-match"))
+        val playerNotInGame = Problem(URI(PROBLEM_BASE_URL + "player-not-in-game"))
     }
 }

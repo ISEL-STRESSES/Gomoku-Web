@@ -14,7 +14,7 @@ data class RuleOutputModel(
     val boardSize: Int,
     val variant: String,
     val openingRule: String
-){
+) {
     constructor(rule: Rules) : this(
         ruleId = rule.ruleId,
         boardSize = rule.boardSize.value,

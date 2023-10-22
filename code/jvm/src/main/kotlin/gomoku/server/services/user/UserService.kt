@@ -107,7 +107,7 @@ class UserService(
             if (!it.usersRepository.isUserStoredById(userId)) {
                 return@run failure(UserRankingServiceError.UserNotFound)
             }
-            if (it.matchRepository.getRuleById(ruleId) == null) {
+            if (it.gameRepository.getRuleById(ruleId) == null) {
                 return@run failure(UserRankingServiceError.RuleNotFound)
             }
             val stats = it.usersRepository.getUserRanking(userId, ruleId)
@@ -128,7 +128,7 @@ class UserService(
      */
     fun searchRanking(ruleId: Int, username: String?, offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT): List<RankingUserData>? =
         transactionManager.run {
-            val availableRules = it.matchRepository.getAllRules()
+            val availableRules = it.gameRepository.getAllRules()
             if (availableRules.any { rule -> rule.ruleId == ruleId }) {
                 return@run it.usersRepository.searchRanking(ruleId, username ?: "", offset, limit)
             } else {

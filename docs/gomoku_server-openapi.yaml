@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Gomoku API
   description: Web-based system that allows multiple players to play the Battleship game
-  version: 0.1.0
+  version: 0.1.1
 servers:
   - url: http://localhost:8888
     description: Local server
@@ -50,16 +50,18 @@ paths:
       responses:
         201:
           description: CREATED
-          content:
-            '*/*':
+          headers:
+            Location:
               schema:
                 type: integer
+              description: UserId
         400:
           $ref: '#/components/responses/BadRequest'
         409:
           $ref: '#/components/responses/Conflict'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/users/logout:
     post:
       tags:
@@ -71,6 +73,7 @@ paths:
           description: OK
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/users/me:
     get:
       tags:
@@ -81,11 +84,12 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/UserHomeOutputModel'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/users/ranking/{ruleId}:
     get:
       tags:
@@ -101,13 +105,14 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
+                $ref : '#/components/schemas/GetUsersDataOutputModel'
         404:
           $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/users/ranking/{userId}/{ruleId}:
     get:
       tags:
@@ -121,13 +126,15 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            'application/json':
               schema:
-                type: object
+                allOf:
+                  - $ref: '#/components/schemas/UserRuleStatsOutputModel'
         404:
           $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/users/stats/{userId}:
     get:
       tags:
@@ -140,13 +147,14 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/UserStatsOutputModel'
         404:
           $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/users/token:
     post:
       tags:
@@ -163,13 +171,14 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/UserTokenCreateOutputModel'
         400:
           $ref: '#/components/responses/BadRequest'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/users/{id}:
     get:
       tags:
@@ -182,48 +191,53 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/UserByIdOutputModel'
         404:
           $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/game/:
     get:
       tags:
         - Games
-      summary: GET api/game/
+      summary: Get Finished games
       operationId: finishedGames
       responses:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
+                $ref : '#/components/schemas/GetFinishedMatchesOutputModel'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/game/rules:
     get:
       tags:
         - Games
-      summary: GET api/game/rules
+      summary: Get the available rules
       operationId: rules
       responses:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
+                $ref : '#/components/schemas/GetRulesOutputModel'
+        404:
+          $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/game/{id}:
     get:
       tags:
         - Games
-      summary: GET api/game/{id}
+      summary: Get the details of a game
       operationId: gameDetails
       parameters:
         - name: 'id'
@@ -235,16 +249,20 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/MatchOutputModel'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
   /api/game/{id}/play:
     post:
       tags:
         - Games
-      summary: POST api/game/{id}/play
+      summary: Makes a move in a game
       operationId: makePlay
       parameters:
         - name: 'id'
@@ -261,16 +279,21 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/MatchOutputModel'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
+
   /api/game/{id}/turn:
     get:
       tags:
         - Games
-      summary: GET api/game/{id}/turn
+      summary: Gets the current turn player id
       operationId: currentTurnPlayerId
       parameters:
         - name: 'id'
@@ -282,16 +305,20 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
+                type: integer
+        400:
+          $ref: '#/components/responses/BadRequest'
+        404:
+          $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
   /api/game/{lobbyId}/leave:
     post:
       tags:
         - Games
-      summary: POST api/game/{lobbyId}/leave
+      summary: Leaves a lobby
       operationId: leaveLobby
       parameters:
         - name: 'lobbyId'
@@ -302,17 +329,15 @@ paths:
       responses:
         200:
           description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
+        404:
+          $ref: '#/components/responses/NotFound'
         500:
           $ref: '#/components/responses/InternalServerError'
   /api/game/{rulesId}:
     post:
       tags:
         - Games
-      summary: POST api/game/{rulesId}
+      summary: Starts matchmaking process
       operationId: startMatchmaking
       parameters:
         - name: 'rulesId'
@@ -324,11 +349,14 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/MatchMakerOutputModel'
+        400:
+          $ref: '#/components/responses/BadRequest'
         500:
           $ref: '#/components/responses/InternalServerError'
+
 components:
   schemas:
     Socials:
@@ -366,6 +394,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Author'
+    PasswordValidationInfo:
+      type: object
+      properties:
+        validationInfo:
+          type: string
+    UserByIdOutputModel:
+      type: object
+      properties:
+        uuid:
+          type: integer
+        username:
+          type: string
+        passwordValidationInfo:
+          $ref: '#/components/schemas/PasswordValidationInfo'
+
+    UserTokenCreateOutputModel:
+      type: object
+      properties:
+        token:
+          type: string
     UserCreateInputModel:
       type: object
       properties:
@@ -380,6 +428,26 @@ components:
           type: integer
         username:
           type: string
+    RuleStatsOutputModel:
+      type: object
+      properties:
+        ruleId:
+          type: integer
+        gamesPlayed:
+          type: integer
+        elo:
+          type: integer
+    UserStatsOutputModel:
+      type: object
+      properties:
+        userId:
+          type: integer
+        username:
+          type: string
+        userRulesOutputModel:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleStatsOutputModel'
     UserCreateTokenInputModel:
       type: object
       properties:
@@ -387,17 +455,122 @@ components:
           type: string
         password:
           type: string
+    UserRuleStatsOutputModel:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        ruleId:
+          type: integer
+        gamesPlayed:
+          type: integer
+        elo:
+          type: integer
+    GetUsersDataOutputModel:
+      type: object
+      properties:
+        userData:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetUsersDataOutputModel'
+
+    RuleOutputModel:
+      type: object
+      properties:
+        ruleId:
+          type: integer
+        boardSize:
+          type: integer
+        variant:
+          type: string
+        openingRule:
+          type: string
+
+    MoveOutputModel:
+      type: object
+      properties:
+        pos:
+          type: integer
+        color:
+          type: string
+    MoveContainerOutputModel:
+      type: object
+      properties:
+        boardSize:
+          type: integer
+        orderOfMoves:
+          type: array
+          items:
+            $ref: '#/components/schemas/MoveOutputModel'
+    color:
+      type: string
+      enum:
+        - 'BLACK'
+        - 'WHITE'
+    MatchType:
+      type: string
+      enum:
+        - 'ONGOING'
+        - 'FINISHED'
+    MatchOutputModel:
+      type: object
+      properties:
+        id:
+          type: integer
+        playerBlack:
+          type: integer
+        playerWhite:
+          type: integer
+        rule:
+          $ref: '#/components/schemas/RuleOutputModel'
+        moves:
+          $ref: '#/components/schemas/MoveContainerOutputModel'
+        matchOutcome:
+          type: string
+        turn:
+          $ref: '#/components/schemas/color'
+        type:
+          $ref: '#/components/schemas/MatchType'
+
+    GetFinishedMatchesOutputModel:
+      type: object
+      properties:
+        finishedMatches:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchOutputModel'
+
+    GetRulesOutputModel:
+      type: object
+      properties:
+        rulesList:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetRulesOutputModel'
+    MatchMakerOutputModel:
+      type: object
+      properties:
+        isMatch:
+          type: boolean
+        id:
+          type: integer
     ErrorModel:
       type: object
       properties:
-        timestamp:
+        type:
           type: string
-        status:
-          type: integer
-        error:
-          type: string
-        path:
-          type: string
+  #        title:
+  #          type: string
+  #        timestamp:
+  #          type: string
+  #        status:
+  #          type: integer
+  #        error:
+  #          type: string
+  #        path:
+  #          type: string
 
   parameters:
     offsetParam:
@@ -456,42 +629,42 @@ components:
     InternalServerError:
       description: Internal Server Error
       content:
-        application/json:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
 
     Conflict:
       description: Conflict
       content:
-        application/json:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
 
     NotFound:
       description: Not Found
       content:
-        application/json:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
 
     BadRequest:
       description: Bad Request
       content:
-        application/json:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
 
     Unauthorized:
       description: Unauthorized
       content:
-        application/json:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
 
     Forbidden:
       description: Forbidden
       content:
-        application/json:
+        application/problem+json:
           schema:
             $ref: '#/components/schemas/ErrorModel'
 
