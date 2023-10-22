@@ -26,7 +26,7 @@ paths:
       operationId: getHome
       responses:
         200:
-          description: Home page
+          description: OK
           content:
             'application/json':
               schema:
@@ -49,11 +49,11 @@ paths:
               $ref: '#/components/schemas/UserCreateInputModel'
       responses:
         201:
-          description: User was created
+          description: CREATED
           content:
             '*/*':
               schema:
-                type: object
+                type: integer
         400:
           $ref: '#/components/responses/BadRequest'
         409:
@@ -68,7 +68,7 @@ paths:
       operationId: logout
       responses:
         200:
-          description: User was logged out
+          description: OK
         500:
           $ref: '#/components/responses/InternalServerError'
   /api/users/me:
@@ -79,7 +79,7 @@ paths:
       operationId: home
       responses:
         200:
-          description: User home page
+          description: OK
           content:
             '*/*':
               schema:
@@ -99,7 +99,7 @@ paths:
         - $ref: '#/components/parameters/limitParam'
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -119,7 +119,7 @@ paths:
         - $ref: '#/components/parameters/ruleIdParam'
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -138,7 +138,7 @@ paths:
         - $ref: '#/components/parameters/userIdParam'
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -161,7 +161,7 @@ paths:
         required: true
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -180,7 +180,7 @@ paths:
         - $ref: '#/components/parameters/userIdParam'
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -197,7 +197,7 @@ paths:
       operationId: finishedGames
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -212,7 +212,7 @@ paths:
       operationId: rules
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -233,7 +233,7 @@ paths:
             type: integer
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -259,7 +259,7 @@ paths:
             type: integer
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -280,7 +280,7 @@ paths:
             type: integer
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -301,7 +301,7 @@ paths:
             type: integer
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
@@ -322,7 +322,7 @@ paths:
             type: integer
       responses:
         200:
-          description: 'OK'
+          description: OK
           content:
             '*/*':
               schema:
