@@ -93,7 +93,8 @@ class UserService(
      */
     fun getUserStats(userId: Int): UserStats? =
         transactionManager.run {
-            it.usersRepository.getUserStats(userId)
+            val user = it.usersRepository.getUserById(userId) ?: return@run null
+            it.usersRepository.getUserStats(userId) ?: return@run UserStats(user.uuid, user.username, emptyList())
         }
 
     /**
