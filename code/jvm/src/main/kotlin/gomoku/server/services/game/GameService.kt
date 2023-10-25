@@ -213,8 +213,8 @@ class GameService(private val transactionManager: TransactionManager) {
      */
     fun getCurrentTurnPlayerId(gameId: Int): CurrentTurnPlayerResult {
         return transactionManager.run {
-            val currentColor = it.gameRepository.getTurn(gameId) ?: return@run failure(CurrentTurnPlayerError.NoTurn)
             val players = it.gameRepository.getGamePlayers(gameId) ?: return@run failure(CurrentTurnPlayerError.GameNotFound)
+            val currentColor = it.gameRepository.getTurn(gameId) ?: return@run failure(CurrentTurnPlayerError.NoTurn)
             when (currentColor) {
                 Color.BLACK -> success(players.first)
                 Color.WHITE -> success(players.second)
@@ -244,10 +244,6 @@ class GameService(private val transactionManager: TransactionManager) {
         transactionManager.run {
             if (!it.usersRepository.isUserStoredById(userId)) {
                 return@run failure(GetGameError.PlayerNotFound)
-            }
-
-            if (!it.gameRepository.isGameStoredById(gameId)) {
-                return@run failure(GetGameError.GameNotFound)
             }
 
             val gamePlayers = it.gameRepository.getGamePlayers(gameId)
