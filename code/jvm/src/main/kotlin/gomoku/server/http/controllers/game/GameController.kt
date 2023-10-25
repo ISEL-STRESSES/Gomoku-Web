@@ -66,7 +66,7 @@ class GameController(private val gameService: GameService) {
     fun rules(): ResponseEntity<*> {
         val rules = gameService.getAvailableRules()
         if (rules.isEmpty()) {
-            return Problem.response(404, Problem.noRulesFound)
+            return Problem.response(Problem.noRulesFound)
         }
 
         return ResponseEntity.ok(GetRulesOutputModel(rules.map { RuleOutputModel(it) }))
@@ -141,13 +141,13 @@ class GameController(private val gameService: GameService) {
      */
     private fun MakeMoveError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            MakeMoveError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
-            MakeMoveError.GameFinished -> Problem.response(400, Problem.gameAlreadyFinished)
-            MakeMoveError.AlreadyOccupied -> Problem.response(400, Problem.positionOccupied)
-            MakeMoveError.ImpossiblePosition -> Problem.response(400, Problem.impossiblePosition)
-            MakeMoveError.InvalidTurn -> Problem.response(400, Problem.notYourTurn)
-            MakeMoveError.InvalidMove -> Problem.response(400, Problem.invalidMove)
-            MakeMoveError.MakeMoveFailed -> Problem.response(500, Problem.makeMoveFailed)
+            MakeMoveError.GameNotFound -> Problem.response(Problem.gameNotFound)
+            MakeMoveError.GameFinished -> Problem.response(Problem.gameAlreadyFinished)
+            MakeMoveError.AlreadyOccupied -> Problem.response(Problem.positionOccupied)
+            MakeMoveError.ImpossiblePosition -> Problem.response(Problem.impossiblePosition)
+            MakeMoveError.InvalidTurn -> Problem.response(Problem.notYourTurn)
+            MakeMoveError.InvalidMove -> Problem.response(Problem.invalidMove)
+            MakeMoveError.MakeMoveFailed -> Problem.response(Problem.makeMoveFailed)
         }
 
     /**
@@ -157,8 +157,8 @@ class GameController(private val gameService: GameService) {
      */
     private fun MatchmakingError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            MatchmakingError.SamePlayer -> Problem.response(400, Problem.samePlayer)
-            MatchmakingError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
+            MatchmakingError.SamePlayer -> Problem.response(Problem.samePlayer)
+            MatchmakingError.LeaveLobbyFailed -> Problem.response(Problem.leaveLobbyFailed)
         }
 
     /**
@@ -168,8 +168,8 @@ class GameController(private val gameService: GameService) {
      */
     private fun CurrentTurnPlayerError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            CurrentTurnPlayerError.NoTurn -> Problem.response(400, Problem.samePlayer)
-            CurrentTurnPlayerError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
+            CurrentTurnPlayerError.NoTurn -> Problem.response(Problem.samePlayer)
+            CurrentTurnPlayerError.GameNotFound -> Problem.response(Problem.gameNotFound)
         }
 
     /**
@@ -179,9 +179,9 @@ class GameController(private val gameService: GameService) {
      */
     private fun GetGameError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            GetGameError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
-            GetGameError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
-            GetGameError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
+            GetGameError.GameNotFound -> Problem.response(Problem.gameNotFound)
+            GetGameError.PlayerNotFound -> Problem.response(Problem.userNotFound)
+            GetGameError.PlayerNotInGame -> Problem.response(Problem.playerNotInGame)
         }
 
     /**
@@ -191,8 +191,8 @@ class GameController(private val gameService: GameService) {
      */
     private fun LeaveLobbyError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            LeaveLobbyError.LobbyNotFound -> Problem.response(404, Problem.lobbyNotFound)
-            LeaveLobbyError.UserNotInLobby -> Problem.response(404, Problem.userNotFound)
-            LeaveLobbyError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
+            LeaveLobbyError.LobbyNotFound -> Problem.response(Problem.lobbyNotFound)
+            LeaveLobbyError.UserNotInLobby -> Problem.response(Problem.userNotFound)
+            LeaveLobbyError.LeaveLobbyFailed -> Problem.response(Problem.leaveLobbyFailed)
         }
 }
