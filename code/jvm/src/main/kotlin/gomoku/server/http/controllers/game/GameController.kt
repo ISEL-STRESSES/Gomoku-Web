@@ -48,7 +48,7 @@ class GameController(private val gameService: GameService) {
         return if (game != null) {
             ResponseEntity.ok(game)
         } else {
-            Problem.response(404, Problem.gameNotFound)
+            Problem.response(Problem.gameNotFound)
         }
     }
 
@@ -60,7 +60,7 @@ class GameController(private val gameService: GameService) {
     fun rules(): ResponseEntity<*> {
         val rules = gameService.getAvailableRules()
         if (rules.isEmpty()) {
-            return Problem.response(404, Problem.noRulesFound)
+            return Problem.response(Problem.noRulesFound)
         }
 
         return ResponseEntity.ok(rules)
@@ -108,7 +108,7 @@ class GameController(private val gameService: GameService) {
     fun leaveLobby(@PathVariable lobbyId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val leftLobby = gameService.leaveLobby(authenticatedUser.user.uuid)
         return if (!leftLobby) {
-            Problem.response(404, Problem.lobbyNotFound)
+            Problem.response(Problem.lobbyNotFound)
         } else {
             ResponseEntity.ok(leftLobby)
         }
@@ -135,13 +135,13 @@ class GameController(private val gameService: GameService) {
      */
     private fun MakeMoveError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            MakeMoveError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
-            MakeMoveError.GameFinished -> Problem.response(400, Problem.gameAlreadyFinished)
-            MakeMoveError.AlreadyOccupied -> Problem.response(400, Problem.positionOccupied)
-            MakeMoveError.ImpossiblePosition -> Problem.response(400, Problem.impossiblePosition)
-            MakeMoveError.InvalidTurn -> Problem.response(400, Problem.notYourTurn)
-            MakeMoveError.InvalidMove -> Problem.response(400, Problem.invalidMove)
-            MakeMoveError.MakeMoveFailed -> Problem.response(500, Problem.makeMoveFailed)
+            MakeMoveError.GameNotFound -> Problem.response(Problem.gameNotFound)
+            MakeMoveError.GameFinished -> Problem.response(Problem.gameAlreadyFinished)
+            MakeMoveError.AlreadyOccupied -> Problem.response(Problem.positionOccupied)
+            MakeMoveError.ImpossiblePosition -> Problem.response(Problem.impossiblePosition)
+            MakeMoveError.InvalidTurn -> Problem.response(Problem.notYourTurn)
+            MakeMoveError.InvalidMove -> Problem.response(Problem.invalidMove)
+            MakeMoveError.MakeMoveFailed -> Problem.response(Problem.makeMoveFailed)
         }
 
     /**
@@ -151,8 +151,8 @@ class GameController(private val gameService: GameService) {
      */
     private fun MatchmakingError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            MatchmakingError.SamePlayer -> Problem.response(400, Problem.samePlayer)
-            MatchmakingError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
+            MatchmakingError.SamePlayer -> Problem.response(Problem.samePlayer)
+            MatchmakingError.LeaveLobbyFailed -> Problem.response(Problem.leaveLobbyFailed)
         }
 
     /**
@@ -162,7 +162,7 @@ class GameController(private val gameService: GameService) {
      */
     private fun CurrentTurnPlayerError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            CurrentTurnPlayerError.NoTurn -> Problem.response(400, Problem.samePlayer)
-            CurrentTurnPlayerError.MatchNotFound -> Problem.response(404, Problem.gameNotFound)
+            CurrentTurnPlayerError.NoTurn -> Problem.response(Problem.samePlayer)
+            CurrentTurnPlayerError.MatchNotFound -> Problem.response(Problem.gameNotFound)
         }
 }

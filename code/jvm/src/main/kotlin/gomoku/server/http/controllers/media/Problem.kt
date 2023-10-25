@@ -3,13 +3,17 @@ package gomoku.server.http.controllers.media
 import org.springframework.http.ResponseEntity
 import java.net.URI
 
+
 /**
  * Represents a problem
+ * @param status The status of the problem
  * @param typeUri The type of the problem
+ * @param title The title of the problem
  */
-class Problem(typeUri: URI) {
+class Problem(val status: Int, typeUri: URI, val title: String) {
 
-    val type: String = typeUri.toASCIIString() // TODO what for?
+    val type: String = typeUri.toASCIIString()
+
 
     companion object {
         private const val MEDIA_TYPE = "application/problem+json"
@@ -17,53 +21,52 @@ class Problem(typeUri: URI) {
 
         /**
          * Creates a response entity with the given status and problem
-         * @param status The status of the response
          * @param problem The problem
          * @return The response entity
          */
-        fun response(status: Int, problem: Problem) = ResponseEntity
-            .status(status)
+        fun response(problem: Problem) = ResponseEntity
+            .status(problem.status)
             .header("Content-Type", MEDIA_TYPE)
             .body<Any>(problem)
 
-        val invalidRule = Problem(URI(PROBLEM_BASE_URL + "invalid-rule"))
+        val ruleNotFound = Problem(404, URI(PROBLEM_BASE_URL + "invalid-rule"), "Rule not found.")
 
-        val userAlreadyExists = Problem(URI(PROBLEM_BASE_URL + "user-already-exists"))
+        val userAlreadyExists = Problem(409, URI(PROBLEM_BASE_URL + "user-already-exists"), "User already exists.")
 
-        val insecurePassword = Problem(URI(PROBLEM_BASE_URL + "insecure-password"))
+        val insecurePassword = Problem(400, URI(PROBLEM_BASE_URL + "insecure-password"), "The provided password is insecure.")
 
-        val invalidUsername = Problem(URI(PROBLEM_BASE_URL + "invalid-username"))
+        val invalidUsername = Problem(400, URI(PROBLEM_BASE_URL + "invalid-username"), "Invalid username format.")
 
-        val userOrPasswordAreInvalid = Problem(URI(PROBLEM_BASE_URL + "user-or-password-are-invalid"))
+        val userOrPasswordAreInvalid = Problem(400, URI(PROBLEM_BASE_URL + "user-or-password-are-invalid"), "User or password are invalid.")
 
-        val invalidRequestContent = Problem(URI(PROBLEM_BASE_URL + "invalid-request-content"))
+        val invalidRequestContent = Problem(400, URI(PROBLEM_BASE_URL + "invalid-request-content"), "Invalid request content.")
 
-        val userNotFound = Problem(URI(PROBLEM_BASE_URL + "user-not-found"))
+        val userNotFound = Problem(404, URI(PROBLEM_BASE_URL + "user-not-found"), "User not found.")
 
-        val gameNotFound = Problem(URI(PROBLEM_BASE_URL + "game-not-found"))
+        val gameNotFound = Problem(404, URI(PROBLEM_BASE_URL + "game-not-found"), "Game not found.")
 
-        val noRulesFound = Problem(URI(PROBLEM_BASE_URL + "rules-not-found"))
+        val noRulesFound = Problem(404, URI(PROBLEM_BASE_URL + "rules-not-found"), "No rules found.")
 
-        val positionOccupied = Problem(URI(PROBLEM_BASE_URL + "position-occupied"))
+        val positionOccupied = Problem(409, URI(PROBLEM_BASE_URL + "position-occupied"), "The position is already occupied.")
 
-        val notYourTurn = Problem(URI(PROBLEM_BASE_URL + "not-your-turn"))
+        val notYourTurn = Problem(400, URI(PROBLEM_BASE_URL + "not-your-turn"), "It's not your turn.")
 
-        val gameAlreadyFinished = Problem(URI(PROBLEM_BASE_URL + "game-already-finished"))
+        val gameAlreadyFinished = Problem(400, URI(PROBLEM_BASE_URL + "game-already-finished"), "Game has already finished.")
 
-        val impossiblePosition = Problem(URI(PROBLEM_BASE_URL + "impossible-position"))
+        val impossiblePosition = Problem(400, URI(PROBLEM_BASE_URL + "impossible-position"), "The chosen position is impossible.")
 
-        val invalidMove = Problem(URI(PROBLEM_BASE_URL + "invalid-move"))
+        val invalidMove = Problem(400, URI(PROBLEM_BASE_URL + "invalid-move"), "Invalid move.")
 
-        val makeMoveFailed = Problem(URI(PROBLEM_BASE_URL + "make-move-failed"))
+        val makeMoveFailed = Problem(500, URI(PROBLEM_BASE_URL + "make-move-failed"), "Failed to make a move.")
 
-        val samePlayer = Problem(URI(PROBLEM_BASE_URL + "same-player"))
+        val samePlayer = Problem(400, URI(PROBLEM_BASE_URL + "same-player"), "It's the same player.")
 
-        val lobbyNotFound = Problem(URI(PROBLEM_BASE_URL + "lobby-not-found"))
+        val lobbyNotFound = Problem(404, URI(PROBLEM_BASE_URL + "lobby-not-found"), "Lobby not found.")
 
-        val leaveLobbyFailed = Problem(URI(PROBLEM_BASE_URL + "leave-lobby-failed"))
+        val leaveLobbyFailed = Problem(500, URI(PROBLEM_BASE_URL + "leave-lobby-failed"), "Failed to leave the lobby.")
 
-        val tokenNotRevoked = Problem(URI(PROBLEM_BASE_URL + "token-not-revoked"))
+        val tokenNotRevoked = Problem(403, URI(PROBLEM_BASE_URL + "token-not-revoked"), "The token was not revoked.")
 
-        val userStatsNotFound = Problem(URI(PROBLEM_BASE_URL + "user-stats-not-found"))
+        val userStatsNotFound = Problem(404, URI(PROBLEM_BASE_URL + "user-stats-not-found"), "User stats not found.")
     }
 }
