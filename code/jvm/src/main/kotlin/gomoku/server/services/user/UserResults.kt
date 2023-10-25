@@ -14,13 +14,6 @@ import gomoku.utils.Either
 typealias UserCreationResult = Either<UserCreationError, Int>
 
 /**
- * Result for login
- * @see LoginError
- * @see TokenExternalInfo
- */
-typealias LoginResult = Either<LoginError, TokenExternalInfo>
-
-/**
  * Result for token creation
  * @see TokenCreationError
  * @see TokenExternalInfo
