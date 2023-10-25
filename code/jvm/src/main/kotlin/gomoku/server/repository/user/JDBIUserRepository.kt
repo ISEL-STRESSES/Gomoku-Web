@@ -240,7 +240,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             join users u on us.user_id = u.id
             where u.username like :username
             and us.rules_id = :rulesId
-            order by us.user_id
+            order by us.elo desc
             limit :limit offset :offset
             """.trimIndent()
         )

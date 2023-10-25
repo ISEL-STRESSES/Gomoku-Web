@@ -1,7 +1,6 @@
 package gomoku.server.services.user
 
 import gomoku.server.domain.user.RankingUserData
-import gomoku.server.services.errors.user.LoginError
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
 import gomoku.server.services.errors.user.UserRankingServiceError
