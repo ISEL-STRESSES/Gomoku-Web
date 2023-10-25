@@ -1,7 +1,5 @@
 # Gomoku API Documentation
 
-## Table of contents
-
 ## Table of Contents
 
 * [Introduction](#introduction)
@@ -15,6 +13,7 @@
     * [Data Representation](#data-representation)
     * [Authentication](#authentication)
     * [Error Handling](#error-handling)
+    * [Problem Handling](#problem-handling)
     * [Running the Application](#running-the-application)
 * [Conclusions - Critical Evaluation](#conclusions---critical-evaluation)
 
@@ -114,10 +113,25 @@ This layer is organized in the following packages:
 and transaction manager for JDBI and the mappers for the objects retried from the database ;
 
 ### [Data Representation](../code/jvm/src/main/kotlin/gomoku/server/domain)
- TODO
+ There are two types of data representation:
+
+- **Domain Model** - the domain model is the main representation of the data and is used up to the controller layer;
+- **Output Model** - the output model is the representation of the data in the HTTP responses, and is used in the 
+controller layer;
+
+The domain model is the main representation of data in tha application, as for the output model, it is used only for
+transforming the domain data into representations for the client.
+
 ### [Authentication](../code/jvm/src/main/kotlin/gomoku/server/http/pipeline)
+The [`AuthenticationInterceptor`](../code/jvm/src/main/kotlin/gomoku/server/http/pipeline/AuthenticationInterceptor.kt)
+class implements the `HandlerInterceptor` interface, and is responsible for intercepting the requests and checking if
+the user is authenticated, in other words, if the endpoint has a parameter type `AuthenticateUser`, with in turn checks 
+based on the `Authorization` header if the user is authenticated or not.
+
+### [Error Handling](../code/jvm/src/main/kotlin/gomoku/server/http/ExceptionHandler.kt)
  TODO
-### [Error Handling](../code/jvm/src/main/kotlin/gomoku/server/http/pipeline)
+
+## [Problem Handling](../code/jvm/src/main/kotlin/gomoku/server/http/controllers/media/Problem.kt)
  TODO
 
 ### [Running the application](../code/jvm)
