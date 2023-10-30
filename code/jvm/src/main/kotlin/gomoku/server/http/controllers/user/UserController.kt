@@ -45,7 +45,7 @@ class UserController(private val service: UserService) {
     fun userStats(@PathVariable userId: Int): ResponseEntity<*> {
         val userStats = service.getUserStats(userId)
         return if (userStats == null) {
-            Problem.response(Problem.userNotFound)
+            Problem.response(404, Problem.userNotFound)
         } else {
             ResponseEntity.ok(UserStatsOutputModel(userStats))
         }
@@ -74,7 +74,7 @@ class UserController(private val service: UserService) {
      */
     @GetMapping(URIs.Users.RANKING)
     fun searchRanking(@PathVariable ruleId: Int, @RequestParam username: String?, @RequestParam offset: Int?, @RequestParam limit: Int?): ResponseEntity<*> {
-        val users = service.searchRanking(ruleId, username) ?: return Problem.response(Problem.ruleNotFound)
+        val users = service.searchRanking(ruleId, username, offset, limit) ?: return Problem.response(404, Problem.ruleNotFound)
         return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserRuleStatsOutputModel)))
     }
 
@@ -85,7 +85,7 @@ class UserController(private val service: UserService) {
      */
     @GetMapping(URIs.Users.GET_BY_ID)
     fun getById(@PathVariable id: Int): ResponseEntity<*> {
-        val user = service.getUserById(id) ?: return Problem.response(Problem.userNotFound)
+        val user = service.getUserById(id) ?: return Problem.response(404, Problem.userNotFound)
         return ResponseEntity.ok(UserByIdOutputModel(user))
     }
 
@@ -127,7 +127,7 @@ class UserController(private val service: UserService) {
                 .body(UserTokenCreateOutputModel(res.value.tokenValue))
 
             is Failure -> when (res.value) {
-                TokenCreationError.UserOrPasswordInvalid -> Problem.response(Problem.userOrPasswordAreInvalid)
+                TokenCreationError.UserOrPasswordInvalid -> Problem.response(400, Problem.userOrPasswordAreInvalid)
             }
         }
     }
@@ -140,7 +140,7 @@ class UserController(private val service: UserService) {
     fun logout(authenticatedUser: AuthenticatedUser) {
         val didRevoke = service.revokeToken(authenticatedUser.token)
         if (!didRevoke) {
-            Problem.response(Problem.tokenNotRevoked)
+            Problem.response(403, Problem.tokenNotRevoked)
         } else {
             ResponseEntity.ok(didRevoke)
         }
@@ -164,9 +164,9 @@ class UserController(private val service: UserService) {
      */
     private fun UserCreationError.resolveProblem() =
         when (this) {
-            UserCreationError.InvalidUsername -> Problem.response(Problem.invalidUsername)
-            UserCreationError.InvalidPassword -> Problem.response(Problem.insecurePassword)
-            UserCreationError.UsernameAlreadyExists -> Problem.response(Problem.userAlreadyExists)
+            UserCreationError.InvalidUsername -> Problem.response(400, Problem.invalidUsername)
+            UserCreationError.InvalidPassword -> Problem.response(400, Problem.insecurePassword)
+            UserCreationError.UsernameAlreadyExists -> Problem.response(409, Problem.userAlreadyExists)
         }
 
     /**
@@ -175,8 +175,8 @@ class UserController(private val service: UserService) {
      */
     private fun UserRankingServiceError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            UserRankingServiceError.UserNotFound -> Problem.response(Problem.userNotFound)
-            UserRankingServiceError.RuleNotFound -> Problem.response(Problem.ruleNotFound)
-            UserRankingServiceError.UserStatsNotFound -> Problem.response(Problem.userStatsNotFound)
+            UserRankingServiceError.UserNotFound -> Problem.response(404, Problem.userNotFound)
+            UserRankingServiceError.RuleNotFound -> Problem.response(404, Problem.ruleNotFound)
+            UserRankingServiceError.UserStatsNotFound -> Problem.response(404, Problem.userStatsNotFound)
         }
 }

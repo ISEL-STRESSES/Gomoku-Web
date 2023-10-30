@@ -34,7 +34,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         request: WebRequest
     ): ResponseEntity<Any>? {
         log.info("Handling MethodArgumentNotValidException: {}", ex.message)
-        return Problem.response(Problem.invalidRequestContent)
+        return Problem.response(400, Problem.invalidRequestContent)
     }
 
     /**
@@ -52,7 +52,7 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
         request: WebRequest
     ): ResponseEntity<Any> {
         log.info("Handling HttpMessageNotReadableException: {}", ex.httpInputMessage)
-        return Problem.response(Problem.invalidRequestContent)
+        return Problem.response(400, Problem.invalidRequestContent)
     }
 
     /**

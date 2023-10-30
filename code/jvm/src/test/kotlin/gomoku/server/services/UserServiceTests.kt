@@ -287,6 +287,4 @@ class UserServiceTests {
 
         // TODO(): Add assertions
     }
-
-    // TODO: Add tests for set methods and others needed.
 }
