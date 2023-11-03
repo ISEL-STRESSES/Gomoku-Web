@@ -5,11 +5,10 @@ import gomoku.server.domain.game.game.move.MoveContainer
 import gomoku.server.domain.game.game.move.Position
 import gomoku.server.domain.game.rules.BoardSize
 import gomoku.server.domain.game.rules.StandardRules
-import gomoku.utils.Failure
-import gomoku.utils.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import java.lang.AssertionError
 
 class GameDomainTests {
 
@@ -20,27 +19,15 @@ class GameDomainTests {
 
     @Test
     fun `OngoingGame computes correct turn color`() {
-        val newContainerWithMoves1 = moves.addMove(Move(Position(1), Color.BLACK))
-        if (newContainerWithMoves1 is Success) {
-            val ongoingGame1 = OngoingGame(1, playerA, playerB, rules, newContainerWithMoves1.value)
-            assertEquals(Color.WHITE, ongoingGame1.turn)
-            val newContainerWithMoves2 = newContainerWithMoves1.value.addMove(Move(Position(2), Color.WHITE))
-            if (newContainerWithMoves2 is Success) {
-                val ongoingGame2 = OngoingGame(1, playerA, playerB, rules, newContainerWithMoves2.value)
-                assertEquals(Color.BLACK, ongoingGame2.turn)
-            } else {
-                assert(false)
-            }
-        } else {
-            assert(false)
-        }
+        val newContainerWithMoves1: MoveContainer = moves.addMove(Move(Position(1, 1, rules.boardSize.maxIndex), CellColor.BLACK)) ?: throw AssertionError()
+        val ongoingGame1 = OngoingGame(1, playerA, playerB, rules, newContainerWithMoves1)
+        assertEquals(CellColor.WHITE, ongoingGame1.turn)
+        val newContainerWithMoves2 = newContainerWithMoves1.addMove(Move(Position(2, 2, rules.boardSize.maxIndex), CellColor.WHITE)) ?: throw AssertionError()
+        val ongoingGame2 = OngoingGame(1, playerA, playerB, rules, newContainerWithMoves2)
+        assertEquals(CellColor.BLACK, ongoingGame2.turn)
 
-        val newContainerWithMovesFail = moves.addMove(Move(Position(225), Color.BLACK))
-        if (newContainerWithMovesFail is Failure) {
-            assert(true)
-        } else {
-            assert(false)
-        }
+        val newContainerWithMovesFail = moves.addMove(Move(Position(19, 19, 18), CellColor.BLACK))
+        assert(newContainerWithMovesFail == null)
     }
 
     @Test

@@ -1,6 +1,6 @@
 package gomoku.server.http.controllers.game.models
 
-import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.FinishedGame
 import gomoku.server.domain.game.game.Game
 import gomoku.server.domain.game.game.OngoingGame
@@ -23,7 +23,7 @@ data class GameOutputModel(
     val rule: RuleOutputModel,
     val moves: MoveContainerOutputModel,
     val gameOutcome: String?,
-    val turn: Color?,
+    val turn: CellColor?,
     val type: GameType
 ) {
 

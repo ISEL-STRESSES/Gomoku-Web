@@ -5,7 +5,7 @@ package gomoku.server.domain.game.game
  * @property BLACK black color
  * @property WHITE white color
  */
-enum class Color {
+enum class CellColor {
     BLACK,
     WHITE;
 
@@ -13,7 +13,7 @@ enum class Color {
      * Returns the other color depending on the current color
      * @return the other color
      */
-    fun other(): Color {
+    fun other(): CellColor {
         return if (this == BLACK) WHITE else BLACK
     }
 }
@@ -24,11 +24,11 @@ enum class Color {
  * @receiver the index to convert
  * @return the color corresponding to the index
  */
-fun Int.toColor(): Color {
+fun Int.toColor(): CellColor {
     val mod = this % 2
     return if (mod == 0) {
-        Color.BLACK
+        CellColor.BLACK
     } else {
-        Color.WHITE
+        CellColor.WHITE
     }
 }

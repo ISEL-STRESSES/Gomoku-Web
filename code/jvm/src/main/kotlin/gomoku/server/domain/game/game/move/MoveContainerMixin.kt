@@ -1,7 +1,7 @@
 package gomoku.server.domain.game.game.move
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.CellColor
 
 /**
  * Represents a Mixin for [MoveContainer] to be used by Jackson.
@@ -12,5 +12,5 @@ import gomoku.server.domain.game.game.Color
 abstract class MoveContainerMixin private constructor(
     @JsonProperty("boardSize") val boardSize: Int,
     @JsonProperty("orderOfMoves") private val orderOfMoves: List<Move> = emptyList(),
-    @JsonProperty("board") private val board: Array<Color?> = Array(boardSize * boardSize) { null }
+    @JsonProperty("board") private val board: Array<CellColor?> = Array(boardSize * boardSize) { null }
 )

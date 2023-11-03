@@ -3,9 +3,10 @@ package gomoku.server.domain.game.rules
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import gomoku.server.domain.game.IsValidMoveResult
-import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.move.Move
 import gomoku.server.domain.game.game.move.MoveContainer
+import gomoku.server.domain.game.game.move.Position
 
 /**
  * Represents a rule
@@ -32,15 +33,15 @@ sealed class Rules {
      * @param turn color of the player trying to play
      * @return the move result
      */
-    abstract fun isValidMove(moveContainer: MoveContainer, move: Move, turn: Color): IsValidMoveResult
+    abstract fun isValidMove(moveContainer: MoveContainer, move: Move, turn: CellColor): IsValidMoveResult
 
     /**
      * Returns the possible moves based on the rules of the game
      * @param moveContainer previous moves of the game
-     * @param color color of the player
+     * @param cellColor color of the player
      * @return the possible moves possible in the set of rules
      */
-    abstract fun possibleMoves(moveContainer: MoveContainer, color: Color): List<Move>
+    abstract fun possiblePositions(moveContainer: MoveContainer, cellColor: CellColor, turn: CellColor): List<Position>
 
     /**
      * Checks if a move is a winning move

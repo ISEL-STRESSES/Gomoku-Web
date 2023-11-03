@@ -1,6 +1,6 @@
 package gomoku.server.repository.game
 
-import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.FinishedGame
 import gomoku.server.domain.game.game.Game
 import gomoku.server.domain.game.game.GameOutcome
@@ -8,7 +8,7 @@ import gomoku.server.domain.game.game.GameState
 import gomoku.server.domain.game.game.move.Move
 import gomoku.server.domain.game.game.toColor
 import gomoku.server.domain.game.rules.Rules
-import gomoku.server.repository.jdbi.mappers.MovesRowMapper
+import gomoku.server.repository.jdbi.mappers.game.MovesRowMapper
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 
@@ -272,7 +272,7 @@ class JDBIGameRepository(private val handle: Handle) : GameRepository {
      * @return the color of the player whose turn it is, of null if
      * the game has already ended or doesn't exist.
      */
-    override fun getTurn(gameId: Int): Color? =
+    override fun getTurn(gameId: Int): CellColor? =
         handle.createQuery(
             """
             SELECT COALESCE(array_length(matches.moves, 1), 0) as array_length

@@ -76,12 +76,13 @@ class GameController(private val gameService: GameService) {
      * Makes a move in the context of a game
      * @param id The id of the game
      * @param authenticatedUser The authenticated user
-     * @param pos The position of the move
+     * @param x The x coordinate of the move
+     * @param y The y coordinate of the move
      * @return The result of the move
      */
     @PostMapping(URIs.Game.MAKE_PLAY)
-    fun makePlay(@PathVariable id: Int, authenticatedUser: AuthenticatedUser, @RequestParam pos: Int): ResponseEntity<*> {
-        val moveResult = gameService.makeMove(id, authenticatedUser.user.uuid, pos)
+    fun makePlay(@PathVariable id: Int, authenticatedUser: AuthenticatedUser, @RequestParam x: Int, @RequestParam y: Int): ResponseEntity<*> {
+        val moveResult = gameService.makeMove(id, authenticatedUser.user.uuid, x, y)
         return when (moveResult) {
             is Failure -> moveResult.value.resolveProblem()
             is Success ->
@@ -148,6 +149,8 @@ class GameController(private val gameService: GameService) {
             MakeMoveError.InvalidTurn -> Problem.response(400, Problem.notYourTurn)
             MakeMoveError.InvalidMove -> Problem.response(400, Problem.invalidMove)
             MakeMoveError.MakeMoveFailed -> Problem.response(500, Problem.makeMoveFailed)
+            MakeMoveError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
+            MakeMoveError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
         }
 
     /**
@@ -168,7 +171,7 @@ class GameController(private val gameService: GameService) {
      */
     private fun CurrentTurnPlayerError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            CurrentTurnPlayerError.NoTurn -> Problem.response(400, Problem.samePlayer)
+            CurrentTurnPlayerError.GameAlreadyFinished -> Problem.response(400, Problem.samePlayer)
             CurrentTurnPlayerError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
         }
 

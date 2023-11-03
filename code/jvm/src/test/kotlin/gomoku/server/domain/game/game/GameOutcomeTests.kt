@@ -12,8 +12,8 @@ class GameOutcomeTests {
 
     @Test
     fun `Verify winner color`() {
-        assertEquals(Color.BLACK, GameOutcome.BLACK_WON.winnerColor)
-        assertEquals(Color.WHITE, GameOutcome.WHITE_WON.winnerColor)
+        assertEquals(CellColor.BLACK, GameOutcome.BLACK_WON.winnerColor)
+        assertEquals(CellColor.WHITE, GameOutcome.WHITE_WON.winnerColor)
     }
 
     @Test

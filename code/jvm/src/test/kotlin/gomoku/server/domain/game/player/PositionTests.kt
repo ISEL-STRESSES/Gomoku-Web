@@ -9,15 +9,37 @@ class PositionTests {
 
     @Test
     fun `Position initializes with valid values`() {
-        val position = Position(10)
+        val position = Position(10, 10, 11)
 
-        assertEquals(10, position.value)
+        assertEquals(10, position.x)
+        assertEquals(10, position.y)
+        assertEquals(11, position.max)
     }
 
     @Test
-    fun `Position throws exception for negative position`() {
+    fun `Position does not initialize for invalid values`() {
         assertThrows<IllegalArgumentException> {
-            Position(-1)
+            Position(-1, 0, 0)
+        }
+
+        assertThrows<IllegalArgumentException> {
+            Position(0, -1, 0)
+        }
+
+        assertThrows<IllegalArgumentException> {
+            Position(0, 0, -1)
+        }
+
+        assertThrows<IllegalArgumentException> {
+            Position(1, 0, 0)
+        }
+
+        assertThrows<IllegalArgumentException> {
+            Position(0, 1, 0)
+        }
+
+        assertThrows<IllegalArgumentException> {
+            Position(0, 3, 3)
         }
     }
 }

@@ -1,6 +1,6 @@
 package gomoku.server.repository.game
 
-import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.FinishedGame
 import gomoku.server.domain.game.game.Game
 import gomoku.server.domain.game.game.GameOutcome
@@ -142,5 +142,5 @@ interface GameRepository {
      * @return the color of the player whose turn it is, of null if
      * the game has already ended or doesn't exist.
      */
-    fun getTurn(gameId: Int): Color?
+    fun getTurn(gameId: Int): CellColor?
 }

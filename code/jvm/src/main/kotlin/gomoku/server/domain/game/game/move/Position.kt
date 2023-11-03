@@ -2,13 +2,19 @@ package gomoku.server.domain.game.game.move
 
 /**
  * Represents a data point
- * @param value The value of the coordinate
- * @throws IllegalArgumentException If any of the coordinates is negative
+ * @param x The x coordinate
+ * @param y The y coordinate
+ * @param max The maximum value for x and y
+ * @throws IllegalArgumentException If any of the coordinates is negative or greater than max
  */
 data class Position(
-    val value: Int
+    val x: Int,
+    val y: Int,
+    val max: Int
 ) {
     init {
-        require(value >= 0) { "Position cannot be negative" }
+        require(x in 0..max && y in 0..max) {
+            "Coordinates must be between 0 and $max"
+        }
     }
 }

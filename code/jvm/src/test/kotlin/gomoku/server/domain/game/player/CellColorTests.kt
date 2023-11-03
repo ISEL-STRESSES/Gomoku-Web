@@ -1,31 +1,31 @@
 package gomoku.server.domain.game.player
 
-import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.toColor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test
 
-class ColorTests {
+class CellColorTests {
 
     @Test
     fun `Verify Number of Colors`() {
-        assertEquals(2, Color.values().size)
+        assertEquals(2, CellColor.values().size)
     }
 
     @Test
     fun `Verify Color other()`() {
-        assertSame(Color.BLACK, Color.WHITE.other())
-        assertSame(Color.WHITE, Color.BLACK.other())
+        assertSame(CellColor.BLACK, CellColor.WHITE.other())
+        assertSame(CellColor.WHITE, CellColor.BLACK.other())
     }
 
     @Test
     fun `Verify color indexation`() {
-        var expectedColor = Color.BLACK
+        var expectedCellColor = CellColor.BLACK
         (0 until 100).forEach { idx ->
-            assertSame(expectedColor, idx.toColor())
+            assertSame(expectedCellColor, idx.toColor())
 
-            expectedColor = expectedColor.other()
+            expectedCellColor = expectedCellColor.other()
         }
     }
 }

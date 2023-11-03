@@ -7,9 +7,9 @@ package gomoku.server.domain.game.game
  * @property WHITE_WON white won the game
  * @property DRAW the game ended in a draw
  */
-enum class GameOutcome(val winnerColor: Color? = null) {
-    BLACK_WON(Color.BLACK),
-    WHITE_WON(Color.WHITE),
+enum class GameOutcome(val winnerColor: CellColor? = null) {
+    BLACK_WON(CellColor.BLACK),
+    WHITE_WON(CellColor.WHITE),
     DRAW
 }
 
@@ -30,8 +30,8 @@ fun String.toGameOutcome() = when (this.uppercase()) {
  * @receiver the color to convert
  * @return the [GameOutcome]
  */
-fun Color?.toGameOutcome() = when (this) {
-    Color.BLACK -> GameOutcome.BLACK_WON
-    Color.WHITE -> GameOutcome.WHITE_WON
+fun CellColor?.toGameOutcome() = when (this) {
+    CellColor.BLACK -> GameOutcome.BLACK_WON
+    CellColor.WHITE -> GameOutcome.WHITE_WON
     null -> GameOutcome.DRAW
 }

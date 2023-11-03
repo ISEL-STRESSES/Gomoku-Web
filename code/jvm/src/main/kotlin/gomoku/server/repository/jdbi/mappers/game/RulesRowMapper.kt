@@ -1,4 +1,4 @@
-package gomoku.server.repository.jdbi.mappers
+package gomoku.server.repository.jdbi.mappers.game
 
 import gomoku.server.domain.game.rules.Rules
 import gomoku.server.domain.game.rules.buildRule
@@ -11,8 +11,7 @@ import java.sql.ResultSet
  * @see RowMapper
  * @see Rules
  */
-class GameRuleRowMapper : RowMapper<Rules> {
-
+class RulesRowMapper : RowMapper<Rules> {
     /**
      * Maps a row of the result set to a [Rules]
      * @param rs The result set to map

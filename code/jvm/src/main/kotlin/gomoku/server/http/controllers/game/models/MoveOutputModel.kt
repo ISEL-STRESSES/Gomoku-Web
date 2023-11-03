@@ -1,6 +1,7 @@
 package gomoku.server.http.controllers.game.models
 
 import gomoku.server.domain.game.game.move.Move
+import gomoku.server.domain.game.game.move.Position
 
 /**
  * Represents the move to be sent from the API
@@ -8,11 +9,11 @@ import gomoku.server.domain.game.game.move.Move
  * @param color the color of the move
  */
 data class MoveOutputModel(
-    val position: Int,
+    val position: Position,
     val color: String
 ) {
     constructor(move: Move) : this(
-        position = move.position.value,
-        color = move.color.name
+        position = move.position,
+        color = move.cellColor.name
     )
 }

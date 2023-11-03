@@ -1,4 +1,4 @@
-package gomoku.server.repository.jdbi.mappers
+package gomoku.server.repository.jdbi.mappers.game
 
 import gomoku.server.domain.game.Lobby
 import gomoku.server.domain.game.rules.buildRule

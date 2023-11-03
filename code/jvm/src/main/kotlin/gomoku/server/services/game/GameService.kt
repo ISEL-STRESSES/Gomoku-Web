@@ -2,7 +2,7 @@ package gomoku.server.services.game
 
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.errors.MoveError
-import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.FinishedGame
 import gomoku.server.domain.game.game.GameOutcome
 import gomoku.server.domain.game.game.GameState
@@ -67,23 +67,28 @@ class GameService(private val transactionManager: TransactionManager) {
      * Makes a move in the given game.
      * @param gameId id of the game
      * @param userId id of the user that wants to make the move
-     * @param pos position of the move
+     * @param x x coordinate of the move
+     * @param y y coordinate of the move
      * @return the result of the move
      * @see MakeMoveResult
      */
-    fun makeMove(gameId: Int, userId: Int, pos: Int): MakeMoveResult {
+    fun makeMove(gameId: Int, userId: Int, x: Int, y: Int): MakeMoveResult {
         return transactionManager.run {
-            val game = it.gameRepository.getGameById(gameId)
-                ?: return@run failure(MakeMoveError.GameNotFound)
+            val gameResult = getGameAndVerifyPlayer(gameId, userId, it)
+            val game = when (gameResult) {
+                is Failure -> return@run gameResult.value.resolveError()
+                is Success -> gameResult.value
+            }
+
             when (game) {
                 is FinishedGame -> return@run failure(MakeMoveError.GameFinished)
                 is OngoingGame -> {
                     val currMove = Move(
-                        position = Position(pos),
-                        color = if (game.playerBlack == userId) {
-                            Color.BLACK
+                        position = Position(x, y, game.rules.boardSize.maxIndex),
+                        cellColor = if (game.playerBlack == userId) {
+                            CellColor.BLACK
                         } else {
-                            Color.WHITE
+                            CellColor.WHITE
                         }
                     )
                     val isValidMoveResult = game.rules.isValidMove(game.moveContainer, currMove, game.turn)
@@ -106,21 +111,23 @@ class GameService(private val transactionManager: TransactionManager) {
      */
     private fun resolveValidMove(game: OngoingGame, move: Move, tr: Transaction): MakeMoveResult {
         if (game.rules.isWinningMove(game.moveContainer, move)) {
-            if (!tr.gameRepository.addToMoveArray(game.id, move.position.value)) {
+            if (!tr.gameRepository.addToMoveArray(game.id, move.position.toIndex())) {
                 return failure(MakeMoveError.MakeMoveFailed)
             }
-            tr.gameRepository.setGameState(game.id, GameState.FINISHED)
-            tr.gameRepository.setGameOutcome(game.id, move.color.toGameOutcome())
 
-            val winnerId = if (move.color == Color.BLACK) game.playerBlack else game.playerWhite
-            val loserId = if (move.color == Color.BLACK) game.playerWhite else game.playerBlack
+            tr.gameRepository.setGameState(game.id, GameState.FINISHED)
+            tr.gameRepository.setGameOutcome(game.id, move.cellColor.toGameOutcome())
+
+            val winnerId = if (move.cellColor == CellColor.BLACK) game.playerBlack else game.playerWhite
+            val loserId = if (move.cellColor == CellColor.BLACK) game.playerWhite else game.playerBlack
 
             updatePlayerStats(winnerId, loserId, game.rules.ruleId, tr, RankingUserData.WIN)
         } else {
-            if (!tr.gameRepository.addToMoveArray(game.id, move.position.value)) {
+            if (!(tr.gameRepository.addToMoveArray(game.id, move.position.toIndex()))) {
                 return failure(MakeMoveError.MakeMoveFailed)
             }
-            if (game.moveContainer.isFull()) {
+            val moveContainer = game.moveContainer.addMove(move) ?: return failure(MakeMoveError.MakeMoveFailed)
+            if (moveContainer.isFull()) {
                 tr.gameRepository.setGameState(game.id, GameState.FINISHED)
                 tr.gameRepository.setGameOutcome(game.id, GameOutcome.DRAW)
 
@@ -128,7 +135,7 @@ class GameService(private val transactionManager: TransactionManager) {
             }
         }
         val newGame = tr.gameRepository.getGameById(game.id)
-            ?: return failure(MakeMoveError.GameNotFound)
+            ?: return failure(MakeMoveError.GameNotFound) // should never return because the game exists
         return success(newGame)
     }
 
@@ -168,11 +175,21 @@ class GameService(private val transactionManager: TransactionManager) {
     }
 
     /**
+     * Resolves a [GetGameError] (getGameAndVerifyPlayer function error) into a [MakeMoveError] (GameService error).
+     */
+    private fun GetGameError.resolveError() =
+        when (this) {
+            is GetGameError.PlayerNotInGame -> failure(MakeMoveError.PlayerNotInGame)
+            is GetGameError.PlayerNotFound -> failure(MakeMoveError.PlayerNotFound)
+            is GetGameError.GameNotFound -> failure(MakeMoveError.GameNotFound)
+        }
+
+    /**
      * Resolves a [MoveError] (isValidMove function error) into a [MakeMoveError] (GameService error).
      */
     private fun MoveError.resolveError() =
         when (this) {
-            is MoveError.ImpossiblePosition -> failure(MakeMoveError.ImpossiblePosition)
+            is MoveError.InvalidPosition -> failure(MakeMoveError.ImpossiblePosition)
             is MoveError.AlreadyOccupied -> failure(MakeMoveError.AlreadyOccupied)
             is MoveError.InvalidTurn -> failure(MakeMoveError.InvalidTurn)
             is MoveError.InvalidMove -> failure(MakeMoveError.InvalidMove)
@@ -185,7 +202,8 @@ class GameService(private val transactionManager: TransactionManager) {
      */
     fun leaveLobby(lobbyId: Int, userId: Int): LeaveLobbyResult =
         transactionManager.run {
-            val lobby = it.lobbyRepository.getLobbyById(lobbyId) ?: return@run failure(LeaveLobbyError.LobbyNotFound) // TODO: Create tests for this function
+            val lobby = it.lobbyRepository.getLobbyById(lobbyId)
+                ?: return@run failure(LeaveLobbyError.LobbyNotFound) // TODO: Create tests for this function
 
             if (lobby.userId != userId) return@run failure(LeaveLobbyError.UserNotInLobby)
 
@@ -213,11 +231,13 @@ class GameService(private val transactionManager: TransactionManager) {
      */
     fun getCurrentTurnPlayerId(gameId: Int): CurrentTurnPlayerResult {
         return transactionManager.run {
-            val players = it.gameRepository.getGamePlayers(gameId) ?: return@run failure(CurrentTurnPlayerError.GameNotFound)
-            val currentColor = it.gameRepository.getTurn(gameId) ?: return@run failure(CurrentTurnPlayerError.NoTurn)
+            val players =
+                it.gameRepository.getGamePlayers(gameId) ?: return@run failure(CurrentTurnPlayerError.GameNotFound)
+            val currentColor =
+                it.gameRepository.getTurn(gameId) ?: return@run failure(CurrentTurnPlayerError.GameAlreadyFinished)
             when (currentColor) {
-                Color.BLACK -> success(players.first)
-                Color.WHITE -> success(players.second)
+                CellColor.BLACK -> success(players.first)
+                CellColor.WHITE -> success(players.second)
             }
         }
     }
@@ -229,7 +249,11 @@ class GameService(private val transactionManager: TransactionManager) {
      * @param userId the id of the user to get the games from
      * @return the list of [FinishedGame]
      */
-    fun getUserFinishedGames(offset: Int = DEFAULT_OFFSET, limit: Int = DEFAULT_LIMIT, userId: Int): List<FinishedGame> =
+    fun getUserFinishedGames(
+        offset: Int = DEFAULT_OFFSET,
+        limit: Int = DEFAULT_LIMIT,
+        userId: Int
+    ): List<FinishedGame> =
         transactionManager.run {
             it.gameRepository.getUserFinishedGames(offset, limit, userId)
         }
@@ -242,19 +266,25 @@ class GameService(private val transactionManager: TransactionManager) {
      */
     fun getGame(gameId: Int, userId: Int): GetGameResult =
         transactionManager.run {
-            if (!it.usersRepository.isUserStoredById(userId)) {
-                return@run failure(GetGameError.PlayerNotFound)
-            }
-
-            val gamePlayers = it.gameRepository.getGamePlayers(gameId)
-                ?: return@run failure(GetGameError.GameNotFound)
-
-            if (gamePlayers.first != userId && gamePlayers.second != userId) {
-                return@run failure(GetGameError.PlayerNotInGame)
-            }
-
-            success(it.gameRepository.getGameById(gameId)!!)
+            getGameAndVerifyPlayer(gameId, userId, it)
         }
+
+    private fun getGameAndVerifyPlayer(gameId: Int, userId: Int, tr: Transaction): GetGameResult {
+        if (!tr.usersRepository.isUserStoredById(userId)) {
+            return failure(GetGameError.PlayerNotFound)
+        }
+        val gamePlayers = tr.gameRepository.getGamePlayers(gameId)
+            ?: return failure(GetGameError.GameNotFound)
+
+        if (gamePlayers.first != userId && gamePlayers.second != userId) {
+            return failure(GetGameError.PlayerNotInGame)
+        }
+        return success(tr.gameRepository.getGameById(gameId)!!)
+    }
+
+    private fun Position.toIndex(): Int {
+        return x + y * max
+    }
 
     companion object {
         private const val DEFAULT_OFFSET = 0

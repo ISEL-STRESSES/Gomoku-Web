@@ -3,7 +3,7 @@ package gomoku.server.domain.game.game.move
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.toColor
 import gomoku.utils.Failure
 import gomoku.utils.Success
@@ -12,16 +12,18 @@ import gomoku.utils.success
 
 /**
  * Represents a container for the moves of a game, that doesn't provide data structure information to the outside.
- * Uses a List of [Move] to keep track of the order of moves, and an array of [Color] to keep track and do searches on the board.
+ * Uses a List of [Move] to keep track of the order of moves, and an array of [CellColor] to keep track and do searches on the board.
  * @param boardSize The size of the board.
  * @param orderOfMoves The list of moves in the order they were played.
- * @param board The board as an array of [Color].
+ * @param board The board as an array of [CellColor].
  */
 class MoveContainer private constructor(
     val boardSize: Int,
     private val orderOfMoves: List<Move>,
-    private val board: Array<Color?>
+    private val board: Array<CellColor?>
 ) {
+
+    //TODO: Remove Mixin and do fromJson and toJson
 
     private val maxAmountOfMoves = boardSize * boardSize
 
@@ -33,21 +35,15 @@ class MoveContainer private constructor(
      * This function only ensures that the position is inside the board and that it's not already occupied.
      * Any further verifications if the move is valid or not, must be verified by the rules of the game.
      * @param move The move to be added.
-     * @return [AddMoveResult] which is either an error or a new [MoveContainer] with the move added.
+     * @return new [MoveContainer] with the move added or null if there is already a move at the given position.
      */
     @JsonIgnore
-    fun addMove(move: Move): AddMoveResult {
+    fun addMove(move: Move): MoveContainer? {
         val position = move.position
-
-        return if (!isPositionInside(position)) {
-            failure(AddMoveError.ImpossiblePosition)
-        } else if (hasMove(position)) {
-            failure(AddMoveError.AlreadyOccupied)
-        } else {
-            val newBoard = board.copyOf()
-            newBoard[position.value] = move.color
-            success(MoveContainer(boardSize, orderOfMoves + move, newBoard))
-        }
+        if (hasMove(position)) return null
+        val newBoard = board.copyOf()
+        newBoard[position.toIndex()] = move.cellColor
+        return MoveContainer(boardSize, orderOfMoves + move, newBoard)
     }
 
     /**
@@ -64,7 +60,7 @@ class MoveContainer private constructor(
      */
     @JsonIgnore
     fun hasMove(position: Position): Boolean {
-        return board[position.value] != null
+        return board[position.toIndex()] != null
     }
 
     /**
@@ -77,13 +73,14 @@ class MoveContainer private constructor(
     }
 
     /**
-     * Checks if a given position is inside the board's bounds.
-     * @param position The position to check.
-     * @return true if the position is inside the board, false otherwise.
+     * Gets the empty positions on the board.
+     * @return A list of [Position] that are empty.
      */
     @JsonIgnore
-    fun isPositionInside(position: Position): Boolean {
-        return position.value in 0..maxIndex
+    fun getEmptyPositions(): List<Position> {
+        return (0..maxIndex)
+            .map { it.toPosition(boardSize) }
+            .filterNot { hasMove(it) }
     }
 
     /**
@@ -111,7 +108,7 @@ class MoveContainer private constructor(
         @JsonCreator
         @JvmStatic
         fun createEmptyMoveContainer(@JsonProperty("boardSize") boardSize: Int): MoveContainer {
-            val moveContainer = Array<Color?>(boardSize * boardSize) { null }
+            val moveContainer = Array<CellColor?>(boardSize * boardSize) { null }
             return MoveContainer(boardSize, emptyList(), moveContainer)
         }
 
@@ -119,26 +116,32 @@ class MoveContainer private constructor(
          * Factory method to create a board from a list of moves.
          * @param boardSize The size of the board.
          * @param movesIndexes The list of moves.
-         * @return [AddMoveResult] which is either an error or a new [MoveContainer] with the given moves.
+         * @return a new [MoveContainer] with the given moves or null if it failed to build the MoveContainer.
          */
         @JsonCreator
         @JvmStatic
         fun buildMoveContainer(
             @JsonProperty("boardSize") boardSize: Int,
             @JsonProperty("movesIndexes") movesIndexes: List<Int>
-        ): AddMoveResult {
+        ): MoveContainer? {
             var moveContainer = createEmptyMoveContainer(boardSize)
             for ((index, boardIndex) in movesIndexes.withIndex()) {
-                val position = Position(boardIndex)
+                val position = boardIndex.toPosition(boardSize)
                 val color = index.toColor()
                 val move = Move(position, color)
-                val addMoveResult = moveContainer.addMove(move)
-                when (addMoveResult) {
-                    is Success -> moveContainer = addMoveResult.value
-                    is Failure -> return failure(addMoveResult.value)
-                }
+                moveContainer = moveContainer.addMove(move) ?: return null
             }
-            return success(moveContainer)
+            return moveContainer
         }
     }
+}
+
+private fun Position.toIndex(): Int {
+    return this.x * this.max + this.y
+}
+
+private fun Int.toPosition(boardSize: Int): Position {
+    val row = this / boardSize
+    val column = this % boardSize
+    return Position(row, column, boardSize - 1)
 }

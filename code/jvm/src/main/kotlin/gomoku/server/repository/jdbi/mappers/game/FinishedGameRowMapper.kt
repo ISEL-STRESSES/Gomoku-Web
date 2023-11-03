@@ -1,6 +1,8 @@
-package gomoku.server.repository.jdbi.mappers
+package gomoku.server.repository.jdbi.mappers.game
 
 import gomoku.server.domain.game.game.FinishedGame
+import gomoku.server.repository.jdbi.mappers.getFinishedGameFromRS
+import gomoku.server.repository.jdbi.mappers.getMoveContainerFromRS
 import org.jdbi.v3.core.mapper.RowMapper
 import org.jdbi.v3.core.statement.StatementContext
 import java.sql.ResultSet

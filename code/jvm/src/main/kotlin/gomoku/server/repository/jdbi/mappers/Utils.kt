@@ -1,14 +1,12 @@
 package gomoku.server.repository.jdbi.mappers
 
+import gomoku.server.domain.game.exceptions.PositionAlreadyOccupiedException
 import gomoku.server.domain.game.game.FinishedGame
 import gomoku.server.domain.game.game.GameOutcome
 import gomoku.server.domain.game.game.OngoingGame
-import gomoku.server.domain.game.game.move.AddMoveError
 import gomoku.server.domain.game.game.move.MoveContainer
 import gomoku.server.domain.game.game.move.MoveContainer.Companion.buildMoveContainer
 import gomoku.server.domain.game.rules.buildRule
-import gomoku.utils.Failure
-import gomoku.utils.Success
 import java.sql.ResultSet
 
 /**
@@ -19,14 +17,7 @@ import java.sql.ResultSet
 fun getMoveContainerFromRS(rs: ResultSet): MoveContainer {
     val boardSize = rs.getInt("board_size")
     val moves = (rs.getArray("moves").array as Array<*>).map { it as Int }
-    val moveContainerResult = buildMoveContainer(boardSize, moves)
-    return when (moveContainerResult) {
-        is Success -> moveContainerResult.value
-        is Failure -> when (moveContainerResult.value) {
-            AddMoveError.ImpossiblePosition -> throw IllegalArgumentException("Invalid position")
-            AddMoveError.AlreadyOccupied -> throw IllegalArgumentException("Position already occupied")
-        }
-    }
+    return buildMoveContainer(boardSize, moves) ?: throw PositionAlreadyOccupiedException("Failed to Deserialize Moves")
 }
 
 /**

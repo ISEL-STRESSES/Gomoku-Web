@@ -7,7 +7,7 @@ package gomoku.server.domain.game.rules
  * @property X19 A 19x19 board
  * @throws IllegalArgumentException If the maximum value is negative
  */
-enum class BoardSize(val value: Int) {
+enum class BoardSize(val value: Int, val maxIndex: Int = value - 1) {
     X15(15),
     X19(19);
 

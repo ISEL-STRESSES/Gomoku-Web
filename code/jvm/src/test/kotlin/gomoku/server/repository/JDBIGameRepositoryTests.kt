@@ -1,6 +1,6 @@
 package gomoku.server.repository
 
-import gomoku.server.domain.game.game.Color
+import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.GameOutcome
 import gomoku.server.domain.game.game.GameState
 import gomoku.server.domain.game.game.OngoingGame
@@ -96,7 +96,7 @@ class JDBIGameRepositoryTests {
         repo.addToMoveArray(gameId, 3)
 
         val moves = repo.getAllMoves(gameId)
-        assertTrue(moves.contains(Move(Position(3), Color.BLACK))) // Assuming Move has a constructor like this
+        assertTrue(moves.contains(Move(Position(3), CellColor.BLACK))) // Assuming Move has a constructor like this
     }
 
     @Test
@@ -119,7 +119,7 @@ class JDBIGameRepositoryTests {
         repo.addToMoveArray(gameId, 3)
 
         val turn = repo.getTurn(gameId)
-        assertEquals(Color.WHITE, turn) // Assuming after 1 move by black, it's white's turn
+        assertEquals(CellColor.WHITE, turn) // Assuming after 1 move by black, it's white's turn
     }
 
     @Test
@@ -199,11 +199,11 @@ class JDBIGameRepositoryTests {
         assertEquals(3, moves2.size)
 
         val getTurn = repo.getTurn(6)
-        assertEquals(Color.WHITE, getTurn)
+        assertEquals(CellColor.WHITE, getTurn)
 
         val getLastNMoves = repo.getLastNMoves(6, 1)
         assertEquals(1, getLastNMoves.size)
-        assertEquals(Color.BLACK, getLastNMoves[0].color)
+        assertEquals(CellColor.BLACK, getLastNMoves[0].cellColor)
         assertEquals(Position(3), getLastNMoves[0].position)
     }
 
