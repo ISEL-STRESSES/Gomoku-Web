@@ -96,7 +96,7 @@ class JDBIGameRepositoryTests {
         repo.addToMoveArray(gameId, 3)
 
         val moves = repo.getAllMoves(gameId)
-        assertTrue(moves.contains(Move(Position(3), CellColor.BLACK))) // Assuming Move has a constructor like this
+        assertTrue(moves.contains(Move(Position(0,3,14), CellColor.BLACK))) // Assuming Move has a constructor like this
     }
 
     @Test
@@ -204,7 +204,7 @@ class JDBIGameRepositoryTests {
         val getLastNMoves = repo.getLastNMoves(6, 1)
         assertEquals(1, getLastNMoves.size)
         assertEquals(CellColor.BLACK, getLastNMoves[0].cellColor)
-        assertEquals(Position(3), getLastNMoves[0].position)
+        assertEquals(Position(0,3,14), getLastNMoves[0].position)
     }
 
     @Test

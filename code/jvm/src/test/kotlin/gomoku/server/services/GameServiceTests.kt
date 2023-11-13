@@ -104,12 +104,13 @@ class GameServiceTests {
     fun `makeMove should successfully make a move for an ongoing game`() {
         val gameId = 1
         val userId = 1
-        val position = 0
+        val positionX = 0
+        val positionY = 0
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
-            val result = gameService.makeMove(gameId, userId, position)
+            val result = gameService.makeMove(gameId, userId, positionX, positionY)
 
             assertTrue(result is Success)
         }
@@ -119,7 +120,8 @@ class GameServiceTests {
     fun `makeMove should fail to make a move for a finished game`() {
         val gameId = 7
         val userId = 7
-        val position = 1
+        val positionX = 1
+        val positionY = 0
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
@@ -129,7 +131,7 @@ class GameServiceTests {
                 it.gameRepository.createFinishedGame(game.playerBlack, game.playerWhite)
             }
 
-            val result = gameService.makeMove(finishedGameId, userId, position)
+            val result = gameService.makeMove(finishedGameId, userId, positionX, positionY)
 
             require(result is Failure)
             assertEquals(MakeMoveError.GameFinished, result.failureOrNull())
@@ -141,15 +143,16 @@ class GameServiceTests {
         val gameId = 3
         val userId1 = 3
         val userId2 = 6
-        val position = 2
+        val positionX = 2
+        val positionY = 0
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
             // Simulate a move on the position
-            gameService.makeMove(gameId, userId1, position)
+            gameService.makeMove(gameId, userId1, positionX, positionY)
 
-            val result = gameService.makeMove(gameId, userId2, position)
+            val result = gameService.makeMove(gameId, userId2, positionX, positionY)
 
             assertTrue(result is Failure)
             assertEquals(MakeMoveError.AlreadyOccupied, result.failureOrNull())
@@ -160,15 +163,17 @@ class GameServiceTests {
     fun `makeMove should fail if trying to move out of turn`() {
         val gameId = 4
         val userId1 = 4
-        val position1 = 3
-        val position2 = 4
+        val position1X = 3
+        val position1Y = 0
+        val position2X = 4
+        val position2Y = 0
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
-            gameService.makeMove(gameId, userId1, position1)
+            gameService.makeMove(gameId, userId1, position1X, position1Y)
 
-            val result = gameService.makeMove(gameId, userId1, position2)
+            val result = gameService.makeMove(gameId, userId1, position2X, position2Y)
 
             assertTrue(result is Failure)
             assertEquals(MakeMoveError.InvalidTurn, result.failureOrNull())
@@ -179,12 +184,13 @@ class GameServiceTests {
     fun `makeMove should resolve to a winning move if the move results in a win`() {
         val gameId = 10
         val userId1 = 10
-        val position = 13
+        val positionX = 13
+        val positionY = 13
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
-            val result = gameService.makeMove(gameId, userId1, position)
+            val result = gameService.makeMove(gameId, userId1, positionX, positionY)
 
             assertTrue(result is Success)
         }
@@ -194,13 +200,14 @@ class GameServiceTests {
     fun `makeMove should set the game state to finished if the move container is full`() {
         val gameId = 11
         val userId1 = 21
-        val position = 4
+        val positionX = 4
+        val positionY = 0
 
         testWithTransactionManagerAndRollback { transactionManager ->
             // test
             val gameService = GameService(transactionManager)
 
-            val result = gameService.makeMove(gameId, userId1, position)
+            val result = gameService.makeMove(gameId, userId1, positionX, positionY)
             assertTrue(result is Success)
             require(result is Success)
             assertTrue(result.value is FinishedGame)
