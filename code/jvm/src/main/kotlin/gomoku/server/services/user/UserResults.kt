@@ -10,7 +10,7 @@ import gomoku.utils.Either
  * Result for user creation
  * @see UserCreationError
  */
-typealias UserCreationResult = Either<UserCreationError, Int>
+typealias UserCreationResult = Either<UserCreationError, UserCreateOutputModel>
 
 /**
  * Result for token creation
@@ -25,3 +25,8 @@ typealias TokenCreationResult = Either<TokenCreationError, TokenExternalInfo>
  * @see RankingUserData
  */
 typealias UserRankingResult = Either<UserRankingServiceError, RankingUserData>
+
+data class UserCreateOutputModel(
+    val userId: Int,
+    val token: String,
+)

@@ -51,7 +51,10 @@ class UserService(
                 failure(UserCreationError.UsernameAlreadyExists)
             } else {
                 val uuid = it.usersRepository.storeUser(username, passwordValidationInfo)
-                success(uuid)
+                val tokenValue = usersDomain.generateTokenValue()
+                val token = createToken(uuid, tokenValue)
+                it.usersRepository.createToken(token, usersDomain.maxNumberOfTokensPerUser)
+                success(UserCreateOutputModel(uuid, tokenValue))
             }
         }
     }
@@ -74,13 +77,7 @@ class UserService(
                 failure(TokenCreationError.UserOrPasswordInvalid)
             }
             val tokenValue = usersDomain.generateTokenValue()
-            val now = clock.now()
-            val token = Token(
-                tokenValidationInfo = usersDomain.createTokenValidationInfo(tokenValue),
-                userId = user.uuid,
-                createdAt = now,
-                lastUsedAt = now
-            )
+            val token = createToken(user.uuid, tokenValue)
             it.usersRepository.createToken(token, usersDomain.maxNumberOfTokensPerUser)
             success(TokenExternalInfo(tokenValue, usersDomain.getTokenExpiration(token)))
         }
@@ -179,6 +176,16 @@ class UserService(
         return transactionManager.run {
             it.usersRepository.removeTokenByTokenValidationInfo(tokenValidationInfo) == 1
         }
+    }
+
+    private fun createToken(userUUID: Int, tokenValue : String): Token {
+        val now = clock.now()
+        return Token(
+            tokenValidationInfo = usersDomain.createTokenValidationInfo(tokenValue),
+            userId = userUUID,
+            createdAt = now,
+            lastUsedAt = now
+        )
     }
 
     companion object {

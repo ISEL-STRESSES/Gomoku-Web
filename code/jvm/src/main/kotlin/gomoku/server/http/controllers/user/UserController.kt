@@ -7,14 +7,15 @@ import gomoku.server.http.controllers.user.models.UserByIdOutputModel
 import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
 import gomoku.server.http.controllers.user.models.UserStatsOutputModel
 import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
-import gomoku.server.http.controllers.user.models.getUsersData.GetUsersDataOutputModel
+import gomoku.server.http.controllers.user.models.getUsersData.GetUsersRankingDataOutputModel
 import gomoku.server.http.controllers.user.models.userCreate.UserCreateInputModel
 import gomoku.server.http.controllers.user.models.userTokenCreate.UserCreateTokenInputModel
-import gomoku.server.http.controllers.user.models.userTokenCreate.UserTokenCreateOutputModel
+import gomoku.server.http.responses.*
 import gomoku.server.repository.user.UserRankingError
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
 import gomoku.server.services.errors.user.UserRankingServiceError
+import gomoku.server.services.user.UserCreateOutputModel
 import gomoku.server.services.user.UserService
 import gomoku.utils.Failure
 import gomoku.utils.Success
@@ -47,7 +48,7 @@ class UserController(private val service: UserService) {
         return if (userStats == null) {
             Problem.response(404, Problem.userNotFound)
         } else {
-            ResponseEntity.ok(UserStatsOutputModel(userStats))
+            GetUserStats.siren(UserStatsOutputModel(userStats)).response(200)
         }
     }
 
@@ -61,7 +62,7 @@ class UserController(private val service: UserService) {
     fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> {
         val userRuleStats = service.getUserRanking(userId, ruleId)
         return when (userRuleStats) {
-            is Success -> ResponseEntity.ok(UserRuleStatsOutputModel(userRuleStats.value))
+            is Success -> GetUserRanking.siren(UserRuleStatsOutputModel(userRuleStats.value)).response(200)
             is Failure -> userRuleStats.value.resolveProblem()
         }
     }
@@ -75,7 +76,7 @@ class UserController(private val service: UserService) {
     @GetMapping(URIs.Users.RANKING)
     fun searchRanking(@PathVariable ruleId: Int, @RequestParam username: String?, @RequestParam offset: Int?, @RequestParam limit: Int?): ResponseEntity<*> {
         val users = service.searchRanking(ruleId, username, offset, limit) ?: return Problem.response(404, Problem.ruleNotFound)
-        return ResponseEntity.ok(GetUsersDataOutputModel(users.map(::UserRuleStatsOutputModel)))
+        return GetRanking.siren(GetUsersRankingDataOutputModel(users.map(::UserRuleStatsOutputModel), ruleId, username ?: "", limit ?: DEFAULT_LIMIT, offset ?: DEFAULT_OFFSET, users.size)).response(200)
     }
 
     /**
@@ -86,7 +87,7 @@ class UserController(private val service: UserService) {
     @GetMapping(URIs.Users.GET_BY_ID)
     fun getById(@PathVariable id: Int): ResponseEntity<*> {
         val user = service.getUserById(id) ?: return Problem.response(404, Problem.userNotFound)
-        return ResponseEntity.ok(UserByIdOutputModel(user))
+        return GetUserById.siren(UserByIdOutputModel(user)).response(200)
     }
 
     /**
@@ -101,11 +102,7 @@ class UserController(private val service: UserService) {
     ): ResponseEntity<*> {
         val res = service.createUser(username = userInput.username, password = userInput.password)
         return when (res) {
-            is Success -> ResponseEntity.status(201)
-                .header(
-                    "Location",
-                    URIs.Users.byID(res.value).toASCIIString()
-                ).build<Unit>()
+            is Success -> SignUp.siren(res.value).response(200)
 
             is Failure -> res.value.resolveProblem()
         }
@@ -123,8 +120,7 @@ class UserController(private val service: UserService) {
     ): ResponseEntity<*> {
         val res = service.createToken(username = userInput.username, password = userInput.password)
         return when (res) {
-            is Success -> ResponseEntity.status(200)
-                .body(UserTokenCreateOutputModel(res.value.tokenValue))
+            is Success -> Login.siren(UserCreateOutputModel(service.getUserByToken(res.value.tokenValue)!!.uuid,res.value.tokenValue)).response(200)
 
             is Failure -> when (res.value) {
                 TokenCreationError.UserOrPasswordInvalid -> Problem.response(400, Problem.userOrPasswordAreInvalid)
@@ -142,7 +138,7 @@ class UserController(private val service: UserService) {
         if (!didRevoke) {
             Problem.response(403, Problem.tokenNotRevoked)
         } else {
-            ResponseEntity.ok(didRevoke)
+            Logout.siren().response(200)
         }
     }
 
@@ -151,12 +147,8 @@ class UserController(private val service: UserService) {
      * @param authenticatedUser The authenticated user
      */
     @GetMapping(URIs.Users.HOME)
-    fun home(authenticatedUser: AuthenticatedUser): UserHomeOutputModel {
-        return UserHomeOutputModel(
-            id = authenticatedUser.user.uuid,
-            username = authenticatedUser.user.username
-        )
-    }
+    fun home(authenticatedUser: AuthenticatedUser): ResponseEntity<*> =
+        UserMe.siren(UserHomeOutputModel(authenticatedUser.user.uuid, authenticatedUser.user.username, authenticatedUser.token)).response(200)
 
     /**
      * Resolves a [UserCreationError] to a [ResponseEntity]
@@ -179,4 +171,9 @@ class UserController(private val service: UserService) {
             UserRankingServiceError.RuleNotFound -> Problem.response(404, Problem.ruleNotFound)
             UserRankingServiceError.UserStatsNotFound -> Problem.response(404, Problem.userStatsNotFound)
         }
+
+    companion object {
+        const val DEFAULT_OFFSET = 0
+        const val DEFAULT_LIMIT = 10
+    }
 }

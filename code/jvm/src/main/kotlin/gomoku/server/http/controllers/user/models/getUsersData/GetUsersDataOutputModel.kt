@@ -7,6 +7,11 @@ import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
  * to be sent from the API
  * @property userData list of users with their statistics
  */
-data class GetUsersDataOutputModel(
-    val userData: List<UserRuleStatsOutputModel>
+data class GetUsersRankingDataOutputModel(
+    val userData: List<UserRuleStatsOutputModel>,
+    val ruleId: Int,
+    val search: String,
+    val limit: Int,
+    val offset: Int,
+    val total: Int
 )
