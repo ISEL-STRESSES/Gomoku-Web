@@ -13,6 +13,9 @@ data class Position(
     val max: Int
 ) {
     init {
+        require(x >= 0 && y >= 0 && max >= 0) {
+            "Coordinates must be positive"
+        }
         require(x in 0..max && y in 0..max) {
             "Coordinates must be between 0 and $max"
         }

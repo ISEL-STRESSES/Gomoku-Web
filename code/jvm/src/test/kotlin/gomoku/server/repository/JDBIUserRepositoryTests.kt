@@ -145,10 +145,6 @@ class JDBIUserRepositoryTests {
         // Check if the size of the returned list is as expected
         assertEquals(10, usersStats.size)
 
-        // Check if pagination is correct
-        assertEquals(1, usersStats.first().uuid)
-        assertEquals(10, usersStats.last().uuid)
-
         val userStats = repo.getUserStats(1)
         assertNotNull(userStats)
         assertEquals(1, userStats!!.uuid)

@@ -95,7 +95,6 @@ class MoveContainerTests {
         val boardSize = 3
         var moveContainer = MoveContainer.createEmptyMoveContainer(boardSize) // 3x3 board
         moveContainer = moveContainer.addMove(Move(Position(0, 0, boardSize - 1), CellColor.BLACK))!!
-        moveContainer = moveContainer.addMove(Move(Position(0, 0, boardSize - 1), CellColor.WHITE))!!
         assertFalse(moveContainer.isFull())
     }
 

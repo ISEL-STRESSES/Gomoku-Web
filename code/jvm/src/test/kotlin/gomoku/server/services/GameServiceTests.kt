@@ -294,7 +294,7 @@ class GameServiceTests {
 
             assertTrue(result is Success)
             require(result is Success)
-            assertEquals(1, result.value)
+            assertEquals(1, result.value.turn)
         }
     }
 

@@ -39,7 +39,7 @@ class PositionTests {
         }
 
         assertThrows<IllegalArgumentException> {
-            Position(0, 3, 3)
+            Position(0, 3, 2)
         }
     }
 }
