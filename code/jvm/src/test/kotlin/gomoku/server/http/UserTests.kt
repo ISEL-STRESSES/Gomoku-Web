@@ -1,6 +1,6 @@
 package gomoku.server.http
 
-import gomoku.server.http.model.TokenResponse
+import gomoku.server.http.model.CreateUserResponse
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -77,7 +77,7 @@ class UserTests {
             )
             .exchange()
             .expectStatus().isOk
-            .expectBody(TokenResponse::class.java)
+            .expectBody(CreateUserResponse::class.java)
             .returnResult()
             .responseBody!!
 

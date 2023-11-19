@@ -102,7 +102,7 @@ class UserController(private val service: UserService) {
     ): ResponseEntity<*> {
         val res = service.createUser(username = userInput.username, password = userInput.password)
         return when (res) {
-            is Success -> SignUp.siren(res.value).response(200)
+            is Success -> SignUp.siren(res.value).response(201)
 
             is Failure -> res.value.resolveProblem()
         }

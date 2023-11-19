@@ -90,11 +90,11 @@ class GameServiceTests {
             // sut
             val gameService = GameService(transactionManager)
 
-            val result1 = gameService.startMatchmakingProcess(ruleId, user1Id.value)
+            val result1 = gameService.startMatchmakingProcess(ruleId, user1Id.value.userId)
 
             assertFalse(result1 is Success && result1.value.isGame)
 
-            val result = gameService.startMatchmakingProcess(ruleId, user2Id.value)
+            val result = gameService.startMatchmakingProcess(ruleId, user2Id.value.userId)
 
             assertTrue(result is Success && result.value.isGame)
         }

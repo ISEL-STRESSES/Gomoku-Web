@@ -214,8 +214,10 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun setUserRanking(userId: Int, rankingUserData: RankingUserData) {
         handle.createUpdate(
             """
-            update user_stats set games_played = :games_played, elo = :elo
-            where user_id = :user_id and rules_id = :rules_id
+            insert into user_stats (user_id, rules_id, games_played, elo)
+            values (:user_id, :rules_id, :games_played, :elo)
+            on conflict (user_id, rules_id) do update
+            set games_played = :games_played, elo = :elo
             """.trimIndent()
         )
             .bind("user_id", userId)

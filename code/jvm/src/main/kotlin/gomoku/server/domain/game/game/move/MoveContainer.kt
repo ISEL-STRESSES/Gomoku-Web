@@ -5,10 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.toColor
-import gomoku.utils.Failure
-import gomoku.utils.Success
-import gomoku.utils.failure
-import gomoku.utils.success
 
 /**
  * Represents a container for the moves of a game, that doesn't provide data structure information to the outside.
@@ -137,11 +133,11 @@ class MoveContainer private constructor(
 }
 
 private fun Position.toIndex(): Int {
-    return this.x * this.max + this.y
+    return this.y * (this.max+1) + this.x
 }
 
 private fun Int.toPosition(boardSize: Int): Position {
-    val row = this / boardSize
-    val column = this % boardSize
-    return Position(row, column, boardSize - 1)
+    val x = this % boardSize
+    val y = this / boardSize
+    return Position(x, y, boardSize - 1)
 }

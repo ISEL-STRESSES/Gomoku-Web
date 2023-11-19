@@ -33,7 +33,7 @@ data class GameOutputModel(
         playerWhite = finishedGame.playerWhite,
         rule = RuleOutputModel(finishedGame.rules),
         moves = MoveContainerOutputModel(finishedGame.moveContainer),
-        gameOutcome = finishedGame.gameOutcome.toString(),
+        gameOutcome = finishedGame.gameOutcome.name,
         turn = null,
         type = GameType.FINISHED
     )

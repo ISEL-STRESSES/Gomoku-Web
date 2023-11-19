@@ -247,7 +247,7 @@ class UserServiceTests {
             val result = userService.getUserByToken(testToken.value.tokenValue)
 
             assertNotNull(result)
-            assertEquals(testUser.value, result.uuid)
+            assertEquals(testUser.value.userId, result.uuid)
             assertEquals(testUserUsername, result.username)
         }
     }
