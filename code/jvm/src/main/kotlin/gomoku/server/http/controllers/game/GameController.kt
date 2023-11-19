@@ -8,6 +8,7 @@ import gomoku.server.http.controllers.game.models.GetRulesOutputModel
 import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
 import gomoku.server.http.controllers.game.models.RuleOutputModel
 import gomoku.server.http.controllers.media.Problem
+import gomoku.server.http.responses.*
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.LeaveLobbyError
@@ -40,7 +41,7 @@ class GameController(private val gameService: GameService) {
     @GetMapping(URIs.Game.HUB)
     fun finishedGames(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val games = gameService.getUserFinishedGames(userId = authenticatedUser.user.uuid)
-        return ResponseEntity.ok(GetFinishedGamesOutputModel(games.map { GameOutputModel(it) }))
+        return GetFinishedGames.siren(GetFinishedGamesOutputModel(games.map { GameOutputModel.fromGame(it) })).response(200)
     }
 
     /**
@@ -54,7 +55,7 @@ class GameController(private val gameService: GameService) {
         val game = gameService.getGame(id, authenticatedUser.user.uuid)
         return when (game) {
             is Failure -> game.value.resolveProblem()
-            is Success -> ResponseEntity.ok(GameOutputModel.fromGame(game.value))
+            is Success -> GetGameById.siren(GameOutputModel.fromGame(game.value)).response(200)
         }
     }
 
@@ -69,7 +70,7 @@ class GameController(private val gameService: GameService) {
             return Problem.response(404, Problem.noRulesFound)
         }
 
-        return ResponseEntity.ok(GetRulesOutputModel(rules.map { RuleOutputModel(it) }))
+        return GetRules.siren(GetRulesOutputModel(rules.map { RuleOutputModel(it) })).response(200)
     }
 
     /**
@@ -86,7 +87,7 @@ class GameController(private val gameService: GameService) {
         return when (moveResult) {
             is Failure -> moveResult.value.resolveProblem()
             is Success ->
-                ResponseEntity.ok(GameOutputModel.fromGame(moveResult.value))
+                MakeMove.siren(GameOutputModel.fromGame(moveResult.value)).response(200)
         }
     }
 
@@ -102,7 +103,7 @@ class GameController(private val gameService: GameService) {
         val matchmaker = gameService.startMatchmakingProcess(rulesId, authenticatedUser.user.uuid)
         return when (matchmaker) {
             is Failure -> matchmaker.value.resolveProblem()
-            is Success -> ResponseEntity.ok(MatchmakerOutputModel(matchmaker.value))
+            is Success -> Matchmaker.siren(MatchmakerOutputModel(matchmaker.value)).response(201)
         }
     }
 
@@ -117,7 +118,7 @@ class GameController(private val gameService: GameService) {
         val leftLobby = gameService.leaveLobby(lobbyId, authenticatedUser.user.uuid)
         return when (leftLobby) {
             is Failure -> leftLobby.value.resolveProblem()
-            is Success -> ResponseEntity.ok(leftLobby.value)
+            is Success -> LeaveLobby.siren(leftLobby.value).response(200)
         }
     }
 
@@ -131,7 +132,7 @@ class GameController(private val gameService: GameService) {
         val currentTurnPlayerId = gameService.getCurrentTurnPlayerId(id)
         return when (currentTurnPlayerId) {
             is Failure -> currentTurnPlayerId.value.resolveProblem()
-            is Success -> ResponseEntity.ok(currentTurnPlayerId.value)
+            is Success -> GetTurn.siren(currentTurnPlayerId.value).response(200)
         }
     }
 
@@ -171,7 +172,7 @@ class GameController(private val gameService: GameService) {
      */
     private fun CurrentTurnPlayerError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            CurrentTurnPlayerError.GameAlreadyFinished -> Problem.response(400, Problem.samePlayer)
+            CurrentTurnPlayerError.GameAlreadyFinished -> Problem.response(400, Problem.gameAlreadyFinished)
             CurrentTurnPlayerError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
         }
 

@@ -1,5 +1,7 @@
 package gomoku.server.services.game
 
+import gomoku.server.domain.game.CurrentTurnPlayerOutput
+import gomoku.server.domain.game.LeaveLobbyOutput
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.game.Game
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
@@ -28,13 +30,13 @@ typealias MakeMoveResult = Either<MakeMoveError, Game>
  * @see CurrentTurnPlayerError
  * @see Game
  */
-typealias CurrentTurnPlayerResult = Either<CurrentTurnPlayerError, Int>
+typealias CurrentTurnPlayerResult = Either<CurrentTurnPlayerError, CurrentTurnPlayerOutput>
 
 /**
  * Result for leaving a lobby
  * @see LeaveLobbyError
  */
-typealias LeaveLobbyResult = Either<LeaveLobbyError, Unit>
+typealias LeaveLobbyResult = Either<LeaveLobbyError, LeaveLobbyOutput>
 
 /**
  * Result for getting a game

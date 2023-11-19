@@ -1,5 +1,7 @@
 package gomoku.server.services.game
 
+import gomoku.server.domain.game.CurrentTurnPlayerOutput
+import gomoku.server.domain.game.LeaveLobbyOutput
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.errors.MoveError
 import gomoku.server.domain.game.game.CellColor
@@ -208,7 +210,7 @@ class GameService(private val transactionManager: TransactionManager) {
             if (lobby.userId != userId) return@run failure(LeaveLobbyError.UserNotInLobby)
 
             if (it.lobbyRepository.leaveLobby(userId)) {
-                return@run success(Unit)
+                return@run success(LeaveLobbyOutput(lobbyId, userId))
             } else {
                 return@run failure(LeaveLobbyError.LeaveLobbyFailed)
             }
@@ -236,8 +238,8 @@ class GameService(private val transactionManager: TransactionManager) {
             val currentColor =
                 it.gameRepository.getTurn(gameId) ?: return@run failure(CurrentTurnPlayerError.GameAlreadyFinished)
             when (currentColor) {
-                CellColor.BLACK -> success(players.first)
-                CellColor.WHITE -> success(players.second)
+                CellColor.BLACK -> success(CurrentTurnPlayerOutput(players.first))
+                CellColor.WHITE -> success(CurrentTurnPlayerOutput(players.second))
             }
         }
     }
