@@ -128,7 +128,12 @@ class UserService(
         transactionManager.run {
             val availableRules = it.gameRepository.getAllRules()
             if (availableRules.any { rule -> rule.ruleId == ruleId }) {
-                return@run it.usersRepository.searchRanking(ruleId, username ?: "", offset ?: DEFAULT_OFFSET, limit ?: DEFAULT_LIMIT)
+                return@run it.usersRepository.searchRanking(
+                    ruleId,
+                    username ?: "",
+                    offset ?: DEFAULT_OFFSET,
+                    limit ?: DEFAULT_LIMIT
+                )
             } else {
                 null
             }

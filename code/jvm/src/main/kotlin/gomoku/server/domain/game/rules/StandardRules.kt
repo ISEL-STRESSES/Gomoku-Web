@@ -46,7 +46,11 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
      * @return the possible moves possible in the set of rules
      */
     @JsonIgnore
-    override fun possiblePositions(moveContainer: MoveContainer, cellColor: CellColor, turn: CellColor): List<Position> {
+    override fun possiblePositions(
+        moveContainer: MoveContainer,
+        cellColor: CellColor,
+        turn: CellColor
+    ): List<Position> {
         return moveContainer.getEmptyPositions()
     }
 
@@ -92,15 +96,15 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
         dx: Int,
         dy: Int
     ): Int {
-        moveContainer.boardSize
+        val size = moveContainer.boardSize - 1
         var count = 0
         var x = position.x + dx
         var y = position.y + dy
 
-        while (x in 0..position.max && y in 0..position.max &&
-            moveContainer.hasMove(Position(x, y, position.max)) &&
+        while (x in 0..size && y in 0..size &&
+            moveContainer.hasMove(Position(x, y)) &&
             moveContainer.getMoves()
-                .any { it.position == Position(x, y, position.max) && it.cellColor == cellColor }
+                .any { it.position == Position(x, y) && it.cellColor == cellColor }
         ) {
             count++
             x += dx

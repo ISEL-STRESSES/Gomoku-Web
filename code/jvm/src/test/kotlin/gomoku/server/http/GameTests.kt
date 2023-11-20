@@ -475,7 +475,8 @@ class GameTests {
 
         // and assert that the stats of the players are updated
         val playerBlackStats = getPlayerRuleStats(client, playerBlackId, ruleId)
-        val playerWhiteId = if (playerBlackId == createUserResponse.userId) createUserResponse2.userId else createUserResponse.userId
+        val playerWhiteId =
+            if (playerBlackId == createUserResponse.userId) createUserResponse2.userId else createUserResponse.userId
         val playerWhiteStats = getPlayerRuleStats(client, playerWhiteId, ruleId)
         assertEquals(1, playerBlackStats.gamesPlayed)
         assertEquals(1, playerWhiteStats.gamesPlayed)
@@ -700,21 +701,22 @@ class GameTests {
                 val json = String(response.responseBody!!)
                 val node = ObjectMapper().readTree(json)
                 val properties = node.get("properties")
-                val ruleId = properties.get("ruleId").asInt()
-                val userId = properties.get("userId").asInt()
+                val ruleIdR = properties.get("ruleId").asInt()
+                val userIdR = properties.get("userId").asInt()
                 val username = properties.get("username").asText()
                 val gamesPlayed = properties.get("gamesPlayed").asInt()
                 val elo = properties.get("elo").asInt()
-                assertNotNull(userId)
+                assertNotNull(userIdR)
                 assertNotNull(username)
-                assertNotNull(ruleId)
+                assertNotNull(ruleIdR)
                 assertNotNull(gamesPlayed)
                 assertNotNull(elo)
-                playerRuleStatsResponse = PlayerRuleStatsResponse(userId, username, ruleId, gamesPlayed, elo)
+                playerRuleStatsResponse = PlayerRuleStatsResponse(userIdR, username, ruleIdR, gamesPlayed, elo)
             }
         requireNotNull(playerRuleStatsResponse)
         return playerRuleStatsResponse!!
     }
+
     companion object {
         private fun newTestUserName() = "User${abs(Random.nextLong())}"
     }

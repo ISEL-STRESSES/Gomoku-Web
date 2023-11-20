@@ -15,7 +15,7 @@ class MoveContainerTests {
     fun `addMove with move inside board and position unoccupied returns success`() {
         val boardSize = 3
         val moveContainer = MoveContainer.createEmptyMoveContainer(boardSize)
-        val move = Move(Position(0, 0, boardSize - 1), CellColor.BLACK)
+        val move = Move(Position(0, 0), CellColor.BLACK)
         val result = moveContainer.addMove(move)
         assertEquals(move, result!!.getLastMoveOrNull())
     }
@@ -24,7 +24,7 @@ class MoveContainerTests {
     fun `addMove with move inside board and position occupied returns null (meaning Position is already occupied)`() {
         val boardSize = 3
         var moveContainer = MoveContainer.createEmptyMoveContainer(boardSize)
-        val move = Move(Position(0, 0, boardSize - 1), CellColor.WHITE)
+        val move = Move(Position(0, 0), CellColor.WHITE)
         moveContainer = moveContainer.addMove(move)!!
         assertTrue(moveContainer.addMove(move) == null)
     }
@@ -39,8 +39,8 @@ class MoveContainerTests {
     fun `getLastMove with some moves returns the last move`() {
         val boardSize = 3
         var moveContainer = MoveContainer.createEmptyMoveContainer(boardSize)
-        moveContainer = moveContainer.addMove(Move(Position(0, 0, boardSize - 1), CellColor.BLACK))!!
-        moveContainer = moveContainer.addMove(Move(Position(1, 1, boardSize - 1), CellColor.WHITE))!!
+        moveContainer = moveContainer.addMove(Move(Position(0, 0), CellColor.BLACK))!!
+        moveContainer = moveContainer.addMove(Move(Position(1, 1), CellColor.WHITE))!!
         assertEquals(CellColor.WHITE, moveContainer.getLastMoveOrNull()?.cellColor)
     }
 
@@ -48,15 +48,15 @@ class MoveContainerTests {
     fun `hasMove with move returns true`() {
         val boardSize = 3
         var moveContainer = MoveContainer.createEmptyMoveContainer(boardSize)
-        moveContainer = moveContainer.addMove(Move(Position(0, 0, boardSize - 1), CellColor.BLACK))!!
-        assertTrue(moveContainer.hasMove(Position(0, 0, boardSize - 1)))
+        moveContainer = moveContainer.addMove(Move(Position(0, 0), CellColor.BLACK))!!
+        assertTrue(moveContainer.hasMove(Position(0, 0)))
     }
 
     @Test
     fun `hasMove without move returns false`() {
         val boardSize = 3
         val moveContainer = MoveContainer.createEmptyMoveContainer(boardSize)
-        assertFalse(moveContainer.hasMove(Position(0, 0, boardSize - 1)))
+        assertFalse(moveContainer.hasMove(Position(0, 0)))
     }
 
     @Test
@@ -69,8 +69,8 @@ class MoveContainerTests {
     fun `getMoves with some moves returns list of moves`() {
         val boardSize = 3
         var moveContainer = MoveContainer.createEmptyMoveContainer(boardSize)
-        moveContainer = moveContainer.addMove(Move(Position(0, 0, boardSize - 1), CellColor.BLACK))!!
-        moveContainer = moveContainer.addMove(Move(Position(0, 1, boardSize - 1), CellColor.WHITE))!!
+        moveContainer = moveContainer.addMove(Move(Position(0, 0), CellColor.BLACK))!!
+        moveContainer = moveContainer.addMove(Move(Position(0, 1), CellColor.WHITE))!!
         assertEquals(2, moveContainer.getMoves().size)
     }
 
@@ -79,10 +79,10 @@ class MoveContainerTests {
     fun `isFull with full board returns true`() {
         val boardSize = 2
         var moveContainer = MoveContainer.createEmptyMoveContainer(boardSize) // 2x2 board
-        moveContainer = moveContainer.addMove(Move(Position(0, 0, boardSize - 1), CellColor.BLACK))!!
-        moveContainer = moveContainer.addMove(Move(Position(0, 1, boardSize - 1), CellColor.WHITE))!!
-        moveContainer = moveContainer.addMove(Move(Position(1, 0, boardSize - 1), CellColor.BLACK))!!
-        moveContainer = moveContainer.addMove(Move(Position(1, 1, boardSize - 1), CellColor.WHITE))!!
+        moveContainer = moveContainer.addMove(Move(Position(0, 0), CellColor.BLACK))!!
+        moveContainer = moveContainer.addMove(Move(Position(0, 1), CellColor.WHITE))!!
+        moveContainer = moveContainer.addMove(Move(Position(1, 0), CellColor.BLACK))!!
+        moveContainer = moveContainer.addMove(Move(Position(1, 1), CellColor.WHITE))!!
         assertTrue(moveContainer.isFull())
     }
 
@@ -90,7 +90,7 @@ class MoveContainerTests {
     fun `isFull with not full board returns false`() {
         val boardSize = 3
         var moveContainer = MoveContainer.createEmptyMoveContainer(boardSize) // 3x3 board
-        moveContainer = moveContainer.addMove(Move(Position(0, 0, boardSize - 1), CellColor.BLACK))!!
+        moveContainer = moveContainer.addMove(Move(Position(0, 0), CellColor.BLACK))!!
         assertFalse(moveContainer.isFull())
     }
 
@@ -104,7 +104,7 @@ class MoveContainerTests {
     fun `isEmpty with non-empty board returns false`() {
         val boardSize = 3
         var moveContainer = MoveContainer.createEmptyMoveContainer(boardSize)
-        moveContainer = moveContainer.addMove(Move(Position(0, 0, boardSize - 1), CellColor.BLACK))!!
+        moveContainer = moveContainer.addMove(Move(Position(0, 0), CellColor.BLACK))!!
         assertFalse(moveContainer.isEmpty())
     }
 }

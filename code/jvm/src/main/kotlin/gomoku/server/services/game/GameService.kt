@@ -85,8 +85,11 @@ class GameService(private val transactionManager: TransactionManager) {
             when (game) {
                 is FinishedGame -> return@run failure(MakeMoveError.GameFinished)
                 is OngoingGame -> {
+                    if (x < 0 || x > game.rules.boardSize.maxIndex || y < 0 || y > game.rules.boardSize.maxIndex) {
+                        return@run failure(MakeMoveError.ImpossiblePosition)
+                    }
                     val currMove = Move(
-                        position = Position(x, y, game.rules.boardSize.maxIndex),
+                        position = Position(x, y),
                         cellColor = if (game.playerBlack == userId) {
                             CellColor.BLACK
                         } else {
@@ -113,7 +116,7 @@ class GameService(private val transactionManager: TransactionManager) {
      */
     private fun resolveValidMove(game: OngoingGame, move: Move, tr: Transaction): MakeMoveResult {
         if (game.rules.isWinningMove(game.moveContainer, move)) {
-            if (!tr.gameRepository.addToMoveArray(game.id, move.position.toIndex())) {
+            if (!tr.gameRepository.addToMoveArray(game.id, move.position.toIndex(game.rules.boardSize.maxIndex))) {
                 return failure(MakeMoveError.MakeMoveFailed)
             }
 
@@ -125,7 +128,7 @@ class GameService(private val transactionManager: TransactionManager) {
 
             updatePlayerStats(winnerId, loserId, game.rules.ruleId, tr, RankingUserData.WIN)
         } else {
-            if (!(tr.gameRepository.addToMoveArray(game.id, move.position.toIndex()))) {
+            if (!(tr.gameRepository.addToMoveArray(game.id, move.position.toIndex(game.rules.boardSize.maxIndex)))) {
                 return failure(MakeMoveError.MakeMoveFailed)
             }
             val moveContainer = game.moveContainer.addMove(move) ?: return failure(MakeMoveError.MakeMoveFailed)
@@ -284,8 +287,8 @@ class GameService(private val transactionManager: TransactionManager) {
         return success(tr.gameRepository.getGameById(gameId)!!)
     }
 
-    private fun Position.toIndex(): Int {
-        return this.y * (this.max + 1) + this.x
+    private fun Position.toIndex(size: Int): Int {
+        return this.y * (size + 1) + this.x
     }
 
     companion object {

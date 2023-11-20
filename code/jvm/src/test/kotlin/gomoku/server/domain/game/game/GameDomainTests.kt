@@ -8,7 +8,6 @@ import gomoku.server.domain.game.rules.StandardRules
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
-import java.lang.AssertionError
 
 class GameDomainTests {
 
@@ -19,10 +18,12 @@ class GameDomainTests {
 
     @Test
     fun `OngoingGame computes correct turn color`() {
-        val newContainerWithMoves1: MoveContainer = moves.addMove(Move(Position(1, 1, rules.boardSize.maxIndex), CellColor.BLACK)) ?: throw AssertionError()
+        val newContainerWithMoves1: MoveContainer =
+            moves.addMove(Move(Position(1, 1), CellColor.BLACK)) ?: throw AssertionError()
         val ongoingGame1 = OngoingGame(1, playerA, playerB, rules, newContainerWithMoves1)
         assertEquals(CellColor.WHITE, ongoingGame1.turn)
-        val newContainerWithMoves2 = newContainerWithMoves1.addMove(Move(Position(2, 2, rules.boardSize.maxIndex), CellColor.WHITE)) ?: throw AssertionError()
+        val newContainerWithMoves2 =
+            newContainerWithMoves1.addMove(Move(Position(2, 2), CellColor.WHITE)) ?: throw AssertionError()
         val ongoingGame2 = OngoingGame(1, playerA, playerB, rules, newContainerWithMoves2)
         assertEquals(CellColor.BLACK, ongoingGame2.turn)
 

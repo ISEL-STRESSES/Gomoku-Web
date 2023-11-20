@@ -82,9 +82,24 @@ class UserController(private val service: UserService) {
      * @return The ranking of the users or a [Problem] if the rule does not exist
      */
     @GetMapping(URIs.Users.RANKING)
-    fun searchRanking(@PathVariable ruleId: Int, @RequestParam username: String?, @RequestParam offset: Int?, @RequestParam limit: Int?): ResponseEntity<*> {
-        val users = service.searchRanking(ruleId, username, offset, limit) ?: return Problem.response(404, Problem.ruleNotFound)
-        return GetRanking.siren(GetUsersRankingDataOutputModel(users.map(::UserRuleStatsOutputModel), ruleId, username ?: "", limit ?: DEFAULT_LIMIT, offset ?: DEFAULT_OFFSET, users.size)).response(200)
+    fun searchRanking(
+        @PathVariable ruleId: Int,
+        @RequestParam username: String?,
+        @RequestParam offset: Int?,
+        @RequestParam limit: Int?
+    ): ResponseEntity<*> {
+        val users =
+            service.searchRanking(ruleId, username, offset, limit) ?: return Problem.response(404, Problem.ruleNotFound)
+        return GetRanking.siren(
+            GetUsersRankingDataOutputModel(
+                users.map(::UserRuleStatsOutputModel),
+                ruleId,
+                username ?: "",
+                limit ?: DEFAULT_LIMIT,
+                offset ?: DEFAULT_OFFSET,
+                users.size
+            )
+        ).response(200)
     }
 
     /**
@@ -128,7 +143,12 @@ class UserController(private val service: UserService) {
     ): ResponseEntity<*> {
         val res = service.createToken(username = userInput.username, password = userInput.password)
         return when (res) {
-            is Success -> Login.siren(UserCreateOutputModel(service.getUserByToken(res.value.tokenValue)!!.uuid, res.value.tokenValue)).response(200)
+            is Success -> Login.siren(
+                UserCreateOutputModel(
+                    service.getUserByToken(res.value.tokenValue)!!.uuid,
+                    res.value.tokenValue
+                )
+            ).response(200)
 
             is Failure -> when (res.value) {
                 TokenCreationError.UserOrPasswordInvalid -> Problem.response(400, Problem.userOrPasswordAreInvalid)
@@ -156,7 +176,13 @@ class UserController(private val service: UserService) {
      */
     @GetMapping(URIs.Users.HOME)
     fun home(authenticatedUser: AuthenticatedUser): ResponseEntity<*> =
-        UserMe.siren(UserHomeOutputModel(authenticatedUser.user.uuid, authenticatedUser.user.username, authenticatedUser.token)).response(200)
+        UserMe.siren(
+            UserHomeOutputModel(
+                authenticatedUser.user.uuid,
+                authenticatedUser.user.username,
+                authenticatedUser.token
+            )
+        ).response(200)
 
     /**
      * Resolves a [UserCreationError] to a [ResponseEntity]

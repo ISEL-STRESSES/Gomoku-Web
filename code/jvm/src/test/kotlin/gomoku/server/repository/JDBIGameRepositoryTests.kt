@@ -45,16 +45,17 @@ class JDBIGameRepositoryTests {
     }
 
     @Test
-    fun `setGameOutcome updates outcome correctly (after game state is finished)`() = testWithHandleAndRollback { handle ->
-        val repo = JDBIGameRepository(handle)
+    fun `setGameOutcome updates outcome correctly (after game state is finished)`() =
+        testWithHandleAndRollback { handle ->
+            val repo = JDBIGameRepository(handle)
 
-        val gameId = repo.createGame(1, 1, 2)
-        repo.setGameState(gameId, GameState.FINISHED)
-        repo.setGameOutcome(gameId, GameOutcome.BLACK_WON)
+            val gameId = repo.createGame(1, 1, 2)
+            repo.setGameState(gameId, GameState.FINISHED)
+            repo.setGameOutcome(gameId, GameOutcome.BLACK_WON)
 
-        val outcome = repo.getGameOutcome(gameId)
-        assertEquals(GameOutcome.BLACK_WON, outcome)
-    }
+            val outcome = repo.getGameOutcome(gameId)
+            assertEquals(GameOutcome.BLACK_WON, outcome)
+        }
 
     @Test
     fun `setGameOutcome doesn't update outcome if game state is not finished`() = testWithHandleAndRollback { handle ->
@@ -96,7 +97,7 @@ class JDBIGameRepositoryTests {
         repo.addToMoveArray(gameId, 3)
 
         val moves = repo.getAllMoves(gameId)
-        assertTrue(moves.contains(Move(Position(3, 0, 14), CellColor.BLACK))) // Assuming Move has a constructor like this
+        assertTrue(moves.contains(Move(Position(3, 0), CellColor.BLACK))) // Assuming Move has a constructor like this
     }
 
     @Test
@@ -123,20 +124,21 @@ class JDBIGameRepositoryTests {
     }
 
     @Test
-    fun `getRuleById gets correctly and doesn't get non-existing, and getAllRules`() = testWithHandleAndRollback { handle ->
+    fun `getRuleById gets correctly and doesn't get non-existing, and getAllRules`() =
+        testWithHandleAndRollback { handle ->
 
-        val repo = JDBIGameRepository(handle)
+            val repo = JDBIGameRepository(handle)
 
-        val rule1 = repo.getRuleById(1)
-        assertNotNull(rule1)
+            val rule1 = repo.getRuleById(1)
+            assertNotNull(rule1)
 
-        val rule4 = repo.getRuleById(4)
-        assertNull(rule4)
+            val rule4 = repo.getRuleById(4)
+            assertNull(rule4)
 
-        val rules = repo.getAllRules()
-        assertNotNull(rules)
-        assertEquals(3, rules.size)
-    }
+            val rules = repo.getAllRules()
+            assertNotNull(rules)
+            assertEquals(3, rules.size)
+        }
 
     @Test
     fun `check base game flow`() = testWithHandleAndRollback { handle ->
@@ -204,7 +206,7 @@ class JDBIGameRepositoryTests {
         val getLastNMoves = repo.getLastNMoves(6, 1)
         assertEquals(1, getLastNMoves.size)
         assertEquals(CellColor.BLACK, getLastNMoves[0].cellColor)
-        assertEquals(Position(3, 0, 14), getLastNMoves[0].position)
+        assertEquals(Position(3, 0), getLastNMoves[0].position)
     }
 
     @Test

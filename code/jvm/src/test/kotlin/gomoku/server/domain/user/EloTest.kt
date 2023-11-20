@@ -17,7 +17,10 @@ class EloTest {
     fun `playerB ties and has the same base points as playerB`() {
         val pointsA = 1500.0
         val pointsB = 1500.0
-        assertEquals(updateElo(pointsA, pointsB, RankingUserData.DRAW), updateElo(pointsB, pointsA, RankingUserData.DRAW))
+        assertEquals(
+            updateElo(pointsA, pointsB, RankingUserData.DRAW),
+            updateElo(pointsB, pointsA, RankingUserData.DRAW)
+        )
     }
 
     @Test

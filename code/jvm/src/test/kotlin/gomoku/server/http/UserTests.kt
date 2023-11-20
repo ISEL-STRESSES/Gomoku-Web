@@ -45,7 +45,9 @@ class UserTests {
     @Test
     fun `can create an user, obtain a token, and access user home, and logout`() {
         // given: an HTTP client
-        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").responseTimeout(Duration.ofHours(1)).build()
+        val client =
+            WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").responseTimeout(Duration.ofHours(1))
+                .build()
 
         // and: a random user
         val username = newTestUserName()

@@ -14,7 +14,8 @@ class Problem(typeUri: URI, val title: String) {
 
     companion object {
         private const val MEDIA_TYPE = "application/problem+json"
-        private const val PROBLEM_BASE_URL = "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/"
+        private const val PROBLEM_BASE_URL =
+            "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/"
 
         /**
          * Creates a response entity with the given status and problem
@@ -30,13 +31,16 @@ class Problem(typeUri: URI, val title: String) {
 
         val userAlreadyExists = Problem(URI(PROBLEM_BASE_URL + "user-already-exists"), "User already exists.")
 
-        val insecurePassword = Problem(URI(PROBLEM_BASE_URL + "insecure-password"), "The provided password is insecure.")
+        val insecurePassword =
+            Problem(URI(PROBLEM_BASE_URL + "insecure-password"), "The provided password is insecure.")
 
         val invalidUsername = Problem(URI(PROBLEM_BASE_URL + "invalid-username"), "Invalid username format.")
 
-        val userOrPasswordAreInvalid = Problem(URI(PROBLEM_BASE_URL + "user-or-password-are-invalid"), "User or password are invalid.")
+        val userOrPasswordAreInvalid =
+            Problem(URI(PROBLEM_BASE_URL + "user-or-password-are-invalid"), "User or password are invalid.")
 
-        val invalidRequestContent = Problem(URI(PROBLEM_BASE_URL + "invalid-request-content"), "Invalid request content.")
+        val invalidRequestContent =
+            Problem(URI(PROBLEM_BASE_URL + "invalid-request-content"), "Invalid request content.")
 
         val userNotFound = Problem(URI(PROBLEM_BASE_URL + "user-not-found"), "User not found.")
 
@@ -50,7 +54,8 @@ class Problem(typeUri: URI, val title: String) {
 
         val gameAlreadyFinished = Problem(URI(PROBLEM_BASE_URL + "game-already-finished"), "Game has already finished.")
 
-        val impossiblePosition = Problem(URI(PROBLEM_BASE_URL + "impossible-position"), "The chosen position is impossible.")
+        val impossiblePosition =
+            Problem(URI(PROBLEM_BASE_URL + "impossible-position"), "The chosen position is impossible.")
 
         val invalidMove = Problem(URI(PROBLEM_BASE_URL + "invalid-move"), "Invalid move.")
 

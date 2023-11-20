@@ -80,7 +80,8 @@ class GameServiceTests {
             // before
             deleteLobbies(transactionManager)
             // user before
-            val userService = UserService(transactionManager = transactionManager, clock = clock, usersDomain = usersDomain)
+            val userService =
+                UserService(transactionManager = transactionManager, clock = clock, usersDomain = usersDomain)
             val randomPassword = "ByQYP78&j7Aug2" // secure password
             val user1Id = userService.createUser("test1", randomPassword)
             val user2Id = userService.createUser("test2", randomPassword)

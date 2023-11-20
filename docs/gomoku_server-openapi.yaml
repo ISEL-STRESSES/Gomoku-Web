@@ -98,7 +98,7 @@ paths:
       operationId: searchRanking
       parameters:
         - $ref: '#/components/parameters/ruleIdParam'
-        - $ref : '#/components/parameters/usernameParam'
+        - $ref: '#/components/parameters/usernameParam'
         - $ref: '#/components/parameters/offsetParam'
         - $ref: '#/components/parameters/limitParam'
       responses:
@@ -107,7 +107,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref : '#/components/schemas/GetUsersDataOutputModel'
+                $ref: '#/components/schemas/GetUsersDataOutputModel'
         404:
           $ref: '#/components/responses/NotFound'
         500:
@@ -211,7 +211,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref : '#/components/schemas/GetFinishedGamesOutputModel'
+                $ref: '#/components/schemas/GetFinishedGamesOutputModel'
         500:
           $ref: '#/components/responses/InternalServerError'
 
@@ -227,7 +227,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref : '#/components/schemas/GetRulesOutputModel'
+                $ref: '#/components/schemas/GetRulesOutputModel'
         404:
           $ref: '#/components/responses/NotFound'
         500:

@@ -32,19 +32,28 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
      */
     @JsonIgnore
     override fun isValidMove(moveContainer: MoveContainer, move: Move, turn: CellColor): IsValidMoveResult {
-        val center = Position(boardSize.maxIndex / 2, boardSize.maxIndex / 2, boardSize.maxIndex) // TODO: Verify this is the actual middle of the board
-
+        val center = Position(
+            boardSize.maxIndex / 2,
+            boardSize.maxIndex / 2
+        ) // TODO: Verify this is the actual middle of the board
+        if (move.position.x < 0 || move.position.y < 0 || move.position.x > boardSize.maxIndex || move.position.y > boardSize.maxIndex) {
+            return failure(
+                MoveError.InvalidPosition
+            )
+        }
         when (moveContainer.getMoves().size) {
             0 -> {
                 if (turn != CellColor.BLACK || turn != move.cellColor || move.position != center) {
                     return failure(MoveError.InvalidPosition)
                 }
             }
+
             1 -> { // White's first move anywhere besides center
                 if (turn != CellColor.WHITE || turn != move.cellColor) {
                     return failure(MoveError.InvalidTurn)
                 }
             }
+
             2 -> {
                 if (turn != CellColor.BLACK || turn != move.cellColor) return failure(MoveError.InvalidTurn)
                 val blackFirstMove = moveContainer.getMoves()[0].position
@@ -52,6 +61,7 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
                     return failure(MoveError.InvalidPosition)
                 }
             }
+
             else -> {
                 if (turn != move.cellColor) return failure(MoveError.InvalidTurn)
             }
@@ -80,17 +90,22 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
      * @return a list with the possible moves.
      */
     @JsonIgnore
-    override fun possiblePositions(moveContainer: MoveContainer, cellColor: CellColor, turn: CellColor): List<Position> {
+    override fun possiblePositions(
+        moveContainer: MoveContainer,
+        cellColor: CellColor,
+        turn: CellColor
+    ): List<Position> {
         return moveContainer
             .getEmptyPositions()
             .filter { position ->
                 when (moveContainer.getMoves().size) {
-                    0 -> position == Position(boardSize.maxIndex / 2, boardSize.maxIndex / 2, boardSize.maxIndex)
+                    0 -> position == Position(boardSize.maxIndex / 2, boardSize.maxIndex / 2)
                     1 -> true
                     2 -> {
                         val blackFirstMove = moveContainer.getMoves()[0].position
                         isTwoSquaresAway(blackFirstMove, position)
                     }
+
                     else -> true
                 }
             }

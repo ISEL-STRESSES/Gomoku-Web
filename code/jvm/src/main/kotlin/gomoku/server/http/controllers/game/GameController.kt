@@ -48,7 +48,8 @@ class GameController(private val gameService: GameService) {
     @GetMapping(URIs.Game.HUB)
     fun finishedGames(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val games = gameService.getUserFinishedGames(userId = authenticatedUser.user.uuid)
-        return GetFinishedGames.siren(GetFinishedGamesOutputModel(games.map { GameOutputModel.fromGame(it) })).response(200)
+        return GetFinishedGames.siren(GetFinishedGamesOutputModel(games.map { GameOutputModel.fromGame(it) }))
+            .response(200)
     }
 
     /**
@@ -89,7 +90,12 @@ class GameController(private val gameService: GameService) {
      * @return The result of the move
      */
     @PostMapping(URIs.Game.MAKE_PLAY)
-    fun makePlay(@PathVariable id: Int, authenticatedUser: AuthenticatedUser, @RequestParam x: Int, @RequestParam y: Int): ResponseEntity<*> {
+    fun makePlay(
+        @PathVariable id: Int,
+        authenticatedUser: AuthenticatedUser,
+        @RequestParam x: Int,
+        @RequestParam y: Int
+    ): ResponseEntity<*> {
         val moveResult = gameService.makeMove(id, authenticatedUser.user.uuid, x, y)
         return when (moveResult) {
             is Failure -> moveResult.value.resolveProblem()

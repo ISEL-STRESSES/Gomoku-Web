@@ -38,7 +38,7 @@ class MoveContainer private constructor(
         val position = move.position
         if (hasMove(position)) return null
         val newBoard = board.copyOf()
-        newBoard[position.toIndex()] = move.cellColor
+        newBoard[position.toIndex(boardSize - 1)] = move.cellColor
         return MoveContainer(boardSize, orderOfMoves + move, newBoard)
     }
 
@@ -56,7 +56,7 @@ class MoveContainer private constructor(
      */
     @JsonIgnore
     fun hasMove(position: Position): Boolean {
-        return board[position.toIndex()] != null
+        return board[position.toIndex(boardSize - 1)] != null
     }
 
     /**
@@ -132,12 +132,12 @@ class MoveContainer private constructor(
     }
 }
 
-private fun Position.toIndex(): Int {
-    return this.y * (this.max + 1) + this.x
+private fun Position.toIndex(size: Int): Int {
+    return this.y * (size + 1) + this.x
 }
 
 private fun Int.toPosition(boardSize: Int): Position {
     val x = this % boardSize
     val y = this / boardSize
-    return Position(x, y, boardSize - 1)
+    return Position(x, y)
 }
