@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Gomoku API
-  description: Web-based system that allows multiple players to play the Battleship game
+  description: Web-based system that allows multiple players to play the Gomoku game
   version: 0.1.1
 servers:
   - url: http://localhost:8888
