@@ -8,24 +8,24 @@ and gameplay.
 
 ## Table of Contents
 
-- [Introduction](#introduction) (Incomplete)
-- [Pagination](#pagination) (TODO)
-- [Authentication](#authentication) (TODO)
+- [Introduction](#introduction)
+- [Pagination](#pagination)
+- [Authentication](#authentication)
 - [Endpoints](#endpoints) (Incomplete)
     - [Home](#home)
         - [Get Home](#get-home)
     - [Users](#users) (Incomplete)
-        - [Create a New User](#create-a-new-user) (Incomplete)
-        - [Logs a User Out](#logs-a-user-out) (Incomplete)
-        - [Gets a user home page](#gets-a-user-home-page) (Incomplete)
-        - [Gets the ranking of the users for a given rule](#gets-the-ranking-of-the-users-for-a-given-rule) (Incomplete)
-        - [Gets the ranking of a user for a given rule](#gets-the-ranking-of-a-user-for-a-given-rule) (Incomplete)
+        - [Create a New User](#create-a-new-user)
+        - [Logs a User Out](#logs-a-user-out)
+        - [Gets a user home page](#gets-a-user-home-page)
+        - [Gets the ranking of the users for a given rule](#gets-the-ranking-of-the-users-for-a-given-rule)
+        - [Gets the ranking of a user for a given rule](#gets-the-ranking-of-a-user-for-a-given-rule)
         - [Gets the whole stats of a user](#gets-the-whole-stats-of-a-user) (Incomplete)
-        - [Creates a token for a user](#creates-a-token-for-a-user) (Incomplete)
-        - [Gets the user with the given id](#gets-the-user-with-the-given-id) (Incomplete)
+        - [Creates a token for a user](#creates-a-token-for-a-user)
+        - [Gets the user with the given id](#gets-the-user-with-the-given-id)
     - [Games](#games) (Incomplete)
-        - [Get the Finished games](#get-finished-games) (Incomplete)
-        - [Get the available rules](#get-game-rules) (Incomplete)
+        - [Get the Finished games](#get-finished-games)
+        - [Get the available rules](#get-game-rules)
         - [Get the details of a game](#get-game-details) (Incomplete)
         - [Makes a move in a game](#make-a-move) (Incomplete)
         - [Gets the player id of the current turn](#get-current-turn-player-id) (Incomplete)
@@ -35,49 +35,73 @@ and gameplay.
     - [Parameters](#parameters)
         - [Password](#password)
         - [Username](#username)
+        - [Position](#position)
+        - [RuleId](#ruleid)
+        - [UserId](#userid)
+        - [LobbyId](#lobbyid)
+        - [GameId](#gameid)
+        - [Offset](#offset)
+        - [Limit](#limit)
     - [Success Types](#success-types) (Incomplete)
         - [Home](#home-1)
-        - [User Created](#user-created) (Incomplete)
-        - [User Logged in](#user-logged-in) (Incomplete)
-    - [Error Types](#error-types) (Incomplete)
-        - [Bad Request](#bad-request) (Incomplete)
-        - [User or Password Invalid](#user-or-password-invalid) (Incomplete)
-        - [Invalid Username](#invalid-username) (Incomplete)
-        - [Insecure Password](#insecure-password) (Incomplete)
-        - [Token Not Revoked](#token-not-revoked) (Incomplete)
-        - [User Not Found](#user-not-found) (Incomplete)
-        - [Rule Not Found](#rule-not-found) (Incomplete)
-        - [User Stats Not Found](#user-stats-not-found) (Incomplete)
-        - [User Already Exits](#user-already-exists) (Incomplete)
-        - [Same Player](#same-player) (Incomplete)
-        - [Game Already Finished](#game-already-finished) (Incomplete)
-        - [Impossible Position](#impossible-position) (Incomplete)
-        - [Not Your Turn](#not-your-turn) (Incomplete)
-        - [Invalid Move](#invalid-move) (Incomplete)
-        - [Player Not in Game](#player-not-in-game) (Incomplete)
-        - [Game Not Found](#game-not-found) (Incomplete)
-        - [No Rules Found](#no-rules-found) (Incomplete)
-        - [Lobby Not Found](#lobby-not-found) (Incomplete)
-        - [Position Already Occupied](#position-already-occupied) (Incomplete)
-        - [Internal Server Error](#internal-server-error) (Incomplete)
-        - [Make Move Failed](#make-move-failed) (Incomplete)
-        - [Leave Lobby Failed](#leave-lobby-failed) (Incomplete)
+        - [User Created](#user-created)
+        - [User Logged in](#user-logged-in)
+        - [User Logged out](#user-logged-out)
+        - [User Home](#user-home)
+        - [User](#user)
+        - [Users Stats](#user-stats)
+        - [User Stats](#user-stats) (Incomplete)
+        - [Available Rules](#available-rules)
+        - [Finished Games](#finished-games)
+        - [Game Details](#game-details) (Incomplete)
+        - [Current Turn Player Id](#current-turn-player-id) (Incomplete)
+        - [Lobby Details](#lobby-details) (Incomplete)
+    - [Error Types](#error-types)
+        - [Bad Request](#bad-request)
+        - [User or Password Invalid](#user-or-password-invalid)
+        - [Invalid Username](#invalid-username)
+        - [Insecure Password](#insecure-password)
+        - [Token Not Revoked](#token-not-revoked)
+        - [User Not Found](#user-not-found)
+        - [Rule Not Found](#rule-not-found)
+        - [User Stats Not Found](#user-stats-not-found)
+        - [User Already Exits](#user-already-exists)
+        - [Same Player](#same-player)
+        - [Game Already Finished](#game-already-finished)
+        - [Impossible Position](#impossible-position)
+        - [Not Your Turn](#not-your-turn)
+        - [Invalid Move](#invalid-move)
+        - [Player Not in Game](#player-not-in-game)
+        - [Game Not Found](#game-not-found)
+        - [No Rules Found](#no-rules-found)
+        - [Lobby Not Found](#lobby-not-found)
+        - [Position Already Occupied](#position-already-occupied)
+        - [Internal Server Error](#internal-server-error)
+        - [Make Move Failed](#make-move-failed)
+        - [Leave Lobby Failed](#leave-lobby-failed)
 
 ## Introduction
 
 For the purpose of the URLs in this document, the base URL is `https://localhost:8080/api/`.
 
+The Siren media type is used to represent the resources. It is media type following a hypermedia specification for
+representing entities. It is a JSON-based format that is
+optimized for HTTP. Siren is designed to be simple, extendable, and consistent.
+The Internet Media Type for Siren is `application/vnd.siren+json`.
+
+As for the Errors the media type is `application/problem+json` and it follows the
+[RFC 7807](https://tools.ietf.org/html/rfc7807).
+
 ## Pagination
 
 The pagination is done with the header `Link` and the following format:
 
-```
-
-```
+There is the relation of `self` (current page), `prev` and `next` (previous and next page).
 
 ## Authentication
 
-_TODO_
+There are requests that need authentication and to those requests you need to add the header `Authorization` with the
+Bearer Token.
 
 ## Endpoints
 
@@ -120,6 +144,8 @@ Retrieves basic information or status of the Gomoku API.
     - **Content:**
         - application/problem+json
             - [Bad Request](#bad-request)
+            - [Invalid Username](#invalid-username)
+            - [Insecure Password](#insecure-password)
             - [User Already Exists](#user-already-exists)
             - [Internal Server Error](#internal-server-error)
 
@@ -140,6 +166,11 @@ Retrieves basic information or status of the Gomoku API.
 - **Content:**
     - application/vnd.siren+json
         - [User Logged in](#user-logged-in)
+- **Error Responses:**
+    - **Content:**
+        - application/problem+json
+            - [User or Password Invalid](#user-or-password-invalid)
+            - [Internal Server Error](#internal-server-error)
 
 #### Logs a User out
 
@@ -148,10 +179,11 @@ Retrieves basic information or status of the Gomoku API.
 - **Success Response:**
     - **Content:**
         - application/vnd.siren+json
-            - _TODO_
+            - [User Logged out](#user-logged-out)
 - **Error Responses:**
     - **Content:**
         - application/problem+json
+            - [Token Not Revoked](#token-not-revoked)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
     ```bash
@@ -181,19 +213,19 @@ Retrieves user-specific home page
 
 Gets the ranking of the users for a given rule
 
-- **URL:** `/api/users/ranking{rukeId}`
+- **URL:** `/api/users/ranking/{ruleId}`
 - **Method:** `GET`
 - **URL Params:**
     - **Required:**
-        - `ruleId=[integer]`
-        - [Username](#username)
+        - [RuleId](#ruleid)
     - **Optional:**
-        - `offset=[integer]`
-        - `limit=[integer]`
+        - [Username](#username)
+        - [Offset](#offset)
+        - [Limit](#limit)
 - **Success Response:**
     - **Content:**
         - application/vnd.siren+json
-            - [User Stats](#user-stats)
+            - [Users Stats](#user-stats)
 - **Error Responses:**
     - **Content:**
         - application/problem+json
@@ -212,8 +244,8 @@ Gets the ranking of a user for a given rule
 - **Method:** `GET`
 - **URL Params:**
     - **Required:**
-        - `ruleId=[integer]`
-        - `userId=[integer]`
+        - [RuleId](#ruleid)
+        - [UserId](#userid)
 - **Success Response:**
     - **Content:**
         - application/vnd.siren+json
@@ -238,11 +270,11 @@ Gets the whole stats of a user
 - **Method:** `GET`
 - **URL Params:**
     - **Required:**
-        - `userId=[integer]`
+        - [UserId](#userid)
 - **Success Response:**
 - **Content:**
     - application/vnd.siren+json
-        - [User Stats](#user-stats)
+        - [User Stats](#user-stats) (TODO)
 - **Error Responses:**
     - **Content:**
         - application/problem+json
@@ -285,7 +317,7 @@ Gets the user with the given id
 - **Method:** `GET`
 - **URL Params:**
     - **Required:**
-        - `userId=[integer]`
+        - [UserId](#userid)
 - **Success Response:**
     - **Content:**
         - application/vnd.siren+json
@@ -349,7 +381,7 @@ Retrieves the details of a game
 - **Method:** `GET`
 - **URL Params:**
     - **Required:**
-        - `id=[integer]`
+        - [GameId](#gameid) (id of the game)
 - **Success Response:**
     - **Content:**
         - application/vnd.siren+json
@@ -370,11 +402,10 @@ Makes a move in a game
 - **Method:** `POST`
 - **URL Params:**
     - **Required:**
-        - `id=[integer]` (id of the game)
+        - [GameId](#gameid)
 - **Query Params:**
     - **Required:**
-        - `x=[integer]`
-        - `y=[integer]`
+        - [Position](#position)
 - **Success Response:**
     - **Content:**
         - application/vnd.siren+json
@@ -405,7 +436,7 @@ Retrieves the player id of the current turn
 - **Method:** `GET`
 - **URL Params:**
     - **Required:**
-        - `id=[integer]` (id of the game)
+        - [GameId](#gameid)
 - **Success Response:**
     - **Content:**
         - application/vnd.siren+json
@@ -429,7 +460,7 @@ Leaves a lobby
 - **Method:** `POST`
 - **URL Params:**
     - **Required:**
-        - `lobbyId=[integer]`
+        - [LobbyId](#lobbyid) (id of the lobby)
 - **Success Response:**
     - **Content:**
         - application/vnd.siren+json
@@ -450,11 +481,11 @@ Leaves a lobby
 
 Starts the matchmaking process
 
-- **URL:** `/api/game/{rulesId}`
+- **URL:** `/api/game/{ruleId}`
 - **Method:** `POST`
 - **URL Params:**
     - **Required:**
-        - `rulesId=[integer]`
+        - [RuleId](#ruleid) (id of the rule)
 - **Success Response:**
     - **Content:**
         - application/vnd.siren+json
@@ -478,6 +509,41 @@ It has to contain at least one lowercase letter, one uppercase letter, one digit
 #### Username
 
 The username is a string with a length between 3 and 50 characters, consisting solely of non-whitespace characters.
+
+#### Position
+
+The Position has two parts, the row(x) and the column(y), both are positive integers.
+The row has to be between 1 and the board size and the column has to be between 1 and the board size.
+The board size is defined by the rule.
+`[x,y]`
+
+#### RuleId
+
+Only positive integers are allowed.
+The rule has to exist.
+
+#### UserId
+
+Only positive integers are allowed.
+The user has to exist.
+
+#### LobbyId
+
+Only positive integers are allowed.
+The lobby has to exist.
+
+#### GameId
+
+Only positive integers are allowed.
+The game has to exist.
+
+#### Offset
+
+Only positive integers are allowed.
+
+#### Limit
+
+Only positive integers are allowed.
 
 ### Success Types
 
@@ -517,17 +583,17 @@ The application home page has the server info and the authors' info with their s
     }
   ],
   "actions": [
-    {
-      "name": "signup",
-      "href": "/create",
-      "method": "POST"
-    },
-    {
-      "name": "login",
-      "href": "/token",
-      "method": "POST"
-    }
-  ]
+     {
+        "name": "signup",
+        "href": "/api/users/create",
+        "method": "POST"
+     },
+     {
+        "name": "login",
+        "href": "/api/users/token",
+        "method": "POST"
+     }
+    ]
 }
 ```
 
@@ -549,7 +615,7 @@ The application home page has the server info and the authors' info with their s
             "rel": [
                 "self"
             ],
-            "href": "/create"
+            "href": "/api/users/create"
         }
     ],
     "actions": []
@@ -574,7 +640,192 @@ The application home page has the server info and the authors' info with their s
             "rel": [
                 "self"
             ],
-            "href": "/token"
+            "href": "/api/users/token"
+        }
+    ],
+    "actions": []
+}
+```
+
+#### User Logged out
+
+- **Sample Response:**
+
+```vnd.siren+json
+{
+    "class": [
+        "logout"
+    ],
+    "properties": "User logged out.",
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/api/users/logout"
+        }
+    ],
+    "actions": []
+}
+```
+
+#### User Home
+
+- **Sample Response:**
+
+```vnd.siren+json
+{
+    "class": [
+        "user"
+    ],
+    "properties": {
+        "id": 27,
+        "username": "Rod21",
+        "token": "PratQUvC8439q0vqI_1FjCpbVpUhAn_SrANtMf5eOpU="
+    },
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/api/users/me"
+        }
+    ],
+    "actions": []
+}
+```
+
+#### User
+
+- **Sample Response:**
+```vnd.siren+json
+{
+    "class": [
+        "user"
+    ],
+    "properties": {
+        "id": 536,
+        "username": "xpto5",
+        "token": "KEkqFztldrzS9bxuhMlLIhLqIOhEqUlmjNO09JxTuoQ="
+    },
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/api/users/me"
+        }
+    ],
+    "actions": []
+}
+```
+
+#### Users Stats
+
+- **Sample Response:**
+
+```vnd.siren+json
+{
+    "class": [
+        "user-ranking-search"
+    ],
+    "properties": {
+        "userData": [
+            {
+                "id": 24,
+                "username": "Sofia",
+                "ruleId": 2,
+                "gamesPlayed": 1,
+                "elo": 1520
+            },
+            {
+                "id": 2,
+                "username": "user2",
+                "ruleId": 2,
+                "gamesPlayed": 5,
+                "elo": 1500
+            },
+            {
+                "id": 3,
+                "username": "user3",
+                "ruleId": 2,
+                "gamesPlayed": 5,
+                "elo": 1500
+            },
+            {
+                "id": 4,
+                "username": "user4",
+                "ruleId": 2,
+                "gamesPlayed": 5,
+                "elo": 1500
+            },
+            {
+                "id": 5,
+                "username": "user5",
+                "ruleId": 2,
+                "gamesPlayed": 5,
+                "elo": 1500
+            },
+            {
+                "id": 6,
+                "username": "user6",
+                "ruleId": 2,
+                "gamesPlayed": 5,
+                "elo": 1500
+            },
+            {
+                "id": 1,
+                "username": "user1",
+                "ruleId": 2,
+                "gamesPlayed": 5,
+                "elo": 1500
+            },
+            {
+                "id": 8,
+                "username": "user8",
+                "ruleId": 2,
+                "gamesPlayed": 5,
+                "elo": 1500
+            },
+            {
+                "id": 9,
+                "username": "user9",
+                "ruleId": 2,
+                "gamesPlayed": 5,
+                "elo": 1500
+            },
+            {
+                "id": 10,
+                "username": "user10",
+                "ruleId": 2,
+                "gamesPlayed": 5,
+                "elo": 1500
+            }
+        ],
+        "ruleId": 2,
+        "search": "",
+        "limit": 10,
+        "offset": 0,
+        "total": 10
+    },
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/api/users/ranking/2?username=&limit=10&offset=0"
+        },
+        {
+            "rel": [
+                "next"
+            ],
+            "href": "/api/users/ranking/2?username=&limit=10&offset=10"
+        },
+        {
+            "rel": [
+                "previous"
+            ],
+            "href": "/api/users/ranking/2?username=&limit=10&offset=0"
         }
     ],
     "actions": []
@@ -582,14 +833,27 @@ The application home page has the server info and the authors' info with their s
 ```
 
 #### User Stats
-
 - **Sample Response:**
 
-```json
+```vnd.siren+json
 {
-  "userId": 530,
-  "username": "DAW_Demo1",
-  "userRuleStats": []
+    "class": [
+        "game"
+    ],
+    "properties": {
+        "finishedGames": [
+        
+        ]
+    },
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/api/game/"
+        }
+    ],
+    "actions": []
 }
 ```
 
@@ -597,28 +861,42 @@ The application home page has the server info and the authors' info with their s
 
 - **Sample Response:**
 
-```json
+```vnd.siren+json
 {
-  "rulesList": [
+  "class": [
+    "rules"
+  ],
+  "properties": {
+    "rulesList": [
+      {
+        "ruleId": 1,
+        "boardSize": 15,
+        "variant": "STANDARD",
+        "openingRule": "FREE"
+      },
+      {
+        "ruleId": 2,
+        "boardSize": 19,
+        "variant": "STANDARD",
+        "openingRule": "FREE"
+      },
+      {
+        "ruleId": 3,
+        "boardSize": 15,
+        "variant": "STANDARD",
+        "openingRule": "PRO"
+      }
+    ]
+  },
+  "links": [
     {
-      "ruleId": 1,
-      "boardSize": 15,
-      "variant": "STANDARD",
-      "openingRule": "FREE"
-    },
-    {
-      "ruleId": 2,
-      "boardSize": 19,
-      "variant": "STANDARD",
-      "openingRule": "FREE"
-    },
-    {
-      "ruleId": 3,
-      "boardSize": 15,
-      "variant": "STANDARD",
-      "openingRule": "PRO"
+      "rel": [
+        "self"
+      ],
+      "href": "/api/game/rules"
     }
-  ]
+  ],
+  "actions": []
 }
 ```
 
@@ -626,34 +904,128 @@ The application home page has the server info and the authors' info with their s
 
 - **Sample Response:**
 
-```json
+```vnd.siren+json
 {
-  "finishedGames": [
+  "class": [
+    "game"
+  ],
+  "properties": {
+    "finishedGames": [
+      {
+        "id": 12,
+        "playerBlack": 24,
+        "playerWhite": 23,
+        "rule": {
+          "ruleId": 2,
+          "boardSize": 19,
+          "variant": "STANDARD",
+          "openingRule": "FREE"
+        },
+        "moves": {
+          "boardSize": 19,
+          "orderOfMoves": [
+            {
+              "position": {
+                "x": 0,
+                "y": 2
+              },
+              "color": "BLACK"
+            },
+            {
+              "position": {
+                "x": 4,
+                "y": 18
+              },
+              "color": "WHITE"
+            },
+            {
+              "position": {
+                "x": 0,
+                "y": 0
+              },
+              "color": "BLACK"
+            },
+            {
+              "position": {
+                "x": 4,
+                "y": 17
+              },
+              "color": "WHITE"
+            },
+            {
+              "position": {
+                "x": 0,
+                "y": 1
+              },
+              "color": "BLACK"
+            },
+            {
+              "position": {
+                "x": 4,
+                "y": 14
+              },
+              "color": "WHITE"
+            },
+            {
+              "position": {
+                "x": 0,
+                "y": 3
+              },
+              "color": "BLACK"
+            },
+            {
+              "position": {
+                "x": 4,
+                "y": 12
+              },
+              "color": "WHITE"
+            },
+            {
+              "position": {
+                "x": 0,
+                "y": 4
+              },
+              "color": "BLACK"
+            }
+          ]
+        },
+        "gameOutcome": "BLACK_WON",
+        "turn": null,
+        "type": "FINISHED"
+      }
+    ]
+  },
+  "links": [
     {
-      "id": "integer",
-      "playerBlack": "integer",
-      "playerWhite": "integer",
-      "rule": {
-        "ruleId": "integer",
-        "boardSize": "integer",
-        "variant": "string",
-        "openingRule": "string"
-      },
-      "moves": {
-        "boardSize": "integer",
-        "orderOfMoves": [
-          {
-            "pos": "integer",
-            "color": "string"
-          }
-        ]
-      },
-      "GameOutcome": "string",
-      "turn": "string",
-      "type": "string"
+      "rel": [
+        "self"
+      ],
+      "href": "/api/game/"
     }
-  ]
+  ],
+  "actions": []
 }
+```
+
+#### Game Details
+
+- **Sample Response:**
+```vnd.siren+json
+
+```
+
+#### Current Turn Player Id
+
+- **Sample Response:**
+```vnd.siren+json
+
+```
+
+#### Lobby Details
+
+- **Sample Response:**
+```vnd.siren+json
+
 ```
 
 ### Error Types
@@ -664,7 +1036,7 @@ This error happens when for example you try to create a user and the username or
 
 - **Sample Error Response:**
 
-```json
+```problem+json
 {
   "title": "Invalid request content.",
   "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/invalid-request-content"
@@ -676,7 +1048,7 @@ This error happens when for example you try to create a user and the username or
 This error happens when you try to log in and the user or password is invalid.
 -**Sample Error Response:**
 
-```json
+```problem+json
 {
   "title": "User or password are invalid.",
   "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/user-or-password-are-invalid"
@@ -690,10 +1062,10 @@ _TODO_
 
 - **Sample Error Response:**
 
-```json
+```problem+json
 {
-  "title": "Invalid request content.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/invalid-request-content"
+  "title": "Invalid username format.",
+  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/invalid-username"
 }
 ```
 
@@ -704,10 +1076,10 @@ _TODO_
 
 - **Sample Error Response:**
 
-```json
+```problem+json
 {
-  "title": "Invalid request content.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/invalid-request-content"
+  "title": "The provided password is insecure.",
+  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/insecure-password"
 }
 ```
 
@@ -718,7 +1090,7 @@ _TODO_
 
 - **Sample Error Response:**
 
-```json
+```problem+json
 {
   "title": "Token not revoked.",
   "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/token-not-revoked"
