@@ -74,7 +74,7 @@ class UserService(
             val user = it.usersRepository.getUserByUsername(username)
                 ?: return@run failure(TokenCreationError.UserOrPasswordInvalid)
             if (!usersDomain.validatePassword(password, user.passwordValidationInfo)) {
-                failure(TokenCreationError.UserOrPasswordInvalid)
+                return@run failure(TokenCreationError.UserOrPasswordInvalid)
             }
             val tokenValue = usersDomain.generateTokenValue()
             val token = createToken(user.uuid, tokenValue)

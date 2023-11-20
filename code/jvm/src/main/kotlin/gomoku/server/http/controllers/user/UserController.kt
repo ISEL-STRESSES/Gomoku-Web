@@ -161,7 +161,7 @@ class UserController(private val service: UserService) {
      * @param authenticatedUser The authenticated user
      */
     @PostMapping(URIs.Users.LOGOUT)
-    fun logout(authenticatedUser: AuthenticatedUser) {
+    fun logout(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val didRevoke = service.revokeToken(authenticatedUser.token)
         return if (!didRevoke) {
             Problem.response(403, Problem.tokenNotRevoked)
