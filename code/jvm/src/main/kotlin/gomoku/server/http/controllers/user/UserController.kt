@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import kotlin.math.ceil
 
 /**
  * Controller for user-related endpoints
@@ -88,17 +89,25 @@ class UserController(private val service: UserService) {
         @RequestParam offset: Int?,
         @RequestParam limit: Int?
     ): ResponseEntity<*> {
-        val users =
+        val (users, totalCount) =
             service.searchRanking(ruleId, username, offset, limit) ?: return Problem.response(404, Problem.ruleNotFound)
+
+        val currentOffset = offset ?: DEFAULT_OFFSET
+        val currentLimit = limit ?: DEFAULT_LIMIT
+        val totalPages = ceil(totalCount.toDouble() / currentLimit).toInt()
+
         return GetRanking.siren(
             GetUsersRankingDataOutputModel(
                 users.map(::UserRuleStatsOutputModel),
                 ruleId,
                 username ?: "",
-                limit ?: DEFAULT_LIMIT,
-                offset ?: DEFAULT_OFFSET,
-                users.size
-            )
+                currentLimit,
+                currentOffset,
+                totalCount
+            ),
+            totalPages,
+            currentOffset,
+            currentLimit
         ).response(200)
     }
 

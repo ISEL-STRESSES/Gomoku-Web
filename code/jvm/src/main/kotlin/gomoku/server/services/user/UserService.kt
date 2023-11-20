@@ -14,6 +14,8 @@ import gomoku.utils.success
 import kotlinx.datetime.Clock
 import org.springframework.stereotype.Service
 
+typealias RankingSearchResult = Pair<List<RankingUserData>, Int>?
+
 /**
  * Service for user-related operations
  * @param transactionManager The transaction manager
@@ -117,23 +119,25 @@ class UserService(
         }
 
     /**
-     * Searches for users stats by their username in a specific rule.
+     * Searches in the ranking by their username and a specific rule.
      * @param ruleId The id of the rule.
      * @param username The username of the users.
      * @param offset The offset of the first user to get.
      * @param limit The maximum number of users to get.
      * @return A list of [UserStats] objects, containing all the stats related to the users, or null if the ruleId is invalid.
      */
-    fun searchRanking(ruleId: Int, username: String?, offset: Int? = null, limit: Int? = null): List<RankingUserData>? =
+    fun searchRanking(ruleId: Int, username: String?, offset: Int? = null, limit: Int? = null): RankingSearchResult =
         transactionManager.run {
             val availableRules = it.gameRepository.getAllRules()
             if (availableRules.any { rule -> rule.ruleId == ruleId }) {
-                return@run it.usersRepository.searchRanking(
+                val totalCount = it.usersRepository.countRankingEntries(ruleId, username ?: "")
+                val users = it.usersRepository.searchRanking(
                     ruleId,
                     username ?: "",
                     offset ?: DEFAULT_OFFSET,
                     limit ?: DEFAULT_LIMIT
                 )
+                return@run Pair(users, totalCount)
             } else {
                 null
             }

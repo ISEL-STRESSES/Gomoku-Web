@@ -27,22 +27,37 @@ object Login {
 }
 
 object GetRanking {
-    fun siren(body: GetUsersRankingDataOutputModel) =
+    fun siren(body: GetUsersRankingDataOutputModel, totalPages: Int, currentOffset: Int, currentLimit: Int) =
         siren(body) {
             clazz("user-ranking-search")
             link(
                 "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${body.offset}",
                 Rel.SELF
             )
-            link(
-                "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${body.offset + 10}",
-                Rel.NEXT
-            )
-            link(
-                "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${if (body.offset - 10 < 0) 0 else body.offset - 10}",
-                Rel.PREV
-            )
+
+            if (currentOffset + currentLimit < totalPages * currentLimit) { //If we are not on the last page
+                link(
+                    "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${currentOffset + currentLimit}",
+                    Rel.NEXT
+                )
+                link(
+                    "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${(totalPages - 1) * currentLimit}",
+                    Rel.LAST
+                )
+            }
+
+            if (currentOffset > 0) { //If we are not on the first page
+                link(
+                    "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${if (currentOffset - currentLimit < 0) 0 else currentOffset - currentLimit}",
+                    Rel.PREV
+                )
+                link(
+                    "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=0",
+                    Rel.FIRST
+                )
+            }
         }
+
 }
 
 object GetUserRanking {

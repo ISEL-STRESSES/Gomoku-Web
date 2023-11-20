@@ -24,7 +24,7 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
     val type = "ProOpeningRules"
 
     /**
-     * Checks if a move is valid according to the Pro rule set.
+     * Checks if a move is valid, according to the Pro rule set.
      * @param moveContainer The move container
      * @param move The move to check
      * @param turn The color of the player who made the move
@@ -32,15 +32,8 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
      */
     @JsonIgnore
     override fun isValidMove(moveContainer: MoveContainer, move: Move, turn: CellColor): IsValidMoveResult {
-        val center = Position(
-            boardSize.maxIndex / 2,
-            boardSize.maxIndex / 2
-        ) // TODO: Verify this is the actual middle of the board
-        if (move.position.x < 0 || move.position.y < 0 || move.position.x > boardSize.maxIndex || move.position.y > boardSize.maxIndex) {
-            return failure(
-                MoveError.InvalidPosition
-            )
-        }
+        val center = Position(boardSize.maxIndex / 2, boardSize.maxIndex / 2)
+
         when (moveContainer.getMoves().size) {
             0 -> {
                 if (turn != CellColor.BLACK || turn != move.cellColor || move.position != center) {
@@ -48,7 +41,7 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
                 }
             }
 
-            1 -> { // White's first move anywhere besides center
+            1 -> { // White's first move anywhere besides the center
                 if (turn != CellColor.WHITE || turn != move.cellColor) {
                     return failure(MoveError.InvalidTurn)
                 }
@@ -112,7 +105,7 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
     }
 
     /**
-     * Checks if a move is a winning move according to the Pro rule set.
+     * Checks if a move is a winning move, according to the Pro rule set.
      * @param moveContainer The move container
      * @param move The move to check
      * @return true if the move is a winning move, false otherwise

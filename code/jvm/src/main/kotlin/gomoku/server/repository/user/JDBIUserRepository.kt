@@ -242,7 +242,7 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             join users u on us.user_id = u.id
             where u.username like :username
             and us.rules_id = :rulesId
-            order by us.elo desc
+            order by us.elo desc, u.username asc
             limit :limit offset :offset
             """.trimIndent()
         )
@@ -252,6 +252,25 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .bind("limit", limit)
             .mapTo<RankingUserData>()
             .list()
+
+    /**
+     * Counts the number of entries in the ranking.
+     * @param rulesId The id of the rules.
+     * @param username The username of the users.
+     * @return The number of entries in the ranking.
+     */
+    override fun countRankingEntries(rulesId: Int, username: String): Int =
+        handle.createQuery(
+            """
+            select count(*) from user_stats us
+            join users u on us.user_id = u.id
+            where u.username like :username and us.rules_id = :rulesId
+            """.trimIndent()
+        )
+            .bind("username", "%$username%")
+            .bind("rulesId", rulesId)
+            .mapTo<Int>()
+            .one()
 
     /**
      * Represents a user and a token.

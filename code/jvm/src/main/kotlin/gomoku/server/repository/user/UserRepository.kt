@@ -112,4 +112,13 @@ interface UserRepository {
      * @return The list of users.
      */
     fun searchRanking(rulesId: Int, username: String, offset: Int, limit: Int): List<RankingUserData>
+
+    /**
+     * Counts the number of entries in the ranking.
+     * @param rulesId The id of the rules.
+     * @param username The username of the users.
+     * @return The number of entries in the ranking.
+     */
+    fun countRankingEntries(rulesId: Int, username: String): Int
+
 }
