@@ -5,5 +5,5 @@ data class PlayerRuleStatsResponse(
     val username: String,
     val ruleId: Int,
     val gamesPlayed: Int,
-    val elo: Int,
+    val elo: Int
 )

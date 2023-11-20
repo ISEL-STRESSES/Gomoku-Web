@@ -3,10 +3,10 @@ package gomoku.server.repository
 import com.fasterxml.jackson.databind.ObjectMapper
 import gomoku.server.domain.game.game.move.MoveContainer
 import gomoku.server.domain.game.game.move.MoveContainerMixin
+import gomoku.server.repository.jdbi.mappers.InstantMapper
 import gomoku.server.repository.jdbi.mappers.game.FinishedGameRowMapper
 import gomoku.server.repository.jdbi.mappers.game.GameRowMapper
 import gomoku.server.repository.jdbi.mappers.game.GameRuleRowMapper
-import gomoku.server.repository.jdbi.mappers.InstantMapper
 import gomoku.server.repository.jdbi.mappers.game.LobbyRowMapper
 import gomoku.server.repository.jdbi.mappers.game.OngoingGameRowMapper
 import gomoku.server.repository.jdbi.mappers.game.RulesRowMapper

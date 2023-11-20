@@ -285,7 +285,7 @@ class GameService(private val transactionManager: TransactionManager) {
     }
 
     private fun Position.toIndex(): Int {
-        return this.y * (this.max+1) + this.x
+        return this.y * (this.max + 1) + this.x
     }
 
     companion object {

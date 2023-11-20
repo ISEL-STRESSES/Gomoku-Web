@@ -3,10 +3,6 @@ package gomoku.server.domain.game.game
 import gomoku.server.domain.game.game.move.Move
 import gomoku.server.domain.game.game.move.MoveContainer
 import gomoku.server.domain.game.game.move.Position
-import gomoku.server.domain.game.rules.BoardSize
-import gomoku.server.successOrNull
-import gomoku.utils.Failure
-import gomoku.utils.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test

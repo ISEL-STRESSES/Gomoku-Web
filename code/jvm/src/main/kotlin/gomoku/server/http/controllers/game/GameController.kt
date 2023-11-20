@@ -8,7 +8,14 @@ import gomoku.server.http.controllers.game.models.GetRulesOutputModel
 import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
 import gomoku.server.http.controllers.game.models.RuleOutputModel
 import gomoku.server.http.controllers.media.Problem
-import gomoku.server.http.responses.*
+import gomoku.server.http.responses.GetFinishedGames
+import gomoku.server.http.responses.GetGameById
+import gomoku.server.http.responses.GetRules
+import gomoku.server.http.responses.GetTurn
+import gomoku.server.http.responses.LeaveLobby
+import gomoku.server.http.responses.MakeMove
+import gomoku.server.http.responses.Matchmaker
+import gomoku.server.http.responses.response
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.LeaveLobbyError
@@ -143,15 +150,15 @@ class GameController(private val gameService: GameService) {
      */
     private fun MakeMoveError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            MakeMoveError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
             MakeMoveError.GameFinished -> Problem.response(400, Problem.gameAlreadyFinished)
-            MakeMoveError.AlreadyOccupied -> Problem.response(409, Problem.positionOccupied)
             MakeMoveError.ImpossiblePosition -> Problem.response(400, Problem.impossiblePosition)
             MakeMoveError.InvalidTurn -> Problem.response(400, Problem.notYourTurn)
             MakeMoveError.InvalidMove -> Problem.response(400, Problem.invalidMove)
-            MakeMoveError.MakeMoveFailed -> Problem.response(500, Problem.makeMoveFailed)
-            MakeMoveError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
             MakeMoveError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
+            MakeMoveError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
+            MakeMoveError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
+            MakeMoveError.AlreadyOccupied -> Problem.response(409, Problem.positionOccupied)
+            MakeMoveError.MakeMoveFailed -> Problem.response(500, Problem.makeMoveFailed)
         }
 
     /**
@@ -183,9 +190,9 @@ class GameController(private val gameService: GameService) {
      */
     private fun GetGameError.resolveProblem(): ResponseEntity<*> =
         when (this) {
+            GetGameError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
             GetGameError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
             GetGameError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
-            GetGameError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
         }
 
     /**

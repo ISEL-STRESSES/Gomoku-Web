@@ -178,7 +178,7 @@ class UserService(
         }
     }
 
-    private fun createToken(userUUID: Int, tokenValue : String): Token {
+    private fun createToken(userUUID: Int, tokenValue: String): Token {
         val now = clock.now()
         return Token(
             tokenValidationInfo = usersDomain.createTokenValidationInfo(tokenValue),

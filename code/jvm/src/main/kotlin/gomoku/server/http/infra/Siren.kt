@@ -4,9 +4,8 @@ import gomoku.server.http.Rel
 import org.springframework.http.HttpMethod
 import java.net.URI
 
-
 open class SirenBuilderScope<T>(
-    val properties: T,
+    val properties: T
 ) {
     private val links = mutableListOf<LinkModel>()
     private val classes = mutableListOf<String>()
@@ -36,7 +35,7 @@ open class SirenBuilderScope<T>(
 class ActionBuilderScope(
     private val name: String,
     private val href: URI,
-    private val method: HttpMethod,
+    private val method: HttpMethod
 ) {
     fun build() = ActionModel(name, href.toASCIIString(), method.name())
 }

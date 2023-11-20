@@ -21,7 +21,7 @@ data class SirenModel<T>(
 
 data class LinkModel(
     val rel: List<String>,
-    val href: String,
+    val href: String
 )
 
 data class ActionModel(

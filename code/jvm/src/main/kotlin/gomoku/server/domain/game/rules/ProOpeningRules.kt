@@ -32,7 +32,7 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
      */
     @JsonIgnore
     override fun isValidMove(moveContainer: MoveContainer, move: Move, turn: CellColor): IsValidMoveResult {
-        val center = Position(boardSize.maxIndex / 2, boardSize.maxIndex / 2, boardSize.maxIndex ) //TODO: Verify this is the actual middle of the board
+        val center = Position(boardSize.maxIndex / 2, boardSize.maxIndex / 2, boardSize.maxIndex) // TODO: Verify this is the actual middle of the board
 
         when (moveContainer.getMoves().size) {
             0 -> {

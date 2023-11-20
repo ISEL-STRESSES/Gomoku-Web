@@ -2,7 +2,7 @@ package gomoku.server.http.controllers
 
 import gomoku.server.domain.ServerInfo
 import gomoku.server.http.URIs
-import gomoku.server.http.responses.GetHome
+import gomoku.server.http.responses.SirenHomeResponses
 import gomoku.server.http.responses.response
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
@@ -22,6 +22,6 @@ class HomeController(private val serverInfo: ServerInfo) {
      */
     @GetMapping(URIs.HOME)
     fun getHome(request: HttpServletRequest): ResponseEntity<*> {
-        return GetHome.siren(serverInfo).response(200)
+        return SirenHomeResponses.siren(serverInfo).response(200)
     }
 }

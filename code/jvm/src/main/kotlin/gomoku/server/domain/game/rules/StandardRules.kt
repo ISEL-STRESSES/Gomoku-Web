@@ -97,7 +97,7 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
         var x = position.x + dx
         var y = position.y + dy
 
-        while (x in 0 .. position.max && y in 0 .. position.max &&
+        while (x in 0..position.max && y in 0..position.max &&
             moveContainer.hasMove(Position(x, y, position.max)) &&
             moveContainer.getMoves()
                 .any { it.position == Position(x, y, position.max) && it.cellColor == cellColor }

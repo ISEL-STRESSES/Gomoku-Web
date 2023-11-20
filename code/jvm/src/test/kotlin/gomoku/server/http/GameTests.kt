@@ -482,7 +482,6 @@ class GameTests {
         assertTrue { playerBlackStats.elo > playerWhiteStats.elo }
         assertEquals(ruleId, playerBlackStats.ruleId)
         assertEquals(ruleId, playerWhiteStats.ruleId)
-
     }
 
     @Test
@@ -579,7 +578,7 @@ class GameTests {
             .exchange()
             .expectBody(expectedType)
             .returnResult()
-            .responseBody?: throw Exception("Response body should not be null")
+            .responseBody ?: throw Exception("Response body should not be null")
     }
 
     /**

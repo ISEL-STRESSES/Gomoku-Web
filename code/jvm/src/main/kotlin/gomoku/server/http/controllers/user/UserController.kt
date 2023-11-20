@@ -10,7 +10,15 @@ import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
 import gomoku.server.http.controllers.user.models.getUsersData.GetUsersRankingDataOutputModel
 import gomoku.server.http.controllers.user.models.userCreate.UserCreateInputModel
 import gomoku.server.http.controllers.user.models.userTokenCreate.UserCreateTokenInputModel
-import gomoku.server.http.responses.*
+import gomoku.server.http.responses.GetRanking
+import gomoku.server.http.responses.GetUserById
+import gomoku.server.http.responses.GetUserRanking
+import gomoku.server.http.responses.GetUserStats
+import gomoku.server.http.responses.Login
+import gomoku.server.http.responses.Logout
+import gomoku.server.http.responses.SignUp
+import gomoku.server.http.responses.UserMe
+import gomoku.server.http.responses.response
 import gomoku.server.repository.user.UserRankingError
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
@@ -120,7 +128,7 @@ class UserController(private val service: UserService) {
     ): ResponseEntity<*> {
         val res = service.createToken(username = userInput.username, password = userInput.password)
         return when (res) {
-            is Success -> Login.siren(UserCreateOutputModel(service.getUserByToken(res.value.tokenValue)!!.uuid,res.value.tokenValue)).response(200)
+            is Success -> Login.siren(UserCreateOutputModel(service.getUserByToken(res.value.tokenValue)!!.uuid, res.value.tokenValue)).response(200)
 
             is Failure -> when (res.value) {
                 TokenCreationError.UserOrPasswordInvalid -> Problem.response(400, Problem.userOrPasswordAreInvalid)

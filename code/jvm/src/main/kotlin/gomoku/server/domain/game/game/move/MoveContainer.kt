@@ -19,7 +19,7 @@ class MoveContainer private constructor(
     private val board: Array<CellColor?>
 ) {
 
-    //TODO: Remove Mixin and do fromJson and toJson
+    // TODO: Remove Mixin and do fromJson and toJson
 
     private val maxAmountOfMoves = boardSize * boardSize
 
@@ -133,7 +133,7 @@ class MoveContainer private constructor(
 }
 
 private fun Position.toIndex(): Int {
-    return this.y * (this.max+1) + this.x
+    return this.y * (this.max + 1) + this.x
 }
 
 private fun Int.toPosition(boardSize: Int): Position {

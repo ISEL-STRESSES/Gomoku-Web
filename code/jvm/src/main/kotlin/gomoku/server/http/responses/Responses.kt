@@ -3,7 +3,6 @@ package gomoku.server.http.responses
 import gomoku.server.http.infra.SirenModel
 import org.springframework.http.ResponseEntity
 
-
 fun <T> SirenModel<T>.response(status: Int) = ResponseEntity
     .status(status)
     .header("Content-Type", SirenModel.MEDIA_TYPE)

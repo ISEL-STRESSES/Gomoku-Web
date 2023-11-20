@@ -31,9 +31,8 @@ object GetRanking {
         siren(body) {
             clazz("user-ranking-search")
             link("${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${body.offset}", Rel.SELF)
-            link("${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${body.offset+10}", Rel.NEXT)
-            link("${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${if (body.offset-10 < 0) 0 else body.offset-10}", Rel.PREVIOUS)
-
+            link("${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${body.offset + 10}", Rel.NEXT)
+            link("${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${if (body.offset - 10 < 0) 0 else body.offset - 10}", Rel.PREVIOUS)
         }
 }
 

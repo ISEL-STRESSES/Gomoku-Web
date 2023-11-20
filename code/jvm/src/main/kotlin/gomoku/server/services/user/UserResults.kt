@@ -28,5 +28,5 @@ typealias UserRankingResult = Either<UserRankingServiceError, RankingUserData>
 
 data class UserCreateOutputModel(
     val userId: Int,
-    val token: String,
+    val token: String
 )
