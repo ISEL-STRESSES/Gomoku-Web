@@ -163,7 +163,7 @@ class UserController(private val service: UserService) {
     @PostMapping(URIs.Users.LOGOUT)
     fun logout(authenticatedUser: AuthenticatedUser) {
         val didRevoke = service.revokeToken(authenticatedUser.token)
-        if (!didRevoke) {
+        return if (!didRevoke) {
             Problem.response(403, Problem.tokenNotRevoked)
         } else {
             Logout.siren().response(200)

@@ -40,7 +40,7 @@ object GetRanking {
             )
             link(
                 "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=${body.limit}&offset=${if (body.offset - 10 < 0) 0 else body.offset - 10}",
-                Rel.PREVIOUS
+                Rel.PREV
             )
         }
 }
