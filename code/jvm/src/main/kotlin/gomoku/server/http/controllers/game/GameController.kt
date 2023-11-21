@@ -16,6 +16,7 @@ import gomoku.server.http.responses.LeaveLobby
 import gomoku.server.http.responses.MakeMove
 import gomoku.server.http.responses.Matchmaker
 import gomoku.server.http.responses.response
+import gomoku.server.http.responses.responseRedirect
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.LeaveLobbyError
@@ -116,7 +117,7 @@ class GameController(private val gameService: GameService) {
         val matchmaker = gameService.startMatchmakingProcess(rulesId, authenticatedUser.user.uuid)
         return when (matchmaker) {
             is Failure -> matchmaker.value.resolveProblem()
-            is Success -> Matchmaker.siren(MatchmakerOutputModel(matchmaker.value)).response(201)
+            is Success -> Matchmaker.siren(MatchmakerOutputModel(matchmaker.value)).responseRedirect(201, URIs.Game.ROOT + "/${matchmaker.value.id}")
         }
     }
 
@@ -131,7 +132,7 @@ class GameController(private val gameService: GameService) {
         val leftLobby = gameService.leaveLobby(lobbyId, authenticatedUser.user.uuid)
         return when (leftLobby) {
             is Failure -> leftLobby.value.resolveProblem()
-            is Success -> LeaveLobby.siren(leftLobby.value).response(200)
+            is Success -> LeaveLobby.siren(leftLobby.value).responseRedirect(200, URIs.Game.ROOT + URIs.Game.HUB)
         }
     }
 

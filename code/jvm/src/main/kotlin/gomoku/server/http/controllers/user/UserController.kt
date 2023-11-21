@@ -19,6 +19,7 @@ import gomoku.server.http.responses.Logout
 import gomoku.server.http.responses.SignUp
 import gomoku.server.http.responses.UserMe
 import gomoku.server.http.responses.response
+import gomoku.server.http.responses.responseRedirect
 import gomoku.server.repository.user.UserRankingError
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
@@ -134,7 +135,7 @@ class UserController(private val service: UserService) {
     ): ResponseEntity<*> {
         val res = service.createUser(username = userInput.username, password = userInput.password)
         return when (res) {
-            is Success -> SignUp.siren(res.value).response(201)
+            is Success -> SignUp.siren(res.value).responseRedirect(201, URIs.Users.ROOT + URIs.Users.HOME)
 
             is Failure -> res.value.resolveProblem()
         }
@@ -157,7 +158,7 @@ class UserController(private val service: UserService) {
                     service.getUserByToken(res.value.tokenValue)!!.uuid,
                     res.value.tokenValue
                 )
-            ).response(200)
+            ).responseRedirect(200, URIs.Users.ROOT + URIs.Users.HOME)
 
             is Failure -> when (res.value) {
                 TokenCreationError.UserOrPasswordInvalid -> Problem.response(400, Problem.userOrPasswordAreInvalid)
@@ -175,7 +176,7 @@ class UserController(private val service: UserService) {
         return if (!didRevoke) {
             Problem.response(403, Problem.tokenNotRevoked)
         } else {
-            Logout.siren().response(200)
+            Logout.siren().responseRedirect(200, URIs.HOME)
         }
     }
 
