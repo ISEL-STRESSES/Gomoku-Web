@@ -1,8 +1,5 @@
 package gomoku.server.repository
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import gomoku.server.domain.game.game.move.MoveContainer
-import gomoku.server.domain.game.game.move.MoveContainerMixin
 import gomoku.server.repository.jdbi.mappers.InstantMapper
 import gomoku.server.repository.jdbi.mappers.game.FinishedGameRowMapper
 import gomoku.server.repository.jdbi.mappers.game.GameRowMapper
@@ -43,8 +40,5 @@ fun Jdbi.configureWithAppRequirements(): Jdbi {
     registerRowMapper(RankingUserDataRowMapper())
     registerRowMapper(OngoingGameRowMapper())
 
-    ObjectMapper().apply {
-        addMixIn(MoveContainer::class.java, MoveContainerMixin::class.java)
-    }
     return this
 }

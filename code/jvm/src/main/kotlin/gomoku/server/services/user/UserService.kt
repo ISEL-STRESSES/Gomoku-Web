@@ -8,7 +8,7 @@ import gomoku.server.domain.user.UsersDomain
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
-import gomoku.server.services.errors.user.UserRankingServiceError
+import gomoku.server.services.errors.user.UserRankingError
 import gomoku.utils.failure
 import gomoku.utils.success
 import kotlinx.datetime.Clock
@@ -105,14 +105,14 @@ class UserService(
     fun getUserRanking(userId: Int, ruleId: Int): UserRankingResult =
         transactionManager.run {
             if (!it.usersRepository.isUserStoredById(userId)) {
-                return@run failure(UserRankingServiceError.UserNotFound)
+                return@run failure(UserRankingError.UserNotFound)
             }
             if (it.gameRepository.getRuleById(ruleId) == null) {
-                return@run failure(UserRankingServiceError.RuleNotFound)
+                return@run failure(UserRankingError.RuleNotFound)
             }
             val stats = it.usersRepository.getUserRanking(userId, ruleId)
             if (stats == null) {
-                return@run failure(UserRankingServiceError.UserStatsNotFound)
+                return@run failure(UserRankingError.UserStatsNotFound)
             } else {
                 return@run success(stats)
             }

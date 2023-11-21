@@ -136,6 +136,23 @@ class JDBIGameRepository(private val handle: Handle) : GameRepository {
             .list()
 
     /**
+     * Gets the number of finished games a user has.
+     * @param userId the id of the user
+     * @return the number of finished games
+     */
+    override fun getUserFinishedGamesCount(userId: Int): Int {
+        return handle.createQuery(
+            """
+                select count(*) from matches
+                where (matches.player_black = :userId or matches.player_white = :userId) and matches.match_state = 'FINISHED'
+            """.trimIndent()
+        )
+            .bind("userId", userId)
+            .mapTo<Int>()
+            .single()
+    }
+
+    /**
      * Gets the state of the game.
      * @param gameId id of the game
      * @return state of the game or null if the game doesn't exist

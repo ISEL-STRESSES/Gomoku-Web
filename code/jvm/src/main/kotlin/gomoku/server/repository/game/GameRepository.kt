@@ -70,6 +70,13 @@ interface GameRepository {
     fun getUserFinishedGames(offset: Int, limit: Int, userId: Int): List<FinishedGame>
 
     /**
+     * Gets the number of finished games a user has.
+     * @param userId the id of the user
+     * @return the number of finished games
+     */
+    fun getUserFinishedGamesCount(userId: Int): Int
+
+    /**
      * Gets the state of the game.
      * @param gameId id of the game
      * @return state of the game or null if the game doesn't exist

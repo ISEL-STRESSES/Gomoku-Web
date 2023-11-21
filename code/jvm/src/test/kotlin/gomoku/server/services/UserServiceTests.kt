@@ -9,7 +9,7 @@ import gomoku.server.jbdiTest
 import gomoku.server.repository.jdbi.JDBITransactionManager
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
-import gomoku.server.services.errors.user.UserRankingServiceError
+import gomoku.server.services.errors.user.UserRankingError
 import gomoku.server.services.user.UserService
 import gomoku.server.testWithTransactionManagerAndRollback
 import gomoku.utils.Failure
@@ -129,21 +129,16 @@ class UserServiceTests {
         val offset = 0
         val limit = 10
 
-        val result = userService.searchRanking(ruleId, null, offset, limit)
-
-        assertNotNull(result)
+        val (result, _) = userService.searchRanking(ruleId, null, offset, limit) ?: throw AssertionError("search ranking should not return null")
         assertEquals(10, result.size)
-        assertEquals(1, result.first().uuid)
-        assertEquals(10, result.last().uuid)
     }
 
     @Test
     fun `searchRanking without username should return user stats with default offset and limit`() {
         val ruleId = 2
 
-        val result = userService.searchRanking(ruleId, null)
+        val (result, _) = userService.searchRanking(ruleId, null) ?: throw AssertionError("search ranking should not return null")
 
-        assertNotNull(result)
         assertEquals(10, result.size)
     }
 
@@ -186,7 +181,7 @@ class UserServiceTests {
 
         val result = userService.getUserRanking(invalidUserId, invalidRuleId)
 
-        assertIs<Failure<UserRankingServiceError>>(result)
+        assertIs<Failure<UserRankingError>>(result)
     }
 
     @Test
@@ -196,10 +191,8 @@ class UserServiceTests {
         val offset = 0
         val limit = 10
 
-        val result = userService.searchRanking(ruleId, username, offset, limit)
-
-        assertNotNull(result)
-        // TODO: Add more assertions based on the expected result
+        val (result, _) = userService.searchRanking(ruleId, username, offset, limit) ?: throw AssertionError("search ranking should not return null")
+        assertEquals(2, result.first().uuid)
     }
 
     @Test

@@ -3,7 +3,7 @@ package gomoku.server.services.user
 import gomoku.server.domain.user.RankingUserData
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
-import gomoku.server.services.errors.user.UserRankingServiceError
+import gomoku.server.services.errors.user.UserRankingError
 import gomoku.utils.Either
 
 /**
@@ -24,7 +24,7 @@ typealias TokenCreationResult = Either<TokenCreationError, TokenExternalInfo>
  * @see UserCreationError
  * @see RankingUserData
  */
-typealias UserRankingResult = Either<UserRankingServiceError, RankingUserData>
+typealias UserRankingResult = Either<UserRankingError, RankingUserData>
 
 data class UserCreateOutputModel(
     val userId: Int,

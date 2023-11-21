@@ -20,10 +20,9 @@ import gomoku.server.http.responses.SignUp
 import gomoku.server.http.responses.UserMe
 import gomoku.server.http.responses.response
 import gomoku.server.http.responses.responseRedirect
-import gomoku.server.repository.user.UserRankingError
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
-import gomoku.server.services.errors.user.UserRankingServiceError
+import gomoku.server.services.errors.user.UserRankingError
 import gomoku.server.services.user.UserCreateOutputModel
 import gomoku.server.services.user.UserService
 import gomoku.utils.Failure
@@ -102,9 +101,6 @@ class UserController(private val service: UserService) {
                 users.map(::UserRuleStatsOutputModel),
                 ruleId,
                 username ?: "",
-                currentLimit,
-                currentOffset,
-                totalCount
             ),
             totalPages,
             currentOffset,
@@ -209,11 +205,11 @@ class UserController(private val service: UserService) {
      * Resolves a [UserRankingError] to a [ResponseEntity]
      * @return A translated [Problem] based on the [UserRankingError]
      */
-    private fun UserRankingServiceError.resolveProblem(): ResponseEntity<*> =
+    private fun UserRankingError.resolveProblem(): ResponseEntity<*> =
         when (this) {
-            UserRankingServiceError.UserNotFound -> Problem.response(404, Problem.userNotFound)
-            UserRankingServiceError.RuleNotFound -> Problem.response(404, Problem.ruleNotFound)
-            UserRankingServiceError.UserStatsNotFound -> Problem.response(404, Problem.userStatsNotFound)
+            UserRankingError.UserNotFound -> Problem.response(404, Problem.userNotFound)
+            UserRankingError.RuleNotFound -> Problem.response(404, Problem.ruleNotFound)
+            UserRankingError.UserStatsNotFound -> Problem.response(404, Problem.userStatsNotFound)
         }
 
     companion object {

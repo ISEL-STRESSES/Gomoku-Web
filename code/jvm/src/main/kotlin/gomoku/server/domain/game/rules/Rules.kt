@@ -1,7 +1,5 @@
 package gomoku.server.domain.game.rules
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import gomoku.server.domain.game.IsValidMoveResult
 import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.move.Move
@@ -15,11 +13,6 @@ import gomoku.server.domain.game.game.move.Position
  * @property variant variant of the rule
  * @property openingRule opening rule
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes(
-    JsonSubTypes.Type(value = StandardRules::class, name = "StandardRules"),
-    JsonSubTypes.Type(value = ProOpeningRules::class, name = "ProOpeningRules")
-)
 sealed class Rules {
     abstract val ruleId: Int
     abstract val boardSize: BoardSize

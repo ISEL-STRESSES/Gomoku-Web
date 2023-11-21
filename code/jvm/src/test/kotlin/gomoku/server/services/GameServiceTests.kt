@@ -406,7 +406,7 @@ class GameServiceTests {
                 it.gameRepository.createFinishedGame(7, 8)
             }
             // sut
-            val result = gameService.getUserFinishedGames(0, 10, userId)
+            val (result, _) = gameService.getUserFinishedGames(0, 10, userId)
 
             assertTrue(result.isNotEmpty())
         }
@@ -419,7 +419,7 @@ class GameServiceTests {
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
-            val result = gameService.getUserFinishedGames(0, 10, userId)
+            val (result, _) = gameService.getUserFinishedGames(0, 10, userId)
 
             assertTrue(result.isEmpty())
         }
@@ -432,7 +432,7 @@ class GameServiceTests {
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
 
-            val result = gameService.getUserFinishedGames(0, 10, userId)
+            val (result, _) = gameService.getUserFinishedGames(0, 10, userId)
 
             assertTrue(result.isEmpty())
         }

@@ -11,7 +11,4 @@ data class GetUsersRankingDataOutputModel(
     val userData: List<UserRuleStatsOutputModel>,
     val ruleId: Int,
     val search: String,
-    val limit: Int,
-    val offset: Int,
-    val total: Int
 )

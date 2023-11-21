@@ -29,6 +29,8 @@ import gomoku.utils.success
 import org.springframework.stereotype.Service
 import kotlin.random.Random
 
+typealias GetUserFinishedGamesResult = Pair<List<FinishedGame>, Int>
+
 /**
  * Service for game-related operations
  * @param transactionManager The transaction manager
@@ -161,44 +163,23 @@ class GameService(private val transactionManager: TransactionManager) {
     ) {
         val player1 = tr.usersRepository.getUserById(player1Id) ?: return // should never return because the user exists
         val player2 = tr.usersRepository.getUserById(player2Id) ?: return // should never return because the user exists
-        val statsPlayer1 = tr.usersRepository.getUserRanking(player1Id, ruleId)
+        val player1Stats = tr.usersRepository.getUserRanking(player1Id, ruleId)
             ?: RankingUserData(player1Id, player1.username, ruleId)
-        val statsPlayer2 = tr.usersRepository.getUserRanking(player2Id, ruleId)
+        val player2Stats = tr.usersRepository.getUserRanking(player2Id, ruleId)
             ?: RankingUserData(player2Id, player2.username, ruleId)
 
-        val newPlayer1Elo = updateElo(statsPlayer1.elo.toDouble(), statsPlayer2.elo.toDouble(), player1Score)
-        val newPlayer2Elo = updateElo(statsPlayer2.elo.toDouble(), statsPlayer1.elo.toDouble(), 1 - player1Score)
+        val newPlayer1Elo = updateElo(player1Stats.elo.toDouble(), player2Stats.elo.toDouble(), player1Score)
+        val newPlayer2Elo = updateElo(player2Stats.elo.toDouble(), player1Stats.elo.toDouble(), 1 - player1Score)
 
         tr.usersRepository.setUserRanking(
             userId = player1Id,
-            rankingUserData = statsPlayer1.copy(gamesPlayed = statsPlayer1.gamesPlayed + 1, elo = newPlayer1Elo.toInt())
+            rankingUserData = player1Stats.copy(gamesPlayed = player1Stats.gamesPlayed + 1, elo = newPlayer1Elo.toInt())
         )
         tr.usersRepository.setUserRanking(
             userId = player2Id,
-            rankingUserData = statsPlayer2.copy(gamesPlayed = statsPlayer2.gamesPlayed + 1, elo = newPlayer2Elo.toInt())
+            rankingUserData = player2Stats.copy(gamesPlayed = player2Stats.gamesPlayed + 1, elo = newPlayer2Elo.toInt())
         )
     }
-
-    /**
-     * Resolves a [GetGameError] (getGameAndVerifyPlayer function error) into a [MakeMoveError] (GameService error).
-     */
-    private fun GetGameError.resolveError() =
-        when (this) {
-            is GetGameError.PlayerNotInGame -> failure(MakeMoveError.PlayerNotInGame)
-            is GetGameError.PlayerNotFound -> failure(MakeMoveError.PlayerNotFound)
-            is GetGameError.GameNotFound -> failure(MakeMoveError.GameNotFound)
-        }
-
-    /**
-     * Resolves a [MoveError] (isValidMove function error) into a [MakeMoveError] (GameService error).
-     */
-    private fun MoveError.resolveError() =
-        when (this) {
-            is MoveError.InvalidPosition -> failure(MakeMoveError.ImpossiblePosition)
-            is MoveError.AlreadyOccupied -> failure(MakeMoveError.AlreadyOccupied)
-            is MoveError.InvalidTurn -> failure(MakeMoveError.InvalidTurn)
-            is MoveError.InvalidMove -> failure(MakeMoveError.InvalidMove)
-        }
 
     /**
      * Leaves the matchmaking process.
@@ -249,18 +230,24 @@ class GameService(private val transactionManager: TransactionManager) {
 
     /**
      * Gets the finished games of a user.
-     * @param offset the offset for the games list
-     * @param limit the limit for the games list
+     * @param offset the offset for the game list
+     * @param limit the limit for the game list
      * @param userId the id of the user to get the games from
      * @return the list of [FinishedGame]
      */
     fun getUserFinishedGames(
-        offset: Int = DEFAULT_OFFSET,
-        limit: Int = DEFAULT_LIMIT,
+        offset: Int? = null,
+        limit: Int? = null,
         userId: Int
-    ): List<FinishedGame> =
+    ): GetUserFinishedGamesResult =
         transactionManager.run {
-            it.gameRepository.getUserFinishedGames(offset, limit, userId)
+            val finishedGames = it.gameRepository.getUserFinishedGames(
+                offset ?: DEFAULT_OFFSET,
+                limit ?: DEFAULT_LIMIT,
+                userId
+            )
+            val totalCount = it.gameRepository.getUserFinishedGamesCount(userId)
+            Pair(finishedGames, totalCount)
         }
 
     /**
@@ -274,6 +261,13 @@ class GameService(private val transactionManager: TransactionManager) {
             getGameAndVerifyPlayer(gameId, userId, it)
         }
 
+    /**
+     * Gets the details of a game and verifies that the user is in the game.
+     * @param gameId The id of the game.
+     * @param userId The id of the user.
+     * @param tr The transaction context.
+     * @return The details of the game, or an error.
+     */
     private fun getGameAndVerifyPlayer(gameId: Int, userId: Int, tr: Transaction): GetGameResult {
         if (!tr.usersRepository.isUserStoredById(userId)) {
             return failure(GetGameError.PlayerNotFound)
@@ -287,6 +281,32 @@ class GameService(private val transactionManager: TransactionManager) {
         return success(tr.gameRepository.getGameById(gameId)!!)
     }
 
+    /**
+     * Resolves a [GetGameError] (getGameAndVerifyPlayer function error) into a [MakeMoveError] (GameService error).
+     */
+    private fun GetGameError.resolveError() =
+        when (this) {
+            is GetGameError.PlayerNotInGame -> failure(MakeMoveError.PlayerNotInGame)
+            is GetGameError.PlayerNotFound -> failure(MakeMoveError.PlayerNotFound)
+            is GetGameError.GameNotFound -> failure(MakeMoveError.GameNotFound)
+        }
+
+    /**
+     * Resolves a [MoveError] (isValidMove function error) into a [MakeMoveError] (GameService error).
+     */
+    private fun MoveError.resolveError() =
+        when (this) {
+            is MoveError.InvalidPosition -> failure(MakeMoveError.ImpossiblePosition)
+            is MoveError.AlreadyOccupied -> failure(MakeMoveError.AlreadyOccupied)
+            is MoveError.InvalidTurn -> failure(MakeMoveError.InvalidTurn)
+            is MoveError.InvalidMove -> failure(MakeMoveError.InvalidMove)
+        }
+
+    /**
+     * Converts a [Position] to an index.
+     * @param size The size of the board.
+     * @return The index of the position.
+     */
     private fun Position.toIndex(size: Int): Int {
         return this.y * (size + 1) + this.x
     }

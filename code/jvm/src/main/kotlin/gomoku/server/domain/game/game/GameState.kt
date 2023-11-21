@@ -1,7 +1,7 @@
 package gomoku.server.domain.game.game
 
 /**
- * Represents the state of a game
+ * Represents the state of the game
  * @property ONGOING the game is ongoing
  * @property FINISHED the game is finished
  */

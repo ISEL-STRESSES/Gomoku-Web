@@ -1,8 +1,5 @@
 package gomoku.server.domain.game.game.move
 
-import com.fasterxml.jackson.annotation.JsonCreator
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
 import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.toColor
 
@@ -19,11 +16,8 @@ class MoveContainer private constructor(
     private val board: Array<CellColor?>
 ) {
 
-    // TODO: Remove Mixin and do fromJson and toJson
-
     private val maxAmountOfMoves = boardSize * boardSize
 
-    @JsonIgnore
     val maxIndex = maxAmountOfMoves - 1
 
     /**
@@ -33,7 +27,6 @@ class MoveContainer private constructor(
      * @param move The move to be added.
      * @return new [MoveContainer] with the move added or null if there is already a move at the given position.
      */
-    @JsonIgnore
     fun addMove(move: Move): MoveContainer? {
         val position = move.position
         if (hasMove(position)) return null
@@ -46,7 +39,6 @@ class MoveContainer private constructor(
      * Gets the last made move.
      * @return The last made move, or null if no move has been made yet.
      */
-    @JsonIgnore
     fun getLastMoveOrNull(): Move? = orderOfMoves.lastOrNull()
 
     /**
@@ -54,7 +46,6 @@ class MoveContainer private constructor(
      * @param position The position to check.
      * @return true if a move exists at the position, false otherwise.
      */
-    @JsonIgnore
     fun hasMove(position: Position): Boolean {
         return board[position.toIndex(boardSize - 1)] != null
     }
@@ -63,7 +54,6 @@ class MoveContainer private constructor(
      * Gets all moves from the board by order of play.
      * @return A list of [Move] in the order they were played.
      */
-    @JsonIgnore
     fun getMoves(): List<Move> {
         return orderOfMoves
     }
@@ -72,7 +62,6 @@ class MoveContainer private constructor(
      * Gets the empty positions on the board.
      * @return A list of [Position] that are empty.
      */
-    @JsonIgnore
     fun getEmptyPositions(): List<Position> {
         return (0..maxIndex)
             .map { it.toPosition(boardSize) }
@@ -82,7 +71,6 @@ class MoveContainer private constructor(
     /**
      * Returns true if the board is full, false otherwise.
      */
-    @JsonIgnore
     fun isFull(): Boolean {
         return orderOfMoves.size == maxAmountOfMoves
     }
@@ -90,7 +78,6 @@ class MoveContainer private constructor(
     /**
      * Returns true if the board is empty, false otherwise.
      */
-    @JsonIgnore
     fun isEmpty(): Boolean {
         return orderOfMoves.isEmpty()
     }
@@ -101,9 +88,7 @@ class MoveContainer private constructor(
          * @param boardSize The size of the board.
          * @return A new empty [MoveContainer].
          */
-        @JsonCreator
-        @JvmStatic
-        fun createEmptyMoveContainer(@JsonProperty("boardSize") boardSize: Int): MoveContainer {
+        fun createEmptyMoveContainer(boardSize: Int): MoveContainer {
             val moveContainer = Array<CellColor?>(boardSize * boardSize) { null }
             return MoveContainer(boardSize, emptyList(), moveContainer)
         }
@@ -114,11 +99,9 @@ class MoveContainer private constructor(
          * @param movesIndexes The list of moves.
          * @return a new [MoveContainer] with the given moves or null if it failed to build the MoveContainer.
          */
-        @JsonCreator
-        @JvmStatic
         fun buildMoveContainer(
-            @JsonProperty("boardSize") boardSize: Int,
-            @JsonProperty("movesIndexes") movesIndexes: List<Int>
+            boardSize: Int,
+            movesIndexes: List<Int>
         ): MoveContainer? {
             var moveContainer = createEmptyMoveContainer(boardSize)
             for ((index, boardIndex) in movesIndexes.withIndex()) {

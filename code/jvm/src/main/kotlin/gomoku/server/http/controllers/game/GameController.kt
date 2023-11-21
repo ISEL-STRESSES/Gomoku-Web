@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import kotlin.math.ceil
 
 /**
  * Controller for game-related endpoints
@@ -47,10 +48,23 @@ class GameController(private val gameService: GameService) {
      * @return The list of games
      */
     @GetMapping(URIs.Game.HUB)
-    fun finishedGames(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val games = gameService.getUserFinishedGames(userId = authenticatedUser.user.uuid)
-        return GetFinishedGames.siren(GetFinishedGamesOutputModel(games.map { GameOutputModel.fromGame(it) }))
-            .response(200)
+    fun finishedGames(
+        @RequestParam offset: Int?,
+        @RequestParam limit: Int?,
+        authenticatedUser: AuthenticatedUser
+    ): ResponseEntity<*> {
+        val (games, totalCount) = gameService.getUserFinishedGames(offset, limit, authenticatedUser.user.uuid)
+
+        val currentOffset = offset ?: DEFAULT_OFFSET
+        val currentLimit = limit ?: DEFAULT_LIMIT
+        val totalPages = ceil(totalCount.toDouble() / 10).toInt()
+
+        return GetFinishedGames.siren(
+            GetFinishedGamesOutputModel(games.map { GameOutputModel.fromGame(it) }),
+            totalPages,
+            currentOffset,
+            currentLimit
+        ).response(200)
     }
 
     /**
@@ -213,4 +227,9 @@ class GameController(private val gameService: GameService) {
             LeaveLobbyError.UserNotInLobby -> Problem.response(404, Problem.userNotFound)
             LeaveLobbyError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
         }
+
+    companion object {
+        const val DEFAULT_OFFSET = 0
+        const val DEFAULT_LIMIT = 10
+    }
 }

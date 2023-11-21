@@ -1,6 +1,8 @@
 package gomoku.server.http
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import gomoku.server.http.model.CreateUserResponse
+import gomoku.server.services.errors.user.UserRankingError
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -79,23 +81,34 @@ class UserTests {
             )
             .exchange()
             .expectStatus().isOk
-            .expectBody(CreateUserResponse::class.java)
+            .expectBody()
             .returnResult()
             .responseBody!!
+
+        // Parse the JSON response
+        val objectMapper = jacksonObjectMapper()
+        val jsonNode = objectMapper.readTree(result)
+        val propertiesNode = jsonNode.path("properties")
+
+        // Extract data and create CreateUserResponse
+        val userId = propertiesNode.path("userId").asInt()
+        val token = propertiesNode.path("token").asText()
+
+        val createUserResponse = CreateUserResponse(userId, token)
 
         // when: getting the user home with a valid token
         // then: the response is a 200 with the proper representation
         client.get().uri("/users/me")
-            .header("Authorization", "Bearer ${result.token}")
+            .header("Authorization", "Bearer ${createUserResponse.token}")
             .exchange()
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("username").isEqualTo(username)
+            .jsonPath("$.properties.username").isEqualTo(username)
 
         // when: getting the user home with an invalid token
         // then: the response is a 401 with the proper problem
         client.get().uri("/users/me")
-            .header("Authorization", "Bearer ${result.token}-invalid")
+            .header("Authorization", "Bearer ${createUserResponse.token}-invalid")
             .exchange()
             .expectStatus().isUnauthorized
             .expectHeader().valueEquals("WWW-Authenticate", "bearer")
@@ -103,14 +116,14 @@ class UserTests {
         // when: revoking the token
         // then: response is a 200
         client.post().uri("/users/logout")
-            .header("Authorization", "Bearer ${result.token}")
+            .header("Authorization", "Bearer ${createUserResponse.token}")
             .exchange()
             .expectStatus().isOk
 
         // when: getting the user home with the revoked token
         // then: response is a 401
         client.get().uri("/users/me")
-            .header("Authorization", "Bearer ${result.token}")
+            .header("Authorization", "Bearer ${createUserResponse.token}")
             .exchange()
             .expectStatus().isUnauthorized
             .expectHeader().valueEquals("WWW-Authenticate", "bearer")
@@ -144,6 +157,7 @@ class UserTests {
         client.get().uri("/users/ranking/$ruleId")
             .exchange()
             .expectStatus().isNotFound
+            .expectBody(UserRankingError.RuleNotFound::class.java)
     }
 
     @Test
@@ -191,9 +205,9 @@ class UserTests {
             .exchange()
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("ruleId").isEqualTo(ruleId)
-            .jsonPath("gamesPlayed").isEqualTo(5)
-            .jsonPath("elo").isEqualTo(1500)
+            .jsonPath("$.properties.ruleId").isEqualTo(ruleId)
+            .jsonPath("$.properties.gamesPlayed").isEqualTo(5)
+            .jsonPath("$.properties.elo").isEqualTo(1500)
     }
 
     @Test
@@ -306,8 +320,8 @@ class UserTests {
             .exchange()
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("uuid").isEqualTo(userId)
-            .jsonPath("username").isEqualTo("user1")
+            .jsonPath("$.properties.uuid").isEqualTo(userId)
+            .jsonPath("$.properties.username").isEqualTo("user1")
     }
 
     @Test

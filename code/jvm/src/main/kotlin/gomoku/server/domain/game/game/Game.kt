@@ -1,7 +1,5 @@
 package gomoku.server.domain.game.game
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import gomoku.server.domain.game.game.move.MoveContainer
 import gomoku.server.domain.game.rules.Rules
 
@@ -13,15 +11,6 @@ import gomoku.server.domain.game.rules.Rules
  * @property rules The rules of the game
  * @property moveContainer The container of the moves
  */
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "type"
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(value = OngoingGame::class, name = "OngoingGame"),
-    JsonSubTypes.Type(value = FinishedGame::class, name = "FinishedGame")
-)
 sealed class Game(
     val id: Int,
     val playerBlack: Int,
@@ -42,8 +31,6 @@ class OngoingGame(
     moves: MoveContainer
 ) : Game(id, playerBlack, playerWhite, rules, moves) {
 
-    val type = "OngoingGame"
-
     val turn = (moves.getMoves().size).toColor()
 }
 
@@ -59,8 +46,6 @@ class FinishedGame(
     moves: MoveContainer,
     val gameOutcome: GameOutcome
 ) : Game(id, playerBlack, playerWhite, rules, moves) {
-
-    val type = "FinishedGame"
 
     /**
      * Gets the winner id or null if the game ended in a draw.
