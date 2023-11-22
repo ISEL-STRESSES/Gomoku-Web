@@ -32,7 +32,7 @@ and gameplay.
         - [Gets the player id of the current turn](#get-current-turn-player-id)
         - [Leaves a lobby](#leave-a-lobby)
         - [Starts the matchmaking process](#start-matchmaking-process)
-- [Types](#types) (Incomplete)
+- [Types](#types)
     - [Parameters](#parameters)
         - [Password](#password)
         - [Username](#username)
