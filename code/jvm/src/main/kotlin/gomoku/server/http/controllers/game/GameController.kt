@@ -153,11 +153,12 @@ class GameController(private val gameService: GameService) {
     /**
      * Gets the current turn player id
      * @param id The id of the game
+     * @param authenticatedUser The authenticated user
      * @return The current turn player id
      */
     @GetMapping(URIs.Game.TURN)
-    fun currentTurnPlayerId(@PathVariable id: Int): ResponseEntity<*> {
-        val currentTurnPlayerId = gameService.getCurrentTurnPlayerId(id)
+    fun currentTurnPlayerId(@PathVariable id: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val currentTurnPlayerId = gameService.getCurrentTurnPlayerId(id, authenticatedUser.user.uuid)
         return when (currentTurnPlayerId) {
             is Failure -> currentTurnPlayerId.value.resolveProblem()
             is Success -> GetTurn.siren(currentTurnPlayerId.value).response(200)
@@ -202,6 +203,7 @@ class GameController(private val gameService: GameService) {
         when (this) {
             CurrentTurnPlayerError.GameAlreadyFinished -> Problem.response(400, Problem.gameAlreadyFinished)
             CurrentTurnPlayerError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
+            CurrentTurnPlayerError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
         }
 
     /**

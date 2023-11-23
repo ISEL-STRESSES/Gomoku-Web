@@ -213,14 +213,18 @@ class GameService(private val transactionManager: TransactionManager) {
     /**
      * Gets the id of the player that has the turn in a given game.
      * @param gameId id of the game
+     * @param userId id of the user that wants to know the current turn
      * @return the id of the player that has the turn, or null if the game doesn't exist
      */
-    fun getCurrentTurnPlayerId(gameId: Int): CurrentTurnPlayerResult {
+    fun getCurrentTurnPlayerId(gameId: Int, userId: Int): CurrentTurnPlayerResult {
         return transactionManager.run {
             val players =
                 it.gameRepository.getGamePlayers(gameId) ?: return@run failure(CurrentTurnPlayerError.GameNotFound)
             val currentColor =
                 it.gameRepository.getTurn(gameId) ?: return@run failure(CurrentTurnPlayerError.GameAlreadyFinished)
+            if (players.first != userId && players.second != userId) {
+                return@run failure(CurrentTurnPlayerError.PlayerNotInGame)
+            }
             when (currentColor) {
                 CellColor.BLACK -> success(CurrentTurnPlayerOutput(players.first))
                 CellColor.WHITE -> success(CurrentTurnPlayerOutput(players.second))

@@ -11,27 +11,28 @@ and gameplay.
 - [Introduction](#introduction)
 - [Pagination](#pagination)
 - [Authentication](#authentication)
-- [Endpoints](#endpoints) (Incomplete)
+- [Endpoints](#endpoints)
     - [Home](#home)
         - [Get Home](#get-home)
-    - [Users](#users) (Incomplete)
+    - [Users](#users)
         - [Create a New User](#create-a-new-user)
+        - [Logs a User In](#logs-a-user-in)
         - [Logs a User Out](#logs-a-user-out)
+        - [Creates a token for a user](#creates-a-token-for-a-user)
         - [Gets a user home page](#gets-a-user-home-page)
         - [Gets the ranking of the users for a given rule](#gets-the-ranking-of-the-users-for-a-given-rule)
         - [Gets the ranking of a user for a given rule](#gets-the-ranking-of-a-user-for-a-given-rule)
-        - [Gets the whole stats of a user](#gets-the-whole-stats-of-a-user) (Incomplete)
-        - [Creates a token for a user](#creates-a-token-for-a-user)
+        - [Gets All stats of a user](#gets-all-stats-of-a-user)
         - [Gets the user with the given id](#gets-the-user-with-the-given-id)
-    - [Games](#games) (Incomplete)
+    - [Games](#games)
         - [Get the Finished games](#get-finished-games)
         - [Get the available rules](#get-game-rules)
-        - [Get the details of a game](#get-game-details) (Incomplete)
-        - [Makes a move in a game](#make-a-move) (Incomplete)
-        - [Gets the player id of the current turn](#get-current-turn-player-id) (Incomplete)
-        - [Leaves a lobby](#leave-a-lobby) (Incomplete)
-        - [Starts the matchmaking process](#start-matchmaking-process) (Incomplete)
-- [Types](#types) (Incomplete)
+        - [Get the details of a game](#get-game-details)
+        - [Makes a move in a game](#make-a-move)
+        - [Gets the player id of the current turn](#get-current-turn-player-id)
+        - [Leaves a lobby](#leave-a-lobby)
+        - [Starts the matchmaking process](#start-matchmaking-process)
+- [Types](#types)
     - [Parameters](#parameters)
         - [Password](#password)
         - [Username](#username)
@@ -42,26 +43,27 @@ and gameplay.
         - [GameId](#gameid)
         - [Offset](#offset)
         - [Limit](#limit)
-    - [Success Types](#success-types) (Incomplete)
+    - [Success Types](#success-types)
         - [Home](#home-1)
         - [User Created](#user-created)
         - [User Logged in](#user-logged-in)
         - [User Logged out](#user-logged-out)
         - [User Home](#user-home)
         - [User](#user)
-        - [Users Stats](#user-stats)
-        - [User Stats](#user-stats) (Incomplete)
+        - [Users Stats](#users-stats)
+        - [User Stats](#user-stats)
         - [Available Rules](#available-rules)
         - [Finished Games](#finished-games)
-        - [Game Details](#game-details) (Incomplete)
-        - [Current Turn Player Id](#current-turn-player-id) (Incomplete)
-        - [Lobby Details](#lobby-details) (Incomplete)
+        - [Game Details](#game-details)
+        - [Current Turn Player Id](#current-turn-player-id)
+        - [Lobby Details](#lobby-details)
     - [Error Types](#error-types)
         - [Bad Request](#bad-request)
         - [User or Password Invalid](#user-or-password-invalid)
         - [Invalid Username](#invalid-username)
         - [Insecure Password](#insecure-password)
         - [Token Not Revoked](#token-not-revoked)
+        - [Unauthorized](#unauthorized)
         - [User Not Found](#user-not-found)
         - [Rule Not Found](#rule-not-found)
         - [User Stats Not Found](#user-stats-not-found)
@@ -100,7 +102,7 @@ There is the relation of `self` (current page), `prev` and `next` (previous and 
 
 ## Authentication
 
-There are requests that need authentication and to those requests you need to add the header `Authorization` with the
+There are requests that need authentication and to those requests you need to add the header `Authorization` with a
 Bearer Token.
 
 ## Endpoints
@@ -115,11 +117,11 @@ Retrieves basic information or status of the Gomoku API.
 - **Method:** `GET`
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [Home](#home-1)
 - **Error Response:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
   ```bash
@@ -130,6 +132,8 @@ Retrieves basic information or status of the Gomoku API.
 
 #### Create a new user
 
+Creates a new user.
+
 - **URL:** `/api/users/create`
 - **Method:** `POST`
 - **Payload Params:**
@@ -138,11 +142,11 @@ Retrieves basic information or status of the Gomoku API.
         - [Password](#password)
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [User Created](#user-created)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [Bad Request](#bad-request)
             - [Invalid Username](#invalid-username)
             - [Insecure Password](#insecure-password)
@@ -156,6 +160,8 @@ Retrieves basic information or status of the Gomoku API.
 
 #### Logs a User in
 
+Logs a user in.
+
 - **URL:** `/api/users/token`
 - **Method:** `POST`
 - **Payload Params:**
@@ -164,25 +170,28 @@ Retrieves basic information or status of the Gomoku API.
         - [Password](#password)
 - **Success Response:**
 - **Content:**
-    - application/vnd.siren+json
+    - `application/vnd.siren+json`
         - [User Logged in](#user-logged-in)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [User or Password Invalid](#user-or-password-invalid)
             - [Internal Server Error](#internal-server-error)
 
 #### Logs a User out
 
+Logs a user out. **Requires authentication**
+
 - **URL:** `/api/users/logout`
 - **Method:** `POST`
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [User Logged out](#user-logged-out)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
+            - [Unauthorized](#unauthorized)
             - [Token Not Revoked](#token-not-revoked)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
@@ -192,17 +201,18 @@ Retrieves basic information or status of the Gomoku API.
 
 #### Gets a User Home Page
 
-Retrieves user-specific home page
+Retrieves user-specific home page. **Requires authentication**
 
 - **URL:** `/api/users/me`
 - **Method:** `GET`
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [User Home](#user-home)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
+            - [Unauthorized](#unauthorized)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
     ```bash
@@ -211,11 +221,11 @@ Retrieves user-specific home page
 
 #### Gets the ranking of the users for a given rule
 
-Gets the ranking of the users for a given rule
+Gets the ranking of the users for a given rule.
 
 - **URL:** `/api/users/ranking/{ruleId}`
 - **Method:** `GET`
-- **URL Params:**
+- **Path Params:**
     - **Required:**
         - [RuleId](#ruleid)
     - **Optional:**
@@ -224,60 +234,61 @@ Gets the ranking of the users for a given rule
         - [Limit](#limit)
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [Users Stats](#user-stats)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [Rule Not Found](#rule-not-found)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
     ```bash
-    curl https://localhost:8080/api/users/ranking?ruleId=1&username=foo
+    curl https://localhost:8080/api/users/ranking/1?username=foo
     ```
 
 #### Gets the ranking of a user for a given rule
 
-Gets the ranking of a user for a given rule
+Gets the ranking of a user for a given rule.
 
-- **URL:** `/api/users/ranking{rukeId}/{userId}`
+- **URL:** `/api/users/ranking/{rukeId}/{userId}`
 - **Method:** `GET`
-- **URL Params:**
+- **Path Params:**
     - **Required:**
         - [RuleId](#ruleid)
         - [UserId](#userid)
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [User Stats](#user-stats)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [User Not Found](#user-not-found)
             - [Rule Not Found](#rule-not-found)
             - [User Stats Not Found](#user-stats-not-found)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
     ```bash
-    curl https://localhost:8080/api/users/ranking?ruleId=1&userId=1
+    curl https://localhost:8080/api/users/ranking/2/1
     ```
 
-#### Gets the whole stats of a user
+#### Gets all stats of a user
 
-Gets the whole stats of a user
+Gets the whole stats of a user. **Requires authentication** (dunno)
 
 - **URL:** `/api/users/stats/{userId}`
 - **Method:** `GET`
-- **URL Params:**
+- **Path Params:**
     - **Required:**
         - [UserId](#userid)
 - **Success Response:**
 - **Content:**
-    - application/vnd.siren+json
-        - [User Stats](#user-stats) (TODO)
+    - `application/vnd.siren+json`
+        - [User Stats](#user-stats)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
+            - [Unauthorized](#unauthorized)
             - [User Not Found](#user-not-found)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
@@ -287,7 +298,7 @@ Gets the whole stats of a user
 
 #### Creates a token for a user
 
-Creates a token for a user
+Creates a token for a user.
 
 - **URL:** `/api/users/token`
 - **Method:** `POST`
@@ -297,11 +308,11 @@ Creates a token for a user
         - [Password](#password)
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [User Logged in](#user-logged-in)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [User or Password Invalid](#user-or-password-invalid)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
@@ -311,20 +322,20 @@ Creates a token for a user
 
 #### Gets the user with the given id
 
-Gets the user with the given id
+Gets the user with the given id.
 
 - **URL:** `/api/users/{userId}`
 - **Method:** `GET`
-- **URL Params:**
+- **Path Params:**
     - **Required:**
         - [UserId](#userid)
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [User](#user)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [User Not Found](#user-not-found)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
@@ -336,17 +347,17 @@ Gets the user with the given id
 
 #### Get Finished Games
 
-Retrieves a list of finished games
+Retrieves a list of finished games.
 
 - **URL:** `/api/game/`
 - **Method:** `GET`
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [Finished Games](#finished-games)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
     ```bash
@@ -355,17 +366,17 @@ Retrieves a list of finished games
 
 #### Get Game Rules
 
-Retrieves available game rules
+Retrieves available game rules.
 
 - **URL:** `/api/game/rules`
 - **Method:** `GET`
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [Available Rules](#available-rules)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [No Rules Found](#no-rules-found)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
@@ -375,32 +386,36 @@ Retrieves available game rules
 
 #### Get Game Details
 
-Retrieves the details of a game
-
+Retrieves the details of a game. **Requires authentication**
 - **URL:** `/api/game/{id}`
 - **Method:** `GET`
-- **URL Params:**
+- **Path Params:**
     - **Required:**
-        - [GameId](#gameid) (id of the game)
+        - [GameId](#gameid)
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [Game Details](#game-details)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
+            - [Unauthorized](#unauthorized)
             - [Game Not Found](#game-not-found)
             - [User Not Found](#user-not-found)
             - [Player Not in Game](#player-not-in-game)
             - [Internal Server Error](#internal-server-error)
+- **Sample Call:**
+    ```bash
+    curl https://localhost:8080/api/game/1
+    ```
 
 #### Make a Move
 
-Makes a move in a game
+Makes a move in a game. **Requires authentication**
 
 - **URL:** `/api/game/{id}/play`
 - **Method:** `POST`
-- **URL Params:**
+- **Path Params:**
     - **Required:**
         - [GameId](#gameid)
 - **Query Params:**
@@ -408,15 +423,16 @@ Makes a move in a game
         - [Position](#position)
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [Game Details](#game-details)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [Game Already Finished](#game-already-finished)
             - [Impossible Position](#impossible-position)
             - [Not Your Turn](#not-your-turn)
             - [Invalid Move](#invalid-move)
+            - [Unauthorized](#unauthorized)
             - [Player Not in Game](#player-not-in-game)
             - [Game Not Found](#game-not-found)
             - [User Not Found](#user-not-found)
@@ -425,27 +441,29 @@ Makes a move in a game
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
     ```bash
-    curl -X POST https://localhost:8080/api/game/1/play?pos=1
+    curl -X POST https://localhost:8080/api/game/1/play?x=1&y=1
     ```
 
 #### Get Current Turn Player Id
 
-Retrieves the player id of the current turn
+Retrieves the player id of the current turn. **Requires authentication**
 
 - **URL:** `/api/game/{id}/turn`
 - **Method:** `GET`
-- **URL Params:**
+- **Path Params:**
     - **Required:**
         - [GameId](#gameid)
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [Current Turn Player id](#current-turn-player-id)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [Game Already Finished](#game-already-finished)
+            - [Unauthorized](#unauthorized)
             - [Game Not Found](#game-not-found)
+            - [Player Not in Game](#player-not-in-game)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
     ```bash
@@ -454,20 +472,21 @@ Retrieves the player id of the current turn
 
 #### Leave a Lobby
 
-Leaves a lobby
+Leaves a lobby. **Requires authentication**
 
 - **URL:** `/api/game/{lobbyId}/leave`
 - **Method:** `POST`
-- **URL Params:**
+- **Path Params:**
     - **Required:**
-        - [LobbyId](#lobbyid) (id of the lobby)
+        - [LobbyId](#lobbyid)
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [Lobby Details](#lobby-details)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
+            - [Unauthorized](#unauthorized)
             - [Lobby Not Found](#lobby-not-found)
             - [User Not in Lobby](#user-not-found)
             - [Leave Lobby Failed](#leave-lobby-failed)
@@ -479,21 +498,22 @@ Leaves a lobby
 
 #### Start Matchmaking Process
 
-Starts the matchmaking process
+Starts the matchmaking process. **Requires authentication**
 
 - **URL:** `/api/game/{ruleId}`
 - **Method:** `POST`
-- **URL Params:**
+- **Path Params:**
     - **Required:**
-        - [RuleId](#ruleid) (id of the rule)
+        - [RuleId](#ruleid)
 - **Success Response:**
     - **Content:**
-        - application/vnd.siren+json
+        - `application/vnd.siren+json`
             - [Lobby Details](#lobby-details)
 - **Error Responses:**
     - **Content:**
-        - application/problem+json
+        - `application/problem+json`
             - [Same Player](#same-player)
+            - [Unauthorized](#unauthorized)
             - [Leave Lobby Failed](#leave-lobby-failed)
             - [Internal Server Error](#internal-server-error)
 
@@ -838,19 +858,19 @@ The application home page has the server info and the authors' info with their s
 ```vnd.siren+json
 {
     "class": [
-        "game"
+        "user-stats-search"
     ],
     "properties": {
-        "finishedGames": [
-        
-        ]
+        "userId": 537,
+        "username": "TestUser1",
+        "userRuleStats": []
     },
     "links": [
         {
             "rel": [
                 "self"
             ],
-            "href": "/api/game/"
+            "href": "/api/users/stats/537"
         }
     ],
     "actions": []
@@ -1011,21 +1031,85 @@ The application home page has the server info and the authors' info with their s
 
 - **Sample Response:**
 ```vnd.siren+json
-
+{
+    "class": [
+        "game"
+    ],
+    "properties": {
+        "id": 372,
+        "playerBlack": 538,
+        "playerWhite": 537,
+        "rule": {
+            "ruleId": 2,
+            "boardSize": 19,
+            "variant": "STANDARD",
+            "openingRule": "FREE"
+        },
+        "moves": {
+            "boardSize": 19,
+            "orderOfMoves": []
+        },
+        "gameOutcome": null,
+        "turn": "BLACK",
+        "type": "ONGOING"
+    },
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/api/game/372"
+        }
+    ],
+    "actions": []
+}
 ```
 
 #### Current Turn Player Id
 
 - **Sample Response:**
 ```vnd.siren+json
-
+{
+    "class": [
+        "game"
+    ],
+    "properties": {
+        "turn": 538
+    },
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/api/game/538/turn"
+        }
+    ],
+    "actions": []
+}
 ```
 
 #### Lobby Details
 
 - **Sample Response:**
 ```vnd.siren+json
-
+{
+    "class": [
+        "game"
+    ],
+    "properties": {
+        "isGame": true,
+        "id": 372
+    },
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/api/game/372"
+        }
+    ],
+    "actions": []
+}
 ```
 
 ### Error Types
@@ -1046,6 +1130,7 @@ This error happens when for example you try to create a user and the username or
 #### User or Password Invalid
 
 This error happens when you try to log in and the user or password is invalid.
+
 -**Sample Error Response:**
 
 ```problem+json
@@ -1056,9 +1141,6 @@ This error happens when you try to log in and the user or password is invalid.
 ```
 
 #### Invalid Username
-
-(400)
-_TODO_
 
 - **Sample Error Response:**
 
@@ -1071,71 +1153,67 @@ _TODO_
 
 #### Insecure Password
 
-(400)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "The provided password is insecure.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/insecure-password"
+    "title": "The provided password is insecure.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/insecure-password"
+}
+```
+
+#### Unauthorized
+
+- **Sample Error Response:**
+    
+```problem+json
+{
+    "title": "Unauthorized.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/unauthorized"
 }
 ```
 
 #### Token Not Revoked
 
-(403)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Token not revoked.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/token-not-revoked"
+    "title": "Token not revoked.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/token-not-revoked"
 }
 ```
 
 #### User Not Found
 
-(404)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "User not found.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/user-not-found"
+    "title": "User not found.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/user-not-found"
 }
 ```
 
 #### Rule Not Found
 
-(404)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Rule not found.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/rules-not-found"
+    "title": "Rule not found.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/rules-not-found"
 }
 ```
 
 #### User Stats Not Found
 
-(404)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "User stats not found.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/user-stats-not-found"
+    "title": "User stats not found.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/user-stats-not-found"
 }
 ```
 
@@ -1147,189 +1225,152 @@ This error happens when you try to create a user and it already exists.
 
 ```problem+json
 {
-  "title": "User already exists.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/user-already-exists"
+    "title": "User already exists.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/user-already-exists"
 }
   ```
 
 #### Same Player
 
-(400)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Same player.",
-  "type": ""https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/same-player"
+    "title": "Same player.",
+    "type": ""https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/same-player"
 }
 ```
 
 #### Game Already Finished
 
-(400)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Game already finished.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/game-already-finished"
+    "title": "Game already finished.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/game-already-finished"
 }
 ```
 
 #### Impossible Position
 
-(400)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Impossible position.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/impossible-position"
+    "title": "Impossible position.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/impossible-position"
 }
 ```
 
 #### Not Your Turn
 
-(400)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Not your turn.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/not-your-turn"
+    "title": "Not your turn.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/not-your-turn"
 }
 ```
 
 #### Invalid Move
 
-(400)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Invalid move.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/invalid-move"
+    "title": "Invalid move.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/invalid-move"
 }
 ```
 
 #### Player Not in Game
 
-(401)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Player not in game.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/player-not-in-game"
+    "title": "Player not in game.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/player-not-in-game"
 }
 ```
 
 #### Game Not Found
 
-(404)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Game not found.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/game-not-found"
+    "title": "Game not found.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/game-not-found"
 }
 ```
 
 #### No Rules Found
 
-(404)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "No rules found.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/no-rules-found"
+    "title": "No rules found.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/no-rules-found"
 }
 ```
 
 #### Lobby Not Found
 
-(404)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Lobby not found.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/lobby-not-found"
+    "title": "Lobby not found.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/lobby-not-found"
 }
 ```
 
 #### Position Already Occupied
 
-(409)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Position already occupied.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/position-already-occupied"
+    "title": "Position already occupied.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/position-already-occupied"
 }
 ```
 
 #### Internal Server Error
 
-(500)
 Internal Server Error
 
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Internal Server Error",
-  "type" : "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/internal-server-error"
+    "title": "Internal Server Error",
+    "type" : "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/internal-server-error"
 }
 ```
 
 #### Make Move Failed
 
-(500)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Make move failed.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/make-move-failed"
+    "title": "Make move failed.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/make-move-failed"
 }
 ```
 
 #### Leave Lobby Failed
 
-(500)
-_TODO_
-
 - **Sample Error Response:**
 
 ```problem+json
 {
-  "title": "Leave lobby failed.",
-  "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/leave-lobby-failed"
+    "title": "Leave lobby failed.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/leave-lobby-failed"
 }
 ```

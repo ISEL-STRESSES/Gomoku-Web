@@ -6,4 +6,5 @@ package gomoku.server.services.errors.game
 sealed class CurrentTurnPlayerError {
     object GameAlreadyFinished : CurrentTurnPlayerError()
     object GameNotFound : CurrentTurnPlayerError()
+    object PlayerNotInGame : CurrentTurnPlayerError()
 }
