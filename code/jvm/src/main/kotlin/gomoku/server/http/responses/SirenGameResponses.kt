@@ -13,8 +13,9 @@ import gomoku.server.http.infra.siren
 object GetFinishedGames {
     fun siren(body: GetFinishedGamesOutputModel, totalPages: Int, currentOffset: Int, currentLimit: Int) =
         siren(body) {
-            clazz("game")
+            clazz(Rel.GAME_LIST.value)
             link(URIs.Game.ROOT + URIs.Game.HUB, Rel.SELF)
+            link(URIs.HOME, Rel.HOME)
 
             if (currentOffset + currentLimit < totalPages * currentLimit) { //If we are not on the last page
                 link(
@@ -44,47 +45,49 @@ object GetFinishedGames {
 object GetGameById {
     fun siren(body: GameOutputModel) =
         siren(body) {
-            clazz("game")
+            clazz(Rel.GAME.value)
             link(URIs.Game.ROOT + "/${body.id}", Rel.SELF)
+            link(URIs.HOME, Rel.HOME)
         }
 }
 
 object GetRules {
     fun siren(body: GetRulesOutputModel) =
         siren(body) {
-            clazz("rules")
+            clazz(Rel.RULES.value)
             link(URIs.Game.ROOT + URIs.Game.GAME_RULES, Rel.SELF)
+            link(URIs.HOME, Rel.HOME)
         }
 }
 
 object Matchmaker {
     fun siren(body: MatchmakerOutputModel) =
         siren(body) {
-            clazz("game")
-            link(URIs.Game.ROOT + "/${body.id}", Rel.SELF)
+            clazz(Rel.MATCHMAKER.value)
+            link(URIs.HOME, Rel.HOME)
         }
 }
 
 object LeaveLobby {
     fun siren(body: LeaveLobbyOutput) =
         siren(body) {
-            clazz("game")
-            link(URIs.Game.ROOT + "/${body.lobbyId}/leave", Rel.SELF)
+            clazz(Rel.LEAVE_LOBBY.value)
+            link(URIs.HOME, Rel.HOME)
         }
 }
 
 object MakeMove {
     fun siren(body: GameOutputModel) =
         siren(body) {
-            clazz("game")
-            link(URIs.Game.ROOT + "/${body.id}/play", Rel.SELF)
+            clazz(Rel.MAKE_MOVE.value)
+            link(URIs.HOME, Rel.HOME)
         }
 }
 
 object GetTurn {
     fun siren(body: CurrentTurnPlayerOutput) =
         siren(body) {
-            clazz("game")
+            clazz(Rel.GET_TURN.value)
             link(URIs.Game.ROOT + "/${body.turn}/turn", Rel.SELF)
         }
 }

@@ -9,9 +9,9 @@ import java.net.URI
 object SirenHomeResponses {
     fun siren(body: ServerInfo) =
         gomoku.server.http.infra.siren(body) {
-            clazz("home")
-            action("signup", URI(URIs.Users.ROOT + URIs.Users.CREATE), HttpMethod.POST)
-            action("login", URI(URIs.Users.ROOT + URIs.Users.TOKEN), HttpMethod.POST)
+            clazz(Rel.HOME.value)
+            action(Rel.SIGNUP.value, URI(URIs.Users.ROOT + URIs.Users.CREATE), HttpMethod.POST)
+            action(Rel.LOGIN.value, URI(URIs.Users.ROOT + URIs.Users.TOKEN), HttpMethod.POST)
             link(URIs.HOME, Rel.SELF)
         }
 }
