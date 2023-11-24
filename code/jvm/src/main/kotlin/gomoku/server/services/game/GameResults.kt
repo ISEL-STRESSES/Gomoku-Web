@@ -1,12 +1,11 @@
 package gomoku.server.services.game
 
-import gomoku.server.domain.game.CurrentTurnPlayerOutput
-import gomoku.server.domain.game.LeaveLobbyOutput
 import gomoku.server.domain.game.Matchmaker
+import gomoku.server.domain.game.game.FinishedGame
 import gomoku.server.domain.game.game.Game
+import gomoku.server.http.controllers.game.models.CurrentTurnPlayerOutput
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.GetGameError
-import gomoku.server.services.errors.game.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.utils.Either
@@ -33,13 +32,9 @@ typealias MakeMoveResult = Either<MakeMoveError, Game>
 typealias CurrentTurnPlayerResult = Either<CurrentTurnPlayerError, CurrentTurnPlayerOutput>
 
 /**
- * Result for leaving a lobby
- * @see LeaveLobbyError
- */
-typealias LeaveLobbyResult = Either<LeaveLobbyError, LeaveLobbyOutput>
-
-/**
  * Result for getting a game
  * @see GetGameError
  */
 typealias GetGameResult = Either<GetGameError, Game>
+
+typealias GetUserFinishedGamesResult = Pair<List<FinishedGame>, Int>

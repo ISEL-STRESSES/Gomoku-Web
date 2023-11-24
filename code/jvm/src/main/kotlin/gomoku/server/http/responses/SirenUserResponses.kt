@@ -66,7 +66,7 @@ object GetUserRanking {
     fun siren(body: UserRuleStatsOutputModel) =
         siren(body) {
             clazz(Rel.USER_RANKING.value)
-            link("${URIs.Users.ROOT}/ranking/${body.id}/${body.ruleId}", Rel.SELF)
+            link("${URIs.Users.ROOT}/${body.id}/ranking/${body.ruleId}", Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
 }

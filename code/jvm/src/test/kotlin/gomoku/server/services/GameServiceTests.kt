@@ -9,10 +9,11 @@ import gomoku.server.domain.user.UsersDomainConfig
 import gomoku.server.failureOrNull
 import gomoku.server.repository.createFinishedGame
 import gomoku.server.services.errors.game.GetGameError
-import gomoku.server.services.errors.game.LeaveLobbyError
+import gomoku.server.services.errors.lobby.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.game.GameService
+import gomoku.server.services.lobby.LobbyService
 import gomoku.server.services.user.UserService
 import gomoku.server.successOrNull
 import gomoku.server.testWithTransactionManagerAndRollback
@@ -227,10 +228,11 @@ class GameServiceTests {
             deleteLobbies(transactionManager)
             // test
             val gameService = GameService(transactionManager)
+            val lobbyService = LobbyService(transactionManager)
 
             val res = gameService.startMatchmakingProcess(ruleId, userId).successOrNull()!!
 
-            val result = gameService.leaveLobby(res.id, userId)
+            val result = lobbyService.leaveLobby(res.id, userId)
 
             assertTrue(result is Success)
         }
@@ -242,8 +244,9 @@ class GameServiceTests {
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
+            val lobbyService = LobbyService(transactionManager)
 
-            val result = gameService.leaveLobby(2, userId)
+            val result = lobbyService.leaveLobby(2, userId)
 
             assertTrue(result is Failure)
             assertTrue(result.failureOrNull() == LeaveLobbyError.LobbyNotFound)
@@ -256,12 +259,13 @@ class GameServiceTests {
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)
+            val lobbyService = LobbyService(transactionManager)
             val dummyLobby = transactionManager.run {
                 deleteLobbies(transactionManager)
                 it.lobbyRepository.createLobby(1, 4)
             }
 
-            val result = gameService.leaveLobby(dummyLobby, userId)
+            val result = lobbyService.leaveLobby(dummyLobby, userId)
 
             assertTrue(result is Failure)
 

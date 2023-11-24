@@ -1,13 +1,16 @@
 package gomoku.server.http.responses
 
-import gomoku.server.domain.game.CurrentTurnPlayerOutput
-import gomoku.server.domain.game.LeaveLobbyOutput
+import gomoku.server.domain.game.Lobby
+import gomoku.server.domain.game.Matchmaker
 import gomoku.server.http.Rel
 import gomoku.server.http.URIs
+import gomoku.server.http.controllers.game.models.CurrentTurnPlayerOutput
 import gomoku.server.http.controllers.game.models.GameOutputModel
 import gomoku.server.http.controllers.game.models.GetFinishedGamesOutputModel
 import gomoku.server.http.controllers.game.models.GetRulesOutputModel
 import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
+import gomoku.server.http.controllers.lobby.models.GetLobbiesOutput
+import gomoku.server.http.controllers.lobby.models.LeaveLobbyOutput
 import gomoku.server.http.infra.siren
 
 object GetFinishedGames {
@@ -72,6 +75,38 @@ object LeaveLobby {
     fun siren(body: LeaveLobbyOutput) =
         siren(body) {
             clazz(Rel.LEAVE_LOBBY.value)
+            link(URIs.HOME, Rel.HOME)
+        }
+}
+
+object JoinLobby {
+    fun siren(body: Matchmaker) =
+        siren(body) {
+            clazz(Rel.JOIN_LOBBY.value)
+            link(URIs.HOME, Rel.HOME)
+        }
+}
+
+object GetLobbies {
+    fun siren(body: GetLobbiesOutput) =
+        siren(body) {
+            clazz(Rel.GET_LOBBIES.value)
+            link(URIs.HOME, Rel.HOME)
+        }
+}
+
+object CreateLobby {
+    fun siren(body: Matchmaker) =
+        siren(body) {
+            clazz(Rel.CREATE_LOBBY.value)
+            link(URIs.HOME, Rel.HOME)
+        }
+}
+
+object GetLobbyById {
+    fun siren(body: Lobby) =
+        siren(body) {
+            clazz(Rel.GET_LOBBY_BY_ID.value)
             link(URIs.HOME, Rel.HOME)
         }
 }

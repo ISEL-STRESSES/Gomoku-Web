@@ -12,14 +12,12 @@ import gomoku.server.http.responses.GetFinishedGames
 import gomoku.server.http.responses.GetGameById
 import gomoku.server.http.responses.GetRules
 import gomoku.server.http.responses.GetTurn
-import gomoku.server.http.responses.LeaveLobby
 import gomoku.server.http.responses.MakeMove
 import gomoku.server.http.responses.Matchmaker
 import gomoku.server.http.responses.response
 import gomoku.server.http.responses.responseRedirect
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.GetGameError
-import gomoku.server.services.errors.game.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.game.GameService
@@ -136,21 +134,6 @@ class GameController(private val gameService: GameService) {
     }
 
     /**
-     * Leaves a lobby
-     * @param lobbyId The id of the lobby
-     * @param authenticatedUser The authenticated user
-     * @return The result of leaving the lobby
-     */
-    @PostMapping(URIs.Game.LEAVE_LOBBY)
-    fun leaveLobby(@PathVariable lobbyId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val leftLobby = gameService.leaveLobby(lobbyId, authenticatedUser.user.uuid)
-        return when (leftLobby) {
-            is Failure -> leftLobby.value.resolveProblem()
-            is Success -> LeaveLobby.siren(leftLobby.value).responseRedirect(200, URIs.Game.ROOT + URIs.Game.HUB)
-        }
-    }
-
-    /**
      * Gets the current turn player id
      * @param id The id of the game
      * @param authenticatedUser The authenticated user
@@ -216,18 +199,6 @@ class GameController(private val gameService: GameService) {
             GetGameError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
             GetGameError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
             GetGameError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
-        }
-
-    /**
-     * Translates the errors of a Leave lobby action into a response
-     * @receiver The error
-     * @return The response
-     */
-    private fun LeaveLobbyError.resolveProblem(): ResponseEntity<*> =
-        when (this) {
-            LeaveLobbyError.LobbyNotFound -> Problem.response(404, Problem.lobbyNotFound)
-            LeaveLobbyError.UserNotInLobby -> Problem.response(404, Problem.userNotFound)
-            LeaveLobbyError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
         }
 
     companion object {

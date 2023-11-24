@@ -72,5 +72,11 @@ class Problem(typeUri: URI, val title: String) {
         val userStatsNotFound = Problem(URI(PROBLEM_BASE_URL + "user-stats-not-found"), "User stats not found.")
 
         val playerNotInGame = Problem(URI(PROBLEM_BASE_URL + "player-not-in-game"), "Player not in game.")
+
+        val userAlreadyInLobby = Problem(URI(PROBLEM_BASE_URL + "user-already-in-lobby"), "User already in lobby.")
+
+        val joinLobbyFailed = Problem(URI(PROBLEM_BASE_URL + "join-lobby-failed"), "Failed to join the lobby.")
+
+        val userNotInLobby = Problem(URI(PROBLEM_BASE_URL + "user-not-in-lobby"), "User not in lobby.")
     }
 }

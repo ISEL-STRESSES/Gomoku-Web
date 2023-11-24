@@ -26,7 +26,11 @@ object Rel {
     val MATCHMAKER = LinkRelation("matchmaker")
     val MAKE_MOVE = LinkRelation("make-move")
     val GET_TURN = LinkRelation("get-turn")
+
     val LEAVE_LOBBY = LinkRelation("leave-lobby")
-    val GET_LOBBIES = LinkRelation("get-lobbies") //TODO: Make this
+    val JOIN_LOBBY = LinkRelation("join-lobby")
+    val CREATE_LOBBY = LinkRelation("create-lobby")
+    val GET_LOBBIES = LinkRelation("get-lobbies")
+    val GET_LOBBY_BY_ID = LinkRelation("lobby")
 
 }

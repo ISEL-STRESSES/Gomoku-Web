@@ -10,12 +10,3 @@ data class Matchmaker(
     val isGame: Boolean,
     val id: Int
 )
-
-data class LeaveLobbyOutput(
-    val lobbyId: Int,
-    val userId: Int
-)
-
-data class CurrentTurnPlayerOutput(
-    val turn: Int
-)

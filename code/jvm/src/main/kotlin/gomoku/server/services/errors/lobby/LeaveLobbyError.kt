@@ -1,4 +1,4 @@
-package gomoku.server.services.errors.game
+package gomoku.server.services.errors.lobby
 
 /**
  * Error for leaving a lobby

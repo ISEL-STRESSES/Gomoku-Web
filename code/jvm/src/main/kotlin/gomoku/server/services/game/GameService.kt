@@ -1,7 +1,5 @@
 package gomoku.server.services.game
 
-import gomoku.server.domain.game.CurrentTurnPlayerOutput
-import gomoku.server.domain.game.LeaveLobbyOutput
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.errors.MoveError
 import gomoku.server.domain.game.game.CellColor
@@ -15,11 +13,11 @@ import gomoku.server.domain.game.game.toGameOutcome
 import gomoku.server.domain.game.rules.Rules
 import gomoku.server.domain.user.RankingUserData
 import gomoku.server.domain.user.updateElo
+import gomoku.server.http.controllers.game.models.CurrentTurnPlayerOutput
 import gomoku.server.repository.Transaction
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.GetGameError
-import gomoku.server.services.errors.game.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.utils.Failure
@@ -28,8 +26,6 @@ import gomoku.utils.failure
 import gomoku.utils.success
 import org.springframework.stereotype.Service
 import kotlin.random.Random
-
-typealias GetUserFinishedGamesResult = Pair<List<FinishedGame>, Int>
 
 /**
  * Service for game-related operations
@@ -53,7 +49,7 @@ class GameService(private val transactionManager: TransactionManager) {
                 if (lobby.userId == userId) {
                     return@run failure(MatchmakingError.SamePlayer)
                 }
-                val didLeave = it.lobbyRepository.leaveLobby(lobby.userId)
+                val didLeave = it.lobbyRepository.leaveLobby(lobby.id, lobby.userId)
                 if (!didLeave) {
                     return@run failure(MatchmakingError.LeaveLobbyFailed)
                 }
@@ -180,25 +176,6 @@ class GameService(private val transactionManager: TransactionManager) {
             rankingUserData = player2Stats.copy(gamesPlayed = player2Stats.gamesPlayed + 1, elo = newPlayer2Elo.toInt())
         )
     }
-
-    /**
-     * Leaves the matchmaking process.
-     * @param userId id of the user
-     * @return an empty [Success] if the user left the matchmaking process, a [Failure] otherwise
-     */
-    fun leaveLobby(lobbyId: Int, userId: Int): LeaveLobbyResult =
-        transactionManager.run {
-            val lobby = it.lobbyRepository.getLobbyById(lobbyId)
-                ?: return@run failure(LeaveLobbyError.LobbyNotFound) // TODO: Create tests for this function
-
-            if (lobby.userId != userId) return@run failure(LeaveLobbyError.UserNotInLobby)
-
-            if (it.lobbyRepository.leaveLobby(userId)) {
-                return@run success(LeaveLobbyOutput(lobbyId, userId))
-            } else {
-                return@run failure(LeaveLobbyError.LeaveLobbyFailed)
-            }
-        }
 
     /**
      * Gets the available rules.
