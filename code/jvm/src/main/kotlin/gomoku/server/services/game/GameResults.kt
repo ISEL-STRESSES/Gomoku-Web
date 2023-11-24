@@ -5,6 +5,7 @@ import gomoku.server.domain.game.game.FinishedGame
 import gomoku.server.domain.game.game.Game
 import gomoku.server.http.controllers.game.models.CurrentTurnPlayerOutput
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
+import gomoku.server.services.errors.game.ForfeitGameError
 import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
@@ -38,3 +39,10 @@ typealias CurrentTurnPlayerResult = Either<CurrentTurnPlayerError, CurrentTurnPl
 typealias GetGameResult = Either<GetGameError, Game>
 
 typealias GetUserFinishedGamesResult = Pair<List<FinishedGame>, Int>
+
+/**
+ * Result for forfeiting a game
+ * @see ForfeitGameError
+ * @see FinishedGame
+ */
+typealias ForfeitGameResult = Either<ForfeitGameError, FinishedGame>

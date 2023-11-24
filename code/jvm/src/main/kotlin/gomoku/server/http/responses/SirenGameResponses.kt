@@ -20,7 +20,7 @@ object GetFinishedGames {
             link(URIs.Game.ROOT + URIs.Game.HUB, Rel.SELF)
             link(URIs.HOME, Rel.HOME)
 
-            if (currentOffset + currentLimit < totalPages * currentLimit) { //If we are not on the last page
+            if (currentOffset + currentLimit < totalPages * currentLimit) { // If we are not on the last page
                 link(
                     URIs.Game.ROOT + URIs.Game.HUB + "?limit=$currentLimit&offset=${currentOffset + currentLimit}",
                     Rel.NEXT
@@ -31,7 +31,7 @@ object GetFinishedGames {
                 )
             }
 
-            if (currentOffset > 0) { //If we are not on the first page
+            if (currentOffset > 0) { // If we are not on the first page
                 link(
                     URIs.Game.ROOT + URIs.Game.HUB + "?limit=$currentLimit&offset=${if (currentOffset - currentLimit < 0) 0 else currentOffset - currentLimit}",
                     Rel.PREV
@@ -41,7 +41,6 @@ object GetFinishedGames {
                     Rel.FIRST
                 )
             }
-
         }
 }
 
@@ -124,5 +123,13 @@ object GetTurn {
         siren(body) {
             clazz(Rel.GET_TURN.value)
             link(URIs.Game.ROOT + "/${body.turn}/turn", Rel.SELF)
+        }
+}
+
+object ForfeitGame {
+    fun siren(body: GameOutputModel) =
+        siren(body) {
+            clazz(Rel.FORFEIT_GAME.value)
+            link(URIs.HOME, Rel.HOME)
         }
 }

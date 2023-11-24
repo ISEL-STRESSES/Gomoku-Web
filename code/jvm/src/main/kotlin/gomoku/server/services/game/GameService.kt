@@ -17,6 +17,7 @@ import gomoku.server.http.controllers.game.models.CurrentTurnPlayerOutput
 import gomoku.server.repository.Transaction
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
+import gomoku.server.services.errors.game.ForfeitGameError
 import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
@@ -76,7 +77,7 @@ class GameService(private val transactionManager: TransactionManager) {
         return transactionManager.run {
             val gameResult = getGameAndVerifyPlayer(gameId, userId, it)
             val game = when (gameResult) {
-                is Failure -> return@run gameResult.value.resolveError()
+                is Failure -> return@run gameResult.value.resolveToMakeMoveResult()
                 is Success -> gameResult.value
             }
 
@@ -243,6 +244,33 @@ class GameService(private val transactionManager: TransactionManager) {
         }
 
     /**
+     * Forfeits a game.
+     * @param gameId The id of the game.
+     * @param userId The id of the user.
+     * @return The details of the game, or an error.
+     */
+    fun forfeitGame(gameId: Int, userId: Int): ForfeitGameResult =
+        transactionManager.run { tr ->
+            val gameResult = getGameAndVerifyPlayer(gameId, userId, tr)
+            val game = when (gameResult) {
+                is Failure -> return@run gameResult.value.resolveToForfeitResult()
+                is Success -> gameResult.value
+            }
+            if (game !is OngoingGame) {
+                return@run failure(ForfeitGameError.GameAlreadyFinished)
+            }
+            val winnerId = if (game.playerBlack == userId) game.playerWhite else game.playerBlack
+            val loserId = if (game.playerBlack == userId) game.playerBlack else game.playerWhite
+            tr.gameRepository.setGameState(game.id, GameState.FINISHED)
+            val gameOutcome = if (game.playerBlack == userId) GameOutcome.WHITE_WON else GameOutcome.BLACK_WON
+            tr.gameRepository.setGameOutcome(game.id, gameOutcome)
+            updatePlayerStats(winnerId, loserId, game.rules.ruleId, tr, RankingUserData.WIN)
+            val newGame = tr.gameRepository.getGameById(game.id)
+                ?: return@run failure(ForfeitGameError.GameNotFound) // should never return because the game exists
+            return@run success(newGame as FinishedGame)
+        }
+
+    /**
      * Gets the details of a game and verifies that the user is in the game.
      * @param gameId The id of the game.
      * @param userId The id of the user.
@@ -265,11 +293,21 @@ class GameService(private val transactionManager: TransactionManager) {
     /**
      * Resolves a [GetGameError] (getGameAndVerifyPlayer function error) into a [MakeMoveError] (GameService error).
      */
-    private fun GetGameError.resolveError() =
+    private fun GetGameError.resolveToMakeMoveResult() =
         when (this) {
             is GetGameError.PlayerNotInGame -> failure(MakeMoveError.PlayerNotInGame)
             is GetGameError.PlayerNotFound -> failure(MakeMoveError.PlayerNotFound)
             is GetGameError.GameNotFound -> failure(MakeMoveError.GameNotFound)
+        }
+
+    /**
+     * Resolves a [GetGameError] (getGameAndVerifyPlayer function error) into a [ForfeitGameError] (GameService error).
+     */
+    private fun GetGameError.resolveToForfeitResult() =
+        when (this) {
+            is GetGameError.PlayerNotInGame -> failure(ForfeitGameError.PlayerNotInGame)
+            is GetGameError.PlayerNotFound -> failure(ForfeitGameError.PlayerNotFound)
+            is GetGameError.GameNotFound -> failure(ForfeitGameError.GameNotFound)
         }
 
     /**

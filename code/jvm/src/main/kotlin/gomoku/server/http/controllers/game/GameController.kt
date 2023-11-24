@@ -8,6 +8,7 @@ import gomoku.server.http.controllers.game.models.GetRulesOutputModel
 import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
 import gomoku.server.http.controllers.game.models.RuleOutputModel
 import gomoku.server.http.controllers.media.Problem
+import gomoku.server.http.responses.ForfeitGame
 import gomoku.server.http.responses.GetFinishedGames
 import gomoku.server.http.responses.GetGameById
 import gomoku.server.http.responses.GetRules
@@ -17,6 +18,7 @@ import gomoku.server.http.responses.Matchmaker
 import gomoku.server.http.responses.response
 import gomoku.server.http.responses.responseRedirect
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
+import gomoku.server.services.errors.game.ForfeitGameError
 import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
@@ -67,13 +69,13 @@ class GameController(private val gameService: GameService) {
 
     /**
      * Gets the details of a game
-     * @param id The id of the game
+     * @param gameId The id of the game
      * @param authenticatedUser The authenticated user
      * @return The details of the game
      */
     @GetMapping(URIs.Game.GET_BY_ID)
-    fun gameDetails(@PathVariable id: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val game = gameService.getGame(id, authenticatedUser.user.uuid)
+    fun gameDetails(@PathVariable gameId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val game = gameService.getGame(gameId, authenticatedUser.user.uuid)
         return when (game) {
             is Failure -> game.value.resolveProblem()
             is Success -> GetGameById.siren(GameOutputModel.fromGame(game.value)).response(200)
@@ -96,7 +98,7 @@ class GameController(private val gameService: GameService) {
 
     /**
      * Makes a move in the context of a game
-     * @param id The id of the game
+     * @param gameId The id of the game
      * @param authenticatedUser The authenticated user
      * @param x The x coordinate of the move
      * @param y The y coordinate of the move
@@ -104,12 +106,12 @@ class GameController(private val gameService: GameService) {
      */
     @PostMapping(URIs.Game.MAKE_PLAY)
     fun makePlay(
-        @PathVariable id: Int,
+        @PathVariable gameId: Int,
         authenticatedUser: AuthenticatedUser,
         @RequestParam x: Int,
         @RequestParam y: Int
     ): ResponseEntity<*> {
-        val moveResult = gameService.makeMove(id, authenticatedUser.user.uuid, x, y)
+        val moveResult = gameService.makeMove(gameId, authenticatedUser.user.uuid, x, y)
         return when (moveResult) {
             is Failure -> moveResult.value.resolveProblem()
             is Success ->
@@ -135,16 +137,31 @@ class GameController(private val gameService: GameService) {
 
     /**
      * Gets the current turn player id
-     * @param id The id of the game
+     * @param gameId The id of the game
      * @param authenticatedUser The authenticated user
      * @return The current turn player id
      */
     @GetMapping(URIs.Game.TURN)
-    fun currentTurnPlayerId(@PathVariable id: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val currentTurnPlayerId = gameService.getCurrentTurnPlayerId(id, authenticatedUser.user.uuid)
+    fun currentTurnPlayerId(@PathVariable gameId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val currentTurnPlayerId = gameService.getCurrentTurnPlayerId(gameId, authenticatedUser.user.uuid)
         return when (currentTurnPlayerId) {
             is Failure -> currentTurnPlayerId.value.resolveProblem()
             is Success -> GetTurn.siren(currentTurnPlayerId.value).response(200)
+        }
+    }
+
+    /**
+     * Forfeits a game
+     * @param gameId The id of the game
+     * @param authenticatedUser The authenticated user
+     * @return The result of the forfeit
+     */
+    @PostMapping(URIs.Game.FORFEIT_GAME)
+    fun forfeit(@PathVariable gameId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val forfeitResult = gameService.forfeitGame(gameId, authenticatedUser.user.uuid)
+        return when (forfeitResult) {
+            is Failure -> forfeitResult.value.resolveProblem()
+            is Success -> ForfeitGame.siren(GameOutputModel.fromGame(forfeitResult.value)).response(200)
         }
     }
 
@@ -199,6 +216,19 @@ class GameController(private val gameService: GameService) {
             GetGameError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
             GetGameError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
             GetGameError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
+        }
+
+    /**
+     * Translates the errors of a Forfeit game action into a response
+     * @receiver The error
+     * @return The response
+     */
+    private fun ForfeitGameError.resolveProblem(): ResponseEntity<*> =
+        when (this) {
+            ForfeitGameError.GameAlreadyFinished -> Problem.response(400, Problem.gameAlreadyFinished)
+            ForfeitGameError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
+            ForfeitGameError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
+            ForfeitGameError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
         }
 
     companion object {

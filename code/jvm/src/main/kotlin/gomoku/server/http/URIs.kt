@@ -43,12 +43,12 @@ object URIs {
     object Game {
         const val ROOT = "$PREFIX/game"
         const val HUB = "/"
-        const val GET_BY_ID = "/{id}" // details
-        const val MAKE_PLAY = "/{id}/play" // try to make a move
+        const val GET_BY_ID = "/{gameId}"
+        const val MAKE_PLAY = "/{gameId}/play"
         const val GAME_RULES = "/rules"
         const val MATCH_MAKE = "/start/{rulesId}"
-        const val TURN = "/{id}/turn"
-        const val FORFEIT_GAME = "/{id}/forfeit"
+        const val TURN = "/{gameId}/turn"
+        const val FORFEIT_GAME = "/{gameId}/forfeit"
 
         fun hub() = URI(HUB)
         fun byId(id: Int) = UriTemplate(ROOT + GET_BY_ID).expand(id)
