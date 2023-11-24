@@ -37,7 +37,7 @@ object GetRanking {
             )
             link(URIs.HOME, Rel.HOME)
 
-            if (currentOffset + currentLimit < totalPages * currentLimit) { //If we are not on the last page
+            if (currentOffset + currentLimit < totalPages * currentLimit) { // If we are not on the last page
                 link(
                     "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${currentOffset + currentLimit}",
                     Rel.NEXT
@@ -48,7 +48,7 @@ object GetRanking {
                 )
             }
 
-            if (currentOffset > 0) { //If we are not on the first page
+            if (currentOffset > 0) { // If we are not on the first page
                 link(
                     "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${if (currentOffset - currentLimit < 0) 0 else currentOffset - currentLimit}",
                     Rel.PREV
@@ -59,7 +59,6 @@ object GetRanking {
                 )
             }
         }
-
 }
 
 object GetUserRanking {

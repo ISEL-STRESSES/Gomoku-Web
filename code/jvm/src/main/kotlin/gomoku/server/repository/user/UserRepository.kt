@@ -120,5 +120,4 @@ interface UserRepository {
      * @return The number of entries in the ranking.
      */
     fun countRankingEntries(rulesId: Int, username: String): Int
-
 }

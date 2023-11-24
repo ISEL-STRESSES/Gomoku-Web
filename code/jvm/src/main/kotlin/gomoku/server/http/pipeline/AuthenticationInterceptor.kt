@@ -29,8 +29,8 @@ class AuthenticationInterceptor(
      */
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         if (handler is HandlerMethod && handler.methodParameters.any {
-                it.parameterType == AuthenticatedUser::class.java
-            }
+            it.parameterType == AuthenticatedUser::class.java
+        }
         ) {
             // enforce authentication
             val user = authorizationHeaderProcessor

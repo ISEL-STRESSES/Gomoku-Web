@@ -99,7 +99,7 @@ class UserController(private val service: UserService) {
             GetUsersRankingDataOutputModel(
                 users.map(::UserRuleStatsOutputModel),
                 ruleId,
-                username ?: "",
+                username ?: ""
             ),
             totalPages,
             currentOffset,

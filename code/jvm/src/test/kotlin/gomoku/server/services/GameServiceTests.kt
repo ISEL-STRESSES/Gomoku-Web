@@ -9,9 +9,9 @@ import gomoku.server.domain.user.UsersDomainConfig
 import gomoku.server.failureOrNull
 import gomoku.server.repository.createFinishedGame
 import gomoku.server.services.errors.game.GetGameError
-import gomoku.server.services.errors.lobby.LeaveLobbyError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
+import gomoku.server.services.errors.lobby.LeaveLobbyError
 import gomoku.server.services.game.GameService
 import gomoku.server.services.lobby.LobbyService
 import gomoku.server.services.user.UserService

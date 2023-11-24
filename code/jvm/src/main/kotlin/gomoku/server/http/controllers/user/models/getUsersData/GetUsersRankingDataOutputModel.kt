@@ -10,5 +10,5 @@ import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
 data class GetUsersRankingDataOutputModel(
     val userData: List<UserRuleStatsOutputModel>,
     val ruleId: Int,
-    val search: String,
+    val search: String
 )
