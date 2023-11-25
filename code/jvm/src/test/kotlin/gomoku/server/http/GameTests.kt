@@ -7,6 +7,7 @@ import gomoku.server.domain.game.Matchmaker
 import gomoku.server.http.controllers.game.models.GameOutputModel
 import gomoku.server.http.controllers.game.models.GetFinishedGamesOutputModel
 import gomoku.server.http.controllers.game.models.GetRulesOutputModel
+import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
 import gomoku.server.http.model.CreateUserResponse
 import gomoku.server.http.model.PlayerRuleStatsResponse
 import gomoku.server.services.errors.game.MakeMoveError
@@ -77,15 +78,15 @@ class GameTests {
             .responseTimeout(Duration.ofHours(1))
             .build()
 
-        // and an empty lobby
+        // and an empty lobbies
         deleteLobbies()
 
         // and information to create 2 users
         val username1 = newTestUserName()
-        val createUserResponse = createUserAndGetId(client, username1) // userId is not needed
+        val createUserResponse = createUserAndGetId(client, username1)
 
         val username2 = newTestUserName()
-        val createUserResponse2 = createUserAndGetId(client, username2) // userId is not needed
+        val createUserResponse2 = createUserAndGetId(client, username2)
 
         // and a ruleId
         val ruleId = 2
@@ -331,7 +332,7 @@ class GameTests {
 
         // when, then: the user tries to start a matchmaking process again should return a bad request
         client.post().uri("/game/$ruleId")
-            .header("Authorization", "Bearer ${createUserResponse.token}")
+            .header("Authorization", "bearer ${createUserResponse.token}")
             .exchange()
             .expectStatus().isBadRequest
             .expectBody(Matchmaker::class.java)
@@ -545,13 +546,13 @@ class GameTests {
      * @param token The token of the user
      * @return The result of the matchmaking process
      */
-    private fun startMatchmakingProcess(client: WebTestClient, ruleId: Int, token: String): Matchmaker =
-        client.post().uri("/game/$ruleId")
-            .header("Authorization", "Bearer $token")
+    private fun startMatchmakingProcess(client: WebTestClient, ruleId: Int, token: String): MatchmakerOutputModel =
+        client.post().uri("/game/start/$ruleId")
+            .header("Authorization", "bearer $token")
             .exchange()
-            .expectStatus().isOk
-            .expectBody(Matchmaker::class.java)
-            .returnResult()
+            .expectStatus().is2xxSuccessful
+            .expectBody(MatchmakerOutputModel::class.java)
+            .returnResult().also { println(it) }
             .responseBody!!
 
     /**
@@ -575,7 +576,7 @@ class GameTests {
         expectedType: Class<T>
     ): T {
         return client.post().uri("/game/$gameId/play?x=$x&y=$y")
-            .header("Authorization", "Bearer $token")
+            .header("Authorization", "bearer $token")
             .exchange()
             .expectBody(expectedType)
             .returnResult()
@@ -626,7 +627,7 @@ class GameTests {
      * @return The list of finished games
      */
     private fun getFinishedGames(client: WebTestClient, token: String): GetFinishedGamesOutputModel =
-        client.get().uri("/game/").header("Authorization", "Bearer $token")
+        client.get().uri("/game/").header("Authorization", "bearer $token")
             .exchange()
             .expectStatus().isOk
             .expectBody<GetFinishedGamesOutputModel>()
@@ -659,7 +660,7 @@ class GameTests {
      */
     private fun leaveLobby(webTestClient: WebTestClient, lobbyId: Int, userToken: String) =
         webTestClient.post().uri("/game/$lobbyId/leave")
-            .header("Authorization", "Bearer $userToken")
+            .header("Authorization", "bearer $userToken")
             .exchange()
             .expectStatus().isOk
             .expectBody<Unit>()
@@ -668,11 +669,11 @@ class GameTests {
 
     private fun <T : Any> getGameDetails(client: WebTestClient, gameId: Int, token: String, expectedType: Class<T>): T =
         client.get().uri("/game/$gameId")
-            .header("Authorization", "Bearer $token")
+            .header("Authorization", "bearer $token")
             .exchange()
             .expectStatus().isOk
             .expectBody(expectedType)
-            .returnResult()
+            .returnResult().also { println(it) }
             .responseBody!!
 
     /**

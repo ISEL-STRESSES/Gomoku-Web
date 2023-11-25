@@ -111,7 +111,7 @@ class UserDomainTests {
             createdAt = currentTime - 10.hours,
             lastUsedAt = currentTime - 30.minutes
         )
-        assertEquals(currentTime, usersDomain.getTokenExpiration(token1))
+        assertEquals(currentTime.toString(), usersDomain.getTokenExpiration(token1))
 
         // Scenario: Token's absolute expiration is sooner than rolling expiration
         val token2 = Token(
@@ -120,7 +120,7 @@ class UserDomainTests {
             createdAt = currentTime - 23.hours - 40.minutes,
             lastUsedAt = currentTime
         )
-        assertEquals(currentTime + 20.minutes, usersDomain.getTokenExpiration(token2))
+        assertEquals((currentTime + 20.minutes).toString(), usersDomain.getTokenExpiration(token2))
 
         // Scenario: Token's absolute expiration and rolling expiration are the same
         val token3 = Token(
@@ -129,7 +129,7 @@ class UserDomainTests {
             createdAt = currentTime - 23.hours - 30.minutes,
             lastUsedAt = currentTime - 30.minutes
         )
-        assertEquals(currentTime, usersDomain.getTokenExpiration(token3))
+        assertEquals(currentTime.toString(), usersDomain.getTokenExpiration(token3))
     }
 
     @Test

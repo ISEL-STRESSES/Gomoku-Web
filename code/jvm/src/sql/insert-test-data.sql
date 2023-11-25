@@ -9,8 +9,7 @@ $$
     BEGIN
         FOR i IN 1..20
             LOOP
-                EXECUTE 'INSERT INTO users(username, password_validation) VALUES (''user' || i || ''', ''password' ||
-                        i || ''')';
+                EXECUTE 'INSERT INTO users(username, password_validation) VALUES (''user' || i || ''', ''!Kz9iYG$%TcB27f'')';
             END LOOP;
     END
 $$;
@@ -83,10 +82,10 @@ $$
         moves_game int[];
     BEGIN
         insert into users (username, password_validation)
-        values ('TestUserDB1', 'ByQYP78&j7Aug2')
+        values ('TestUserDB1', '!Kz9iYG$%TcB27f')
         returning id into user_id1;
         insert into users (username, password_validation)
-        values ('TestUserDB2', 'ByQYP78&j7Aug2')
+        values ('TestUserDB2', '!Kz9iYG$%TcB27f')
         returning id into user_id2;
         select id into rule_id from rules where board_size = 15 and opening_rule = 'FREE' and variant = 'STANDARD';
         if (rule_id IS NULL) then

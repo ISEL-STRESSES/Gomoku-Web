@@ -286,7 +286,7 @@ class GameServiceTests {
     }
 
     @Test
-    fun `getCurrentTurnPlayerId should return the id of the player whose turn it is`() {
+    fun `getCurrentTurnPlayerId should return the id of the player whose turn it is with logged in player`() {
         val gameId = 1
 
         testWithTransactionManagerAndRollback { transactionManager ->
@@ -295,7 +295,7 @@ class GameServiceTests {
             // test
             val gameService = GameService(transactionManager)
 
-            val result = gameService.getCurrentTurnPlayerId(gameId)
+            val result = gameService.getCurrentTurnPlayerId(gameId, 1) /* take away magic number */
 
             assertTrue(result is Success)
             require(result is Success)
@@ -313,7 +313,7 @@ class GameServiceTests {
             // test
             val gameService = GameService(transactionManager)
 
-            val result = gameService.getCurrentTurnPlayerId(gameId)
+            val result = gameService.getCurrentTurnPlayerId(gameId, 1) /* take away magic number */
 
             assertTrue(result is Failure)
         }
@@ -331,7 +331,7 @@ class GameServiceTests {
                 it.gameRepository.createFinishedGame(1, 2)
             }
             // sut
-            val result = gameService.getCurrentTurnPlayerId(finishedGameId)
+            val result = gameService.getCurrentTurnPlayerId(finishedGameId, 1) /* take away magic number */
 
             assertTrue(result is Failure)
         }

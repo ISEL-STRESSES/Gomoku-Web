@@ -99,7 +99,7 @@ class UserTests {
         // when: getting the user home with a valid token
         // then: the response is a 200 with the proper representation
         client.get().uri("/users/me")
-            .header("Authorization", "Bearer ${createUserResponse.token}")
+            .header("Authorization", "bearer $tokenValue")
             .exchange()
             .expectStatus().isOk
             .expectBody()
@@ -108,7 +108,7 @@ class UserTests {
         // when: getting the user home with an invalid token
         // then: the response is a 401 with the proper problem
         client.get().uri("/users/me")
-            .header("Authorization", "Bearer ${createUserResponse.token}-invalid")
+            .header("Authorization", "bearer token-invalid")
             .exchange()
             .expectStatus().isUnauthorized
             .expectHeader().valueEquals("WWW-Authenticate", "bearer")
@@ -116,14 +116,14 @@ class UserTests {
         // when: revoking the token
         // then: response is a 200
         client.post().uri("/users/logout")
-            .header("Authorization", "Bearer ${createUserResponse.token}")
+            .header("Authorization", "bearer $tokenValue")
             .exchange()
             .expectStatus().isOk
 
         // when: getting the user home with the revoked token
         // then: response is a 401
         client.get().uri("/users/me")
-            .header("Authorization", "Bearer ${createUserResponse.token}")
+            .header("Authorization", "bearer $tokenValue")
             .exchange()
             .expectStatus().isUnauthorized
             .expectHeader().valueEquals("WWW-Authenticate", "bearer")
@@ -195,13 +195,13 @@ class UserTests {
         // given: an HTTP client
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
 
-        // and: a random rule id
+        // and: a known rule id and user id
         val userId = 1
         val ruleId = 1
 
         // when: searching for the ranking of a user and rule
         // then: the response is a 200
-        client.get().uri("/users/ranking/$userId/$ruleId")
+        client.get().uri("/users/$userId/ranking/$ruleId")
             .exchange()
             .expectStatus().isOk
             .expectBody()

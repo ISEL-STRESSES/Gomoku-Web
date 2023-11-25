@@ -185,8 +185,10 @@ class JDBILobbyRepositoryTests {
 
         assertTrue(repo.getLobbies().isEmpty())
         repo.createLobby(1, newUser)
+        val lobbyId = repo.getLobbyByUserId(newUser)?.id
+        assertNotNull(lobbyId)
         assertTrue(repo.getLobbies().isNotEmpty())
-        val result = repo.leaveLobby(newUser)
+        val result = repo.leaveLobby(lobbyId, newUser)
         assertTrue(result)
         val lobby = repo.getLobbyByUserId(newUser)
         assertNull(lobby)
@@ -197,8 +199,8 @@ class JDBILobbyRepositoryTests {
     fun `leaveLobby should return false for user not in any lobby`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val userId = 3
-
-        val result = repo.leaveLobby(userId)
+        val randomLobbyId = Random.nextInt()
+        val result = repo.leaveLobby(randomLobbyId, userId)
 
         assertFalse(result)
     }
@@ -207,8 +209,8 @@ class JDBILobbyRepositoryTests {
     fun `leaveLobby should be false for invalid userId`() = testWithHandleAndRollback { handle ->
         val repo = JDBILobbyRepository(handle)
         val userId = -1
-
-        val result = repo.leaveLobby(userId)
+        val randomLobbyId = Random.nextInt()
+        val result = repo.leaveLobby(randomLobbyId, userId)
 
         assertFalse(result)
     }
