@@ -103,9 +103,9 @@ class UsersDomain(
      * @param token the token to check
      * @return the token expiration time
      */
-    fun getTokenExpiration(token: Token): Instant {
-        val absoluteExpiration = token.createdAt + config.tokenTtl
-        val rollingExpiration = token.lastUsedAt + config.tokenRollingTtl
+    fun getTokenExpiration(token: Token): String {
+        val absoluteExpiration = (token.createdAt + config.tokenTtl).toString()
+        val rollingExpiration = (token.lastUsedAt + config.tokenRollingTtl).toString()
         return if (absoluteExpiration < rollingExpiration) {
             absoluteExpiration
         } else {

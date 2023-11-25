@@ -1,7 +1,6 @@
 package gomoku.server.http
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import gomoku.server.http.model.CreateUserResponse
 import gomoku.server.services.errors.user.UserRankingError
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -57,7 +56,7 @@ class UserTests {
 
         // when: creating an user
         // then: the response is a 201 with a proper Location header
-        client.post().uri("/users/create")
+        val createResult = client.post().uri("/users/create")
             .bodyValue(
                 mapOf(
                     "username" to username,
@@ -69,33 +68,17 @@ class UserTests {
             .expectHeader().value("Location") {
                 assertTrue(it.startsWith("/api/users/"))
             }
-
-        // when: creating a token
-        // then: the response is a 200
-        val result = client.post().uri("/users/token")
-            .bodyValue(
-                mapOf(
-                    "username" to username,
-                    "password" to password
-                )
-            )
-            .exchange()
-            .expectStatus().isOk
             .expectBody()
             .returnResult()
-            .responseBody!!
+            .responseBody
 
         // Parse the JSON response
         val objectMapper = jacksonObjectMapper()
-        val jsonNode = objectMapper.readTree(result)
+        val jsonNode = objectMapper.readTree(createResult)
         val propertiesNode = jsonNode.path("properties")
 
-        // Extract data and create CreateUserResponse
-        val userId = propertiesNode.path("userId").asInt()
-        val token = propertiesNode.path("token").asText()
-
-        val createUserResponse = CreateUserResponse(userId, token)
-
+        val tokenValue = propertiesNode.path("token").asText()
+        println(tokenValue)
         // when: getting the user home with a valid token
         // then: the response is a 200 with the proper representation
         client.get().uri("/users/me")

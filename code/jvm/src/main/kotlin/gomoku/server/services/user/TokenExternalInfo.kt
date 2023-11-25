@@ -1,7 +1,5 @@
 package gomoku.server.services.user
 
-import kotlinx.datetime.Instant
-
 /**
  * External info of the token
  * @param tokenValue the token value
@@ -9,5 +7,5 @@ import kotlinx.datetime.Instant
  */
 data class TokenExternalInfo(
     val tokenValue: String,
-    val tokenExpiration: Instant
+    val tokenExpiration: String
 )
