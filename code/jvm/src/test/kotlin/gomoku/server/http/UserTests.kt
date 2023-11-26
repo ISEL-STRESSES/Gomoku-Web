@@ -1,5 +1,6 @@
 package gomoku.server.http
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import gomoku.server.services.errors.user.UserRankingError
 import org.junit.jupiter.api.Test
@@ -25,22 +26,147 @@ class UserTests {
 
         // and: a random user
         val username = newTestUserName()
-        val password = "!Kz9iYG$%TcB27f"
 
         // when: creating an user
         // then: the response is a 201 with a proper Location header
+        createUser(client, username)
+    }
+
+    @Test
+    fun `can't create a user with existing username`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: an existing user
+        val username = newTestUserName()
+
+        createUser(client, username)
+
+        // when: creating an user
+        // then: the response is a 409 with a proper Location header
         client.post().uri("/users/create")
             .bodyValue(
                 mapOf(
                     "username" to username,
-                    "password" to password
+                    "password" to "!Kz9iYG$%TcB27f"
                 )
             )
             .exchange()
-            .expectStatus().isCreated
-            .expectHeader().value("Location") {
-                assertTrue(it.startsWith("/api/users/"))
-            }
+            .expectStatus().is4xxClientError //409
+    }
+
+    @Test
+    fun `can't create user with weak password`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random user
+        val username = newTestUserName()
+
+        // when: creating an user
+        // then: the response is a 400 with a proper Location header
+        client.post().uri("/users/create")
+            .bodyValue(
+                mapOf(
+                    "username" to username,
+                    "password" to "weak"
+                )
+            )
+            .exchange()
+            .expectStatus().is4xxClientError //400
+    }
+
+    @Test
+    fun `can't create user with empty username`() {
+        // given: an HTTP client
+        val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
+
+        // and: a random user
+        val username = ""
+
+        // when: creating an user
+        // then: the response is a 400 with a proper Location header
+        client.post().uri("/users/create")
+            .bodyValue(
+                mapOf(
+                    "username" to username,
+                    "password" to "!Kz9iYG$%TcB27f"
+                )
+            )
+            .exchange()
+            .expectStatus().is4xxClientError //400
+    }
+
+    @Test
+    fun `log in user`() {
+        // given: an HTTP client
+        val client =
+            WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").responseTimeout(Duration.ofHours(1))
+                .build()
+
+        // and: a random user
+        val username = newTestUserName()
+
+        // when: creating an user
+        // then: the response is a 201 with a proper Location header
+        createUser(client, username).parseJson()
+
+        // when: logging in
+        login(client, username).parseJson()
+    }
+
+    @Test
+    fun `can't log in user with wrong password`() {
+        // given: an HTTP client
+        val client = WebTestClient
+                .bindToServer()
+                .baseUrl("http://localhost:$port/api")
+                .responseTimeout(Duration.ofHours(1))
+                .build()
+
+        // and: a random user
+        val username = newTestUserName()
+
+        // when: creating an user
+        // then: the response is a 201 with a proper Location header
+        createUser(client, username).parseJson()
+
+        // when: logging in
+        // then: the response is a 400 with a proper Location header
+        client.post().uri("/users/token")
+            .bodyValue(
+                mapOf(
+                    "username" to username,
+                    "password" to "wrongpassword"
+                )
+            )
+            .exchange()
+            .expectStatus().is4xxClientError //400
+    }
+
+    @Test
+    fun `get user home successfully`() {
+        // given: an HTTP client
+        val client =
+            WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").responseTimeout(Duration.ofHours(1))
+                .build()
+
+        // and: a random user
+        val username = newTestUserName()
+
+        // when: creating an user
+        // then: the response is a 201 with a proper Location header
+        val createResult = createUser(client, username).parseJson()
+
+        val tokenValue = createResult.path("token").asText()
+        // when: getting the user home with a valid token
+        // then: the response is a 200 with the proper representation
+        client.get().uri("/users/me")
+            .header("Authorization", "bearer $tokenValue")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .jsonPath("$.properties.username").isEqualTo(username)
     }
 
     @Test
@@ -52,32 +178,12 @@ class UserTests {
 
         // and: a random user
         val username = newTestUserName()
-        val password = "!Kz9iYG$%2TcB7f"
 
         // when: creating an user
         // then: the response is a 201 with a proper Location header
-        val createResult = client.post().uri("/users/create")
-            .bodyValue(
-                mapOf(
-                    "username" to username,
-                    "password" to password
-                )
-            )
-            .exchange()
-            .expectStatus().isCreated
-            .expectHeader().value("Location") {
-                assertTrue(it.startsWith("/api/users/"))
-            }
-            .expectBody()
-            .returnResult()
-            .responseBody
+        val createResult = createUser(client, username).parseJson()
 
-        // Parse the JSON response
-        val objectMapper = jacksonObjectMapper()
-        val jsonNode = objectMapper.readTree(createResult)
-        val propertiesNode = jsonNode.path("properties")
-
-        val tokenValue = propertiesNode.path("token").asText()
+        val tokenValue = createResult.path("token").asText()
         // when: getting the user home with a valid token
         // then: the response is a 200 with the proper representation
         client.get().uri("/users/me")
@@ -320,7 +426,51 @@ class UserTests {
             .expectStatus().isNotFound
     }
 
+    /**
+     * Util Function:
+     *
+     * Creates a user with a random username and password
+     * @param client The HTTP client
+     * @return The response body
+     */
+    private fun createUser(client: WebTestClient, username: String) =
+        client.post().uri("/users/create")
+        .bodyValue(
+            mapOf(
+                "username" to username,
+                "password" to "!Kz9iYG$%TcB27f"
+            )
+        )
+        .exchange()
+        .expectStatus().isCreated
+        .expectHeader().value("Location") {
+            assertTrue(it.startsWith("/api/users/"))
+        }
+        .expectBody()
+        .returnResult()
+        .responseBody!!
+
+    private fun login(client: WebTestClient, username: String) =
+        client.post().uri("/users/token")
+        .bodyValue(
+            mapOf(
+                "username" to username,
+                "password" to "!Kz9iYG$%TcB27f"
+            )
+        )
+        .exchange()
+        .expectStatus().isOk
+        .expectBody()
+        .returnResult()
+        .responseBody!!
+
     companion object {
         private fun newTestUserName() = "User${abs(Random.nextLong())}"
+
+        private fun ByteArray.parseJson(): JsonNode {
+            val objectMapper = jacksonObjectMapper()
+            val jsonNode = objectMapper.readTree(this)
+            return jsonNode.path("properties")
+        }
     }
 }

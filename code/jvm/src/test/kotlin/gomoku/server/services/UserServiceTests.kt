@@ -233,7 +233,7 @@ class UserServiceTests {
             val randomPassword = "ByQYP78&j7Aug2"
             val testUserUsername = "testUser" + Random.nextBits(10)
             val testUser = userService.createUser(testUserUsername, randomPassword)
-            require(testUser is Success)
+            require(testUser is Success) // can fail here if user creation fails with same username
             val testToken = userService.createToken(testUserUsername, randomPassword)
             require(testToken is Success)
 
