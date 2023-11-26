@@ -5,7 +5,6 @@ import gomoku.server.domain.user.User.Companion.MAX_PASSWORD_SIZE
 import gomoku.server.domain.user.User.Companion.MIN_NAME_SIZE
 import gomoku.server.domain.user.User.Companion.MIN_PASSWORD_SIZE
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import java.security.SecureRandom

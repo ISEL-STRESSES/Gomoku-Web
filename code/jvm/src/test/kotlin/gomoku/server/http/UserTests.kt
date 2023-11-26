@@ -78,7 +78,6 @@ class UserTests {
         val propertiesNode = jsonNode.path("properties")
 
         val tokenValue = propertiesNode.path("token").asText()
-        println(tokenValue)
         // when: getting the user home with a valid token
         // then: the response is a 200 with the proper representation
         client.get().uri("/users/me")
