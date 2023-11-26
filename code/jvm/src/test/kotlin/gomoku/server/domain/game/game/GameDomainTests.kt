@@ -27,8 +27,6 @@ class GameDomainTests {
         val ongoingGame2 = OngoingGame(1, playerA, playerB, rules, newContainerWithMoves2)
         assertEquals(CellColor.BLACK, ongoingGame2.turn)
 
-//        val newContainerWithMovesFail = moves.addMove(Move(Position(19, 19, 18), CellColor.BLACK)) TODO: FIX THIS SO THAT POSITION DOESN'T THROW ILLEGALARGUMENTEXCEPTION WHEN CREATED
-//        assert(newContainerWithMovesFail == null)
     }
 
     @Test
