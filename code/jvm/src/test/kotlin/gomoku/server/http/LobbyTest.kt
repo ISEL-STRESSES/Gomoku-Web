@@ -224,7 +224,7 @@ class LobbyTest {
         createLobby(client, 2, createUserResponse2.token)
 
         // when, then: the user tries to enter the lobby becomes a game
-        val lobbies = getLobbies(client, createUserResponse.token).parseJson().also { println(it) }.toLobbiesResponse().also { println(it) }
+        val lobbies = getLobbies(client, createUserResponse.token).parseJson().toLobbiesResponse()
         assertEquals(2, lobbies.lobbiesList.size)
     }
 

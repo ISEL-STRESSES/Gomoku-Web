@@ -30,8 +30,14 @@ and gameplay.
         - [Get the details of a game](#get-game-details)
         - [Makes a move in a game](#make-a-move)
         - [Gets the player id of the current turn](#get-current-turn-player-id)
-        - [Leaves a lobby](#leave-a-lobby)
         - [Starts the matchmaking process](#start-matchmaking-process)
+        - [Forfeit a game](#forfeit-a-game)
+    - [Lobbies](#lobbies)
+      - [Get all lobbies](#get-all-lobbies)
+      - [Create a lobby](#create-a-lobby)
+      - [Join a lobby](#join-a-lobby)
+      - [Leave a lobby](#leave-a-lobby)
+      - [Get the details of a lobby](#get-the-details-of-a-lobby)
 - [Types](#types)
     - [Parameters](#parameters)
         - [Password](#password)
@@ -57,6 +63,7 @@ and gameplay.
         - [Game Details](#game-details)
         - [Current Turn Player Id](#current-turn-player-id)
         - [Lobby Details](#lobby-details)
+        - [Lobby List](#lobby-list)
     - [Error Types](#error-types)
         - [Bad Request](#bad-request)
         - [User or Password Invalid](#user-or-password-invalid)
@@ -77,6 +84,7 @@ and gameplay.
         - [Game Not Found](#game-not-found)
         - [No Rules Found](#no-rules-found)
         - [Lobby Not Found](#lobby-not-found)
+        - [User Already in Lobby](#user-already-in-lobby)
         - [Position Already Occupied](#position-already-occupied)
         - [Internal Server Error](#internal-server-error)
         - [Make Move Failed](#make-move-failed)
@@ -470,11 +478,133 @@ Retrieves the player id of the current turn. **Requires authentication**
     curl https://localhost:8080/api/game/1/turn
     ```
 
+#### Start Matchmaking Process
+
+Starts the matchmaking process. **Requires authentication**
+
+- **URL:** `/api/game/start/{ruleId}`
+- **Method:** `POST`
+- **Path Params:**
+    - **Required:**
+        - [RuleId](#ruleid)
+- **Success Response:**
+    - **Content:**
+        - `application/vnd.siren+json`
+            - [Lobby Details](#lobby-details)
+- **Error Responses:**
+    - **Content:**
+        - `application/problem+json`
+            - [Same Player](#same-player)
+            - [Unauthorized](#unauthorized)
+            - [Leave Lobby Failed](#leave-lobby-failed)
+            - [Internal Server Error](#internal-server-error)
+- **Sample Call:**
+    ```bash
+    curl -X POST https://localhost:8080/api/game/start/1
+    ```
+
+#### Forfeit a Game
+
+Forfeit a game. **Requires authentication**
+
+- **URL:** `/api/game/{gameId}/forfeit`
+- **Method:** `POST`
+- **Path Params:**
+    - **Required:**
+        - [GameId](#gameid)
+- **Success Response:**
+- **Content:**
+    - `application/vnd.siren+json`
+        - [Game Details](#game-details)
+- **Error Responses:**
+    - **Content:**
+        - `application/problem+json`
+            - [Unauthorized](#unauthorized)
+            - [Game Already Finished](#game-already-finished)
+            - [Game Not Found](#game-not-found)
+            - [User Not Found](#user-not-found)
+            - [Player Not in Game](#player-not-in-game)
+            - [Internal Server Error](#internal-server-error)
+- **Sample Call:**
+    ```bash
+    curl -X POST https://localhost:8080/api/game/1/forfeit
+    ```
+
+### Lobbies
+
+#### Get All Lobbies
+
+Retrieves all lobbies. **Requires authentication**
+
+- **URL:** `/api/lobby/lobbies`
+- **Method:** `GET`
+- **Success Response:**
+    - **Content:**
+        - `application/vnd.siren+json`
+            - [Lobby List](#lobby-list)
+- **Error Responses:**
+    - **Content:**
+        - `application/problem+json`
+            - [Unauthorized](#unauthorized)
+            - [Internal Server Error](#internal-server-error)
+- **Sample Call:**
+    ```bash
+    curl https://localhost:8080/api/lobby/lobbies
+    ```
+
+#### Create a Lobby
+
+Creates a lobby. **Requires authentication**
+
+- **URL:** `/api/lobby/create/{ruleId}`
+- **Method:** `POST`
+- **Path Params:**
+    - **Required:**
+        - [RuleId](#ruleid)
+- **Success Response:**
+    - **Content:**
+        - `application/vnd.siren+json`
+            - [Lobby Details](#lobby-details)
+- **Error Responses:**
+    - **Content:**
+        - `application/problem+json`
+            - [Unauthorized](#unauthorized)
+            - [Internal Server Error](#internal-server-error)
+- **Sample Call:**
+    ```bash
+    curl -X POST https://localhost:8080/api/lobby/create/1
+    ```
+
+#### Join a Lobby
+
+Joins a lobby. **Requires authentication**
+
+- **URL:** `/api/lobby/{lobbyId}/join`
+- **Method:** `POST`
+- **Path Params:**
+    - **Required:**
+        - [LobbyId](#lobbyid)
+- **Success Response:**
+    - **Content:**
+        - `application/vnd.siren+json`
+            - [Lobby Details](#lobby-details)
+- **Error Responses:**
+    - **Content:**
+        - `application/problem+json`
+            - [Unauthorized](#unauthorized)
+            - [Lobby Not Found](#lobby-not-found)
+            - [User already in Lobby](#user-already-in-lobby)
+            - [Internal Server Error](#internal-server-error)
+- **Sample Call:**
+    ```bash
+    curl -X POST https://localhost:8080/api/lobby/1/join
+    ```
+
 #### Leave a Lobby
 
 Leaves a lobby. **Requires authentication**
 
-- **URL:** `/api/game/{lobbyId}/leave`
+- **URL:** `/api/lobby/{lobbyId}/leave`
 - **Method:** `POST`
 - **Path Params:**
     - **Required:**
@@ -496,15 +626,15 @@ Leaves a lobby. **Requires authentication**
     curl -X POST https://localhost:8080/api/game/1/leave
     ```
 
-#### Start Matchmaking Process
+#### Get the Details of a Lobby
 
-Starts the matchmaking process. **Requires authentication**
+Retrieves the details of a lobby. **Requires authentication**
 
-- **URL:** `/api/game/{ruleId}`
-- **Method:** `POST`
+- **URL:** `/api/lobby/{lobbyId}`
+- **Method:** `GET`
 - **Path Params:**
     - **Required:**
-        - [RuleId](#ruleid)
+        - [LobbyId](#lobbyid)
 - **Success Response:**
     - **Content:**
         - `application/vnd.siren+json`
@@ -512,10 +642,13 @@ Starts the matchmaking process. **Requires authentication**
 - **Error Responses:**
     - **Content:**
         - `application/problem+json`
-            - [Same Player](#same-player)
             - [Unauthorized](#unauthorized)
-            - [Leave Lobby Failed](#leave-lobby-failed)
+            - [Lobby Not Found](#lobby-not-found)
             - [Internal Server Error](#internal-server-error)
+- **Sample Call:**
+    ```bash
+    curl https://localhost:8080/api/lobby/1
+    ```
 
 ## Types
 
@@ -1112,6 +1245,48 @@ The application home page has the server info and the authors' info with their s
 }
 ```
 
+#### Lobby List
+
+- **Sample Response:**
+```vnd.siren+json
+{
+    "class": [
+        "get-lobbies"
+    ],
+    "properties": {
+        "lobbies": [
+            {
+                "id":701,
+                "rule": {
+                    "ruleId":1,
+                    "boardSize":"X15",
+                    "type":"StandardRules"
+                },
+                "userId":1387
+            },
+            {
+                "id":702,
+                "rule": {
+                    "ruleId":2,
+                    "boardSize":"X19",
+                    "type":"StandardRules"
+                },
+                "userId":1388
+            }
+        ]
+    },
+    "links": [
+        {
+            "rel": [
+                "self"
+            ],
+            "href": "/api/"
+        }
+    ],
+    "actions": []
+}
+```
+
 ### Error Types
 
 #### Bad Request
@@ -1326,6 +1501,17 @@ This error happens when you try to create a user and it already exists.
 {
     "title": "Lobby not found.",
     "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/lobby-not-found"
+}
+```
+
+#### User Already in Lobby
+
+- **Sample Error Response:**
+
+```problem+json
+{
+    "title": "User already in lobby.",
+    "type": "https://github.com/isel-leic-daw/2023-daw-leic51d-01/blob/main/docs/problems/user-already-in-lobby"
 }
 ```
 
