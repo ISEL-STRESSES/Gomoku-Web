@@ -300,8 +300,8 @@ class GameTests {
         val createUserResponse2 = createUserAndGetId(client, username2) // userId is not needed
 
         // and a game
-        startMatchmakingProcess(client,  createUserResponse.token)
-        val game = startMatchmakingProcess(client,  createUserResponse2.token).parseJson()
+        startMatchmakingProcess(client, createUserResponse.token)
+        val game = startMatchmakingProcess(client, createUserResponse2.token).parseJson()
 
         // and a turn
         val getTurn = getTurnFromGame(client, game.path("id").asInt(), createUserResponse.token).parseJson()
@@ -334,7 +334,7 @@ class GameTests {
 
         val username3 = newTestUserName()
         val createUserResponse3 = createUserAndGetId(client, username3)
-        
+
         // and a game
         startMatchmakingProcess(client, createUserResponse.token)
         val game = startMatchmakingProcess(client, createUserResponse2.token).parseJson()
@@ -510,9 +510,6 @@ class GameTests {
         val username2 = newTestUserName()
         val createUserResponse2 = createUserAndGetId(client, username2)
 
-       
-       
-
         // and a game
         startMatchmakingProcess(client, createUserResponse.token)
         val game = startMatchmakingProcess(client, createUserResponse2.token).parseJson()
@@ -548,9 +545,6 @@ class GameTests {
 
         val username2 = newTestUserName()
         val createUserResponse2 = createUserAndGetId(client, username2)
-
-       
-       
 
         // and a game
         startMatchmakingProcess(client, createUserResponse.token)
@@ -606,9 +600,6 @@ class GameTests {
 
         val username3 = newTestUserName()
         val createUserResponse3 = createUserAndGetId(client, username3)
-
-       
-       
 
         // and a game
         startMatchmakingProcess(client, createUserResponse.token)
@@ -767,9 +758,6 @@ class GameTests {
 
         val username2 = newTestUserName()
         val createUserResponse2 = createUserAndGetId(client, username2) // userId is not needed
-
-       
-       
 
         // and a game
         startMatchmakingProcess(client, createUserResponse.token)

@@ -6,6 +6,7 @@ import gomoku.server.deleteLobbies
 import gomoku.server.http.model.toGameResponse
 import gomoku.server.http.model.toLobbiesResponse
 import gomoku.server.http.model.toRulesResponse
+import org.junit.jupiter.api.Assertions.assertNull
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -17,7 +18,6 @@ import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Assertions.assertNull
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LobbyTest {
@@ -72,12 +72,12 @@ class LobbyTest {
 
         // when, then: the user tries to leave the matchmaking process is successful
         client.post().uri("/lobby/${lobby.path("id").asInt()}/leave")
-                .header("Authorization", "bearer ${anotherCreateUserResponse.token}")
-                .exchange()
-                .expectStatus().isNotFound
-                .expectBody()
-                .returnResult()
-                .responseBody!!
+            .header("Authorization", "bearer ${anotherCreateUserResponse.token}")
+            .exchange()
+            .expectStatus().isNotFound
+            .expectBody()
+            .returnResult()
+            .responseBody!!
     }
 
     @Test
@@ -101,12 +101,12 @@ class LobbyTest {
 
         // when, then: the user tries to leave the matchmaking process is successful
         client.post().uri("/lobby/${lobby.path("id").asInt() + 1}/leave")
-                .header("Authorization", "bearer ${createUserResponse.token}")
-                .exchange()
-                .expectStatus().isNotFound
-                .expectBody()
-                .returnResult()
-                .responseBody!!
+            .header("Authorization", "bearer ${createUserResponse.token}")
+            .exchange()
+            .expectStatus().isNotFound
+            .expectBody()
+            .returnResult()
+            .responseBody!!
     }
 
     @Test
@@ -160,12 +160,12 @@ class LobbyTest {
 
         // when, then: the user tries to enter the lobby becomes a game
         client.post().uri("/lobby/${Int.MAX_VALUE}/join")
-                .header("Authorization", "bearer ${createUserResponse.token}")
-                .exchange()
-                .expectStatus().isNotFound
-                .expectBody()
-                .returnResult()
-                .responseBody!!
+            .header("Authorization", "bearer ${createUserResponse.token}")
+            .exchange()
+            .expectStatus().isNotFound
+            .expectBody()
+            .returnResult()
+            .responseBody!!
     }
 
     @Test
@@ -189,12 +189,12 @@ class LobbyTest {
 
         // when, then: the user tries to leave the matchmaking process is successful
         client.post().uri("/lobby/${lobby.path("id").asInt()}/join")
-                .header("Authorization", "bearer ${createUserResponse.token}")
-                .exchange()
-                .expectStatus().is4xxClientError
-                .expectBody()
-                .returnResult()
-                .responseBody!!
+            .header("Authorization", "bearer ${createUserResponse.token}")
+            .exchange()
+            .expectStatus().is4xxClientError
+            .expectBody()
+            .returnResult()
+            .responseBody!!
     }
 
     @Test
@@ -224,7 +224,7 @@ class LobbyTest {
         createLobby(client, 2, createUserResponse2.token)
 
         // when, then: the user tries to enter the lobby becomes a game
-        val lobbies = getLobbies(client, createUserResponse.token).parseJson().also { println(it) }.toLobbiesResponse().also{ println(it) }
+        val lobbies = getLobbies(client, createUserResponse.token).parseJson().also { println(it) }.toLobbiesResponse().also { println(it) }
         assertEquals(2, lobbies.lobbiesList.size)
     }
 
@@ -293,12 +293,12 @@ class LobbyTest {
 
         // when, then: the user tries to enter the lobby becomes a game
         client.get().uri("/lobby/${Int.MAX_VALUE}")
-                .header("Authorization", "bearer ${createUserResponse.token}")
-                .exchange()
-                .expectStatus().isNotFound
-                .expectBody()
-                .returnResult()
-                .responseBody!!
+            .header("Authorization", "bearer ${createUserResponse.token}")
+            .exchange()
+            .expectStatus().isNotFound
+            .expectBody()
+            .returnResult()
+            .responseBody!!
     }
 
     companion object {

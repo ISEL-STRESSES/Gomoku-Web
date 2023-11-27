@@ -132,7 +132,7 @@ class GameController(private val gameService: GameService) {
         return when (matchmaker) {
             is Failure -> matchmaker.value.resolveProblem()
             is Success -> Matchmaker.siren(MatchmakerOutputModel(matchmaker.value))
-                    .responseRedirect(201, URIs.Game.ROOT + "/${matchmaker.value.id}")
+                .responseRedirect(201, URIs.Game.ROOT + "/${matchmaker.value.id}")
         }
     }
 
