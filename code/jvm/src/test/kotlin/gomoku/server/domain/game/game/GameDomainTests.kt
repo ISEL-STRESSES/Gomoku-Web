@@ -26,7 +26,6 @@ class GameDomainTests {
             newContainerWithMoves1.addMove(Move(Position(2, 2), CellColor.WHITE)) ?: throw AssertionError()
         val ongoingGame2 = OngoingGame(1, playerA, playerB, rules, newContainerWithMoves2)
         assertEquals(CellColor.BLACK, ongoingGame2.turn)
-
     }
 
     @Test

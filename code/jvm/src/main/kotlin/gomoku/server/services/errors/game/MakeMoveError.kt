@@ -11,6 +11,5 @@ sealed class MakeMoveError {
     object PlayerNotInGame : MakeMoveError()
     object PlayerNotFound : MakeMoveError()
     object GameFinished : MakeMoveError()
-    object InvalidMove : MakeMoveError()
     object MakeMoveFailed : MakeMoveError()
 }

@@ -52,7 +52,7 @@ class UserTests {
                 )
             )
             .exchange()
-            .expectStatus().is4xxClientError //409
+            .expectStatus().is4xxClientError // 409
     }
 
     @Test
@@ -73,7 +73,7 @@ class UserTests {
                 )
             )
             .exchange()
-            .expectStatus().is4xxClientError //400
+            .expectStatus().is4xxClientError // 400
     }
 
     @Test
@@ -94,7 +94,7 @@ class UserTests {
                 )
             )
             .exchange()
-            .expectStatus().is4xxClientError //400
+            .expectStatus().is4xxClientError // 400
     }
 
     @Test
@@ -119,10 +119,10 @@ class UserTests {
     fun `can't log in user with wrong password`() {
         // given: an HTTP client
         val client = WebTestClient
-                .bindToServer()
-                .baseUrl("http://localhost:$port/api")
-                .responseTimeout(Duration.ofHours(1))
-                .build()
+            .bindToServer()
+            .baseUrl("http://localhost:$port/api")
+            .responseTimeout(Duration.ofHours(1))
+            .build()
 
         // and: a random user
         val username = newTestUserName()
@@ -141,7 +141,7 @@ class UserTests {
                 )
             )
             .exchange()
-            .expectStatus().is4xxClientError //400
+            .expectStatus().is4xxClientError // 400
     }
 
     @Test
@@ -435,34 +435,34 @@ class UserTests {
      */
     private fun createUser(client: WebTestClient, username: String) =
         client.post().uri("/users/create")
-        .bodyValue(
-            mapOf(
-                "username" to username,
-                "password" to "!Kz9iYG$%TcB27f"
+            .bodyValue(
+                mapOf(
+                    "username" to username,
+                    "password" to "!Kz9iYG$%TcB27f"
+                )
             )
-        )
-        .exchange()
-        .expectStatus().isCreated
-        .expectHeader().value("Location") {
-            assertTrue(it.startsWith("/api/users/"))
-        }
-        .expectBody()
-        .returnResult()
-        .responseBody!!
+            .exchange()
+            .expectStatus().isCreated
+            .expectHeader().value("Location") {
+                assertTrue(it.startsWith("/api/users/"))
+            }
+            .expectBody()
+            .returnResult()
+            .responseBody!!
 
     private fun login(client: WebTestClient, username: String) =
         client.post().uri("/users/token")
-        .bodyValue(
-            mapOf(
-                "username" to username,
-                "password" to "!Kz9iYG$%TcB27f"
+            .bodyValue(
+                mapOf(
+                    "username" to username,
+                    "password" to "!Kz9iYG$%TcB27f"
+                )
             )
-        )
-        .exchange()
-        .expectStatus().isOk
-        .expectBody()
-        .returnResult()
-        .responseBody!!
+            .exchange()
+            .expectStatus().isOk
+            .expectBody()
+            .returnResult()
+            .responseBody!!
 
     companion object {
         private fun newTestUserName() = "User${abs(Random.nextLong())}"

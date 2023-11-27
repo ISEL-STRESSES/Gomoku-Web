@@ -87,7 +87,7 @@ class LobbyController(private val lobbyService: LobbyService) {
     private fun JoinLobbyError.resolveProblem(): ResponseEntity<*> =
         when (this) {
             JoinLobbyError.LobbyNotFound -> Problem.response(404, Problem.lobbyNotFound)
-            JoinLobbyError.UserAlreadyInLobby -> Problem.response(404, Problem.userAlreadyInLobby)
+            JoinLobbyError.UserAlreadyInLobby -> Problem.response(409, Problem.userAlreadyInLobby)
             JoinLobbyError.JoinLobbyFailed -> Problem.response(500, Problem.joinLobbyFailed)
         }
 
