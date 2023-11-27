@@ -201,3 +201,39 @@ fun forfeitGame(client: WebTestClient, gameId: Int, userToken: String): ByteArra
         .expectBody()
         .returnResult()
         .responseBody!!
+
+fun joinLobby(client: WebTestClient, lobbyId: Int, userToken: String) =
+    client.post().uri("/lobby/$lobbyId/join")
+        .header("Authorization", "bearer $userToken")
+        .exchange()
+        .expectStatus().isCreated
+        .expectBody()
+        .returnResult()
+        .responseBody!!
+
+fun getLobbies(client: WebTestClient, userToken: String): ByteArray =
+    client.get().uri("/lobbies")
+        .header("Authorization", "bearer $userToken")
+        .exchange()
+        .expectStatus().isOk
+        .expectBody()
+        .returnResult()
+        .responseBody!!
+
+fun createLobby(client: WebTestClient, ruleId: Int, userToken: String): ByteArray =
+    client.post().uri("/lobby/create/$ruleId")
+        .header("Authorization", "bearer $userToken")
+        .exchange()
+        .expectStatus().isCreated
+        .expectBody()
+        .returnResult()
+        .responseBody!!
+
+fun getLobbyById(client: WebTestClient, lobbyId: Int, userToken: String): ByteArray =
+    client.get().uri("/lobby/$lobbyId")
+        .header("Authorization", "bearer $userToken")
+        .exchange()
+        .expectStatus().isOk
+        .expectBody()
+        .returnResult()
+        .responseBody!!
