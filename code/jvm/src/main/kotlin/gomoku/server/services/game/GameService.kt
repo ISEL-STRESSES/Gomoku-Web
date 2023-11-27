@@ -318,7 +318,6 @@ class GameService(private val transactionManager: TransactionManager) {
             is MoveError.InvalidPosition -> failure(MakeMoveError.ImpossiblePosition)
             is MoveError.AlreadyOccupied -> failure(MakeMoveError.AlreadyOccupied)
             is MoveError.InvalidTurn -> failure(MakeMoveError.InvalidTurn)
-            is MoveError.InvalidMove -> failure(MakeMoveError.InvalidMove)
         }
 
     /**

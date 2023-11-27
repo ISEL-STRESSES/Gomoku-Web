@@ -131,7 +131,8 @@ class GameController(private val gameService: GameService) {
         val matchmaker = gameService.startMatchmakingProcess(rulesId, authenticatedUser.user.uuid)
         return when (matchmaker) {
             is Failure -> matchmaker.value.resolveProblem()
-            is Success -> Matchmaker.siren(MatchmakerOutputModel(matchmaker.value)).responseRedirect(201, URIs.Game.ROOT + "/${matchmaker.value.id}")
+            is Success -> Matchmaker.siren(MatchmakerOutputModel(matchmaker.value))
+                    .responseRedirect(201, URIs.Game.ROOT + "/${matchmaker.value.id}")
         }
     }
 
@@ -175,7 +176,6 @@ class GameController(private val gameService: GameService) {
             MakeMoveError.GameFinished -> Problem.response(400, Problem.gameAlreadyFinished)
             MakeMoveError.ImpossiblePosition -> Problem.response(400, Problem.impossiblePosition)
             MakeMoveError.InvalidTurn -> Problem.response(400, Problem.notYourTurn)
-            MakeMoveError.InvalidMove -> Problem.response(400, Problem.invalidMove)
             MakeMoveError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
             MakeMoveError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
             MakeMoveError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
@@ -202,8 +202,8 @@ class GameController(private val gameService: GameService) {
     private fun CurrentTurnPlayerError.resolveProblem(): ResponseEntity<*> =
         when (this) {
             CurrentTurnPlayerError.GameAlreadyFinished -> Problem.response(400, Problem.gameAlreadyFinished)
-            CurrentTurnPlayerError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
             CurrentTurnPlayerError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
+            CurrentTurnPlayerError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
         }
 
     /**
@@ -226,8 +226,8 @@ class GameController(private val gameService: GameService) {
     private fun ForfeitGameError.resolveProblem(): ResponseEntity<*> =
         when (this) {
             ForfeitGameError.GameAlreadyFinished -> Problem.response(400, Problem.gameAlreadyFinished)
-            ForfeitGameError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
             ForfeitGameError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
+            ForfeitGameError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
             ForfeitGameError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
         }
 
