@@ -115,10 +115,16 @@ class MoveContainer private constructor(
     }
 }
 
+/**
+ * Converts a [Position] to and index of the [MoveContainer].
+ */
 private fun Position.toIndex(size: Int): Int {
     return this.y * (size + 1) + this.x
 }
 
+/**
+ * Converts a serialized integer to a [Position]
+ */
 private fun Int.toPosition(boardSize: Int): Position {
     val x = this % boardSize
     val y = this / boardSize

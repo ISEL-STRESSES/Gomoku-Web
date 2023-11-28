@@ -42,6 +42,12 @@ class LobbyController(private val lobbyService: LobbyService) {
         }
     }
 
+    /**
+     * Joins a lobby
+     * @param lobbyId the id of the lobby
+     * @param authenticatedUser the authenticated user
+     * @return the result of joining a lobby
+     */
     @PostMapping(URIs.Lobby.JOIN_LOBBY)
     fun joinLobby(@PathVariable lobbyId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val joinedLobby = lobbyService.joinLobby(lobbyId, authenticatedUser.user.uuid)
@@ -51,18 +57,38 @@ class LobbyController(private val lobbyService: LobbyService) {
         }
     }
 
+    /**
+     * Get all the available lobbies
+     *
+     * @param authenticatedUser the authenticated user
+     * @return the result of the fetch of all lobbies
+     */
     @GetMapping(URIs.Lobby.GET_LOBBIES)
     fun getLobbies(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val lobbies = lobbyService.getLobbies()
         return GetLobbies.siren(GetLobbiesOutput(lobbies)).response(200)
     }
 
+    /**
+     * Create a lobby
+     *
+     * @param ruleId the id of the rule
+     * @param authenticatedUser the authenticated user
+     * @return the result of the creation of a lobby
+     */
     @PostMapping(URIs.Lobby.CREATE_LOBBY)
     fun createLobby(@PathVariable ruleId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val createLobbyResult = lobbyService.createLobby(ruleId, authenticatedUser.user.uuid)
         return CreateLobby.siren(createLobbyResult).responseRedirect(201, URIs.Lobby.GET_LOBBY_BY_ID + "/${createLobbyResult.id}")
     }
 
+    /**
+     * Get teh lobby by its id
+     *
+     * @param lobbyId the id of the lobby
+     * @param authenticatedUser the authenticated user
+     * @return the return of the get lobby by id operation
+     */
     @GetMapping(URIs.Lobby.GET_LOBBY_BY_ID)
     fun getLobbyById(@PathVariable lobbyId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val lobby = lobbyService.getLobbyById(lobbyId)
@@ -84,6 +110,11 @@ class LobbyController(private val lobbyService: LobbyService) {
             LeaveLobbyError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
         }
 
+    /**
+     * Translates the errors of joining a lobby action into a response
+     * @receiver The error
+     * @return The response
+     */
     private fun JoinLobbyError.resolveProblem(): ResponseEntity<*> =
         when (this) {
             JoinLobbyError.LobbyNotFound -> Problem.response(404, Problem.lobbyNotFound)
@@ -91,6 +122,11 @@ class LobbyController(private val lobbyService: LobbyService) {
             JoinLobbyError.JoinLobbyFailed -> Problem.response(500, Problem.joinLobbyFailed)
         }
 
+    /**
+     * Translates the errors of get the lobby action into a response
+     * @receiver The error
+     * @return The response
+     */
     private fun GetLobbyError.resolveProblem(): ResponseEntity<*> =
         when (this) {
             GetLobbyError.LobbyNotFound -> Problem.response(404, Problem.lobbyNotFound)

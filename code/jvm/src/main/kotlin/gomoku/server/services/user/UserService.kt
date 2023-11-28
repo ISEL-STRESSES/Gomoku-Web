@@ -5,6 +5,7 @@ import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserStats
 import gomoku.server.domain.user.UsersDomain
+import gomoku.server.http.controllers.user.models.UserCreateOutputModel
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
@@ -187,6 +188,13 @@ class UserService(
         }
     }
 
+    /**
+     * Creates a token for a user with the [userUUID].
+     *
+     * @param userUUID user identifier
+     * @param tokenValue the value to match the token validation info
+     * @return The new token validated.
+     */
     private fun createToken(userUUID: Int, tokenValue: String): Token {
         val now = clock.now()
         return Token(

@@ -38,6 +38,9 @@ typealias CurrentTurnPlayerResult = Either<CurrentTurnPlayerError, CurrentTurnPl
  */
 typealias GetGameResult = Either<GetGameError, Game>
 
+/**
+ * Result for getting all the finished games from a user
+ */
 typealias GetUserFinishedGamesResult = Pair<List<FinishedGame>, Int>
 
 /**

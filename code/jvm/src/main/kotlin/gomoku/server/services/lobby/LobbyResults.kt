@@ -8,6 +8,11 @@ import gomoku.server.services.errors.lobby.JoinLobbyError
 import gomoku.server.services.errors.lobby.LeaveLobbyError
 import gomoku.utils.Either
 
+/**
+ * Result for joining a lobby
+ * @see JoinLobbyError
+ * @see Matchmaker
+ */
 typealias JoinLobbyResult = Either<JoinLobbyError, Matchmaker>
 
 /**
@@ -16,4 +21,9 @@ typealias JoinLobbyResult = Either<JoinLobbyError, Matchmaker>
  */
 typealias LeaveLobbyResult = Either<LeaveLobbyError, LeaveLobbyOutput>
 
+/**
+ * Result for getting a lobby
+ * @see GetLobbyError
+ * @see Lobby
+ */
 typealias GetLobbyResult = Either<GetLobbyError, Lobby>

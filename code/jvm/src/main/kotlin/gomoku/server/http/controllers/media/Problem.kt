@@ -57,8 +57,6 @@ class Problem(typeUri: URI, val title: String) {
         val impossiblePosition =
             Problem(URI(PROBLEM_BASE_URL + "impossible-position"), "The chosen position is impossible.")
 
-        val invalidMove = Problem(URI(PROBLEM_BASE_URL + "invalid-move"), "Invalid move.")
-
         val makeMoveFailed = Problem(URI(PROBLEM_BASE_URL + "make-move-failed"), "Failed to make a move.")
 
         val samePlayer = Problem(URI(PROBLEM_BASE_URL + "same-player"), "It's the same player.")

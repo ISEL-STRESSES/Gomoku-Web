@@ -17,7 +17,7 @@ class LobbyService(private val transactionManager: TransactionManager) {
     /**
      * Leaves the matchmaking process.
      * @param userId id of the user
-     * @return an empty [Success] if the user left the matchmaking process, a [Failure] otherwise
+     * @return a LeaveLobbyOutput in case of success or a LeaveLobbyError in case of a failure
      */
     fun leaveLobby(lobbyId: Int, userId: Int): LeaveLobbyResult =
         transactionManager.run {
@@ -33,11 +33,23 @@ class LobbyService(private val transactionManager: TransactionManager) {
             }
         }
 
+    /**
+     * Creates a Lobby with a user in it with a specific rule.
+     * @param ruleId the rule to apply to the lobby.
+     * @param userId to be a part of the lobby
+     * @return A MatchMaker with the id of the lobby.
+     */
     fun createLobby(ruleId: Int, userId: Int): Matchmaker =
         transactionManager.run {
             Matchmaker(false, it.lobbyRepository.createLobby(ruleId, userId))
         }
 
+    /**
+     * Joins a user to a lobby
+     * @param lobbyId the id of the lobby
+     * @param userId the id of the lobby
+     * @return The Result of the joining a lobby operation
+     */
     fun joinLobby(lobbyId: Int, userId: Int): JoinLobbyResult =
         transactionManager.run {
             val lobbyGet = it.lobbyRepository.getLobbyById(lobbyId)
@@ -55,11 +67,20 @@ class LobbyService(private val transactionManager: TransactionManager) {
             return@run success(Matchmaker(true, gameId))
         }
 
+    /**
+     * Gets all the lobbies.
+     * @return List of lobbies.
+     */
     fun getLobbies(): List<Lobby> =
         transactionManager.run {
             it.lobbyRepository.getLobbies()
         }
 
+    /**
+     * Searches for a lobby by the given [lobbyId].
+     * @param lobbyId id to search
+     * @return Either returns a Lobby if successful or an [GetLobbyError].
+     */
     fun getLobbyById(lobbyId: Int): GetLobbyResult =
         transactionManager.run {
             val lobby = it.lobbyRepository.getLobbyById(lobbyId) ?: return@run failure(GetLobbyError.LobbyNotFound)
