@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSetUser } from './Authn';
+import { useState } from "react";
+
+const baseURL = 'http://localhost:8080';
 
 type State =
   | { tag: 'editing'; error?: string; inputs: { username: string; password: string } }
@@ -45,23 +48,52 @@ function reduce(state: State, action: Action): State {
   }
 }
 
-function delay(delayInMs: number) {
+/*function delay(delayInMs: number) {
   return new Promise(resolve => {
     setTimeout(() => resolve(undefined), delayInMs);
   });
-}
+}*/
 
-export async function authenticate(username: string, password: string): Promise<string | undefined> {
+/*export async function authenticate(username: string, password: string): Promise<{id:number, name:string} | undefined> {
   await delay(5000);
   if ((username == 'alice' || username == 'bob') && password == '1234') {
-    return username;
+    return {id: 1, name: username};
   }
   return undefined;
+}*/
+
+export async function authenticate1 (url:string, username:string, password:string): Promise<{id:number, name:string} | undefined> {
+  return fetch(baseURL + url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username, password }),
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(res => {
+      if (res) {
+        console.log(res);
+        return { id: res.id, name: username };
+      } else {
+        return undefined;
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      return undefined;
+    });
 }
 
 export function Login() {
   console.log('Login');
   const [state, dispatch] = React.useReducer(reduce, { tag: 'editing', inputs: { username: '', password: '' } });
+  const [isSignUp, setSignUp] = useState(true);
   const setUser = useSetUser();
   const location = useLocation();
   if (state.tag === 'redirect') {
@@ -72,45 +104,73 @@ export function Login() {
   }
   function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
+    console.log('handleSubmit');
     if (state.tag !== 'editing') {
       return;
     }
+    console.log('dispatch submit')
     dispatch({ type: 'submit' });
     const username = state.inputs.username;
     const password = state.inputs.password;
-    authenticate(username, password)
-      .then(res => {
-        if (res) {
-          console.log(`setUser(${res})`);
-          setUser(res);
-          dispatch({ type: 'success' });
-        } else {
-          dispatch({ type: 'error', message: 'Invalid username or password' });
-        }
-      })
-      .catch(error => {
-        dispatch({ type: 'error', message: error.message });
-      });
+    if (isSignUp) {
+      authenticate1('/api/users/create', username, password)
+        .then(res => {
+          if (res) {
+            console.log(`setUser(${res})`);
+            setUser(res);
+            dispatch({ type: 'success' });
+          } else {
+            dispatch({ type: 'error', message: 'Invalid username or password' });
+          }
+        })
+        .catch(error => {
+          dispatch({ type: 'error', message: error.message });
+        });
+      return;
+    }else {
+      authenticate1('/api/users/token', username, password)
+        .then(res => {
+          if (res) {
+            console.log(`setUser(${res})`);
+            setUser(res);
+            dispatch({ type: 'success' });
+          } else {
+            dispatch({ type: 'error', message: 'Invalid username or password' });
+          }
+        })
+        .catch(error => {
+          dispatch({ type: 'error', message: error.message });
+        });
+    }
   }
 
   const username = state.tag === 'submitting' ? state.username : state.inputs.username
   const password = state.tag === 'submitting' ? "" : state.inputs.password
+
   return (
-    <form onSubmit={handleSubmit}>
-      <fieldset disabled={state.tag !== 'editing'}>
-        <div>
-          <label htmlFor="username">Username</label>
-          <input id="username" type="text" name="username" value={username} onChange={handleChange} />
-        </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input id="password" type="text" name="password" value={password} onChange={handleChange} />
-        </div>
-        <div>
-          <button type="submit">Login</button>
-        </div>
-      </fieldset>
-      {state.tag === 'editing' && state.error}
-    </form>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <fieldset disabled={state.tag !== 'editing'}>
+          <center>
+            <div>
+              <input className="input" type="text" name="username" value={username} onChange={handleChange} required />
+              <label htmlFor="input">Username</label>
+            </div>
+            <div>
+              <input className="input" type="password" name="password" value={password} onChange={handleChange} required />
+              <label htmlFor="input">Password</label>
+            </div>
+            <div>
+              <button className="button" type="submit" onClick={() => setSignUp(false)}>
+                Log in
+              </button>
+              <button className="button" type="submit" onClick={() => setSignUp(true)}>
+                Sign Up
+              </button>
+            </div>
+          </center>
+        </fieldset>
+      </form>
+    </div>
   );
 }

@@ -2,10 +2,10 @@ import * as React from 'react';
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 import { Home } from './Home';
 import { About } from './About';
-import { Me } from './Me';
-import { AuthnContainer } from './authentication/Authn';
-import { RequireAuthn } from './authentication/RequireAuthn';
+import { AuthnContainer, Logout } from './authentication/Authn';
 import { Login } from './authentication/Login';
+import { RequireAuth } from "./authentication/RequireAuth";
+import { ShowMe } from "./user/ShowMe";
 
 const router = createBrowserRouter([
   {
@@ -20,16 +20,20 @@ const router = createBrowserRouter([
             'path': '/login',
             'element': <Login />,
           },
+          {
+            'path': '/about',
+            'element': <About />,
+          },
+          {
+            "path": "/me",
+            "element": <RequireAuth><ShowMe /></RequireAuth>
+          },
+          {
+            "path": "/logout",
+            "element": <Logout />
+          },
         ],
       },
-      {
-        'path': '/me',
-        'element': <RequireAuthn><Me /></RequireAuthn>,
-      },
-      {
-        'path': '/about',
-        'element': <About />,
-      }
     ],
   },
 ]);

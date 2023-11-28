@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton'
 import EmailIcon from '@mui/icons-material/Email'
 import GitHubIcon from '@mui/icons-material/GitHub'
@@ -61,14 +60,11 @@ const showAuthor = (author: Author, index: number | null | undefined) => {
 };
 
 export  function About() {
-  const navigate = useNavigate();
   //TODO: Make titles have better styling, also add a link to the github repo and version number
   return (
-    <div>
-      <h1>About</h1>
-      <h2>Authors:</h2>
+    <div className="about">
+      <h1>Meet the team</h1>
       <AuthorList />
-      <button onClick={() => navigate(-1)}>Back</button>
     </div>
   );
 }

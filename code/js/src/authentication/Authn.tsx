@@ -3,11 +3,23 @@ import {
   useState,
   createContext,
   useContext,
+  useEffect
 } from 'react'
+import { getCookie } from "../utils/cookieUtils";
+import { Navigate } from 'react-router-dom';
+
+export const tokenCookie = 'Gomoku-daw-token-cookie';
+export const userInfoCookieName = 'Gomoku-daw-userinfo-name-cookie';
+export const userInfoCookieId = 'Gomoku-daw-userinfo-id-cookie';
+
+type UserInfo = {
+  id: number,
+  name: string
+}
 
 type ContextType = {
-  user: string | undefined,
-  setUser: (v: string | undefined) => void
+  user: UserInfo | undefined,
+  setUser: (newUser: UserInfo | undefined) => void
 }
 const LoggedInContext = createContext<ContextType>({
   user: undefined,
@@ -15,10 +27,15 @@ const LoggedInContext = createContext<ContextType>({
 })
 
 export function AuthnContainer({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<string | undefined>(undefined)
-  console.log(`AuthnContainer: ${user}`)
+  const id = getCookie(userInfoCookieId);
+  const name = getCookie(userInfoCookieName);
+  const info = id !== undefined && name !== undefined ? { id: parseInt(id), name } : undefined;
+
+  const [userInfo, setUser] = useState(info);
+  console.log(`AuthnContainer: ${name}`)
+
   return (
-    <LoggedInContext.Provider value={{ user: user, setUser: setUser }}>
+    <LoggedInContext.Provider value={{ user: userInfo, setUser: setUser }}>
       {children}
     </LoggedInContext.Provider>
   )
@@ -30,4 +47,18 @@ export function useCurrentUser() {
 
 export function useSetUser() {
   return useContext(LoggedInContext).setUser
+}
+
+export function Logout() {
+  const setUser = useSetUser();
+
+  useEffect(() => {
+    setUser(undefined);
+  });
+
+  return (
+    <div>
+      <Navigate to={ "/" } replace={ true }/>
+    </div>
+  );
 }
