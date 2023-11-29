@@ -15,12 +15,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class PipelineConfigurer(
     val authenticationInterceptor: AuthenticationInterceptor,
-    val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver,
+    val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver
 ) : WebMvcConfigurer {
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authenticationInterceptor)
-        //registry.addInterceptor(pathAuthenticationInterceptor)
+        // registry.addInterceptor(pathAuthenticationInterceptor)
     }
 
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
