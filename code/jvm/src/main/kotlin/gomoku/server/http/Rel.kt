@@ -2,6 +2,9 @@ package gomoku.server.http
 
 import gomoku.server.http.infra.LinkRelation
 
+/**
+ * TODO
+ */
 object Rel {
 
     val SELF = LinkRelation("self")

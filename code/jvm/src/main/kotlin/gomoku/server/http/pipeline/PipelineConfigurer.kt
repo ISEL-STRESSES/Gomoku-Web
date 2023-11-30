@@ -18,15 +18,24 @@ class PipelineConfigurer(
     val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver
 ) : WebMvcConfigurer {
 
+    /**
+     * TODO
+     */
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authenticationInterceptor)
         // registry.addInterceptor(pathAuthenticationInterceptor)
     }
 
+    /**
+     * TODO
+     */
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(authenticatedUserArgumentResolver)
     }
 
+    /**
+     * TODO
+     */
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE").allowedHeaders("*")
     }

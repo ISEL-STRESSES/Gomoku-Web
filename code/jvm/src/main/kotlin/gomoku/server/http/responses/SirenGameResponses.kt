@@ -13,7 +13,14 @@ import gomoku.server.http.controllers.lobby.models.GetLobbiesOutput
 import gomoku.server.http.controllers.lobby.models.LeaveLobbyOutput
 import gomoku.server.http.infra.siren
 
+/**
+ * TODO
+ */
 object GetFinishedGames {
+
+    /**
+     * TODO
+     */
     fun siren(body: GetFinishedGamesOutputModel, totalPages: Int, currentOffset: Int, currentLimit: Int) =
         siren(body) {
             clazz(Rel.GAME_LIST.value)
@@ -44,7 +51,14 @@ object GetFinishedGames {
         }
 }
 
+/**
+ * TODO
+ */
 object GetGameById {
+
+    /**
+     * TODO
+     */
     fun siren(body: GameOutputModel) =
         siren(body) {
             clazz(Rel.GAME.value)
@@ -53,7 +67,14 @@ object GetGameById {
         }
 }
 
+/**
+ * TODO
+ */
 object GetRules {
+
+    /**
+     * TODO
+     */
     fun siren(body: GetRulesOutputModel) =
         siren(body) {
             clazz(Rel.RULES.value)
@@ -62,7 +83,14 @@ object GetRules {
         }
 }
 
+/**
+ * TODO
+ */
 object Matchmaker {
+
+    /**
+     * TODO
+     */
     fun siren(body: MatchmakerOutputModel) =
         siren(body) {
             clazz(Rel.MATCHMAKER.value)
@@ -70,7 +98,14 @@ object Matchmaker {
         }
 }
 
+/**
+ * TODO
+ */
 object LeaveLobby {
+
+    /**
+     * TODO
+     */
     fun siren(body: LeaveLobbyOutput) =
         siren(body) {
             clazz(Rel.LEAVE_LOBBY.value)
@@ -78,7 +113,14 @@ object LeaveLobby {
         }
 }
 
+/**
+ * TODO
+ */
 object JoinLobby {
+
+    /**
+     * TODO
+     */
     fun siren(body: Matchmaker) =
         siren(body) {
             clazz(Rel.JOIN_LOBBY.value)
@@ -86,7 +128,14 @@ object JoinLobby {
         }
 }
 
+/**
+ * TODO
+ */
 object GetLobbies {
+
+    /**
+     * TODO
+     */
     fun siren(body: GetLobbiesOutput) =
         siren(body) {
             clazz(Rel.GET_LOBBIES.value)
@@ -94,7 +143,14 @@ object GetLobbies {
         }
 }
 
+/**
+ * TODO
+ */
 object CreateLobby {
+
+    /**
+     * TODO
+     */
     fun siren(body: Matchmaker) =
         siren(body) {
             clazz(Rel.CREATE_LOBBY.value)
@@ -102,7 +158,14 @@ object CreateLobby {
         }
 }
 
+/**
+ * TODO
+ */
 object GetLobbyById {
+
+    /**
+     * TODO
+     */
     fun siren(body: Lobby) =
         siren(body) {
             clazz(Rel.GET_LOBBY_BY_ID.value)
@@ -110,7 +173,14 @@ object GetLobbyById {
         }
 }
 
+/**
+ * TODO
+ */
 object MakeMove {
+
+    /**
+     * TODO
+     */
     fun siren(body: GameOutputModel) =
         siren(body) {
             clazz(Rel.MAKE_MOVE.value)
@@ -118,7 +188,14 @@ object MakeMove {
         }
 }
 
+/**
+ * TODO
+ */
 object GetTurn {
+
+    /**
+     * TODO
+     */
     fun siren(body: CurrentTurnPlayerOutput) =
         siren(body) {
             clazz(Rel.GET_TURN.value)
@@ -126,7 +203,14 @@ object GetTurn {
         }
 }
 
+/**
+ * TODO
+ */
 object ForfeitGame {
+
+    /**
+     * TODO
+     */
     fun siren(body: GameOutputModel) =
         siren(body) {
             clazz(Rel.FORFEIT_GAME.value)

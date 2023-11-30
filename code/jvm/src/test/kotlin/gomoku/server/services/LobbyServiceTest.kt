@@ -52,18 +52,6 @@ class LobbyServiceTest {
         }
     }
 
-    @Test // TODO("How can i do this if its required for a user to be in a lobby, how can i differentiate from different errors")
-    fun `leave lobby with an un-existing user id`() {
-        val userTestId = Int.MAX_VALUE
-        testWithTransactionManagerAndRollback { transactionManager ->
-            // before
-            deleteLobbies()
-
-            // test
-            val lobbyService = LobbyService(transactionManager)
-        }
-    }
-
     @Test
     fun `create Lobby`() {
         val testRuleId = 1

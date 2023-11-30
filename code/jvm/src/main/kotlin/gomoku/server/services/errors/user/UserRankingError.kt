@@ -5,8 +5,6 @@ package gomoku.server.services.errors.user
  */
 sealed class UserRankingError {
     object UserNotFound : UserRankingError()
-
     object RuleNotFound : UserRankingError()
-
     object UserStatsNotFound : UserRankingError()
 }

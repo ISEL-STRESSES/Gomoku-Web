@@ -10,7 +10,14 @@ import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
 import gomoku.server.http.controllers.user.models.getUsersData.GetUsersRankingDataOutputModel
 import gomoku.server.http.infra.siren
 
+/**
+ * TODO
+ */
 object SignUp {
+
+    /**
+     * TODO
+     */
     fun siren(body: UserCreateOutputModel) =
         siren(body) {
             clazz(Rel.SIGNUP.value)
@@ -18,7 +25,14 @@ object SignUp {
         }
 }
 
+/**
+ * TODO
+ */
 object Login {
+
+    /**
+     * TODO
+     */
     fun siren(body: UserCreateOutputModel) =
         siren(body) {
             clazz(Rel.LOGIN.value)
@@ -26,7 +40,14 @@ object Login {
         }
 }
 
+/**
+ * TODO
+ */
 object GetRanking {
+
+    /**
+     * TODO
+     */
     fun siren(body: GetUsersRankingDataOutputModel, totalPages: Int, currentOffset: Int, currentLimit: Int) =
         siren(body) {
             clazz(Rel.SEARCH_RANKING.value)
@@ -60,7 +81,14 @@ object GetRanking {
         }
 }
 
+/**
+ * TODO
+ */
 object GetUserRanking {
+
+    /**
+     * TODO
+     */
     fun siren(body: UserRuleStatsOutputModel) =
         siren(body) {
             clazz(Rel.USER_RANKING.value)
@@ -69,7 +97,14 @@ object GetUserRanking {
         }
 }
 
+/**
+ * TODO
+ */
 object GetUserStats {
+
+    /**
+     * TODO
+     */
     fun siren(body: UserStatsOutputModel) =
         siren(body) {
             clazz(Rel.USER_STATS.value)
@@ -78,7 +113,14 @@ object GetUserStats {
         }
 }
 
+/**
+ * TODO
+ */
 object GetUserById {
+
+    /**
+     * TODO
+     */
     fun siren(body: UserByIdOutputModel) =
         siren(body) {
             clazz(Rel.USER.value)
@@ -87,7 +129,14 @@ object GetUserById {
         }
 }
 
+/**
+ * TODO
+ */
 object Logout {
+
+    /**
+     * TODO
+     */
     fun siren() =
         siren("User logged out.") {
             clazz(Rel.LOGOUT.value)
@@ -95,7 +144,14 @@ object Logout {
         }
 }
 
+/**
+ * TODO
+ */
 object UserMe {
+
+    /**
+     * TODO
+     */
     fun siren(body: UserHomeOutputModel) =
         siren(body) {
             clazz(Rel.USER.value)

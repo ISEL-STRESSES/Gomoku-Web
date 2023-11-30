@@ -37,7 +37,6 @@ interface GameRepository {
     fun isRuleStoredById(ruleId: Int): Boolean
 
     // game
-
     /**
      * Verifies if the game is stored based on the [gameId]
      * @param gameId id of the game

@@ -6,7 +6,14 @@ import gomoku.server.http.URIs
 import org.springframework.http.HttpMethod
 import java.net.URI
 
+/**
+ * TODO
+ */
 object SirenHomeResponses {
+
+    /**
+     * TODO
+     */
     fun siren(body: ServerInfo) =
         gomoku.server.http.infra.siren(body) {
             clazz(Rel.HOME.value)
