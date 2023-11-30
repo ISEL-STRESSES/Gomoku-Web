@@ -8,5 +8,7 @@ package gomoku.server.http.controllers.user.models
  */
 data class UserCreateOutputModel(
     val userId: Int,
-    val token: String
+    val username: String,
+    val token: String,
+    val tokenExpiration: String
 )

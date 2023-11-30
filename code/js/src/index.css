@@ -128,3 +128,71 @@ input[type="checkbox"]{
     flex: 0 0 auto;
     margin: 10px;
 }
+
+#authDiv {
+    max-width: 400px;
+    min-width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+#authForm {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #1b1b1b;
+    color: #fff;
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+}
+
+button:hover {
+    color: #111;
+    background-color: #fff;
+}
+
+label {
+    margin-bottom: 5px;
+}
+
+fieldset[disabled] .button {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Additional styles for visual feedback when disabled */
+fieldset[disabled] .input {
+    background-color: #eee;
+    cursor: not-allowed;
+}
+
+fieldset[disabled] input::placeholder {
+    color: #aaa;
+}
+
+#authFieldSet {
+    border: none;
+}
+
+label {
+    margin-bottom: 6px;
+    display: block;
+    font-size: 18px;
+    color: #fff;
+}

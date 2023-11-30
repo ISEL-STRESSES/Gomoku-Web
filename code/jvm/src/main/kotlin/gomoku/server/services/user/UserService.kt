@@ -57,7 +57,7 @@ class UserService(
                 val tokenValue = usersDomain.generateTokenValue()
                 val token = createToken(uuid, tokenValue)
                 it.usersRepository.createToken(token, usersDomain.maxNumberOfTokensPerUser)
-                success(UserCreateOutputModel(uuid, tokenValue))
+                success(UserCreateOutputModel(uuid, username, tokenValue, usersDomain.getTokenExpiration(token)))
             }
         }
     }
@@ -82,7 +82,7 @@ class UserService(
             val tokenValue = usersDomain.generateTokenValue()
             val token = createToken(user.uuid, tokenValue)
             it.usersRepository.createToken(token, usersDomain.maxNumberOfTokensPerUser)
-            success(TokenExternalInfo(tokenValue, usersDomain.getTokenExpiration(token)))
+            success(UserCreateOutputModel(user.uuid, user.username, tokenValue, usersDomain.getTokenExpiration(token)))
         }
     }
 

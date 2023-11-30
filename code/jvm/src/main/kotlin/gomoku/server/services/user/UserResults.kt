@@ -19,7 +19,7 @@ typealias UserCreationResult = Either<UserCreationError, UserCreateOutputModel>
  * @see TokenCreationError
  * @see TokenExternalInfo
  */
-typealias TokenCreationResult = Either<TokenCreationError, TokenExternalInfo>
+typealias TokenCreationResult = Either<TokenCreationError, UserCreateOutputModel>
 
 /**
  * Result for user ranking

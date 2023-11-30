@@ -48,21 +48,7 @@ function reduce(state: State, action: Action): State {
   }
 }
 
-/*function delay(delayInMs: number) {
-  return new Promise(resolve => {
-    setTimeout(() => resolve(undefined), delayInMs);
-  });
-}*/
-
-/*export async function authenticate(username: string, password: string): Promise<{id:number, name:string} | undefined> {
-  await delay(5000);
-  if ((username == 'alice' || username == 'bob') && password == '1234') {
-    return {id: 1, name: username};
-  }
-  return undefined;
-}*/
-
-export async function authenticate1 (url:string, username:string, password:string): Promise<{id:number, name:string} | undefined> {
+export async function authenticate (url:string, username:string, password:string): Promise<{id:number, name:string} | undefined> {
   return fetch(baseURL + url, {
     method: 'POST',
     headers: {
@@ -113,7 +99,7 @@ export function Login() {
     const username = state.inputs.username;
     const password = state.inputs.password;
     if (isSignUp) {
-      authenticate1('/api/users/create', username, password)
+      authenticate('/api/users/create', username, password)
         .then(res => {
           if (res) {
             console.log(`setUser(${res})`);
@@ -128,7 +114,7 @@ export function Login() {
         });
       return;
     }else {
-      authenticate1('/api/users/token', username, password)
+      authenticate('/api/users/token', username, password)
         .then(res => {
           if (res) {
             console.log(`setUser(${res})`);
@@ -148,27 +134,25 @@ export function Login() {
   const password = state.tag === 'submitting' ? "" : state.inputs.password
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <fieldset disabled={state.tag !== 'editing'}>
-          <center>
-            <div>
-              <input className="input" type="text" name="username" value={username} onChange={handleChange} required />
-              <label htmlFor="input">Username</label>
-            </div>
-            <div>
-              <input className="input" type="password" name="password" value={password} onChange={handleChange} required />
-              <label htmlFor="input">Password</label>
-            </div>
-            <div>
-              <button className="button" type="submit" onClick={() => setSignUp(false)}>
-                Log in
-              </button>
-              <button className="button" type="submit" onClick={() => setSignUp(true)}>
-                Sign Up
-              </button>
-            </div>
-          </center>
+    <div id="authDiv">
+      <form onSubmit={handleSubmit} id="authForm">
+        <fieldset disabled={state.tag !== 'editing'} id="authFieldSet">
+          <div>
+            <label htmlFor="input">Username</label>
+            <input id="autbBtnUser" className="input" type="text" name="username" value={username} onChange={handleChange} required />
+          </div>
+          <div>
+            <label htmlFor="input">Password</label>
+            <input id="autbBtnPass" className="input" type="password" name="password" value={password} onChange={handleChange} required />
+          </div>
+          <div>
+            <button className="button" type="submit" onClick={() => setSignUp(false)}>
+              Log in
+            </button>
+            <button className="button" type="submit" onClick={() => setSignUp(true)}>
+              Sign Up
+            </button>
+          </div>
         </fieldset>
       </form>
     </div>

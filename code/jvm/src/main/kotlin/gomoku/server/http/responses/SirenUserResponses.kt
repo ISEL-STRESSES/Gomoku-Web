@@ -9,7 +9,6 @@ import gomoku.server.http.controllers.user.models.UserStatsOutputModel
 import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
 import gomoku.server.http.controllers.user.models.getUsersData.GetUsersRankingDataOutputModel
 import gomoku.server.http.infra.siren
-import gomoku.server.services.user.TokenExternalInfo
 
 object SignUp {
     fun siren(body: UserCreateOutputModel) =
@@ -20,7 +19,7 @@ object SignUp {
 }
 
 object Login {
-    fun siren(body: TokenExternalInfo) =
+    fun siren(body: UserCreateOutputModel) =
         siren(body) {
             clazz(Rel.LOGIN.value)
             link(URIs.HOME, Rel.HOME)

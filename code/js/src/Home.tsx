@@ -13,14 +13,14 @@ export function Home() {
             <label htmlFor="click" className="menu-btn">
               <i className="fas fa-bars"></i>
             </label>
-          { Auth() }
+          { Nav() }
         </nav>
         <Outlet />
       </div>
   )
 }
 
-function Auth() {
+function Nav() {
   const user = useCurrentUser();
   if (!user)
     return (
