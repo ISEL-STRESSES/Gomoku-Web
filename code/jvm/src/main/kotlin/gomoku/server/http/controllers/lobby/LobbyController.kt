@@ -83,7 +83,7 @@ class LobbyController(private val lobbyService: LobbyService) {
     }
 
     /**
-     * Get teh lobby by its id
+     * Get the lobby by its id
      *
      * @param lobbyId the id of the lobby
      * @param authenticatedUser the authenticated user

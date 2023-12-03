@@ -2,15 +2,19 @@
  * A problem that occurred during the processing of a request.
  *
  * @property type a URI that identifies the problem type
- * @property title a short, human-readable summary of the problem
- * @property status the HTTP status code for this occurrence of the problem
+ * @property title A short, human-readable summary of the problem type.
+ * @property status the HTTP status code
+ * @property detail a human-readable explanation specific to this occurrence of the problem
+ * @property instance a URI reference that identifies the specific occurrence of the problem
  *
  * @see <a href="https://tools.ietf.org/html/rfc7807">Problem Details for HTTP APIs</a>
  */
 export interface Problem {
     type: string
     title: string
-    status: number
+    status?: number
+    detail?: string
+    instance?: string
 }
 
 /**
@@ -18,8 +22,10 @@ export interface Problem {
  * Extends the Error class to allow for the use of the throw keyword.
  *
  * @property type a URI that identifies the problem type
- * @property title a short, human-readable summary of the problem
- * @property status the HTTP status code for this occurrence of the problem
+ * @property title A short, human-readable summary of the problem type.
+ * @property status the HTTP status code
+ * @property detail a human-readable explanation specific to this occurrence of the problem
+ * @property instance a URI reference that identifies the specific occurrence of the problem
  *
  * @see <a href="https://tools.ietf.org/html/rfc7807">Problem Details for HTTP APIs</a>
  */
@@ -29,6 +35,8 @@ export class Problem extends Error {
         this.type = problem.type
         this.title = problem.title
         this.status = problem.status
+        this.detail = problem.detail
+        this.instance = problem.instance
     }
 }
 

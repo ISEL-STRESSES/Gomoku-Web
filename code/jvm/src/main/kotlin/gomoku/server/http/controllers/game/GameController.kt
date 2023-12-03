@@ -43,7 +43,7 @@ import kotlin.math.ceil
 class GameController(private val gameService: GameService) {
 
     /**
-     * Gets the list of games
+     * Gets the list of finished games
      * @param authenticatedUser The authenticated user
      * @return The list of games
      */
