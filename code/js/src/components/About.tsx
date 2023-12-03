@@ -32,6 +32,9 @@ const authors: Author[] = [
   }
 ]
 
+const githubRepository: string = "https://github.com/isel-leic-daw/2023-daw-leic51d-01"
+const versionNr: string = "1.0.0"
+
 function AuthorList() {
   return (
     <Box>
@@ -60,11 +63,12 @@ const showAuthor = (author: Author, index: number | null | undefined) => {
 };
 
 export  function About() {
-  //TODO: Make titles have better styling, also add a link to the github repo and version number
   return (
     <div className="about">
       <h1>Meet the team</h1>
       <AuthorList />
+      <p>Version: {versionNr}</p>
+      <p>Repository: <a href={githubRepository} target="_blank" rel="noopener noreferrer">{githubRepository}</a></p>
     </div>
   );
 }

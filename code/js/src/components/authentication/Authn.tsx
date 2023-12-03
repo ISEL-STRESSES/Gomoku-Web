@@ -5,7 +5,7 @@ import {
   useContext,
   useEffect
 } from 'react'
-import { getCookie } from "../utils/cookieUtils";
+import { getCookie } from "../../utils/cookieUtils";
 import { Navigate } from 'react-router-dom';
 
 export const tokenCookie = 'Gomoku-daw-token-cookie';

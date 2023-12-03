@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
-import { Home } from './Home';
-import { About } from './About';
-import { AuthnContainer, Logout } from './authentication/Authn';
-import { Login } from './authentication/Login';
-import { RequireAuth } from "./authentication/RequireAuth";
-import { ShowMe } from "./user/ShowMe";
+import { Home } from './components/Home';
+import { About } from './components/About';
+import { AuthnContainer, Logout } from './components/authentication/Authn';
+import { Login } from './components/authentication/Login';
+import { RequireAuth } from "./components/authentication/RequireAuth";
+import { ShowMe } from "./components/user/ShowMe";
 
 const router = createBrowserRouter([
   {
