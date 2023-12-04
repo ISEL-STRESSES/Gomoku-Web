@@ -9,9 +9,17 @@ import gomoku.server.http.controllers.game.models.GameOutputModel
 import gomoku.server.http.controllers.game.models.GetFinishedGamesOutputModel
 import gomoku.server.http.controllers.game.models.GetRulesOutputModel
 import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
+import gomoku.server.http.controllers.game.models.RuleOutputModel
 import gomoku.server.http.controllers.lobby.models.GetLobbiesOutput
 import gomoku.server.http.controllers.lobby.models.LeaveLobbyOutput
+import gomoku.server.http.infra.ActionFieldModel
+import gomoku.server.http.infra.EntityModel
+import gomoku.server.http.infra.LinkModel
+import gomoku.server.http.infra.PropertyDefaultModel
+import gomoku.server.http.infra.SirenMediaType
 import gomoku.server.http.infra.siren
+import org.springframework.http.HttpMethod
+import java.net.URI
 
 /**
  * TODO
@@ -24,7 +32,10 @@ object GetFinishedGames {
     fun siren(body: GetFinishedGamesOutputModel, totalPages: Int, currentOffset: Int, currentLimit: Int) =
         siren {
             clazz(Rel.GAME_LIST.value)
-            property(body)
+            property(PropertyDefaultModel(body.finishedGames.size))
+            body.finishedGames.forEach {
+                entity(EntityModel(listOf(Rel.GAME.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Game.ROOT + "/${it.id}"))))
+            }
             link(URIs.Game.ROOT + URIs.Game.HUB, Rel.SELF)
             link(URIs.HOME, Rel.HOME)
 
@@ -64,6 +75,35 @@ object GetGameById {
         siren {
             clazz(Rel.GAME.value)
             property(body)
+            if (body.gameOutcome == null) {
+                action(
+                    "make-move",
+                    "Make Move",
+                    HttpMethod.POST,
+                    URI(URIs.Game.ROOT + "/${body.id}/play"),
+                    SirenMediaType,
+                    listOf(
+                        ActionFieldModel(name = "x", type = "number"),
+                        ActionFieldModel(name = "y", type = "number")
+                    )
+                )
+                action(
+                    "get-turn",
+                    "Get Turn",
+                    HttpMethod.GET,
+                    URI(URIs.Game.ROOT + "/${body.id}/turn"),
+                    SirenMediaType,
+                    emptyList()
+                )
+                action(
+                    "forfeit-game",
+                    "Forfeit Game",
+                    HttpMethod.POST,
+                    URI(URIs.Game.ROOT + "/${body.id}/forfeit"),
+                    SirenMediaType,
+                    emptyList()
+                )
+            }
             link(URIs.Game.ROOT + "/${body.id}", Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
@@ -80,8 +120,35 @@ object GetRules {
     fun siren(body: GetRulesOutputModel) =
         siren {
             clazz(Rel.RULES.value)
-            property(body)
+            property(PropertyDefaultModel(body.rulesList.size))
+            body.rulesList.forEach {
+                entity(EntityModel(listOf(Rel.RULES.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Game.ROOT + "/rules/${it.ruleId}"))))
+            }
             link(URIs.Game.ROOT + URIs.Game.GAME_RULES, Rel.SELF)
+            link(URIs.HOME, Rel.HOME)
+        }
+}
+
+object GetRuleById {
+
+    /**
+     * TODO
+     */
+    fun siren(body: RuleOutputModel) =
+        siren {
+            clazz(Rel.RULES.value)
+            property(body)
+            action(
+                "show-ranking",
+                "Show Ranking",
+                HttpMethod.GET,
+                URI(URIs.Users.ROOT + "/ranking/${body.ruleId}"),
+                SirenMediaType,
+                listOf(
+                    ActionFieldModel(name = "ruleId", type = "number")
+                )
+            )
+            link(URIs.Game.ROOT + URIs.Game.GAME_RULES + "/${body.ruleId}", Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -145,7 +212,51 @@ object GetLobbies {
     fun siren(body: GetLobbiesOutput) =
         siren {
             clazz(Rel.GET_LOBBIES.value)
-            property(body)
+            property(PropertyDefaultModel(body.lobbies.size))
+            body.lobbies.forEach {
+                entity(EntityModel(listOf(Rel.GET_LOBBY_BY_ID.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Lobby.ROOT + "/${it.id}"))))
+            }
+            action(
+                "create-lobby",
+                "Create Lobby",
+                HttpMethod.POST,
+                URI(URIs.Lobby.ROOT + URIs.Lobby.CREATE_LOBBY),
+                SirenMediaType,
+                listOf(
+                    ActionFieldModel(name = "ruleId", type = "number")
+                )
+            )
+            action(
+                "join-lobby",
+                "Join Lobby",
+                HttpMethod.POST,
+                URI(URIs.Lobby.ROOT + URIs.Lobby.JOIN_LOBBY),
+                SirenMediaType,
+                listOf(
+                    ActionFieldModel(name = "lobbyId", type = "number")
+                )
+            )
+            action(
+                "leave-lobby",
+                "Leave Lobby",
+                HttpMethod.POST,
+                URI(URIs.Lobby.ROOT + URIs.Lobby.LEAVE_LOBBY),
+                SirenMediaType,
+                listOf(
+                    ActionFieldModel(name = "lobbyId", type = "number")
+                )
+            )
+            action(
+                "match-make",
+                "Match Make",
+                HttpMethod.POST,
+                URI(URIs.Lobby.ROOT + URIs.Lobby.MATCH_MAKE),
+                SirenMediaType,
+                listOf(
+                    ActionFieldModel(name = "ruleId", type = "number")
+                )
+            )
+            link(URIs.Lobby.ROOT + URIs.Lobby.GET_LOBBIES, Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
 }

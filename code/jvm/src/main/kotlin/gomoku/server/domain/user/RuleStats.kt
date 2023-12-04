@@ -8,6 +8,7 @@ package gomoku.server.domain.user
  */
 data class RuleStats(
     val ruleId: Int,
+    val rank: Int,
     val gamesPlayed: Int,
     val elo: Int
 )

@@ -54,9 +54,23 @@ data class ActionModel(
     val fields: List<Any>
 )
 
+data class ActionFieldModel(
+    val name: String,
+    val type: String? = null,
+    val value: String? = null
+)
+
 data class PropertyRankingModel(
     val ruleId: Int,
-    val search: String,
-    val limit: Int,
-    val offset: Int
+    val size: Int
+)
+
+data class PropertyDefaultModel(
+    val size: Int
+)
+
+data class PropertyUserStatsModel(
+    val userId: Int,
+    val username: String,
+    val size: Int
 )

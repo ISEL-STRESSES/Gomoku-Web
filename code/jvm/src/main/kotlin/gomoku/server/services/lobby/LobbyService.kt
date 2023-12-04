@@ -4,9 +4,11 @@ import gomoku.server.domain.game.Lobby
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.http.controllers.lobby.models.LeaveLobbyOutput
 import gomoku.server.repository.TransactionManager
+import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.errors.lobby.GetLobbyError
 import gomoku.server.services.errors.lobby.JoinLobbyError
 import gomoku.server.services.errors.lobby.LeaveLobbyError
+import gomoku.server.services.game.MatchmakingResult
 import gomoku.utils.failure
 import gomoku.utils.success
 import org.springframework.stereotype.Service
@@ -14,6 +16,36 @@ import kotlin.random.Random
 
 @Service
 class LobbyService(private val transactionManager: TransactionManager) {
+
+    /**
+     * Starts the matchmaking process for the given rule and user.
+     * @param ruleId id of the rule
+     * @param userId the id of the user that wants to play
+     * @return the result of the matchmaking process
+     * @see MatchmakingResult
+     */
+    fun startMatchmakingProcess(ruleId: Int, userId: Int): MatchmakingResult {
+        return transactionManager.run {
+            val lobby = it.lobbyRepository.getLobbyByRuleId(ruleId)
+
+            if (lobby != null) {
+                if (lobby.userId == userId) {
+                    return@run failure(MatchmakingError.SamePlayer)
+                }
+                val didLeave = it.lobbyRepository.leaveLobby(lobby.id, lobby.userId)
+                if (!didLeave) {
+                    return@run failure(MatchmakingError.LeaveLobbyFailed)
+                }
+                val playerBlack = if (Random.nextBoolean()) userId else lobby.userId
+                val playerWhite = if (playerBlack == userId) lobby.userId else userId
+                val gameId = it.gameRepository.createGame(ruleId, playerBlack, playerWhite)
+                return@run success(Matchmaker(true, gameId))
+            } else {
+                return@run success(Matchmaker(false, it.lobbyRepository.createLobby(ruleId, userId)))
+            }
+        }
+    }
+
     /**
      * Leaves the matchmaking process.
      * @param userId id of the user

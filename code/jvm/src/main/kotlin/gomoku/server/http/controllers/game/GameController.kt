@@ -5,23 +5,21 @@ import gomoku.server.http.URIs
 import gomoku.server.http.controllers.game.models.GameOutputModel
 import gomoku.server.http.controllers.game.models.GetFinishedGamesOutputModel
 import gomoku.server.http.controllers.game.models.GetRulesOutputModel
-import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
 import gomoku.server.http.controllers.game.models.RuleOutputModel
 import gomoku.server.http.controllers.media.Problem
 import gomoku.server.http.responses.ForfeitGame
 import gomoku.server.http.responses.GetFinishedGames
 import gomoku.server.http.responses.GetGameById
+import gomoku.server.http.responses.GetRuleById
 import gomoku.server.http.responses.GetRules
 import gomoku.server.http.responses.GetTurn
 import gomoku.server.http.responses.MakeMove
-import gomoku.server.http.responses.Matchmaker
 import gomoku.server.http.responses.response
-import gomoku.server.http.responses.responseRedirect
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.ForfeitGameError
 import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.MakeMoveError
-import gomoku.server.services.errors.game.MatchmakingError
+import gomoku.server.services.errors.game.RuleError
 import gomoku.server.services.game.GameService
 import gomoku.utils.Failure
 import gomoku.utils.Success
@@ -97,6 +95,20 @@ class GameController(private val gameService: GameService) {
     }
 
     /**
+     * Gets the details of a rule
+     * @param ruleId The id of the rule
+     * @return The details of the rule
+     */
+    @GetMapping(URIs.Game.GAME_RULE_ID)
+    fun ruleDetails(@PathVariable ruleId: Int): ResponseEntity<*> {
+        val rule = gameService.getRule(ruleId)
+        return when (rule) {
+            is Failure -> rule.value.resolveProblem()
+            is Success -> GetRuleById.siren(RuleOutputModel(rule.value)).response(200)
+        }
+    }
+
+    /**
      * Makes a move in the context of a game
      * @param gameId The id of the game
      * @param authenticatedUser The authenticated user
@@ -116,23 +128,6 @@ class GameController(private val gameService: GameService) {
             is Failure -> moveResult.value.resolveProblem()
             is Success ->
                 MakeMove.siren(GameOutputModel.fromGame(moveResult.value)).response(200)
-        }
-    }
-
-    /**
-     * Starts the matchmaking process for a game, either
-     * by creating a new lobby or joining a game
-     * @param rulesId The id of the rule
-     * @param authenticatedUser The authenticated user
-     * @return The result of the matchmaking process
-     */
-    @PostMapping(URIs.Game.MATCH_MAKE)
-    fun startMatchmaking(@PathVariable rulesId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val matchmaker = gameService.startMatchmakingProcess(rulesId, authenticatedUser.user.uuid)
-        return when (matchmaker) {
-            is Failure -> matchmaker.value.resolveProblem()
-            is Success -> Matchmaker.siren(MatchmakerOutputModel(matchmaker.value))
-                .responseRedirect(201, URIs.Game.ROOT + "/${matchmaker.value.id}")
         }
     }
 
@@ -184,17 +179,6 @@ class GameController(private val gameService: GameService) {
         }
 
     /**
-     * Translates the errors of a Matchmaking action into a response
-     * @receiver The error
-     * @return The response
-     */
-    private fun MatchmakingError.resolveProblem(): ResponseEntity<*> =
-        when (this) {
-            MatchmakingError.SamePlayer -> Problem.response(400, Problem.samePlayer)
-            MatchmakingError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
-        }
-
-    /**
      * Translates the errors of a Current turn player action into a response
      * @receiver The error
      * @return The response
@@ -216,6 +200,11 @@ class GameController(private val gameService: GameService) {
             GetGameError.PlayerNotInGame -> Problem.response(401, Problem.playerNotInGame)
             GetGameError.GameNotFound -> Problem.response(404, Problem.gameNotFound)
             GetGameError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
+        }
+
+    private fun RuleError.resolveProblem(): ResponseEntity<*> =
+        when (this) {
+            RuleError.RuleNotFound -> Problem.response(404, Problem.ruleNotFound)
         }
 
     /**

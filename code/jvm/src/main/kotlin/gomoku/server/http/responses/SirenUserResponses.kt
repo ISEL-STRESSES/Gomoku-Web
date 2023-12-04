@@ -11,6 +11,7 @@ import gomoku.server.http.controllers.user.models.getUsersData.GetUsersRankingDa
 import gomoku.server.http.infra.EntityModel
 import gomoku.server.http.infra.LinkModel
 import gomoku.server.http.infra.PropertyRankingModel
+import gomoku.server.http.infra.PropertyUserStatsModel
 import gomoku.server.http.infra.siren
 
 /**
@@ -56,9 +57,9 @@ object GetRanking {
     fun siren(body: GetUsersRankingDataOutputModel, totalPages: Int, currentOffset: Int, currentLimit: Int) =
         siren {
             clazz(Rel.SEARCH_RANKING.value)
-            property(PropertyRankingModel(body.ruleId, body.search, currentLimit, currentOffset))
+            property(PropertyRankingModel(body.ruleId, body.userData.size))
             body.userData.forEach {
-                entity(EntityModel(listOf(Rel.USER.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.USER.value), URIs.Users.ROOT + "/${it.id}"))))
+                entity(EntityModel(listOf(Rel.USER.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Users.ROOT + "/${it.id}/ranking/${body.ruleId}"))))
             }
             link(
                 "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=$currentOffset",
@@ -118,7 +119,10 @@ object GetUserStats {
     fun siren(body: UserStatsOutputModel) =
         siren {
             clazz(Rel.USER_STATS.value)
-            property(body)
+            property(PropertyUserStatsModel(body.userId, body.username, body.userRuleStats.size))
+            body.userRuleStats.forEach {
+                entity(EntityModel(listOf(Rel.USER_RANKING.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Users.ROOT + "/${body.userId}/ranking/${it.ruleId}"))))
+            }
             link("${URIs.Users.ROOT}/stats/${body.userId}", Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }

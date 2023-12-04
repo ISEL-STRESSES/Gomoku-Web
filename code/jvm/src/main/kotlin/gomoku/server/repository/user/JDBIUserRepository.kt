@@ -179,13 +179,32 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun getUserStats(userId: Int): UserStats? =
         handle.createQuery(
             """
-            select users.id as user_id, rules.id as rule_id, users.username, rules.board_size, rules.opening_rule, rules.variant, user_stats.games_played, user_stats.elo
-            from users
-            inner join user_stats
-            on users.id = user_stats.user_id
-            inner join rules
-            on user_stats.rules_id = rules.id
-            where users.id = :user_id
+            with ranked_users as (
+            select
+                user_id,
+                rules_id,
+                elo,
+                RANK() over (partition by rules_id order by elo desc) as rank
+            from user_stats
+        )
+        select
+            users.id as user_id,
+            rules.id as rule_id,
+            users.username,
+            rules.board_size,
+            rules.opening_rule,
+            rules.variant,
+            user_stats.games_played,
+            user_stats.elo,
+            ru.rank
+        from users
+        inner join user_stats
+        on users.id = user_stats.user_id
+        inner join rules
+        on user_stats.rules_id = rules.id
+        left join ranked_users ru
+        on user_stats.user_id = ru.user_id and user_stats.rules_id = ru.rules_id
+        where users.id = :user_id
             """.trimIndent()
         )
             .bind("user_id", userId)
@@ -195,9 +214,25 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun getUserRanking(userId: Int, ruleId: Int): RankingUserData? =
         handle.createQuery(
             """
-            select us.user_id, u.username, us.rules_id as rule_id, us.games_played, us.elo, u.username from user_stats us
+            with ranked_users as (
+                select
+                    user_id,
+                    elo,
+                    RANK() over (order by elo desc) as rank
+                from user_stats
+                where rules_id = :rules_id
+            )
+            select
+                ru.user_id,
+                u.username,
+                us.rules_id as rule_id,
+                us.games_played,
+                us.elo,
+                ru.rank
+            from user_stats us
             join users u on us.user_id = u.id
-            where u.id = :user_id
+            join ranked_users ru on us.user_id = ru.user_id
+            where us.user_id = :user_id
             and us.rules_id = :rules_id
             """.trimIndent()
         )
@@ -238,11 +273,28 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
     override fun searchRanking(rulesId: Int, username: String, offset: Int, limit: Int): List<RankingUserData> =
         handle.createQuery(
             """
-            select us.user_id, us.rules_id as rule_id, us.games_played, us.elo, u.username from user_stats us
-            join users u on us.user_id = u.id
-            where u.username like :username
-            and us.rules_id = :rulesId
-            order by us.elo desc, u.username asc
+            with ranked_users as (
+                select
+                    us.user_id,
+                    us.rules_id as rule_id,
+                    us.games_played,
+                    us.elo,
+                    u.username,
+                    RANK() OVER (PARTITION BY us.rules_id ORDER BY us.elo DESC) as rank
+                from user_stats us
+                join users u on us.user_id = u.id
+                where us.rules_id = :rulesId
+            )
+            select
+                ru.user_id,
+                ru.rule_id,
+                ru.games_played,
+                ru.elo,
+                ru.username,
+                ru.rank
+            from ranked_users ru
+            where ru.username like :username
+            order by ru.rank, ru.username asc
             limit :limit offset :offset
             """.trimIndent()
         )

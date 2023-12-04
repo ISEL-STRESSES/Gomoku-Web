@@ -20,8 +20,9 @@ class UserRuleStatsRowMapper : RowMapper<RuleStats> {
      */
     override fun map(rs: ResultSet, ctx: StatementContext?): RuleStats {
         val ruleId = rs.getInt("rules_id")
+        val rank = rs.getInt("rank")
         val gamesPlayed = rs.getInt("games_played")
         val elo = rs.getInt("elo")
-        return RuleStats(ruleId, gamesPlayed, elo)
+        return RuleStats(ruleId, rank, gamesPlayed, elo)
     }
 }

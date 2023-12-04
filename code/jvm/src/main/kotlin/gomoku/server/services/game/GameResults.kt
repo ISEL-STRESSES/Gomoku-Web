@@ -3,12 +3,14 @@ package gomoku.server.services.game
 import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.game.FinishedGame
 import gomoku.server.domain.game.game.Game
+import gomoku.server.domain.game.rules.Rules
 import gomoku.server.http.controllers.game.models.CurrentTurnPlayerOutput
 import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.ForfeitGameError
 import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.MakeMoveError
 import gomoku.server.services.errors.game.MatchmakingError
+import gomoku.server.services.errors.game.RuleError
 import gomoku.utils.Either
 
 /**
@@ -49,3 +51,5 @@ typealias GetUserFinishedGamesResult = Pair<List<FinishedGame>, Int>
  * @see FinishedGame
  */
 typealias ForfeitGameResult = Either<ForfeitGameError, FinishedGame>
+
+typealias RuleResult = Either<RuleError, Rules>

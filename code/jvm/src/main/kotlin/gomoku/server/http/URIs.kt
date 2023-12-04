@@ -46,32 +46,34 @@ object URIs {
         const val GET_BY_ID = "/{gameId}"
         const val MAKE_PLAY = "/{gameId}/play"
         const val GAME_RULES = "/rules"
-        const val MATCH_MAKE = "/start/{rulesId}"
+        const val GAME_RULE_ID = "/rules/{ruleId}"
         const val TURN = "/{gameId}/turn"
         const val FORFEIT_GAME = "/{gameId}/forfeit"
 
         fun hub() = URI(HUB)
         fun byId(id: Int) = UriTemplate(ROOT + GET_BY_ID).expand(id)
-        fun joinLobby(rulesId: Int) = UriTemplate(ROOT + MATCH_MAKE).expand(rulesId)
         fun turn(gameID: Int) = UriTemplate(ROOT + TURN).expand(gameID)
         fun forfeitGame(gameID: Int) = UriTemplate(ROOT + FORFEIT_GAME).expand(gameID)
         fun play(gameId: Int) = UriTemplate(ROOT + MAKE_PLAY).expand(gameId)
     }
 
     object Lobby {
-        const val GET_LOBBIES = "/lobbies"
-        const val CREATE_LOBBY = "/lobby/create/{ruleId}"
-        const val JOIN_LOBBY = "/lobby/{lobbyId}/join"
-        const val LEAVE_LOBBY = "/lobby/{lobbyId}/leave"
-        const val GET_LOBBY_BY_ID = "/lobby/{lobbyId}"
+        const val ROOT = "$PREFIX/lobby"
+        const val GET_LOBBIES = "/"
+        const val MATCH_MAKE = "/start"
+        const val CREATE_LOBBY = "/create"
+        const val JOIN_LOBBY = "/join"
+        const val LEAVE_LOBBY = "/leave"
+        const val GET_LOBBY_BY_ID = "/{lobbyId}"
 
-        fun createLobby(ruleId: Int) = UriTemplate(HOME + CREATE_LOBBY).expand(ruleId)
-        fun leaveLobby(lobbyId: Int) = UriTemplate(HOME + LEAVE_LOBBY).expand(lobbyId)
+        fun createLobby(ruleId: Int) = UriTemplate(ROOT + CREATE_LOBBY).expand(ruleId)
+        fun leaveLobby(lobbyId: Int) = UriTemplate(ROOT + LEAVE_LOBBY).expand(lobbyId)
 
-        fun joinLobby(lobbyId: Int) = UriTemplate(HOME + JOIN_LOBBY).expand(lobbyId)
+        fun joinLobby(lobbyId: Int) = UriTemplate(ROOT + JOIN_LOBBY).expand(lobbyId)
+        fun matchMake() = URI(ROOT + MATCH_MAKE)
 
-        fun getLobbyById(lobbyId: Int) = UriTemplate(HOME + GET_LOBBY_BY_ID).expand(lobbyId)
+        fun getLobbyById(lobbyId: Int) = UriTemplate(ROOT + GET_LOBBY_BY_ID).expand(lobbyId)
 
-        fun getLobbies() = URI(HOME + GET_LOBBIES)
+        fun getLobbies() = URI(ROOT + GET_LOBBIES)
     }
 }

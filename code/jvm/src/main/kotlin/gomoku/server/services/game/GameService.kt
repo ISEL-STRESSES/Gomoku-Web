@@ -1,6 +1,5 @@
 package gomoku.server.services.game
 
-import gomoku.server.domain.game.Matchmaker
 import gomoku.server.domain.game.errors.MoveError
 import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.FinishedGame
@@ -20,13 +19,12 @@ import gomoku.server.services.errors.game.CurrentTurnPlayerError
 import gomoku.server.services.errors.game.ForfeitGameError
 import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.MakeMoveError
-import gomoku.server.services.errors.game.MatchmakingError
+import gomoku.server.services.errors.game.RuleError
 import gomoku.utils.Failure
 import gomoku.utils.Success
 import gomoku.utils.failure
 import gomoku.utils.success
 import org.springframework.stereotype.Service
-import kotlin.random.Random
 
 /**
  * Service for game-related operations
@@ -34,35 +32,6 @@ import kotlin.random.Random
  */
 @Service
 class GameService(private val transactionManager: TransactionManager) {
-
-    /**
-     * Starts the matchmaking process for the given rule and user.
-     * @param ruleId id of the rule
-     * @param userId the id of the user that wants to play
-     * @return the result of the matchmaking process
-     * @see MatchmakingResult
-     */
-    fun startMatchmakingProcess(ruleId: Int, userId: Int): MatchmakingResult {
-        return transactionManager.run {
-            val lobby = it.lobbyRepository.getLobbyByRuleId(ruleId)
-
-            if (lobby != null) {
-                if (lobby.userId == userId) {
-                    return@run failure(MatchmakingError.SamePlayer)
-                }
-                val didLeave = it.lobbyRepository.leaveLobby(lobby.id, lobby.userId)
-                if (!didLeave) {
-                    return@run failure(MatchmakingError.LeaveLobbyFailed)
-                }
-                val playerBlack = if (Random.nextBoolean()) userId else lobby.userId
-                val playerWhite = if (playerBlack == userId) lobby.userId else userId
-                val gameId = it.gameRepository.createGame(ruleId, playerBlack, playerWhite)
-                return@run success(Matchmaker(true, gameId))
-            } else {
-                return@run success(Matchmaker(false, it.lobbyRepository.createLobby(ruleId, userId)))
-            }
-        }
-    }
 
     /**
      * Makes a move in the given game.
@@ -186,6 +155,12 @@ class GameService(private val transactionManager: TransactionManager) {
     fun getAvailableRules(): List<Rules> =
         transactionManager.run {
             it.gameRepository.getAllRules()
+        }
+
+    fun getRule(ruleId: Int): RuleResult =
+        transactionManager.run {
+            val rule = it.gameRepository.getRuleById(ruleId) ?: return@run failure(RuleError.RuleNotFound)
+            return@run success(rule)
         }
 
     /**

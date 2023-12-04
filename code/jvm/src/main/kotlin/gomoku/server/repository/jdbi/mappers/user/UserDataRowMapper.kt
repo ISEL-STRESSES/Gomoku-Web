@@ -27,10 +27,11 @@ class UserDataRowMapper : RowMapper<UserStats> {
 
         do {
             val ruleId = rs.getInt("rule_id")
+            val rank = rs.getInt("rank")
             val gamesPlayed = rs.getInt("games_played")
             val elo = rs.getInt("elo")
 
-            userRuleStats.add(RuleStats(ruleId, gamesPlayed, elo))
+            userRuleStats.add(RuleStats(ruleId, rank, gamesPlayed, elo))
         } while (rs.next())
 
         return UserStats(uuid, username, userRuleStats)

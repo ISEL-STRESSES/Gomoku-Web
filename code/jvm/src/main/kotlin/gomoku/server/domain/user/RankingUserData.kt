@@ -15,6 +15,7 @@ data class RankingUserData(
     val uuid: Int,
     val username: String,
     val ruleId: Int,
+    val rank: Int = 0,
     val gamesPlayed: Int = 0,
     val elo: Int = DEFAULT_ELO
 ) {

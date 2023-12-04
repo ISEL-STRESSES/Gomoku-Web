@@ -10,12 +10,14 @@ import gomoku.server.domain.user.RankingUserData
  */
 data class UserRuleStatsOutputModel(
     val id: Int,
+    val rank: Int,
     val username: String,
     val gamesPlayed: Int,
     val elo: Int
 ) {
     constructor(userRuleStats: RankingUserData) : this(
         id = userRuleStats.uuid,
+        rank = userRuleStats.rank,
         username = userRuleStats.username,
         gamesPlayed = userRuleStats.gamesPlayed,
         elo = userRuleStats.elo

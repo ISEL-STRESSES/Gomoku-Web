@@ -2,6 +2,9 @@ package gomoku.server.http.controllers.lobby
 
 import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
+import gomoku.server.http.controllers.game.models.LobbyInputModel
+import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
+import gomoku.server.http.controllers.game.models.RuleIdInputModel
 import gomoku.server.http.controllers.lobby.models.GetLobbiesOutput
 import gomoku.server.http.controllers.media.Problem
 import gomoku.server.http.responses.CreateLobby
@@ -9,8 +12,10 @@ import gomoku.server.http.responses.GetLobbies
 import gomoku.server.http.responses.GetLobbyById
 import gomoku.server.http.responses.JoinLobby
 import gomoku.server.http.responses.LeaveLobby
+import gomoku.server.http.responses.Matchmaker
 import gomoku.server.http.responses.response
 import gomoku.server.http.responses.responseRedirect
+import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.errors.lobby.GetLobbyError
 import gomoku.server.services.errors.lobby.JoinLobbyError
 import gomoku.server.services.errors.lobby.LeaveLobbyError
@@ -21,21 +26,22 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController(value = "Lobbies")
-@RequestMapping(URIs.HOME)
+@RequestMapping(URIs.Lobby.ROOT)
 class LobbyController(private val lobbyService: LobbyService) {
     /**
      * Leaves a lobby
-     * @param lobbyId The id of the lobby
+     * @param lobbyIdModel The id of the lobby
      * @param authenticatedUser The authenticated user
      * @return The result of leaving the lobby
      */
     @PostMapping(URIs.Lobby.LEAVE_LOBBY)
-    fun leaveLobby(@PathVariable lobbyId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val leftLobby = lobbyService.leaveLobby(lobbyId, authenticatedUser.user.uuid)
+    fun leaveLobby(@RequestBody lobbyIdModel: LobbyInputModel, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val leftLobby = lobbyService.leaveLobby(lobbyIdModel.lobbyId, authenticatedUser.user.uuid)
         return when (leftLobby) {
             is Failure -> leftLobby.value.resolveProblem()
             is Success -> LeaveLobby.siren(leftLobby.value).responseRedirect(200, URIs.Game.ROOT + URIs.Game.HUB)
@@ -44,13 +50,13 @@ class LobbyController(private val lobbyService: LobbyService) {
 
     /**
      * Joins a lobby
-     * @param lobbyId the id of the lobby
+     * @param lobbyIdModel the id of the lobby
      * @param authenticatedUser the authenticated user
      * @return the result of joining a lobby
      */
     @PostMapping(URIs.Lobby.JOIN_LOBBY)
-    fun joinLobby(@PathVariable lobbyId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val joinedLobby = lobbyService.joinLobby(lobbyId, authenticatedUser.user.uuid)
+    fun joinLobby(@RequestBody lobbyIdModel: LobbyInputModel, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val joinedLobby = lobbyService.joinLobby(lobbyIdModel.lobbyId, authenticatedUser.user.uuid)
         return when (joinedLobby) {
             is Failure -> joinedLobby.value.resolveProblem()
             is Success -> JoinLobby.siren(joinedLobby.value).responseRedirect(201, URIs.Lobby.GET_LOBBY_BY_ID + "/${joinedLobby.value.id}")
@@ -72,14 +78,31 @@ class LobbyController(private val lobbyService: LobbyService) {
     /**
      * Create a lobby
      *
-     * @param ruleId the id of the rule
+     * @param ruleIdInput the id of the rule
      * @param authenticatedUser the authenticated user
      * @return the result of the creation of a lobby
      */
     @PostMapping(URIs.Lobby.CREATE_LOBBY)
-    fun createLobby(@PathVariable ruleId: Int, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val createLobbyResult = lobbyService.createLobby(ruleId, authenticatedUser.user.uuid)
+    fun createLobby(@RequestBody ruleIdInput: RuleIdInputModel, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val createLobbyResult = lobbyService.createLobby(ruleIdInput.ruleId, authenticatedUser.user.uuid)
         return CreateLobby.siren(createLobbyResult).responseRedirect(201, URIs.Lobby.GET_LOBBY_BY_ID + "/${createLobbyResult.id}")
+    }
+
+    /**
+     * Starts the matchmaking process for a game, either
+     * by creating a new lobby or joining a game
+     * @param ruleIdInput The id of the rule
+     * @param authenticatedUser The authenticated user
+     * @return The result of the matchmaking process
+     */
+    @PostMapping(URIs.Lobby.MATCH_MAKE)
+    fun startMatchmaking(@RequestBody ruleIdInput: RuleIdInputModel, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val matchmaker = lobbyService.startMatchmakingProcess(ruleIdInput.ruleId, authenticatedUser.user.uuid)
+        return when (matchmaker) {
+            is Failure -> matchmaker.value.resolveProblem()
+            is Success -> Matchmaker.siren(MatchmakerOutputModel(matchmaker.value))
+                .responseRedirect(201, URIs.Game.ROOT + "/${matchmaker.value.id}")
+        }
     }
 
     /**
@@ -97,6 +120,17 @@ class LobbyController(private val lobbyService: LobbyService) {
             is Success -> GetLobbyById.siren(lobby.value).responseRedirect(200, URIs.Lobby.GET_LOBBY_BY_ID + "/${lobby.value.id}")
         }
     }
+
+    /**
+     * Translates the errors of a Matchmaking action into a response
+     * @receiver The error
+     * @return The response
+     */
+    private fun MatchmakingError.resolveProblem(): ResponseEntity<*> =
+        when (this) {
+            MatchmakingError.SamePlayer -> Problem.response(400, Problem.samePlayer)
+            MatchmakingError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
+        }
 
     /**
      * Translates the errors of a Leave lobby action into a response

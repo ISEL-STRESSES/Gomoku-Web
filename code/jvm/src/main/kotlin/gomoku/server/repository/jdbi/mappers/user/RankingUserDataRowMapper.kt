@@ -20,6 +20,7 @@ class RankingUserDataRowMapper : RowMapper<RankingUserData> {
     override fun map(rs: ResultSet, ctx: StatementContext?): RankingUserData {
         return RankingUserData(
             uuid = rs.getInt("user_id"),
+            rank = rs.getInt("rank"),
             username = rs.getString("username"),
             ruleId = rs.getInt("rule_id"),
             gamesPlayed = rs.getInt("games_played"),
