@@ -5,6 +5,7 @@ import { getCookie } from '../../utils/cookieUtils';
 import { tokenCookie } from '../../components/authentication/Authn';
 import { SirenEntity, sirenMediaType } from '../media/siren/SirenEntity';
 import { Problem, problemMediaType } from '../media/Problem';
+import { API_ENDPOINT } from '../home/HomeService';
 
 /**
  * An error that occurs if there is a network error.
@@ -37,7 +38,7 @@ async function fetchWithEither(url: string, options: RequestInit): Promise<Eithe
   }
 }
 
-async function fetchFunction<T>(url: string, method: string, data: any, headers: any): Promise<Either<Problem, SirenEntity<any>>> {
+async function fetchFunction<T>(url: string, method: string, data: any, headers: any): Promise<Either<Error, SirenEntity<any>>> {
   const fetchResult = await fetchWithEither(url, {
     method: method,
     headers: {
@@ -48,7 +49,7 @@ async function fetchFunction<T>(url: string, method: string, data: any, headers:
   });
 
   if (fetchResult instanceof Failure) {
-    throw fetchResult.value;// TODO: How can i handle if it's a NetworkError or UnexpectedResponseError? just throw it and have a handler for it in the component?
+    return fetchResult;
   } else {
     const response = fetchResult.value;
     const contentType = response.headers.get('Content-Type');
@@ -57,44 +58,34 @@ async function fetchFunction<T>(url: string, method: string, data: any, headers:
       if (contentType?.includes(problemMediaType)) {
         return failure(new Problem(body));
       } else {
-        throw new UnexpectedResponseError(`Unexpected response type: ${contentType}`);
+        return failure(new UnexpectedResponseError(`Unexpected response type: ${contentType}`));
       }
     } else {
       if (contentType?.includes(sirenMediaType)) {
         return success(new SirenEntity<T>(body));
       } else {
-        throw new UnexpectedResponseError(`Unexpected response type: ${contentType}`);
+        return failure(new UnexpectedResponseError(`Unexpected response type: ${contentType}`));
       }
     }
   }
 }
 
-export function useFetch<T>(url: string, method: string, data: any): {
-  result: Either<Problem | Error, SirenEntity<T>> | undefined, //TODO: This is very smelly, no better way to do this?
-  isLoading: boolean,
-} {
-  const [result, setResult] = useState<Either<any, any>>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
+export function useFetch<T>(partialURL: string, method: string, requireAuth: boolean, data: any = undefined): Either<Error, SirenEntity<T>> | undefined {
+  const [result, setResult] = useState<Either<Error, SirenEntity<T>> | undefined>(undefined);
+  const url = API_ENDPOINT + partialURL;
   useEffect(() => {
     let cancelled = false;
-    setIsLoading(true);
 
-    fetchFunction(url, method, data, { //TODO: Explore if this is really needed
-      'Authorization': 'Bearer ' + getCookie(tokenCookie), //TODO: Even in the case of a public endpoint, the token is sent.
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'PUT',
-      'Access-Control-Allow-Headers': 'content-type, x-requested-with, Authorization',
+    fetchFunction<T>(url, method, data, {
+      ...requireAuth ? { 'Authorization': 'Bearer ' + getCookie(tokenCookie) } : undefined,
     })
       .then(eitherResult => {
         if (!cancelled) {
           setResult(eitherResult);
-          setIsLoading(false);
         }
       })
       .catch(err => {
         if (!cancelled) {
-          setIsLoading(false);
           setResult(failure(err));
         }
       });
@@ -104,6 +95,5 @@ export function useFetch<T>(url: string, method: string, data: any): {
     };
   }, [url, method, data]);
 
-  return { result, isLoading };
+  return result;
 }
-
