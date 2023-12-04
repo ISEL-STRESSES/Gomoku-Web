@@ -1,24 +1,45 @@
 package gomoku.server.http.infra
 
-import gomoku.server.http.Rel
 import org.springframework.http.HttpMethod
 import java.net.URI
 
 /**
  * TODO
  */
-open class SirenBuilderScope<T>(
-    val properties: T
-) {
-    private val links = mutableListOf<LinkModel>()
+open class SirenBuilderScope{
     private val classes = mutableListOf<String>()
+    private val properties = mutableListOf<Any>()
+    private val entities = mutableListOf<EntityModel>()
     private val actions = mutableListOf<ActionModel>()
+    private val links = mutableListOf<LinkModel>()
 
     /**
      * TODO
      */
     fun clazz(value: String) {
         classes.add(value)
+    }
+
+    /**
+     * TODO
+     */
+    fun property(value: Any) {
+        properties.add(value)
+    }
+
+    /**
+     * TODO
+     */
+    fun entity(value: EntityModel) {
+        entities.add(value)
+    }
+
+    /**
+     * TODO
+     */
+    fun action(name: String, title: String, method: HttpMethod, href: URI, type: String, fields: List<Any>) {
+        val scope = ActionBuilderScope(name, title, method, href, type, fields)
+        actions.add(scope.build())
     }
 
     /**
@@ -31,19 +52,12 @@ open class SirenBuilderScope<T>(
     /**
      * TODO
      */
-    fun action(name: String, href: URI, method: HttpMethod) {
-        val scope = ActionBuilderScope(name, href, method)
-        actions.add(scope.build())
-    }
-
-    /**
-     * TODO
-     */
-    fun build(): SirenModel<T> = SirenModel(
-        clazz = classes,
-        properties = properties,
-        links = links,
-        actions = actions
+    fun build() = SirenModel(
+        classes,
+        properties,
+        entities,
+        actions,
+        links
     )
 }
 
@@ -52,29 +66,32 @@ open class SirenBuilderScope<T>(
  */
 class ActionBuilderScope(
     private val name: String,
+    private val title: String,
+    private val method: HttpMethod,
     private val href: URI,
-    private val method: HttpMethod
+    private val type: String,
+    private val fields: List<Any>
 ) {
     /**
      * TODO
      */
-    fun build() = ActionModel(name, href.toASCIIString(), method.name())
+    fun build() = ActionModel(
+        name,
+        title,
+        method.name(),
+        href.toASCIIString(),
+        type,
+        fields
+    )
 }
 
 /**
  * TODO
  */
-fun <T> siren(value: T, block: SirenBuilderScope<T>.() -> Unit): SirenModel<T> {
-    val scope = SirenBuilderScope(value)
+fun siren(block: SirenBuilderScope.() -> Unit): SirenModel {
+    val scope = SirenBuilderScope()
     scope.block()
     return scope.build()
 }
 
-/**
- * TODO
- */
-fun <T> makeSiren(body: T, link: String) =
-    siren(body) {
-        link(link, Rel.SELF)
-        link(link, LinkRelation(link))
-    }
+const val SirenMediaType = "application/vnd.siren+json"

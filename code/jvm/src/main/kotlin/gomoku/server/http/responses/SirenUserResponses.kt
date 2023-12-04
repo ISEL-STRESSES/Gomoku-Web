@@ -8,6 +8,9 @@ import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
 import gomoku.server.http.controllers.user.models.UserStatsOutputModel
 import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
 import gomoku.server.http.controllers.user.models.getUsersData.GetUsersRankingDataOutputModel
+import gomoku.server.http.infra.EntityModel
+import gomoku.server.http.infra.LinkModel
+import gomoku.server.http.infra.PropertyRankingModel
 import gomoku.server.http.infra.siren
 
 /**
@@ -19,8 +22,9 @@ object SignUp {
      * TODO
      */
     fun siren(body: UserCreateOutputModel) =
-        siren(body) {
+        siren {
             clazz(Rel.SIGNUP.value)
+            property(body)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -34,8 +38,9 @@ object Login {
      * TODO
      */
     fun siren(body: UserCreateOutputModel) =
-        siren(body) {
+        siren {
             clazz(Rel.LOGIN.value)
+            property(body)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -49,8 +54,12 @@ object GetRanking {
      * TODO
      */
     fun siren(body: GetUsersRankingDataOutputModel, totalPages: Int, currentOffset: Int, currentLimit: Int) =
-        siren(body) {
+        siren {
             clazz(Rel.SEARCH_RANKING.value)
+            property(PropertyRankingModel(body.ruleId, body.search, currentLimit, currentOffset))
+            body.userData.forEach {
+                entity(EntityModel(listOf(Rel.USER.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.USER.value), URIs.Users.ROOT + "/${it.id}"))))
+            }
             link(
                 "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=$currentOffset",
                 Rel.SELF
@@ -89,10 +98,11 @@ object GetUserRanking {
     /**
      * TODO
      */
-    fun siren(body: UserRuleStatsOutputModel) =
-        siren(body) {
+    fun siren(body: UserRuleStatsOutputModel, ruleId: Int) =
+        siren {
             clazz(Rel.USER_RANKING.value)
-            link("${URIs.Users.ROOT}/${body.id}/ranking/${body.ruleId}", Rel.SELF)
+            property(body)
+            link("${URIs.Users.ROOT}/${body.id}/ranking/${ruleId}", Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -106,8 +116,9 @@ object GetUserStats {
      * TODO
      */
     fun siren(body: UserStatsOutputModel) =
-        siren(body) {
+        siren {
             clazz(Rel.USER_STATS.value)
+            property(body)
             link("${URIs.Users.ROOT}/stats/${body.userId}", Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
@@ -122,8 +133,9 @@ object GetUserById {
      * TODO
      */
     fun siren(body: UserByIdOutputModel) =
-        siren(body) {
+        siren {
             clazz(Rel.USER.value)
+            property(body)
             link(URIs.Users.ROOT + "/${body.uuid}", Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
@@ -138,8 +150,9 @@ object Logout {
      * TODO
      */
     fun siren() =
-        siren("User logged out.") {
+        siren {
             clazz(Rel.LOGOUT.value)
+            property("User logged out.")
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -153,8 +166,9 @@ object UserMe {
      * TODO
      */
     fun siren(body: UserHomeOutputModel) =
-        siren(body) {
+        siren {
             clazz(Rel.USER.value)
+            property(body)
             link(URIs.Users.ROOT + URIs.Users.HOME, Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }

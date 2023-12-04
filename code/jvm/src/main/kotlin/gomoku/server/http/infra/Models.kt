@@ -13,17 +13,26 @@ value class LinkRelation(
 /**
  * TODO
  */
-data class SirenModel<T>(
+data class SirenModel(
     @get:JsonProperty("class")
     val clazz: List<String>,
-    val properties: T,
-    val links: List<LinkModel>,
-    val actions: List<ActionModel>
+    val properties: Any,
+    val entities: List<EntityModel>,
+    val actions: List<ActionModel>,
+    val links: List<LinkModel>
 ) {
     companion object {
         const val MEDIA_TYPE = "application/vnd.siren+json"
     }
 }
+
+data class EntityModel(
+    @get:JsonProperty("class")
+    val clazz: List<String>,
+    val rel : List<String>,
+    val properties: Any,
+    val links: List<LinkModel>
+)
 
 /**
  * TODO
@@ -38,6 +47,16 @@ data class LinkModel(
  */
 data class ActionModel(
     val name: String,
+    val title: String,
+    val method: String,
     val href: String,
-    val method: String
+    val type: String,
+    val fields: List<Any>
+)
+
+data class PropertyRankingModel(
+    val ruleId: Int,
+    val search: String,
+    val limit: Int,
+    val offset: Int
 )

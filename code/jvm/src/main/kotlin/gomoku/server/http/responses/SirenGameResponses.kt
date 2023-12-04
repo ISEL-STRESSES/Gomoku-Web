@@ -22,8 +22,9 @@ object GetFinishedGames {
      * TODO
      */
     fun siren(body: GetFinishedGamesOutputModel, totalPages: Int, currentOffset: Int, currentLimit: Int) =
-        siren(body) {
+        siren {
             clazz(Rel.GAME_LIST.value)
+            property(body)
             link(URIs.Game.ROOT + URIs.Game.HUB, Rel.SELF)
             link(URIs.HOME, Rel.HOME)
 
@@ -60,8 +61,9 @@ object GetGameById {
      * TODO
      */
     fun siren(body: GameOutputModel) =
-        siren(body) {
+        siren {
             clazz(Rel.GAME.value)
+            property(body)
             link(URIs.Game.ROOT + "/${body.id}", Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
@@ -76,8 +78,9 @@ object GetRules {
      * TODO
      */
     fun siren(body: GetRulesOutputModel) =
-        siren(body) {
+        siren {
             clazz(Rel.RULES.value)
+            property(body)
             link(URIs.Game.ROOT + URIs.Game.GAME_RULES, Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
@@ -92,8 +95,9 @@ object Matchmaker {
      * TODO
      */
     fun siren(body: MatchmakerOutputModel) =
-        siren(body) {
+        siren {
             clazz(Rel.MATCHMAKER.value)
+            property(body)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -107,8 +111,9 @@ object LeaveLobby {
      * TODO
      */
     fun siren(body: LeaveLobbyOutput) =
-        siren(body) {
+        siren {
             clazz(Rel.LEAVE_LOBBY.value)
+            property(body)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -122,8 +127,9 @@ object JoinLobby {
      * TODO
      */
     fun siren(body: Matchmaker) =
-        siren(body) {
+        siren {
             clazz(Rel.JOIN_LOBBY.value)
+            property(body)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -137,8 +143,9 @@ object GetLobbies {
      * TODO
      */
     fun siren(body: GetLobbiesOutput) =
-        siren(body) {
+        siren {
             clazz(Rel.GET_LOBBIES.value)
+            property(body)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -152,8 +159,9 @@ object CreateLobby {
      * TODO
      */
     fun siren(body: Matchmaker) =
-        siren(body) {
+        siren {
             clazz(Rel.CREATE_LOBBY.value)
+            property(body)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -167,8 +175,9 @@ object GetLobbyById {
      * TODO
      */
     fun siren(body: Lobby) =
-        siren(body) {
+        siren {
             clazz(Rel.GET_LOBBY_BY_ID.value)
+            property(body)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -182,8 +191,9 @@ object MakeMove {
      * TODO
      */
     fun siren(body: GameOutputModel) =
-        siren(body) {
+        siren {
             clazz(Rel.MAKE_MOVE.value)
+            property(body)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -197,8 +207,9 @@ object GetTurn {
      * TODO
      */
     fun siren(body: CurrentTurnPlayerOutput) =
-        siren(body) {
+        siren {
             clazz(Rel.GET_TURN.value)
+            property(body)
             link(URIs.Game.ROOT + "/${body.turn}/turn", Rel.SELF)
         }
 }
@@ -212,8 +223,9 @@ object ForfeitGame {
      * TODO
      */
     fun siren(body: GameOutputModel) =
-        siren(body) {
+        siren {
             clazz(Rel.FORFEIT_GAME.value)
+            property(body)
             link(URIs.HOME, Rel.HOME)
         }
 }

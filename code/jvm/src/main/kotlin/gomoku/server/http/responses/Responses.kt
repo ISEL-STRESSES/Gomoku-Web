@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity
 /**
  * TODO
  */
-fun <T> SirenModel<T>.response(status: Int) = ResponseEntity
+fun SirenModel.response(status: Int) = ResponseEntity
     .status(status)
     .header("Content-Type", SirenModel.MEDIA_TYPE)
     .body(this)
@@ -14,7 +14,7 @@ fun <T> SirenModel<T>.response(status: Int) = ResponseEntity
 /**
  * TODO
  */
-fun <T> SirenModel<T>.responseRedirect(status: Int, headerValues: String) = ResponseEntity
+fun SirenModel.responseRedirect(status: Int, headerValues: String) = ResponseEntity
     .status(status)
     .header("Content-Type", SirenModel.MEDIA_TYPE)
     .header("Location", headerValues)

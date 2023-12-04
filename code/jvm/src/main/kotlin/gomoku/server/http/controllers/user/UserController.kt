@@ -70,7 +70,7 @@ class UserController(private val service: UserService) {
     fun userRanking(@PathVariable userId: Int, @PathVariable ruleId: Int): ResponseEntity<*> {
         val userRuleStats = service.getUserRanking(userId, ruleId)
         return when (userRuleStats) {
-            is Success -> GetUserRanking.siren(UserRuleStatsOutputModel(userRuleStats.value)).response(200)
+            is Success -> GetUserRanking.siren(UserRuleStatsOutputModel(userRuleStats.value), ruleId).response(200)
             is Failure -> userRuleStats.value.resolveProblem()
         }
     }
