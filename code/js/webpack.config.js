@@ -1,5 +1,9 @@
 const ESLintPlugin = require('eslint-webpack-plugin');
-
+function delay(ms) {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, ms);
+  });
+}
 module.exports = {
   mode: 'development',
   devServer: {

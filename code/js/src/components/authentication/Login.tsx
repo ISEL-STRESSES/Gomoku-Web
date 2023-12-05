@@ -1,9 +1,10 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useState } from "react";
 import { UserService } from '../../service/user/UserService';
 import { Failure, Success } from '../../utils/Either';
 import { Problem } from '../../service/media/Problem';
+import { Alert, Stack } from '@mui/material';
 
 type State =
   | { tag: 'editing'; error?: string; inputs: { username: string; password: string } }
@@ -93,32 +94,55 @@ export function Login() {
   }
 
 
-
   const username = state.tag === 'submitting' ? state.username : state.inputs.username;
-  const password = state.tag === 'submitting' ? "" : state.inputs.password;
+  const password = state.tag === 'submitting' ? '' : state.inputs.password;
 
   return (
-    <div id="authDiv">
-      <form onSubmit={handleSubmit} id="authForm">
-        <fieldset disabled={state.tag !== 'editing'} id="authFieldSet">
+    <div id='authDiv'>
+      <form onSubmit={handleSubmit} id='authForm'>
+        <fieldset disabled={state.tag !== 'editing'} id='authFieldSet'>
           <div>
-            <label htmlFor="input">Username</label>
-            <input id="autbBtnUser" className="input" type="text" name="username" value={username} onChange={handleChange} required />
+            <label htmlFor='input'>Username</label>
+            <input
+              id='autbBtnUser'
+              className='input'
+              type='text'
+              name='username'
+              value={username}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div>
-            <label htmlFor="input">Password</label>
-            <input id="autbBtnPass" className="input" type="password" name="password" value={password} onChange={handleChange} required />
+            <label htmlFor='input'>Password</label>
+            <input
+              id='autbBtnPass'
+              className='input'
+              type='password'
+              name='password'
+              value={password}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div>
-            <button className="button" type="submit" onClick={() => setSignUp(false)}>
-              Log in
-            </button>
-            <button className="button" type="submit" onClick={() => setSignUp(true)}>
-              Sign Up
-            </button>
+            <Stack spacing={2} direction='row'>
+              <button className='button' type='submit' onClick={() => setSignUp(false)}>
+                Log in
+              </button>
+              <button className='button' type='submit' onClick={() => setSignUp(true)}>
+                Sign Up
+              </button>
+            </Stack>
           </div>
+          {state.tag === 'editing' && state.error && (
+            <Alert severity='error' className='error-message'>
+              {state.error}
+            </Alert>
+          )}
         </fieldset>
       </form>
     </div>
   );
+
 }

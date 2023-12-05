@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 /**
  * Annotation for safe password
  * @property message message to return if the password is not safe
- * @property groups groups of the annotation
+ * @property groups groups of the annotations
  * @property payload payload
  * @see SafePasswordValidator
  * @see Constraint

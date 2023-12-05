@@ -35,15 +35,17 @@ async function fetchWithEither(url: string, options: RequestInit): Promise<Eithe
   }
 }
 
-export async function fetchFunction<T>(partialUrl: string, method: string, data: any, headers?: any): Promise<Either<Error | Problem, SirenEntity<any>>> {
+export async function fetchFunction<T>(partialUrl: string, method: string, data: any, authentication: boolean = false, headers?: any): Promise<Either<Error | Problem, SirenEntity<any>>> {
   const url = API_ENDPOINT + partialUrl;
   const fetchResult = await fetchWithEither(url, {
     method: method,
     headers: {
       ...headers,
       'Accept': `${sirenMediaType}, ${problemMediaType}`,
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(data),
+    credentials: authentication ? 'include' : 'omit'
   });
 
   if (fetchResult instanceof Failure) {
@@ -67,31 +69,3 @@ export async function fetchFunction<T>(partialUrl: string, method: string, data:
     }
   }
 }
-
-// export function useFetch<T>(partialURL: string, method: string, requireAuth: boolean, data: any = undefined): Either<Error | Problem, SirenEntity<T>> | undefined {
-//   const [result, setResult] = useState<Either<Error, SirenEntity<T>> | undefined>(undefined);
-//   const url = API_ENDPOINT + partialURL;
-//   useEffect(() => {
-//     let cancelled = false;
-//
-//     fetchFunction<T>(url, method, data, {
-//       ...requireAuth ? { 'Authorization': 'Bearer ' + getCookie(tokenCookie) } : undefined,
-//     })
-//       .then(eitherResult => {
-//         if (!cancelled) {
-//           setResult(eitherResult);
-//         }
-//       })
-//       .catch(err => {
-//         if (!cancelled) {
-//           setResult(failure(err));
-//         }
-//       });
-//
-//     return () => {
-//       cancelled = true;
-//     };
-//   }, [url, method, data]);
-//
-//   return result;
-// }
