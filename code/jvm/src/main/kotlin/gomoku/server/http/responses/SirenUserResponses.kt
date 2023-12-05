@@ -2,22 +2,41 @@ package gomoku.server.http.responses
 
 import gomoku.server.http.Rel
 import gomoku.server.http.URIs
-import gomoku.server.http.controllers.user.models.UserByIdOutputModel
-import gomoku.server.http.controllers.user.models.UserCreateOutputModel
+import gomoku.server.http.controllers.user.models.userCreate.UserCreateOutputModel
 import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
 import gomoku.server.http.controllers.user.models.UserStatsOutputModel
 import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
 import gomoku.server.http.controllers.user.models.getUsersData.GetUsersRankingDataOutputModel
+import gomoku.server.http.infra.ActionFieldModel
 import gomoku.server.http.infra.EntityModel
 import gomoku.server.http.infra.LinkModel
 import gomoku.server.http.infra.PropertyRankingModel
 import gomoku.server.http.infra.PropertyUserStatsModel
+import gomoku.server.http.infra.SirenMediaType
 import gomoku.server.http.infra.siren
+import org.springframework.http.HttpMethod
+import java.net.URI
 
 /**
  * TODO
  */
-object SignUp {
+object SignUpWithCookie {
+
+    /**
+     * TODO
+     */
+    fun siren(body: String) =
+        siren {
+            clazz(Rel.SIGNUP.value)
+            property(body)
+            link(URIs.HOME, Rel.HOME)
+        }
+}
+
+/**
+ * TODO
+ */
+object SignUpWithoutCookie {
 
     /**
      * TODO
@@ -33,7 +52,23 @@ object SignUp {
 /**
  * TODO
  */
-object Login {
+object LoginWithCookie {
+
+    /**
+     * TODO
+     */
+    fun siren(body: String) =
+        siren {
+            clazz(Rel.LOGIN.value)
+            property(body)
+            link(URIs.HOME, Rel.HOME)
+        }
+}
+
+/**
+ * TODO
+ */
+object LoginWithoutCookie {
 
     /**
      * TODO
@@ -131,23 +166,6 @@ object GetUserStats {
 /**
  * TODO
  */
-object GetUserById {
-
-    /**
-     * TODO
-     */
-    fun siren(body: UserByIdOutputModel) =
-        siren {
-            clazz(Rel.USER.value)
-            property(body)
-            link(URIs.Users.ROOT + "/${body.uuid}", Rel.SELF)
-            link(URIs.HOME, Rel.HOME)
-        }
-}
-
-/**
- * TODO
- */
 object Logout {
 
     /**
@@ -172,7 +190,28 @@ object UserMe {
     fun siren(body: UserHomeOutputModel) =
         siren {
             clazz(Rel.USER.value)
-            property(body)
+            property(PropertyUserStatsModel(body.userId, body.username, body.userStats.size))
+            body.userStats.forEach {
+                entity(EntityModel(listOf(Rel.USER_RANKING.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Users.ROOT + "/${body.userId}/ranking/${it.ruleId}"))))
+            }
+            action(
+                "get-lobbies",
+                "Get Lobbies",
+                HttpMethod.GET,
+                URI(URIs.Lobby.ROOT + URIs.Lobby.GET_LOBBIES),
+                SirenMediaType,
+                emptyList()
+            )
+            action(
+                "match-make",
+                "Match Make",
+                HttpMethod.POST,
+                URI(URIs.Lobby.ROOT + URIs.Lobby.MATCH_MAKE),
+                SirenMediaType,
+                listOf(
+                    ActionFieldModel(name = "ruleId", type = "number")
+                )
+            )
             link(URIs.Users.ROOT + URIs.Users.HOME, Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }

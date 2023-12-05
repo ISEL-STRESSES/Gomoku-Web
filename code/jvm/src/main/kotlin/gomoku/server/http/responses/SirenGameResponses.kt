@@ -165,6 +165,18 @@ object Matchmaker {
         siren {
             clazz(Rel.MATCHMAKER.value)
             property(body)
+            if (!body.isGame){
+                action(
+                    "leave-lobby",
+                    "Leave Lobby",
+                    HttpMethod.POST,
+                    URI(URIs.Lobby.ROOT + URIs.Lobby.LEAVE_LOBBY),
+                    SirenMediaType,
+                    listOf(
+                        ActionFieldModel(name = "lobbyId", type = "number")
+                    )
+                )
+            }
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -273,6 +285,16 @@ object CreateLobby {
         siren {
             clazz(Rel.CREATE_LOBBY.value)
             property(body)
+            action(
+                "leave-lobby",
+                "Leave Lobby",
+                HttpMethod.POST,
+                URI(URIs.Lobby.ROOT + URIs.Lobby.LEAVE_LOBBY),
+                SirenMediaType,
+                listOf(
+                    ActionFieldModel(name = "lobbyId", type = "number")
+                )
+            )
             link(URIs.HOME, Rel.HOME)
         }
 }

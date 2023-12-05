@@ -1,7 +1,7 @@
 package gomoku.server.services.user
 
 import gomoku.server.domain.user.RankingUserData
-import gomoku.server.http.controllers.user.models.UserCreateOutputModel
+import gomoku.server.http.controllers.user.models.userCreate.UserCreateOutputModel
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
 import gomoku.server.services.errors.user.UserRankingError

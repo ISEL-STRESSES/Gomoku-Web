@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Size
  * sent to the API
  * @property username The username of the user
  * @property password The password of the user
+ * @property sendTokenViaCookie Whether to send the token via cookie or body
  */
 data class UserCreateInputModel(
 
@@ -21,5 +22,6 @@ data class UserCreateInputModel(
     val username: String,
 
     @SafePassword
-    val password: String
+    val password: String,
+    val sendTokenViaCookie: Boolean = false
 )

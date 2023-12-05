@@ -20,7 +20,7 @@ import java.util.*
 class UsersDomain(
     private val passwordEncoder: PasswordEncoder,
     private val tokenEncoder: TokenEncoder,
-    private val config: UsersDomainConfig
+    val config: UsersDomainConfig
 ) {
 
     companion object {

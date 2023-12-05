@@ -1,9 +1,9 @@
 package gomoku.server.http.controllers.user
 
 import gomoku.server.domain.user.AuthenticatedUser
+import gomoku.server.domain.user.UsersDomainConfig
 import gomoku.server.http.URIs
 import gomoku.server.http.controllers.media.Problem
-import gomoku.server.http.controllers.user.models.UserByIdOutputModel
 import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
 import gomoku.server.http.controllers.user.models.UserStatsOutputModel
 import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
@@ -11,12 +11,13 @@ import gomoku.server.http.controllers.user.models.getUsersData.GetUsersRankingDa
 import gomoku.server.http.controllers.user.models.userCreate.UserCreateInputModel
 import gomoku.server.http.controllers.user.models.userTokenCreate.UserCreateTokenInputModel
 import gomoku.server.http.responses.GetRanking
-import gomoku.server.http.responses.GetUserById
 import gomoku.server.http.responses.GetUserRanking
 import gomoku.server.http.responses.GetUserStats
-import gomoku.server.http.responses.Login
+import gomoku.server.http.responses.LoginWithCookie
+import gomoku.server.http.responses.LoginWithoutCookie
 import gomoku.server.http.responses.Logout
-import gomoku.server.http.responses.SignUp
+import gomoku.server.http.responses.SignUpWithCookie
+import gomoku.server.http.responses.SignUpWithoutCookie
 import gomoku.server.http.responses.UserMe
 import gomoku.server.http.responses.response
 import gomoku.server.http.responses.responseRedirect
@@ -26,7 +27,10 @@ import gomoku.server.services.errors.user.UserRankingError
 import gomoku.server.services.user.UserService
 import gomoku.utils.Failure
 import gomoku.utils.Success
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
+import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -36,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import kotlin.math.ceil
+import kotlin.time.DurationUnit
 
 /**
  * Controller for user-related endpoints
@@ -45,12 +50,14 @@ import kotlin.math.ceil
 @RequestMapping(URIs.Users.ROOT)
 class UserController(private val service: UserService) {
 
+    private val usersDomainConfig: UsersDomainConfig = service.usersDomain.config
+
     /**
      * Gets the stats of a user
      * @param userId The id of the user
      * @return The stats of the user or a problem if the user does not exist
      */
-    @GetMapping(URIs.Users.USER_STATS)
+    @GetMapping(URIs.Users.GET_BY_ID)
     fun userStats(@PathVariable userId: Int): ResponseEntity<*> {
         val userStats = service.getUserStats(userId)
         return if (userStats == null) {
@@ -108,33 +115,29 @@ class UserController(private val service: UserService) {
     }
 
     /**
-     * Gets the user by its id
-     * @param id The id of the user
-     * @return The user or a [Problem] if the user does not exist
-     */
-    @GetMapping(URIs.Users.GET_BY_ID)
-    fun getById(@PathVariable id: Int): ResponseEntity<*> {
-        val user = service.getUserById(id) ?: return Problem.response(404, Problem.userNotFound)
-        return GetUserById.siren(UserByIdOutputModel(user)).response(200)
-    }
-
-    /**
      * Creates a user given its username and password
      * @param userInput The user input
      * @return The created user or if not a [Problem]
      */
     @PostMapping(URIs.Users.CREATE)
     fun create(
-        @Valid @RequestBody
-        userInput: UserCreateInputModel
+        @Valid @RequestBody userInput: UserCreateInputModel,
+        response: HttpServletResponse
     ): ResponseEntity<*> {
         val res = service.createUser(username = userInput.username, password = userInput.password)
         return when (res) {
-            is Success -> SignUp.siren(res.value).responseRedirect(201, URIs.Users.ROOT + URIs.Users.HOME)
-
+            is Success -> {
+                if (userInput.sendTokenViaCookie) {
+                    setAuthenticationCookies(response, res.value.token, userInput.username)
+                    SignUpWithCookie.siren("User created.").responseRedirect(201, URIs.Users.ROOT + URIs.Users.HOME)
+                } else {
+                    SignUpWithoutCookie.siren(res.value).responseRedirect(201, URIs.Users.ROOT + URIs.Users.HOME)
+                }
+            }
             is Failure -> res.value.resolveProblem()
         }
     }
+
 
     /**
      * Creates a token for a user given its username and password, for example to login
@@ -143,18 +146,26 @@ class UserController(private val service: UserService) {
      */
     @PostMapping(URIs.Users.TOKEN)
     fun token(
-        @Valid @RequestBody
-        userInput: UserCreateTokenInputModel
+        @Valid @RequestBody userInput: UserCreateTokenInputModel,
+        response: HttpServletResponse
     ): ResponseEntity<*> {
         val res = service.createToken(username = userInput.username, password = userInput.password)
         return when (res) {
-            is Success -> Login.siren(res.value).responseRedirect(200, URIs.Users.ROOT + URIs.Users.HOME)
+            is Success -> {
+                if (userInput.sendTokenViaCookie) {
+                    setAuthenticationCookies(response, res.value.token, userInput.username)
+                    LoginWithCookie.siren("User logged in.").responseRedirect(200, URIs.Users.ROOT + URIs.Users.HOME)
 
+                } else {
+                    LoginWithoutCookie.siren(res.value).responseRedirect(200, URIs.Users.ROOT + URIs.Users.HOME)
+                }
+            }
             is Failure -> when (res.value) {
                 TokenCreationError.UserOrPasswordInvalid -> Problem.response(400, Problem.userOrPasswordAreInvalid)
             }
         }
     }
+
 
     /**
      * Logs out a user given its token
@@ -175,14 +186,16 @@ class UserController(private val service: UserService) {
      * @param authenticatedUser The authenticated user
      */
     @GetMapping(URIs.Users.HOME)
-    fun home(authenticatedUser: AuthenticatedUser): ResponseEntity<*> =
-        UserMe.siren(
+    fun home(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+        val userStats = service.getUserStats(authenticatedUser.user.uuid)
+        return UserMe.siren(
             UserHomeOutputModel(
                 authenticatedUser.user.uuid,
                 authenticatedUser.user.username,
-                authenticatedUser.token
+                userStats?.userRuleStats ?: emptyList()
             )
         ).response(200)
+    }
 
     /**
      * Resolves a [UserCreationError] to a [ResponseEntity]
@@ -206,8 +219,56 @@ class UserController(private val service: UserService) {
             UserRankingError.UserStatsNotFound -> Problem.response(404, Problem.userStatsNotFound)
         }
 
+
     companion object {
         const val DEFAULT_OFFSET = 0
         const val DEFAULT_LIMIT = 10
+
+        private fun HttpServletResponse.addCookie(cookie: ResponseCookie) {
+            this.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
+        }
     }
+
+    private fun setAuthenticationCookies(
+        response: HttpServletResponse,
+        userToken: String,
+        username: String
+    ) {
+        val accessTokenCookie = ResponseCookie.from("tokenCookie", userToken)
+            .httpOnly(true)
+            .path("/")
+            .maxAge(usersDomainConfig.tokenTtl.toLong(DurationUnit.SECONDS))
+            .sameSite("Strict")
+            .build()
+
+        val usernameCookie = ResponseCookie.from("usernameCookie", username)
+            .httpOnly(false)
+            .path("/")
+            .maxAge(usersDomainConfig.tokenTtl.toLong(DurationUnit.SECONDS))
+            .sameSite("Strict")
+            .build()
+
+        response.addCookie(accessTokenCookie)
+        response.addCookie(usernameCookie)
+    }
+
+    private fun clearAuthenticationCookies(response: HttpServletResponse) {
+        val accessTokenCookie = ResponseCookie.from("tokenCookie", "")
+            .httpOnly(true)
+            .path("/")
+            .maxAge(0)
+            .sameSite("Strict")
+            .build()
+
+        val usernameCookie = ResponseCookie.from("usernameCookie", "")
+            .httpOnly(false)
+            .path("/")
+            .maxAge(0)
+            .sameSite("Strict")
+            .build()
+
+        response.addCookie(accessTokenCookie)
+        response.addCookie(usernameCookie)
+    }
+
 }
