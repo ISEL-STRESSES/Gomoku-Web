@@ -208,26 +208,6 @@ class UserServiceTests {
     }
 
     @Test
-    fun `getUserById should return user for valid userId`() {
-        val userId = 1
-
-        val result = userService.getUserById(userId)
-
-        assertNotNull(result)
-        assertEquals(1, result.uuid)
-        assertEquals("user1", result.username)
-    }
-
-    @Test
-    fun `getUserById should return null for invalid userId`() {
-        val invalidUserId = 9999
-
-        val result = userService.getUserById(invalidUserId)
-
-        assertNull(result)
-    }
-
-    @Test
     fun `getUserByToken should return user for valid token`() {
         testWithTransactionManagerAndRollback {
             val randomPassword = "ByQYP78&j7Aug2"

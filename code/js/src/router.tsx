@@ -32,6 +32,10 @@ const router = createBrowserRouter([
             "path": "/logout",
             "element": <Logout />
           },
+          {
+            'path': '/ranking',
+            'element': <ShowMe />,
+          }
         ],
       },
     ],

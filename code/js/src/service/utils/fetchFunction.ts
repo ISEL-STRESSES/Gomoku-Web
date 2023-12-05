@@ -44,7 +44,7 @@ export async function fetchFunction<T>(partialUrl: string, method: string, data:
       'Accept': `${sirenMediaType}, ${problemMediaType}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(data),
+    body: data,
     credentials: authentication ? 'include' : 'omit'
   });
 

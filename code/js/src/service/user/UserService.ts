@@ -73,7 +73,8 @@ export namespace UserService {
    */
   export async function signUp(username: string, password: string): Promise<Either<Error | Problem, AuthenticationOutput>> {
     const url = `/users/create`;
-    const data = JSON.stringify({ username, password });
+    const sendTokenViaCookie = "true";
+    const data = JSON.stringify({ username, password, sendTokenViaCookie });
     return fetchFunction(url, "POST", data);
   }
 
@@ -87,7 +88,9 @@ export namespace UserService {
   */
   export async function login(username: string, password: string): Promise<Either<Error | Problem, AuthenticationOutput>> {
     const url = `/users/token`;
-    const data = JSON.stringify({ username, password });
+    const sendTokenViaCookie = "true";
+    const data = JSON.stringify({ username, password, sendTokenViaCookie });
+    console.log(data);
     return fetchFunction(url, "POST", data);
   }
 

@@ -32,11 +32,4 @@ class PipelineConfigurer(
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(authenticatedUserArgumentResolver)
     }
-
-    /**
-     * TODO
-     */
-    override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE").allowedHeaders("*")
-    }
 }
