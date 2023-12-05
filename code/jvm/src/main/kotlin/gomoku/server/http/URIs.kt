@@ -18,14 +18,13 @@ object URIs {
      */
     object Users {
         const val ROOT = "$PREFIX/users"
-        const val GET_BY_ID = "/{id}"
+        const val GET_BY_ID = "/{userId}"
         const val HOME = "/me"
         const val TOKEN = "/token"
         const val CREATE = "/create"
         const val LOGOUT = "/logout"
         const val RANKING = "/ranking/{ruleId}"
         const val USER_RANKING = "/{userId}/ranking/{ruleId}"
-        const val USER_STATS = "/stats/{userId}"
 
         fun byID(id: Int) = UriTemplate(ROOT + GET_BY_ID).expand(id)
         fun home() = URI(HOME)
@@ -34,7 +33,6 @@ object URIs {
         fun logout() = URI(LOGOUT)
         fun ranking(ruleId: Int) = UriTemplate(ROOT + RANKING).expand(ruleId)
         fun userRanking(userId: Int, ruleId: Int) = UriTemplate(ROOT + USER_RANKING).expand(userId, ruleId)
-        fun userStats(userId: Int) = UriTemplate(ROOT + USER_STATS).expand(userId)
     }
 
     /**

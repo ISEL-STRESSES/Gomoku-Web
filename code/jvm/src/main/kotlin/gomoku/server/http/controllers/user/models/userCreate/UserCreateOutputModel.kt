@@ -1,4 +1,4 @@
-package gomoku.server.http.controllers.user.models
+package gomoku.server.http.controllers.user.models.userCreate
 
 /**
  * Represents a user created with its id and active token to be sent from the API

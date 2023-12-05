@@ -5,7 +5,7 @@ import gomoku.server.domain.user.Token
 import gomoku.server.domain.user.User
 import gomoku.server.domain.user.UserStats
 import gomoku.server.domain.user.UsersDomain
-import gomoku.server.http.controllers.user.models.UserCreateOutputModel
+import gomoku.server.http.controllers.user.models.userCreate.UserCreateOutputModel
 import gomoku.server.repository.TransactionManager
 import gomoku.server.services.errors.user.TokenCreationError
 import gomoku.server.services.errors.user.UserCreationError
@@ -26,7 +26,7 @@ typealias RankingSearchResult = Pair<List<RankingUserData>, Int>?
 @Service
 class UserService(
     private val transactionManager: TransactionManager,
-    private val usersDomain: UsersDomain,
+    val usersDomain: UsersDomain,
     private val clock: Clock
 ) {
 
@@ -143,17 +143,6 @@ class UserService(
                 null
             }
         }
-
-    /**
-     * Gets a user by its id.
-     * @param id The id of the user.
-     * @return The user, or null if the user doesn't exist.
-     */
-    fun getUserById(id: Int): User? {
-        return transactionManager.run {
-            it.usersRepository.getUserById(id)
-        }
-    }
 
     /**
      * Gets a user by its token.

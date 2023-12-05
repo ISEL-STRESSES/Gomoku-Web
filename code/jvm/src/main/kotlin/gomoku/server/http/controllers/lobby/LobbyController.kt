@@ -59,7 +59,7 @@ class LobbyController(private val lobbyService: LobbyService) {
         val joinedLobby = lobbyService.joinLobby(lobbyIdModel.lobbyId, authenticatedUser.user.uuid)
         return when (joinedLobby) {
             is Failure -> joinedLobby.value.resolveProblem()
-            is Success -> JoinLobby.siren(joinedLobby.value).responseRedirect(201, URIs.Lobby.GET_LOBBY_BY_ID + "/${joinedLobby.value.id}")
+            is Success -> JoinLobby.siren(joinedLobby.value).responseRedirect(201, URIs.Game.ROOT + "/${joinedLobby.value.id}")
         }
     }
 
@@ -85,7 +85,7 @@ class LobbyController(private val lobbyService: LobbyService) {
     @PostMapping(URIs.Lobby.CREATE_LOBBY)
     fun createLobby(@RequestBody ruleIdInput: RuleIdInputModel, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val createLobbyResult = lobbyService.createLobby(ruleIdInput.ruleId, authenticatedUser.user.uuid)
-        return CreateLobby.siren(createLobbyResult).responseRedirect(201, URIs.Lobby.GET_LOBBY_BY_ID + "/${createLobbyResult.id}")
+        return CreateLobby.siren(createLobbyResult).responseRedirect(201, URIs.HOME + "/${createLobbyResult.id}")
     }
 
     /**
@@ -100,8 +100,11 @@ class LobbyController(private val lobbyService: LobbyService) {
         val matchmaker = lobbyService.startMatchmakingProcess(ruleIdInput.ruleId, authenticatedUser.user.uuid)
         return when (matchmaker) {
             is Failure -> matchmaker.value.resolveProblem()
-            is Success -> Matchmaker.siren(MatchmakerOutputModel(matchmaker.value))
-                .responseRedirect(201, URIs.Game.ROOT + "/${matchmaker.value.id}")
+            is Success -> if (matchmaker.value.isGame) {
+                Matchmaker.siren(MatchmakerOutputModel(matchmaker.value)).responseRedirect(201, URIs.Game.ROOT + "/${matchmaker.value.id}")
+            } else {
+                Matchmaker.siren(MatchmakerOutputModel(matchmaker.value)).responseRedirect(201, URIs.Lobby.ROOT + "/${matchmaker.value.id}")
+            }
         }
     }
 
