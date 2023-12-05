@@ -1,0 +1,58 @@
+version: "3.3"
+services:
+  gomoku-db:
+    container_name: gomoku-db
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=master
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+
+  gomoku-service-1:
+    container_name: gomoku-service-1
+    depends_on:
+    - gomoku-db
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile-spring
+    environment:
+      - DB_URL=jdbc:postgresql://db-tests:5432/postgres?user=postgres&password=master
+    expose:
+      - "80"
+
+  gomoku-service-2:
+    container_name: gomoku-service-2
+    depends_on:
+    - gomoku-service-1
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile-spring
+    environment:
+      - DB_URL=jdbc:postgresql://db-tests:5432/postgres?user=postgres&password=master
+    expose:
+      - "80"
+
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./dockerfiles/nginx:/etc/nginx
+    depends_on:
+      - gomoku-service-1
+      - gomoku-service-2
+
+  # Just a machine running ubuntu, with 'dig' installed so that we can observe the docker compose environment.
+#  ubuntu:
+#    container_name: ubuntu
+#    build:
+#      context: .
+#      dockerfile: ./tests/Dockerfile-ubuntu
+#    tty: true

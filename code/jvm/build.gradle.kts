@@ -1,11 +1,16 @@
+import org.jetbrains.kotlin.gradle.model.NoArg
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    val kotlinVersion = "1.8.22"
     id("org.springframework.boot") version "3.1.3"
     id("io.spring.dependency-management") version "1.1.3"
     id("org.jlleitschuh.gradle.ktlint") version "11.6.0"
-    kotlin("jvm") version "1.8.22"
-    kotlin("plugin.spring") version "1.8.22"
+    id("org.jetbrains.kotlin.plugin.noarg") version kotlinVersion
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.spring") version kotlinVersion
+    kotlin("kapt") version kotlinVersion
+    idea
 }
 
 group = "gomoku"
@@ -15,8 +20,21 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
 }
 
+noArg {
+    annotation(NoArg::class.java.`package`.name + "." + NoArg::class.java.simpleName)
+    invokeInitializers = true
+}
+
 repositories {
     mavenCentral()
+}
+
+idea {
+    module {
+        val kaptMain = file("build/generated/source/kapt/main")
+        sourceDirs.plusAssign(kaptMain)
+        generatedSourceDirs.plusAssign(kaptMain)
+    }
 }
 
 dependencies {
@@ -57,12 +75,12 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-// /**
-// * DB related tasks
-// * - To run `psql` inside the container, do
-// *      docker exec -ti db-tests psql -d db -U dbuser -W
-// *   and provide it with the same password as define on `tests/Dockerfile-db-test`
-// */
+/**
+ * DB related tasks
+ * - To run `psql` inside the container, do
+ *      docker exec -ti db-tests psql -d postgres -U postgres -W
+ *   and provide it with the same password as define on `tests/Dockerfile-ubuntu-spring-nginx-db-test`
+ */
 // task<Exec>("dbTestsUp") {
 //    commandLine("docker-compose", "up", "-d", "--build", "--force-recreate", "db-tests")
 // }
@@ -80,3 +98,19 @@ tasks.withType<Test> {
 //    dependsOn("dbTestsWait")
 //    finalizedBy("dbTestsDown")
 // }
+
+/**
+ * Docker related tasks
+ */
+task<Copy>("extractUberJar") {
+    dependsOn("assemble")
+    // opens the JAR containing everything...
+    from(zipTree("$buildDir/libs/${rootProject.name}-$version.jar"))
+    // ... into the 'build/dependency' folder
+    into("build/dependency")
+}
+
+task<Exec>("composeUp") {
+    commandLine("docker-compose", "up", "--build", "--force-recreate")
+    // dependsOn("extractUberJar")
+}
