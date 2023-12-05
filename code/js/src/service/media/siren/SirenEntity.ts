@@ -15,10 +15,10 @@ import { throwError } from '../../../utils/throwError';
  * @property links the links to other entities (optional)
  * @property title the title of the entity (optional)
  */
-export interface InputSirenEntity<T> {
+export interface InputSirenEntity<T, R> {
     class?: string[]
     properties?: T
-    entities?: SubEntity<unknown>[]
+    entities?: SubEntity<R>[]
     actions?: Action[]
     links?: Link[]
     title?: string
@@ -36,15 +36,15 @@ export interface InputSirenEntity<T> {
  * @property links the links to other entities (optional)
  * @property title the title of the entity (optional)
  */
-export class SirenEntity<T> implements InputSirenEntity<T> {
+export class SirenEntity<T, R = undefined> implements InputSirenEntity<T, R> {
     class?: string[]
     properties?: T
-    entities?: SubEntity<unknown>[]
+    entities?: SubEntity<R>[]
     actions?: Action[]
     links?: Link[]
     title?: string
 
-    constructor(entity: InputSirenEntity<T>) {
+    constructor(entity: InputSirenEntity<T, R>) {
         this.class = entity.class
         this.properties = entity.properties
         this.entities = entity.entities
@@ -98,10 +98,15 @@ export class SirenEntity<T> implements InputSirenEntity<T> {
      *
      * @return the embedded sub entities with the given [rels]
      */
-    getEmbeddedSubEntities<T>(): EmbeddedSubEntity<T>[] {
+    getEmbeddedSubEntities(): EmbeddedSubEntity<R>[] {
+
+        if(!this.entities || typeof this.entities === 'undefined') {
+            return [];
+        }
+
         return this.entities
           ?.filter(entity => !Object.keys(entity).includes("href"))
-          .map(entity => new EmbeddedSubEntity(entity as InputEmbeddedSubEntity<T>)) ?? []
+          .map(entity => new EmbeddedSubEntity(entity as InputEmbeddedSubEntity<R>)) ?? []
     }
 
     /**
