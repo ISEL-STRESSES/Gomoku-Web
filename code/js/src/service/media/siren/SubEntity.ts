@@ -1,6 +1,6 @@
 import {Link} from "./Link"
 import {Action} from "./Action"
-import {throwError} from "../../../../../../../battleships-web-jeez/code/js/src/Services/utils/errorUtils"
+import {throwError} from "../../../utils/throwError"
 
 /**
  * A sub-entity is an entity that is part of another entity.

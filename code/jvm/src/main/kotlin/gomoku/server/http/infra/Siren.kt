@@ -6,7 +6,7 @@ import java.net.URI
 /**
  * TODO
  */
-open class SirenBuilderScope{
+open class SirenBuilderScope {
     private val classes = mutableListOf<String>()
     private val properties = mutableListOf<Any>()
     private val entities = mutableListOf<EntityModel>()

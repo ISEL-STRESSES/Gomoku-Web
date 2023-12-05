@@ -59,7 +59,7 @@ object GetRanking {
             clazz(Rel.SEARCH_RANKING.value)
             property(PropertyRankingModel(body.ruleId, body.userData.size))
             body.userData.forEach {
-                entity(EntityModel(listOf(Rel.USER.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Users.ROOT + "/${it.id}/ranking/${body.ruleId}"))))
+                entity(EntityModel(listOf(Rel.USER.value), emptyList(), it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Users.ROOT + "/${it.id}/ranking/${body.ruleId}"))))
             }
             link(
                 "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=$currentOffset",
@@ -103,7 +103,7 @@ object GetUserRanking {
         siren {
             clazz(Rel.USER_RANKING.value)
             property(body)
-            link("${URIs.Users.ROOT}/${body.id}/ranking/${ruleId}", Rel.SELF)
+            link("${URIs.Users.ROOT}/${body.id}/ranking/$ruleId", Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
 }
@@ -121,7 +121,7 @@ object GetUserStats {
             clazz(Rel.USER_STATS.value)
             property(PropertyUserStatsModel(body.userId, body.username, body.userRuleStats.size))
             body.userRuleStats.forEach {
-                entity(EntityModel(listOf(Rel.USER_RANKING.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Users.ROOT + "/${body.userId}/ranking/${it.ruleId}"))))
+                entity(EntityModel(listOf(Rel.USER_RANKING.value), emptyList(), it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Users.ROOT + "/${body.userId}/ranking/${it.ruleId}"))))
             }
             link("${URIs.Users.ROOT}/stats/${body.userId}", Rel.SELF)
             link(URIs.HOME, Rel.HOME)

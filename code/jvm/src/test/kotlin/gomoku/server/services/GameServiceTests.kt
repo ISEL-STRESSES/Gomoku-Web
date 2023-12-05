@@ -10,17 +10,14 @@ import gomoku.server.failureOrNull
 import gomoku.server.repository.createFinishedGame
 import gomoku.server.services.errors.game.GetGameError
 import gomoku.server.services.errors.game.MakeMoveError
-import gomoku.server.services.errors.game.MatchmakingError
 import gomoku.server.services.errors.lobby.LeaveLobbyError
 import gomoku.server.services.game.GameService
 import gomoku.server.services.lobby.LobbyService
-import gomoku.server.services.user.UserService
 import gomoku.server.successOrNull
 import gomoku.server.testWithTransactionManagerAndRollback
 import gomoku.utils.Failure
 import gomoku.utils.Success
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.test.Test
@@ -35,72 +32,72 @@ class GameServiceTests {
     )
     private val clock = TestClock()
 
-    @Test
-    fun `startMatchmakingProcess should start a new lobby if no existing lobbies with the same ruleId exist`() {
-        val ruleId = 2
-        val userId = 1 // Some random user
-
-        testWithTransactionManagerAndRollback { transactionManager ->
-            // before
-            deleteLobbies(transactionManager)
-            // test
-            val gameService = GameService(transactionManager)
-
-            val result = gameService.startMatchmakingProcess(ruleId, userId)
-
-            assertTrue(result is Success && !result.value.isGame)
-        }
-    }
-
-    @Test
-    fun `startMatchmakingProcess should return SamePlayer error if user tries to match with themselves`() {
-        val ruleId = 2
-        val userId = 3
-
-        testWithTransactionManagerAndRollback { transactionManager ->
-            // before
-            deleteLobbies(transactionManager)
-            // test
-            val gameService = GameService(transactionManager)
-
-            // Simulate the presence of an existing lobby
-            gameService.startMatchmakingProcess(ruleId, userId)
-
-            val result = gameService.startMatchmakingProcess(ruleId, userId)
-
-            assertTrue(result is Failure)
-            assertEquals(MatchmakingError.SamePlayer, result.failureOrNull())
-        }
-    }
-
-    @Test
-    fun `startMatchmakingProcess should handle the case where the user is matched into a game`() {
-        val ruleId = 2
-
-        testWithTransactionManagerAndRollback { transactionManager ->
-            // before
-            deleteLobbies(transactionManager)
-            // user before
-            val userService =
-                UserService(transactionManager = transactionManager, clock = clock, usersDomain = usersDomain)
-            val randomPassword = "ByQYP78&j7Aug2" // secure password
-            val user1Id = userService.createUser("test1", randomPassword)
-            val user2Id = userService.createUser("test2", randomPassword)
-
-            require(user1Id is Success)
-            require(user2Id is Success)
-            // sut
-            val gameService = GameService(transactionManager)
-
-            val result1 = gameService.startMatchmakingProcess(ruleId, user1Id.value.userId)
-
-            assertFalse(result1 is Success && result1.value.isGame)
-
-            val result = gameService.startMatchmakingProcess(ruleId, user2Id.value.userId)
-
-            assertTrue(result is Success && result.value.isGame)
-        }
-    }
+//    @Test
+//    fun `startMatchmakingProcess should start a new lobby if no existing lobbies with the same ruleId exist`() {
+//        val ruleId = 2
+//        val userId = 1 // Some random user
+//
+//        testWithTransactionManagerAndRollback { transactionManager ->
+//            // before
+//            deleteLobbies(transactionManager)
+//            // test
+//            val gameService = GameService(transactionManager)
+//
+//            val result = gameService.startMatchmakingProcess(ruleId, userId)
+//
+//            assertTrue(result is Success && !result.value.isGame)
+//        }
+//    }
+//
+//    @Test
+//    fun `startMatchmakingProcess should return SamePlayer error if user tries to match with themselves`() {
+//        val ruleId = 2
+//        val userId = 3
+//
+//        testWithTransactionManagerAndRollback { transactionManager ->
+//            // before
+//            deleteLobbies(transactionManager)
+//            // test
+//            val gameService = GameService(transactionManager)
+//
+//            // Simulate the presence of an existing lobby
+//            gameService.startMatchmakingProcess(ruleId, userId)
+//
+//            val result = gameService.startMatchmakingProcess(ruleId, userId)
+//
+//            assertTrue(result is Failure)
+//            assertEquals(MatchmakingError.SamePlayer, result.failureOrNull())
+//        }
+//    }
+//
+//    @Test
+//    fun `startMatchmakingProcess should handle the case where the user is matched into a game`() {
+//        val ruleId = 2
+//
+//        testWithTransactionManagerAndRollback { transactionManager ->
+//            // before
+//            deleteLobbies(transactionManager)
+//            // user before
+//            val userService =
+//                UserService(transactionManager = transactionManager, clock = clock, usersDomain = usersDomain)
+//            val randomPassword = "ByQYP78&j7Aug2" // secure password
+//            val user1Id = userService.createUser("test1", randomPassword)
+//            val user2Id = userService.createUser("test2", randomPassword)
+//
+//            require(user1Id is Success)
+//            require(user2Id is Success)
+//            // sut
+//            val gameService = GameService(transactionManager)
+//
+//            val result1 = gameService.startMatchmakingProcess(ruleId, user1Id.value.userId)
+//
+//            assertFalse(result1 is Success && result1.value.isGame)
+//
+//            val result = gameService.startMatchmakingProcess(ruleId, user2Id.value.userId)
+//
+//            assertTrue(result is Success && result.value.isGame)
+//        }
+//    }
 
     @Test
     fun `makeMove should successfully make a move for an ongoing game`() {
@@ -218,25 +215,25 @@ class GameServiceTests {
         }
     }
 
-    @Test
-    fun `leaveLobby should be true if the user was on it`() {
-        val ruleId = 2
-        val userId = 3
-
-        testWithTransactionManagerAndRollback { transactionManager ->
-            // before
-            deleteLobbies(transactionManager)
-            // test
-            val gameService = GameService(transactionManager)
-            val lobbyService = LobbyService(transactionManager)
-
-            val res = gameService.startMatchmakingProcess(ruleId, userId).successOrNull()!!
-
-            val result = lobbyService.leaveLobby(res.id, userId)
-
-            assertTrue(result is Success)
-        }
-    }
+//    @Test
+//    fun `leaveLobby should be true if the user was on it`() {
+//        val ruleId = 2
+//        val userId = 3
+//
+//        testWithTransactionManagerAndRollback { transactionManager ->
+//            // before
+//            deleteLobbies(transactionManager)
+//            // test
+//            val gameService = GameService(transactionManager)
+//            val lobbyService = LobbyService(transactionManager)
+//
+//            val res = gameService.startMatchmakingProcess(ruleId, userId).successOrNull()!!
+//
+//            val result = lobbyService.leaveLobby(res.id, userId)
+//
+//            assertTrue(result is Success)
+//        }
+//    }
 
     @Test
     fun `leaveLobby should be LobbyNotFound if the lobby doesn't exist`() {

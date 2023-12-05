@@ -237,7 +237,7 @@ class UserServiceTests {
             val testToken = userService.createToken(testUserUsername, randomPassword)
             require(testToken is Success)
 
-            val result = userService.getUserByToken(testToken.value.tokenValue)
+            val result = userService.getUserByToken(testToken.value.token)
 
             assertNotNull(result)
             assertEquals(testUser.value.userId, result.uuid)
@@ -264,9 +264,9 @@ class UserServiceTests {
             val testToken = userService.createToken(testUserUsername, randomPassword)
             require(testToken is Success)
 
-            userService.revokeToken(testToken.value.tokenValue)
+            userService.revokeToken(testToken.value.token)
 
-            val result = userService.getUserByToken(testToken.value.tokenValue)
+            val result = userService.getUserByToken(testToken.value.token)
 
             assertNull(result)
         }

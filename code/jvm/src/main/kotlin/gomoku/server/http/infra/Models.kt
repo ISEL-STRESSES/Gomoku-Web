@@ -29,7 +29,7 @@ data class SirenModel(
 data class EntityModel(
     @get:JsonProperty("class")
     val clazz: List<String>,
-    val rel : List<String>,
+    val rel: List<String>,
     val properties: Any,
     val links: List<LinkModel>
 )

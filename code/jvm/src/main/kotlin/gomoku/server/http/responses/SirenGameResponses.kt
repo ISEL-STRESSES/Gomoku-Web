@@ -34,7 +34,7 @@ object GetFinishedGames {
             clazz(Rel.GAME_LIST.value)
             property(PropertyDefaultModel(body.finishedGames.size))
             body.finishedGames.forEach {
-                entity(EntityModel(listOf(Rel.GAME.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Game.ROOT + "/${it.id}"))))
+                entity(EntityModel(listOf(Rel.GAME.value), emptyList(), it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Game.ROOT + "/${it.id}"))))
             }
             link(URIs.Game.ROOT + URIs.Game.HUB, Rel.SELF)
             link(URIs.HOME, Rel.HOME)
@@ -122,7 +122,7 @@ object GetRules {
             clazz(Rel.RULES.value)
             property(PropertyDefaultModel(body.rulesList.size))
             body.rulesList.forEach {
-                entity(EntityModel(listOf(Rel.RULES.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Game.ROOT + "/rules/${it.ruleId}"))))
+                entity(EntityModel(listOf(Rel.RULES.value), emptyList(), it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Game.ROOT + "/rules/${it.ruleId}"))))
             }
             link(URIs.Game.ROOT + URIs.Game.GAME_RULES, Rel.SELF)
             link(URIs.HOME, Rel.HOME)
@@ -214,7 +214,7 @@ object GetLobbies {
             clazz(Rel.GET_LOBBIES.value)
             property(PropertyDefaultModel(body.lobbies.size))
             body.lobbies.forEach {
-                entity(EntityModel(listOf(Rel.GET_LOBBY_BY_ID.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Lobby.ROOT + "/${it.id}"))))
+                entity(EntityModel(listOf(Rel.GET_LOBBY_BY_ID.value), emptyList(), it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Lobby.ROOT + "/${it.id}"))))
             }
             action(
                 "create-lobby",

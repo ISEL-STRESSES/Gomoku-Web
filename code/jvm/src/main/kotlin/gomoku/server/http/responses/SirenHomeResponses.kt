@@ -5,9 +5,9 @@ import gomoku.server.http.Rel
 import gomoku.server.http.URIs
 import gomoku.server.http.infra.ActionFieldModel
 import gomoku.server.http.infra.SirenMediaType
+import gomoku.server.http.infra.siren
 import org.springframework.http.HttpMethod
 import java.net.URI
-import gomoku.server.http.infra.siren
 
 /**
  * TODO
@@ -29,7 +29,8 @@ object SirenHomeResponses {
                 SirenMediaType,
                 listOf(
                     ActionFieldModel("username", "text"),
-                    ActionFieldModel("password", "password"))
+                    ActionFieldModel("password", "password")
+                )
             )
             action(
                 Rel.LOGIN.value,
@@ -39,7 +40,8 @@ object SirenHomeResponses {
                 SirenMediaType,
                 listOf(
                     ActionFieldModel("username", "text"),
-                    ActionFieldModel("password", "password"))
+                    ActionFieldModel("password", "password")
+                )
             )
             action(
                 Rel.LOGOUT.value,
