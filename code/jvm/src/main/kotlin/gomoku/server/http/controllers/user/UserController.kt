@@ -121,7 +121,7 @@ class UserController(private val service: UserService) {
      */
     @PostMapping(URIs.Users.CREATE)
     fun create(
-        @Valid @RequestBody userInput: UserCreateInputModel,
+        @RequestBody userInput: UserCreateInputModel,
         response: HttpServletResponse
     ): ResponseEntity<*> {
         val res = service.createUser(username = userInput.username, password = userInput.password)
@@ -146,7 +146,7 @@ class UserController(private val service: UserService) {
      */
     @PostMapping(URIs.Users.TOKEN)
     fun token(
-        @Valid @RequestBody userInput: UserCreateTokenInputModel,
+        @RequestBody userInput: UserCreateTokenInputModel,
         response: HttpServletResponse
     ): ResponseEntity<*> {
         val res = service.createToken(username = userInput.username, password = userInput.password)
@@ -232,7 +232,7 @@ class UserController(private val service: UserService) {
     private fun setAuthenticationCookies(
         response: HttpServletResponse,
         userToken: String,
-        username: String
+        username: String    
     ) {
         val accessTokenCookie = ResponseCookie.from("tokenCookie", userToken)
             .httpOnly(true)
