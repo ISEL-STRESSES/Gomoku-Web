@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useSetUser } from './Authn';
 import { useState } from "react";
-
-const baseURL = 'http://localhost:8080';
+import { UserService } from '../../service/user/UserService';
+import { Failure, Success } from '../../utils/Either';
+import { Problem } from '../../service/media/Problem';
 
 type State =
   | { tag: 'editing'; error?: string; inputs: { username: string; password: string } }
@@ -48,90 +48,54 @@ function reduce(state: State, action: Action): State {
   }
 }
 
-export async function authenticate (url:string, username:string, password:string): Promise<{id:number, name:string} | undefined> {
-  return fetch(baseURL + url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ username, password }),
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(res => {
-      if (res) {
-        console.log(res);
-        return { id: res.id, name: username };
-      } else {
-        return undefined;
-      }
-    })
-    .catch(error => {
-      console.log(error);
-      return undefined;
-    });
-}
-
 export function Login() {
   console.log('Login');
   const [state, dispatch] = React.useReducer(reduce, { tag: 'editing', inputs: { username: '', password: '' } });
   const [isSignUp, setSignUp] = useState(true);
-  const setUser = useSetUser();
   const location = useLocation();
+
   if (state.tag === 'redirect') {
     return <Navigate to={location.state?.source?.pathname || '/me'} replace={true} />;
   }
+
   function handleChange(ev: React.FormEvent<HTMLInputElement>) {
     dispatch({ type: 'edit', inputName: ev.currentTarget.name, inputValue: ev.currentTarget.value });
   }
+
   function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
-    console.log('handleSubmit');
     if (state.tag !== 'editing') {
       return;
     }
-    console.log('dispatch submit')
     dispatch({ type: 'submit' });
-    const username = state.inputs.username;
-    const password = state.inputs.password;
-    if (isSignUp) {
-      authenticate('/api/users/create', username, password)
-        .then(res => {
-          if (res) {
-            console.log(`setUser(${res})`);
-            setUser(res);
-            dispatch({ type: 'success' });
+
+    const authFunction = isSignUp ? UserService.signUp : UserService.login;
+    authFunction(state.inputs.username, state.inputs.password)
+      .then(res => {
+        if (res instanceof Success) {
+          dispatch({ type: 'success' });
+        } else if (res instanceof Failure) {
+          // Check if the failure is due to an Error or a Problem
+          if (res.value instanceof Error) {
+            // Handle the Error case
+            dispatch({ type: 'error', message: res.value.message });
+          } else if (res.value instanceof Problem) {
+            // Handle the Problem case
+            // Adjust this based on the structure of your Problem class
+            const problemMessage = res.value.title || 'A problem occurred';
+            dispatch({ type: 'error', message: problemMessage });
           } else {
-            dispatch({ type: 'error', message: 'Invalid username or password' });
+            // Generic error handling if the failure type is unknown
+            dispatch({ type: 'error', message: 'An unexpected error occurred' });
           }
-        })
-        .catch(error => {
-          dispatch({ type: 'error', message: error.message });
-        });
-      return;
-    }else {
-      authenticate('/api/users/token', username, password)
-        .then(res => {
-          if (res) {
-            console.log(`setUser(${res})`);
-            setUser(res);
-            dispatch({ type: 'success' });
-          } else {
-            dispatch({ type: 'error', message: 'Invalid username or password' });
-          }
-        })
-        .catch(error => {
-          dispatch({ type: 'error', message: error.message });
-        });
-    }
+        }
+      });
   }
 
-  const username = state.tag === 'submitting' ? state.username : state.inputs.username
-  const password = state.tag === 'submitting' ? "" : state.inputs.password
+
+
+  const username = state.tag === 'submitting' ? state.username : state.inputs.username;
+  const password = state.tag === 'submitting' ? "" : state.inputs.password;
 
   return (
     <div id="authDiv">

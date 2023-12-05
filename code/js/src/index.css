@@ -196,3 +196,13 @@ label {
     font-size: 18px;
     color: #fff;
 }
+
+.error-message {
+    background-color: #ffcccc;
+    color: #d8000c;
+    border: 1px solid #d8000c;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    text-align: center;
+}

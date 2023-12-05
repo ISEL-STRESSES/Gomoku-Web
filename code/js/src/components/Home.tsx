@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { useCurrentUser } from "./authentication/Authn";
+import { getUserName } from '../utils/cookieUtils';
 
 export function Home() {
   return (
@@ -21,8 +21,8 @@ export function Home() {
 }
 
 function Nav() {
-  const user = useCurrentUser();
-  if (!user)
+  const currentUser = getUserName()
+  if (!currentUser)
     return (
       <ol id="navMenu">
         <li><Link to="/">Home</Link></li>

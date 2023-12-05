@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { useCurrentUser } from "../authentication/Authn";
+import { getUserName } from '../../utils/cookieUtils';
 
 export function ShowMe() {
-    const currentUser = useCurrentUser();
+    const currentUser = getUserName()
 
     return (
         <div>
-            {`Hello ${currentUser!.name}!`}
+            {`Hello ${currentUser!}!`}
         </div>
     );
 }

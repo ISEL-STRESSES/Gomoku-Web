@@ -1,39 +1,39 @@
-import { useFetch } from '../utils/useFetch';
+import { fetchFunction } from '../utils/fetchFunction';
 import { Either } from '../../utils/Either';
-import { SirenEntity } from '../media/siren/SirenEntity';
-import { GetUserStatsOutput } from './models/GetUserStatsOutput';
-import { GetUserRuleStatsOutput } from './models/GetUserRuleStatsOutput';
-import { GetUsersRankingOutput } from './models/GetUsersRankingOutput';
-import { GetUserByIdOutput } from './models/GetUserByIdOutput';
+import { Problem } from '../media/Problem';
 import { AuthenticationOutput } from './models/AuthenticationOutput';
-
+import { GetUserByIdOutput } from './models/GetUserByIdOutput';
+import { GetUsersRankingOutput } from './models/GetUsersRankingOutput';
+import { GetUserRuleStatsOutput } from './models/GetUserRuleStatsOutput';
+import { GetUserStatsOutput } from './models/GetUserStatsOutput';
+import { LogoutOutput } from './models/LogoutOutput';
 
 export namespace UserService {
 
-  //TODO: Either centralize URIs or find them from the link map using hypermedia
+  /**
+   * Gets user stats.
+   *
+   * @param userID the id of the user
+   *
+   * @return the API result of the get user stats request
+   */
+  export async function getUserStats(userID: number): Promise<Either<Error | Problem, GetUserStatsOutput>> {
+    const url = `/users/stats/${userID}`;
+    return fetchFunction(url, "GET", null);
+  }
 
-    /**
-     * Gets user stats.
-     *
-     * @param userID the id of the user
-     *
-     * @return the API result of the get user stats request
-     */
-    export function getUserStats(userID: number): Either<Error, GetUserStatsOutput> | undefined {
-        return useFetch(`/users/stats/${userID}`, "GET", false)
-    }
-
-    /**
-     * Gets user stats for a given rule
-     *
-     * @param userID the id of the user
-     * @param ruleID the id of the rule
-     *
-     * @return the API result of the get user stats request
-     */
-    export function getUserStatsForRule(userID: number, ruleID: number): Either<Error, GetUserRuleStatsOutput> | undefined {
-      return useFetch(`/users/${userID}/ranking/${ruleID}`, "GET", false)
-    }
+  /**
+   * Gets user stats for a given rule
+   *
+   * @param userID the id of the user
+   * @param ruleID the id of the rule
+   *
+   * @return the API result of the get user stats request
+   */
+  export async function getUserStatsForRule(userID: number, ruleID: number): Promise<Either<Error | Problem, GetUserRuleStatsOutput>> {
+    const url = `/users/${userID}/ranking/${ruleID}`;
+    return fetchFunction(url, "GET", null);
+  }
 
   /**
    * Gets the ranking of the users for a given rule
@@ -43,12 +43,12 @@ export namespace UserService {
    *
    * @return the API result of the get-ranking request
    */
-  export function getRanking(ruleID: number, username?: string): Either<Error, GetUsersRankingOutput> | undefined { //TODO: Figure out how to do pagination
+  export async function getRanking(ruleID: number, username?: string): Promise<Either<Error | Problem, GetUsersRankingOutput>> {
+    let url = `/users/ranking/${ruleID}`;
     if (username) {
-      return useFetch(`/users/ranking/${ruleID}?username=${username}`, "GET", false)
-    } else {
-      return useFetch(`/users/ranking/${ruleID}`, "GET", false)
+      url += `?username=${username}`;
     }
+    return fetchFunction(url, "GET", null);
   }
 
   /**
@@ -58,8 +58,9 @@ export namespace UserService {
    *
    * @return the API result of the get user request
    */
-  export function getUser(userID: number): Either<Error, GetUserByIdOutput> | undefined {
-    return useFetch(`/users/${userID}`, "GET", false)
+  export async function getUser(userID: number): Promise<Either<Error | Problem, GetUserByIdOutput>> {
+    const url = `/users/${userID}`;
+    return fetchFunction(url, "GET", null);
   }
 
   /**
@@ -70,20 +71,24 @@ export namespace UserService {
    *
    * @return the API result of the sign-up request
    */
-  export function signUp(username: string, password: string): Either<Error, AuthenticationOutput> | undefined {
-    return useFetch(`/users/create`, "POST", false, JSON.stringify({ username, password }))
+  export async function signUp(username: string, password: string): Promise<Either<Error | Problem, AuthenticationOutput>> {
+    const url = `/users/create`;
+    const data = JSON.stringify({ username, password });
+    return fetchFunction(url, "POST", data);
   }
 
   /**
-   * Logs in a user
-   *
-   * @param username the username of the user
-   * @param password the password of the user
-   *
-   * @return the API result of the login request
-   */
-  export function login(username: string, password: string): Either<Error, AuthenticationOutput> | undefined {
-    return useFetch(`/users/token`, "POST", false, JSON.stringify({ username, password }))
+  * Logs in a user
+  *
+  * @param username the username of the user
+  * @param password the password of the user
+  *
+  * @return the API result of the login request
+  */
+  export async function login(username: string, password: string): Promise<Either<Error | Problem, AuthenticationOutput>> {
+    const url = `/users/token`;
+    const data = JSON.stringify({ username, password });
+    return fetchFunction(url, "POST", data);
   }
 
   /**
@@ -91,7 +96,8 @@ export namespace UserService {
    *
    * @return the API result of the logout request
    */
-  export function logout(): Either<Error, SirenEntity<string>> | undefined {
-    return useFetch(`/users/logout`, "POST", true)
+  export async function logout(): Promise<Either<Error | Problem, LogoutOutput>> {
+    const url = `/users/logout`;
+    return fetchFunction(url, "POST", null);
   }
 }

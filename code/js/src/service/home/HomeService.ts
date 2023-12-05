@@ -1,6 +1,7 @@
 import { GetHomeOutput } from './models/GetHomeOutput';
-import { useFetch } from '../utils/useFetch';
+import { fetchFunction } from '../utils/fetchFunction';
 import { Either } from '../../utils/Either';
+import { Problem } from '../media/Problem';
 
 export const API_ENDPOINT = "http://localhost:8000/api"
 
@@ -11,7 +12,7 @@ export namespace HomeService {
       *
       * @return the API result of the get home request
       */
-      export function getHome(): Either<Error, GetHomeOutput> | undefined {
-            return useFetch("/", "GET", false)
+      export function getHome(): Promise<Either<Error | Problem, GetHomeOutput>> {
+            return fetchFunction<GetHomeOutput>("/", "GET", false)
       }
 }

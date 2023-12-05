@@ -1,8 +1,5 @@
 // Assuming Either.ts contains the Either class and its related functions
-import { useEffect, useState } from 'react';
 import { Either, failure, Failure, success } from '../../utils/Either';
-import { getCookie } from '../../utils/cookieUtils';
-import { tokenCookie } from '../../components/authentication/Authn';
 import { SirenEntity, sirenMediaType } from '../media/siren/SirenEntity';
 import { Problem, problemMediaType } from '../media/Problem';
 import { API_ENDPOINT } from '../home/HomeService';
@@ -38,7 +35,8 @@ async function fetchWithEither(url: string, options: RequestInit): Promise<Eithe
   }
 }
 
-async function fetchFunction<T>(url: string, method: string, data: any, headers: any): Promise<Either<Error, SirenEntity<any>>> {
+export async function fetchFunction<T>(partialUrl: string, method: string, data: any, headers?: any): Promise<Either<Error | Problem, SirenEntity<any>>> {
+  const url = API_ENDPOINT + partialUrl;
   const fetchResult = await fetchWithEither(url, {
     method: method,
     headers: {
@@ -70,30 +68,30 @@ async function fetchFunction<T>(url: string, method: string, data: any, headers:
   }
 }
 
-export function useFetch<T>(partialURL: string, method: string, requireAuth: boolean, data: any = undefined): Either<Error, SirenEntity<T>> | undefined {
-  const [result, setResult] = useState<Either<Error, SirenEntity<T>> | undefined>(undefined);
-  const url = API_ENDPOINT + partialURL;
-  useEffect(() => {
-    let cancelled = false;
-
-    fetchFunction<T>(url, method, data, {
-      ...requireAuth ? { 'Authorization': 'Bearer ' + getCookie(tokenCookie) } : undefined,
-    })
-      .then(eitherResult => {
-        if (!cancelled) {
-          setResult(eitherResult);
-        }
-      })
-      .catch(err => {
-        if (!cancelled) {
-          setResult(failure(err));
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [url, method, data]);
-
-  return result;
-}
+// export function useFetch<T>(partialURL: string, method: string, requireAuth: boolean, data: any = undefined): Either<Error | Problem, SirenEntity<T>> | undefined {
+//   const [result, setResult] = useState<Either<Error, SirenEntity<T>> | undefined>(undefined);
+//   const url = API_ENDPOINT + partialURL;
+//   useEffect(() => {
+//     let cancelled = false;
+//
+//     fetchFunction<T>(url, method, data, {
+//       ...requireAuth ? { 'Authorization': 'Bearer ' + getCookie(tokenCookie) } : undefined,
+//     })
+//       .then(eitherResult => {
+//         if (!cancelled) {
+//           setResult(eitherResult);
+//         }
+//       })
+//       .catch(err => {
+//         if (!cancelled) {
+//           setResult(failure(err));
+//         }
+//       });
+//
+//     return () => {
+//       cancelled = true;
+//     };
+//   }, [url, method, data]);
+//
+//   return result;
+// }
