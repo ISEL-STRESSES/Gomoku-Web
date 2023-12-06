@@ -4,6 +4,8 @@ import { Problem } from '../media/Problem';
 import { GetRulesOutput } from './models/GetRulesOutput';
 import { RuleOutput } from './models/RuleOutput';
 import { GameOutput } from './models/GameOutput';
+import { PlayPositionInputModel } from "./models/PlayPositionInputModel";
+import { GetTurnOutput } from "./models/GetTurnOutput";
 
 export namespace GameService {
 
@@ -35,7 +37,7 @@ export namespace GameService {
    * @param playData the data representing the play
    * @return the API result of the make play request
    */
-  export async function makePlay(gameId: number, playData: any): Promise<Either<Error | Problem, MakePlayOutput>> { // Replace any with the actual expected input type
+  export async function makePlay(gameId: number, playData: PlayPositionInputModel): Promise<Either<Error | Problem, GameOutput>> {
     const url = `/game/${gameId}/play`;
     return fetchFunction(url, "POST", JSON.stringify(playData));
   }
@@ -78,10 +80,8 @@ export namespace GameService {
    * @param gameId the ID of the game
    * @return the API result of the forfeit game request
    */
-  export async function forfeitGame(gameId: number): Promise<Either<Error | Problem, ForfeitGameOutput>> {
+  export async function forfeitGame(gameId: number): Promise<Either<Error | Problem, GameOutput>> {
     const url = `/game/${gameId}/forfeit`;
     return fetchFunction(url, "POST", null);
   }
-
-  // ... Add any other methods that are needed according to your GameController.kt and API documentation.
 }

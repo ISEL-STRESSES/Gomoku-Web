@@ -35,7 +35,7 @@ async function fetchWithEither(url: string, options: RequestInit): Promise<Eithe
   }
 }
 
-export async function fetchFunction<T>(partialUrl: string, method: string, data: any, authentication: boolean = false, headers?: any): Promise<Either<Error | Problem, SirenEntity<any>>> {
+export async function fetchFunction<T, R = undefined>(partialUrl: string, method: string, data: any, authentication: boolean = false, headers?: any): Promise<Either<Error | Problem, SirenEntity<T, R>>> {
   const url = API_ENDPOINT + partialUrl;
   const fetchResult = await fetchWithEither(url, {
     method: method,
@@ -62,7 +62,7 @@ export async function fetchFunction<T>(partialUrl: string, method: string, data:
       }
     } else {
       if (contentType?.includes(sirenMediaType)) {
-        return success(new SirenEntity<T>(body));
+        return success(new SirenEntity<T, R>(body));
       } else {
         return failure(new UnexpectedResponseError(`Unexpected response type: ${contentType}`));
       }

@@ -1,21 +1,29 @@
 import * as React from 'react';
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
-import { Home } from './components/Home';
+import { Home } from "./components/Home";
+import { NavBar } from "./components/layouts/NavBar";
 import { About } from './components/About';
 import { Login } from './components/authentication/Login';
 import { RequireAuth } from "./components/authentication/RequireAuth";
 import { ShowMe } from "./components/user/ShowMe";
 import { Logout } from './components/authentication/logout/Logout';
+import { Ranking } from "./components/Ranking";
+import { AuthnContainer } from "./components/authentication/Authn";
+import { UserDetails } from "./components/user/UserDetails";
 
 const router = createBrowserRouter([
   {
     'path': '/',
-    'element': <Outlet />,
+    'element': <AuthnContainer><Outlet /></AuthnContainer>,
     'children': [
       {
         'path': '/',
-        'element': <Home />,
+        'element': <NavBar />,
         'children': [
+          {
+            'path': '/',
+            'element': <Home />,
+          },
           {
             'path': '/login',
             'element': <Login />,
@@ -34,7 +42,11 @@ const router = createBrowserRouter([
           },
           {
             'path': '/ranking',
-            'element': <ShowMe />,
+            'element': <Ranking />,
+          },
+          {
+            'path': '/users/:userId',
+            'element': <UserDetails />
           }
         ],
       },

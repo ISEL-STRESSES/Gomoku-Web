@@ -1,45 +1,44 @@
 import * as React from 'react';
-import { Link, Outlet } from 'react-router-dom';
-import { getUserName } from '../utils/cookieUtils';
+import { useNavigate } from 'react-router-dom';
+import { useCurrentUser } from "./authentication/Authn";
+import PageContent from "./shared/PageContent";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import MenuButton from "./shared/MenuButton";
+import { LoginRounded, PlayArrowRounded } from "@mui/icons-material";
 
 export function Home() {
+  const currentUser = useCurrentUser()
+  const navigate = useNavigate()
   return (
-      <div>
-        <nav>
-          <div id="title">
-            <h1>Gomoku</h1>
-          </div>
-          <input type="checkbox" id="click"/>
-            <label htmlFor="click" className="menu-btn">
-              <i className="fas fa-bars"></i>
-            </label>
-          { Nav() }
-        </nav>
-        <Outlet />
-      </div>
-  )
-}
+    <div>
+      <PageContent title={" "}>
+        <Typography variant="h5" component="h2" gutterBottom>
+          Welcome{currentUser ? ", " + currentUser : ""}!
+        </Typography>
 
-function Nav() {
-  const currentUser = getUserName()
-  if (!currentUser)
-    return (
-      <ol id="navMenu">
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/about">About</Link></li>
-        <li><Link to="/ranking">Ranking</Link></li>
-        <li><Link to="/login">Login</Link></li>
-      </ol>
-    );
-  else {
-    return ((
-      <ol id="navMenu">
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/about">About</Link></li>
-        <li><Link to="/ranking">Ranking</Link></li>
-        <li><Link to="/me"><img id="user-image" src='/images/user.png' alt="user"></img></Link></li>
-        <li><Link to="/logout">Logout</Link></li>
-      </ol>
-    ));
-  }
+        <Typography variant="h6" gutterBottom>
+          This is a simple game of gomoku where you can play against other players online.
+        </Typography>
+
+        <img src="/images/favicon.ico" alt="logo" width="300" height="300"/>
+
+        <Box sx={{mt: 1}}>
+          <Typography variant="h6" gutterBottom>
+            {
+              currentUser
+                ? "Simply click the button below to start playing!"
+                : "You need to be logged in to play. Please log in or sign up to play."
+            }
+          </Typography>
+
+          <MenuButton
+            title={currentUser ? "Play" : "Log in"}
+            icon={currentUser ? <PlayArrowRounded/> : <LoginRounded/>}
+            onClick={() => navigate(currentUser ? '/gameplay-menu' : '/login')}
+          />
+        </Box>
+      </PageContent>
+    </div>
+  )
 }

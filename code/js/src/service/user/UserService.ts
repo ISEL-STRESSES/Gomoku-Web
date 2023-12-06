@@ -2,10 +2,9 @@ import { fetchFunction } from '../utils/fetchFunction';
 import { Either } from '../../utils/Either';
 import { Problem } from '../media/Problem';
 import { AuthenticationOutput } from './models/AuthenticationOutput';
-import { GetUserByIdOutput } from './models/GetUserByIdOutput';
 import { GetUsersRankingOutput } from './models/GetUsersRankingOutput';
 import { GetUserRuleStatsOutput } from './models/GetUserRuleStatsOutput';
-import { GetUserStatsOutput } from './models/GetUserStatsOutput';
+import { GetUserOutput } from './models/GetUserStatsOutput';
 import { LogoutOutput } from './models/LogoutOutput';
 
 export namespace UserService {
@@ -17,8 +16,8 @@ export namespace UserService {
    *
    * @return the API result of the get user stats request
    */
-  export async function getUserStats(userID: number): Promise<Either<Error | Problem, GetUserStatsOutput>> {
-    const url = `/users/stats/${userID}`;
+  export async function getUser(userID: number): Promise<Either<Error | Problem, GetUserOutput>> {
+    const url = `/users/${userID}`;
     return fetchFunction(url, "GET", null);
   }
 
@@ -52,14 +51,13 @@ export namespace UserService {
   }
 
   /**
-   * Gets a user by its id
+   * Gets the ranking page requested by the url of the users for a given rule
    *
-   * @param userID the id of the user
+   * @param url url obtained from the link in the ranking siren entity to fetch for the wanted page.
    *
-   * @return the API result of the get user request
+   * @return the API result of the get-ranking request
    */
-  export async function getUser(userID: number): Promise<Either<Error | Problem, GetUserByIdOutput>> {
-    const url = `/users/${userID}`;
+  export async function getRankingPage(url: string): Promise<Either<Error | Problem, GetUsersRankingOutput>> {
     return fetchFunction(url, "GET", null);
   }
 
@@ -75,7 +73,7 @@ export namespace UserService {
     const url = `/users/create`;
     const sendTokenViaCookie = "true";
     const data = JSON.stringify({ username, password, sendTokenViaCookie });
-    return fetchFunction(url, "POST", data);
+    return fetchFunction(url, "POST", data, true);
   }
 
   /**
@@ -91,7 +89,7 @@ export namespace UserService {
     const sendTokenViaCookie = "true";
     const data = JSON.stringify({ username, password, sendTokenViaCookie });
     console.log(data);
-    return fetchFunction(url, "POST", data);
+    return fetchFunction(url, "POST", data, true);
   }
 
   /**
@@ -101,6 +99,6 @@ export namespace UserService {
    */
   export async function logout(): Promise<Either<Error | Problem, LogoutOutput>> {
     const url = `/users/logout`;
-    return fetchFunction(url, "POST", null);
+    return fetchFunction(url, "POST", null, true);
   }
 }

@@ -1,15 +1,16 @@
 import { SirenEntity } from '../../media/siren/SirenEntity';
 
-interface GetUserStatsOutputModel {
+export interface GetUserStatsOutputModel {
   userID: number
   username: string
-  userRuleStats: RuleStatsModel[]
+  size: number
 }
 
-interface RuleStatsModel {
+export interface RuleStatsModel {
   ruleID: number
+  rank: number
   gamesPlayed: number
   elo: number
 }
 
-export type GetUserStatsOutput = SirenEntity<GetUserStatsOutputModel>
+export type GetUserOutput = SirenEntity<GetUserStatsOutputModel, RuleStatsModel>

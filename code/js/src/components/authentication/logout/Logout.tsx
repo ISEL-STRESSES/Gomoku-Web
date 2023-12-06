@@ -5,15 +5,19 @@ import { UserService } from '../../../service/user/UserService';
 import { Failure, Success } from '../../../utils/Either';
 import { Problem } from '../../../service/media/Problem';
 import './Logout.css';
+import { useSetUser } from "../Authn";
+import { getUserName } from "../../../utils/cookieUtils";
 
 export function Logout() {
   const [isLoggedOut, setLoggedOut] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const setUser = useSetUser()
 
   useEffect(() => {
     UserService.logout()
       .then(res => {
         if (res instanceof Success) {
+          setUser(getUserName()) //This will give undefined
           setLoggedOut(true);
         } else if (res instanceof Failure) {
           const message = res.value instanceof Problem ?

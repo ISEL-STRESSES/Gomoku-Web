@@ -28,7 +28,6 @@ import gomoku.server.services.user.UserService
 import gomoku.utils.Failure
 import gomoku.utils.Success
 import jakarta.servlet.http.HttpServletResponse
-import jakarta.validation.Valid
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
@@ -155,7 +154,6 @@ class UserController(private val service: UserService) {
                 if (userInput.sendTokenViaCookie) {
                     setAuthenticationCookies(response, res.value.token, userInput.username)
                     LoginWithCookie.siren("User logged in.").responseRedirect(200, URIs.Users.ROOT + URIs.Users.HOME)
-
                 } else {
                     LoginWithoutCookie.siren(res.value).responseRedirect(200, URIs.Users.ROOT + URIs.Users.HOME)
                 }
@@ -172,11 +170,15 @@ class UserController(private val service: UserService) {
      * @param authenticatedUser The authenticated user
      */
     @PostMapping(URIs.Users.LOGOUT)
-    fun logout(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+    fun logout(
+        authenticatedUser: AuthenticatedUser,
+        response: HttpServletResponse
+    ): ResponseEntity<*> {
         val didRevoke = service.revokeToken(authenticatedUser.token)
         return if (!didRevoke) {
             Problem.response(403, Problem.tokenNotRevoked)
         } else {
+            clearAuthenticationCookies(response)
             Logout.siren().responseRedirect(200, URIs.HOME)
         }
     }
@@ -232,7 +234,7 @@ class UserController(private val service: UserService) {
     private fun setAuthenticationCookies(
         response: HttpServletResponse,
         userToken: String,
-        username: String    
+        username: String
     ) {
         val accessTokenCookie = ResponseCookie.from("tokenCookie", userToken)
             .httpOnly(true)

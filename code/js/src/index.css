@@ -206,3 +206,54 @@ label {
     border-radius: 5px;
     text-align: center;
 }
+
+#ranking {
+    font-family: 'Roboto', sans-serif;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#ranking h1 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#rankingRules {
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #333;
+}
+
+#ranking table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#ranking th, #ranking td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    color: #555;
+}
+
+#ranking th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+#ranking tbody tr:hover {
+    background-color: #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+

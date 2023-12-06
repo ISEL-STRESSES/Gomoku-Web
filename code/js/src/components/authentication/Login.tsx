@@ -5,6 +5,8 @@ import { UserService } from '../../service/user/UserService';
 import { Failure, Success } from '../../utils/Either';
 import { Problem } from '../../service/media/Problem';
 import { Alert, Stack } from '@mui/material';
+import { useSetUser } from "./Authn";
+import { getUserName } from "../../utils/cookieUtils";
 
 type State =
   | { tag: 'editing'; error?: string; inputs: { username: string; password: string } }
@@ -54,6 +56,7 @@ export function Login() {
   const [state, dispatch] = React.useReducer(reduce, { tag: 'editing', inputs: { username: '', password: '' } });
   const [isSignUp, setSignUp] = useState(true);
   const location = useLocation();
+  const setUser = useSetUser();
 
   if (state.tag === 'redirect') {
     return <Navigate to={location.state?.source?.pathname || '/me'} replace={true} />;
@@ -74,25 +77,20 @@ export function Login() {
     authFunction(state.inputs.username, state.inputs.password)
       .then(res => {
         if (res instanceof Success) {
+          setUser(getUserName())
           dispatch({ type: 'success' });
         } else if (res instanceof Failure) {
-          // Check if the failure is due to an Error or a Problem
           if (res.value instanceof Error) {
-            // Handle the Error case
             dispatch({ type: 'error', message: res.value.message });
           } else if (res.value instanceof Problem) {
-            // Handle the Problem case
-            // Adjust this based on the structure of your Problem class
             const problemMessage = res.value.title || 'A problem occurred';
             dispatch({ type: 'error', message: problemMessage });
           } else {
-            // Generic error handling if the failure type is unknown
             dispatch({ type: 'error', message: 'An unexpected error occurred' });
           }
         }
       });
   }
-
 
   const username = state.tag === 'submitting' ? state.username : state.inputs.username;
   const password = state.tag === 'submitting' ? '' : state.inputs.password;

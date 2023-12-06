@@ -5,6 +5,7 @@ import gomoku.server.http.URIs
 import gomoku.server.http.controllers.game.models.GameOutputModel
 import gomoku.server.http.controllers.game.models.GetFinishedGamesOutputModel
 import gomoku.server.http.controllers.game.models.GetRulesOutputModel
+import gomoku.server.http.controllers.game.models.PlayPositionInput
 import gomoku.server.http.controllers.game.models.RuleOutputModel
 import gomoku.server.http.controllers.media.Problem
 import gomoku.server.http.responses.ForfeitGame
@@ -27,6 +28,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -112,18 +114,16 @@ class GameController(private val gameService: GameService) {
      * Makes a move in the context of a game
      * @param gameId The id of the game
      * @param authenticatedUser The authenticated user
-     * @param x The x coordinate of the move
-     * @param y The y coordinate of the move
+     * @param position The position to play
      * @return The result of the move
      */
     @PostMapping(URIs.Game.MAKE_PLAY)
     fun makePlay(
         @PathVariable gameId: Int,
         authenticatedUser: AuthenticatedUser,
-        @RequestParam x: Int,
-        @RequestParam y: Int
+        @RequestBody position: PlayPositionInput
     ): ResponseEntity<*> {
-        val moveResult = gameService.makeMove(gameId, authenticatedUser.user.uuid, x, y)
+        val moveResult = gameService.makeMove(gameId, authenticatedUser.user.uuid, position.x, position.y)
         return when (moveResult) {
             is Failure -> moveResult.value.resolveProblem()
             is Success ->

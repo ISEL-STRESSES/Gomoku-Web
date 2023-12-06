@@ -13,6 +13,6 @@ export namespace HomeService {
       * @return the API result of the get home request
       */
       export function getHome(): Promise<Either<Error | Problem, GetHomeOutput>> {
-            return fetchFunction<GetHomeOutput>("/", "GET", false)
+            return fetchFunction("/", "GET", false)
       }
 }
