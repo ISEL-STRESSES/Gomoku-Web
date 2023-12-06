@@ -8,7 +8,7 @@ import java.net.URI
  */
 open class SirenBuilderScope {
     private val classes = mutableListOf<String>()
-    private val properties = mutableListOf<Any>()
+    private lateinit var properties: Any
     private val entities = mutableListOf<EntityModel>()
     private val actions = mutableListOf<ActionModel>()
     private val links = mutableListOf<LinkModel>()
@@ -24,7 +24,7 @@ open class SirenBuilderScope {
      * TODO
      */
     fun property(value: Any) {
-        properties.add(value)
+        properties = value
     }
 
     /**

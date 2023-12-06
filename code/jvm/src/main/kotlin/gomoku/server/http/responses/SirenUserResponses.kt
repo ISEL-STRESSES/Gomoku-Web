@@ -158,7 +158,7 @@ object GetUserStats {
             body.userRuleStats.forEach {
                 entity(EntityModel(listOf(Rel.USER_RANKING.value), emptyList(), it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Users.ROOT + "/${body.userId}/ranking/${it.ruleId}"))))
             }
-            link("${URIs.Users.ROOT}/stats/${body.userId}", Rel.SELF)
+            link("${URIs.Users.ROOT}/${body.userId}", Rel.SELF)
             link(URIs.HOME, Rel.HOME)
         }
 }

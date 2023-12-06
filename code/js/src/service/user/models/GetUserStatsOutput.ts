@@ -1,13 +1,13 @@
 import { SirenEntity } from '../../media/siren/SirenEntity';
 
 export interface GetUserStatsOutputModel {
-  userID: number
+  userId: number
   username: string
   size: number
 }
 
 export interface RuleStatsModel {
-  ruleID: number
+  ruleId: number
   rank: number
   gamesPlayed: number
   elo: number
