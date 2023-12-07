@@ -81,7 +81,7 @@ export function Ranking() {
     fetchRankingAndRules();
 
     return () => {
-      // Cleanup if necessary
+      setState({ type: 'loading' });
     };
   }, [ruleId]);
 
