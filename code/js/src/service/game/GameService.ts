@@ -27,7 +27,7 @@ export namespace GameService {
    */
   export async function getGameById(gameId: number): Promise<Either<Error | Problem, GameOutput>> {
     const url = `/game/${gameId}`;
-    return fetchFunction(url, "GET", null);
+    return fetchFunction(url, "GET", null, true);
   }
 
   /**

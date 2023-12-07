@@ -53,4 +53,15 @@ export namespace LobbyService {
     const url = `/lobby/join`;
     return fetchFunction(url, "POST", JSON.stringify(lobby), true);
   }
+
+  /**
+   * Join by match-make.
+   *
+   * @param rule the data representing the rule
+   * @return the API result of the create lobby request
+   */
+  export async function joinByMatchMake(rule: PostRuleIdInputModel): Promise<Either<Error | Problem, LobbyOutput>> {
+    const url = `/lobby/start`;
+    return fetchFunction(url, "POST", JSON.stringify(rule), true);
+  }
 }

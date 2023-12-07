@@ -113,12 +113,12 @@ export function CreateGame() {
     return false
   }
 
-  const handleRuleClick = (ruleId: number | undefined) => {
+  const handleRuleClickToCreate = (ruleId: number | undefined) => {
     if (ruleId === undefined) {
       setState({ type: 'error', message: 'Rule ID is undefined' });
       return;
     }
-    const fetchLobby = async () => {
+    const fetchLobbyCreate = async () => {
       try {
         setState({ type: 'loading' })
         const ruleInput: PostRuleIdInputModel = {
@@ -143,7 +143,44 @@ export function CreateGame() {
       }
     };
 
-    fetchLobby();
+    fetchLobbyCreate();
+  }
+
+  const handleRuleClickToJoin = (ruleId: number | undefined) => {
+    if (ruleId === undefined) {
+      setState({ type: 'error', message: 'Rule ID is undefined' });
+      return;
+    }
+    const fetchRuleJoin = async () => {
+      try {
+        setState({ type: 'loading' })
+        const ruleInput: PostRuleIdInputModel = {
+          ruleId: ruleId
+        };
+        const lobbyRes = await LobbyService.joinByMatchMake(ruleInput);
+
+        if (lobbyRes instanceof Success) {
+          if (lobbyRes.value.properties?.isGame) {
+            navigate("/game", { state: lobbyRes.value.properties?.id})
+          }else {
+            setState({
+              type: 'success-lobby',
+              lobby: lobbyRes.value
+            });
+          }
+        } else {
+          let errorMessage = 'Error fetching data';
+          errorMessage = handleError(lobbyRes.value);
+          setState({ type: 'error', message: errorMessage });
+        }
+      } catch (error) {
+        console.error('Error fetching ranking and rules:', error);
+        const errorMessage = handleError(error);
+        setState({ type: 'error', message: errorMessage });
+      }
+    };
+
+    fetchRuleJoin();
   }
 
   function RulesDisplay({ rules }: { rules: EmbeddedSubEntity<RuleOutputModel>[] }) {
@@ -158,7 +195,7 @@ export function CreateGame() {
               <div>X{rule.properties?.boardSize}</div>
               <div>{rule.properties?.openingRule}</div>
               <div>{rule.properties?.variant}</div>
-              <Button variant="contained" color="inherit" onClick={() => {location.state? navigate("/match-make", { state: rule.properties?.ruleId }) : handleRuleClick(rule.properties?.ruleId)}}>
+              <Button variant="contained" color="inherit" onClick={() => {location.state? handleRuleClickToJoin(rule.properties?.ruleId) : handleRuleClickToCreate(rule.properties?.ruleId)}}>
                 Button
               </Button>
             </Box>

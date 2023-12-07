@@ -79,7 +79,7 @@ export function Lobbies() {
         const res = await LobbyService.joinLobby(lobbyInput);
 
         if (res instanceof Success) {
-          navigate(`/game/${res.value.properties?.id}`)
+          navigate("/game", { state: res.value.properties?.id });
         } else {
           let errorMessage = 'Error fetching data';
           errorMessage = handleError(res.value);

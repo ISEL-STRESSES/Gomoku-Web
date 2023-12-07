@@ -13,6 +13,7 @@ import { UserDetails } from "./components/user/UserDetails";
 import GameplayMenu from "./components/game/GameplayMenu";
 import { CreateGame } from "./components/game/CreateGame";
 import { Lobbies } from "./components/game/Lobbies";
+import { Game } from "./components/game/Game";
 
 const router = createBrowserRouter([
   {
@@ -62,8 +63,13 @@ const router = createBrowserRouter([
           {
             'path': '/lobby',
             'element': <RequireAuth><Lobbies/></RequireAuth>,
-          }
-        ],
+          },
+        ]
+      },
+      {
+        'path': '/game',
+        'element': <RequireAuth><Game /></RequireAuth>,
+        'children': []
       },
     ],
   },
