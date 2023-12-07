@@ -9,10 +9,11 @@ import { GetUserRuleStatsOutputModel } from "../service/user/models/GetUserRuleS
 import { EmbeddedSubEntity } from "../service/media/siren/SubEntity";
 import { CircularProgress, Alert } from '@mui/material';
 import { Problem } from '../service/media/Problem';
+import { Link } from "../service/media/siren/Link";
 
 type RankingState =
   | { type: 'loading' }
-  | { type: 'success'; ranking: EmbeddedSubEntity<GetUserRuleStatsOutputModel>[]; rules: EmbeddedSubEntity<RuleOutputModel>[] }
+  | { type: 'success'; ranking: EmbeddedSubEntity<GetUserRuleStatsOutputModel>[]; rules: EmbeddedSubEntity<RuleOutputModel>[]; rankingLinks?: Link[] }
   | { type: 'error'; message: string };
 
 export function Ranking() {
@@ -25,6 +26,15 @@ export function Ranking() {
       navigate(`/users/${userId}`);
     } else {
       console.error("User ID is undefined");
+    }
+  };
+
+  const handleButtonClick = (rel: string) => {
+    if (state.type === 'success') {
+      const link = state.rankingLinks?.find((link) => link.rel.at(0) === rel);
+      if (link) {
+        console.log(link);
+      }
     }
   };
 
@@ -41,6 +51,7 @@ export function Ranking() {
   useEffect(() => {
     const fetchRankingAndRules = async () => {
       try {
+        setState({ type: 'loading' })
         const rankingRes = await UserService.getRanking(ruleId);
         const rulesRes = await GameService.getGameRules();
 
@@ -48,7 +59,8 @@ export function Ranking() {
           setState({
             type: 'success',
             ranking: rankingRes.value.getEmbeddedSubEntities(),
-            rules: rulesRes.value.getEmbeddedSubEntities()
+            rules: rulesRes.value.getEmbeddedSubEntities(),
+            rankingLinks: rankingRes.value.links
           });
         } else {
           let errorMessage = 'Error fetching data';
@@ -75,7 +87,11 @@ export function Ranking() {
 
   switch (state.type) {
     case 'loading':
-      return <CircularProgress />;
+      return (
+        <div id="loading">
+          <CircularProgress />
+        </div>
+      );
 
     case 'error':
       return <Alert severity="error">{state.message}</Alert>;
@@ -111,6 +127,20 @@ export function Ranking() {
             ))}
             </tbody>
           </table>
+          <div className="buttons-container">
+            <button onClick={() => handleButtonClick('first')} disabled={!state.rankingLinks?.find((link) => link.rel.at(0) === 'first')}>
+              First
+            </button>
+            <button onClick={() => handleButtonClick('prev')} disabled={!state.rankingLinks?.find((link) => link.rel.at(0) === 'prev')}>
+              Previous
+            </button>
+            <button onClick={() => handleButtonClick('next')} disabled={!state.rankingLinks?.find((link) => link.rel.at(0) === 'next')}>
+              Next
+            </button>
+            <button onClick={() => handleButtonClick('last')} disabled={!state.rankingLinks?.find((link) => link.rel.at(0) === 'last')}>
+              Last
+            </button>
+          </div>
         </div>
       );
   }

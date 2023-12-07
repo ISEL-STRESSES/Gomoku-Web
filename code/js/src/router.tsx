@@ -10,6 +10,9 @@ import { Logout } from './components/authentication/logout/Logout';
 import { Ranking } from "./components/Ranking";
 import { AuthnContainer } from "./components/authentication/Authn";
 import { UserDetails } from "./components/user/UserDetails";
+import GameplayMenu from "./components/game/GameplayMenu";
+import { CreateGame } from "./components/game/CreateGame";
+import { Lobbies } from "./components/game/Lobbies";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +50,18 @@ const router = createBrowserRouter([
           {
             'path': '/users/:userId',
             'element': <UserDetails />
+          },
+          {
+            'path': '/gameplay-menu',
+            'element': <RequireAuth><GameplayMenu/></RequireAuth>,
+          },
+          {
+            'path': '/create-game',
+            'element': <RequireAuth><CreateGame/></RequireAuth>,
+          },
+          {
+            'path': '/lobby',
+            'element': <RequireAuth><Lobbies/></RequireAuth>,
           }
         ],
       },

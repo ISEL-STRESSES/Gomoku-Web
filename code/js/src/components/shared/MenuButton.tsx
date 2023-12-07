@@ -25,7 +25,7 @@ export default function MenuButton({title, icon, onClick}: MenuButtonProps) {
             variant="contained"
             sx={{mt: 3, mb: 2}}
             startIcon={icon}
-            color="primary"
+            color="inherit"
             onClick={onClick}
         >
             {title}

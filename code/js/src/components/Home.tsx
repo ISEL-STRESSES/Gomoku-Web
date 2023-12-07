@@ -11,7 +11,7 @@ export function Home() {
   const currentUser = useCurrentUser()
   const navigate = useNavigate()
   return (
-    <div>
+    <div id="homePage">
       <PageContent title={" "}>
         <Typography variant="h5" component="h2" gutterBottom>
           Welcome{currentUser ? ", " + currentUser : ""}!
@@ -21,7 +21,7 @@ export function Home() {
           This is a simple game of gomoku where you can play against other players online.
         </Typography>
 
-        <img src="/images/favicon.ico" alt="logo" width="300" height="300"/>
+        <img src="/images/logo.png" alt="logo" width="300" height="300"/>
 
         <Box sx={{mt: 1}}>
           <Typography variant="h6" gutterBottom>

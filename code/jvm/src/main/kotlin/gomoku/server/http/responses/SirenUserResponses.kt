@@ -104,6 +104,10 @@ object GetRanking {
 
             if (currentOffset + currentLimit < totalPages * currentLimit) { // If we are not on the last page
                 link(
+                    "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=0",
+                    Rel.FIRST
+                )
+                link(
                     "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${currentOffset + currentLimit}",
                     Rel.NEXT
                 )
