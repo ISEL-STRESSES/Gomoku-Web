@@ -14,6 +14,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { SirenEntity } from "../../service/media/siren/SirenEntity";
 import { LobbyOutputModel, PostRuleIdInputModel } from "../../service/lobby/models/LobbyOutput";
 import { LobbyService } from "../../service/lobby/LobbyService";
+import { useInterval } from "./utils/useInterval";
+
+const POLLING_DELAY = 5000;
 
 type CreateGameState =
   | { type: 'loading' }
@@ -65,6 +68,50 @@ export function CreateGame() {
       // Cleanup if necessary
     };
   }, []);
+
+  useInterval(checkIfOpponentJoined, POLLING_DELAY, [state.type === 'success-lobby'])
+
+  /**
+   * Checks if the opponent has joined the game.
+   *
+   * @returns true if the opponent has joined, false otherwise
+   */
+  async function checkIfOpponentJoined() {
+    if (state.type !== 'success-lobby')
+      return false
+
+    const fetchGetLobby = async () => {
+      try {
+        if (state.lobby.properties === undefined) {
+          setState({ type: 'error', message: 'Lobby is undefined' });
+          return false;
+        }
+        const res = await LobbyService.getLobbyById(state.lobby.properties.id);
+
+        if (res instanceof Success) {
+          if (res.value.properties?.state) {
+            navigate("/game", { state: res.value.properties?.gameId})
+            return true;
+          }else {
+            console.log("Waiting for opponent to join...")
+            return false
+          }
+        } else {
+          let errorMessage = 'Error fetching data';
+          errorMessage = handleError(res.value);
+          setState({ type: 'error', message: errorMessage });
+        }
+      } catch (error) {
+        console.error('Error fetching lobby:', error);
+        const errorMessage = handleError(error);
+        setState({ type: 'error', message: errorMessage });
+      }
+    };
+
+    fetchGetLobby();
+
+    return false
+  }
 
   const handleRuleClick = (ruleId: number | undefined) => {
     if (ruleId === undefined) {

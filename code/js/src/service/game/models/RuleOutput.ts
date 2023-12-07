@@ -7,4 +7,10 @@ export interface RuleOutputModel {
   openingRule: string;
 }
 
+export interface RuleModel {
+  ruleId: number
+  boardSize: string
+  type: string
+}
+
 export type RuleOutput = SirenEntity<RuleOutputModel>;

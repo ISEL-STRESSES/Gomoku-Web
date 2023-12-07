@@ -7,4 +7,6 @@ sealed class JoinLobbyError {
     object LobbyNotFound : JoinLobbyError()
     object UserAlreadyInLobby : JoinLobbyError()
     object JoinLobbyFailed : JoinLobbyError()
+
+    object LobbySateChangeFailed : JoinLobbyError()
 }

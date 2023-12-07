@@ -32,13 +32,13 @@ class LobbyService(private val transactionManager: TransactionManager) {
                 if (lobby.userId == userId) {
                     return@run failure(MatchmakingError.SamePlayer)
                 }
-                val didLeave = it.lobbyRepository.leaveLobby(lobby.id, lobby.userId)
-                if (!didLeave) {
-                    return@run failure(MatchmakingError.LeaveLobbyFailed)
-                }
                 val playerBlack = if (Random.nextBoolean()) userId else lobby.userId
                 val playerWhite = if (playerBlack == userId) lobby.userId else userId
                 val gameId = it.gameRepository.createGame(ruleId, playerBlack, playerWhite)
+                val stateChanged = it.lobbyRepository.changeLobbySate(lobby.id, gameId)
+                if (!stateChanged) {
+                    return@run failure(MatchmakingError.LobbySateChangeFailed)
+                }
                 return@run success(Matchmaker(true, gameId))
             } else {
                 return@run success(Matchmaker(false, it.lobbyRepository.createLobby(ruleId, userId)))
@@ -91,11 +91,11 @@ class LobbyService(private val transactionManager: TransactionManager) {
             }
             val playerBlack = if (Random.nextBoolean()) userId else lobbyGet.userId
             val playerWhite = if (playerBlack == userId) lobbyGet.userId else userId
-            val didLeave = it.lobbyRepository.leaveLobby(lobbyGet.id, lobbyGet.userId)
-            if (!didLeave) {
-                return@run failure(JoinLobbyError.JoinLobbyFailed)
-            }
             val gameId = it.gameRepository.createGame(lobbyGet.rule.ruleId, playerBlack, playerWhite)
+            val stateChanged = it.lobbyRepository.changeLobbySate(lobbyGet.id, gameId)
+            if (!stateChanged) {
+                return@run failure(JoinLobbyError.LobbySateChangeFailed)
+            }
             return@run success(Matchmaker(true, gameId))
         }
 

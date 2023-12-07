@@ -11,5 +11,7 @@ import gomoku.server.domain.game.rules.Rules
 data class Lobby(
     val id: Int,
     val rule: Rules,
-    val userId: Int
+    val userId: Int,
+    val state: Boolean,
+    val gameId: Int
 )

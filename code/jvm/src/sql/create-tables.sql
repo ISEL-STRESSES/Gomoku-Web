@@ -42,19 +42,6 @@ create table if not exists rules
     constraint check_board_size check (board_size = 15 or board_size = 19)
 );
 
--- lobby table
-create table if not exists lobby
-(
-    id         int primary key generated always as identity,
-    user_id    int    not null,
-    rules_id   int    not null,
-    created_at bigint not null,
-
-    constraint fk_lobby_user foreign key (user_id) references users (id),
-    constraint fk_lobby_rules foreign key (rules_id) references rules (id),
-    unique (user_id, rules_id)
-);
-
 -- user_stats table
 create table if not exists user_stats
 (
@@ -85,6 +72,21 @@ create table if not exists matches
     constraint match_outcome_check check (match_outcome is null or match_outcome ~* '^(black_won|white_won|draw)$'),
     constraint match_state_check check (match_state ~* '^(ongoing|finished)$'),
     constraint different_users check (player_black <> player_white)
+);
+
+-- lobby table
+create table if not exists lobby
+(
+    id         int primary key generated always as identity,
+    user_id    int    not null,
+    rules_id   int    not null,
+    created_at bigint not null,
+    started    bool not null,
+    game_id    int  null,
+
+    constraint fk_lobby_user foreign key (user_id) references users (id),
+    constraint fk_lobby_rules foreign key (rules_id) references rules (id),
+    constraint fk_lobby_game foreign key (game_id) references matches (id)
 );
 
 COMMIT;

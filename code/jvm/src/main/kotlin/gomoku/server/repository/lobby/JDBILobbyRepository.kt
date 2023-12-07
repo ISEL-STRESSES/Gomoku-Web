@@ -20,7 +20,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     override fun getLobbyByRuleId(ruleId: Int): Lobby? =
         handle.createQuery(
             """
-            SELECT lobby.id, rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, users.id as user_id
+            SELECT lobby.id, lobby.started, lobby.game_id,rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, users.id as user_id
             FROM lobby join users 
             on users.id = lobby.user_id
             join rules
@@ -39,9 +39,10 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     override fun getLobbies(): List<Lobby> =
         handle.createQuery(
             """
-            SELECT lobby.id, rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id
+            SELECT lobby.id, lobby.started, lobby.game_id, rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id
             FROM lobby join rules 
-            on lobby.rules_id = rules.id 
+            on lobby.rules_id = rules.id
+            where lobby.started = false
             """.trimIndent()
         )
             .mapTo<Lobby>()
@@ -55,7 +56,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     override fun getLobbyById(lobbyId: Int): Lobby? =
         handle.createQuery(
             """
-            SELECT lobby.id, rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id
+            SELECT lobby.id, lobby.started, lobby.game_id, rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id
             FROM lobby join rules
             on lobby.rules_id = rules.id 
             where lobby.id = :lobbyId
@@ -73,7 +74,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     override fun getLobbyByUserId(userId: Int): Lobby? =
         handle.createQuery(
             """
-            SELECT lobby.id ,rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id            
+            SELECT lobby.id, lobby.started, lobby.game_id, rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id            
             FROM lobby join rules 
             on rules.id = lobby.rules_id
             where lobby.user_id = :userId
@@ -92,7 +93,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
     override fun createLobby(ruleId: Int, userId: Int): Int {
         return handle.createUpdate(
             """
-            INSERT INTO lobby (user_id, rules_id, created_at) VALUES (:userId, :ruleId, :createdAt)
+            INSERT INTO lobby (user_id, rules_id, created_at, started) VALUES (:userId, :ruleId, :createdAt, false)
             """.trimIndent()
         )
             .bind("ruleId", ruleId)
@@ -115,6 +116,17 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
         )
             .bind("lobbyId", lobbyId)
             .bind("userId", userId)
+            .execute() > 0
+    }
+
+    override fun changeLobbySate(lobbyId: Int, gameId: Int): Boolean {
+        return handle.createUpdate(
+            """
+            UPDATE lobby SET game_id = :gameId, started = true WHERE id = :lobbyId
+            """.trimIndent()
+        )
+            .bind("lobbyId", lobbyId)
+            .bind("gameId", gameId)
             .execute() > 0
     }
 }

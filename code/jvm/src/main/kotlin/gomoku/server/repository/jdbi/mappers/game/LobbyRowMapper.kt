@@ -28,7 +28,9 @@ class LobbyRowMapper : RowMapper<Lobby> {
                 variantName = rs.getString("variant"),
                 openingRuleName = rs.getString("opening_rule")
             ),
-            userId = rs.getInt("user_id")
+            userId = rs.getInt("user_id"),
+            state = rs.getBoolean("started"),
+            gameId = rs.getInt("game_id")
         )
     }
 }

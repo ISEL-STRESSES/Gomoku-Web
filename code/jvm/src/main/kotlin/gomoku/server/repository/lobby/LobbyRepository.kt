@@ -47,4 +47,6 @@ interface LobbyRepository {
      * @param userId The id of the user to remove
      */
     fun leaveLobby(lobbyId: Int, userId: Int): Boolean
+
+    fun changeLobbySate(lobbyId: Int, gameId: Int): Boolean
 }

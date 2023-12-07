@@ -65,6 +65,8 @@ class Problem(typeUri: URI, val title: String) {
 
         val leaveLobbyFailed = Problem(URI(PROBLEM_BASE_URL + "leave-lobby-failed"), "Failed to leave the lobby.")
 
+        val lobbySateChangeFailed = Problem(URI(PROBLEM_BASE_URL + "lobby-state-change-failed"), "Failed to change the lobby state.")
+
         val tokenNotRevoked = Problem(URI(PROBLEM_BASE_URL + "token-not-revoked"), "The token was not revoked.")
 
         val userStatsNotFound = Problem(URI(PROBLEM_BASE_URL + "user-stats-not-found"), "User stats not found.")

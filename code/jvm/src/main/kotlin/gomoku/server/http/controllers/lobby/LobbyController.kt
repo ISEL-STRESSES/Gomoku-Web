@@ -133,6 +133,7 @@ class LobbyController(private val lobbyService: LobbyService) {
         when (this) {
             MatchmakingError.SamePlayer -> Problem.response(400, Problem.samePlayer)
             MatchmakingError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
+            MatchmakingError.LobbySateChangeFailed -> Problem.response(500, Problem.lobbySateChangeFailed)
         }
 
     /**
@@ -157,6 +158,7 @@ class LobbyController(private val lobbyService: LobbyService) {
             JoinLobbyError.LobbyNotFound -> Problem.response(404, Problem.lobbyNotFound)
             JoinLobbyError.UserAlreadyInLobby -> Problem.response(409, Problem.userAlreadyInLobby)
             JoinLobbyError.JoinLobbyFailed -> Problem.response(500, Problem.joinLobbyFailed)
+            JoinLobbyError.LobbySateChangeFailed -> Problem.response(500, Problem.lobbySateChangeFailed)
         }
 
     /**
