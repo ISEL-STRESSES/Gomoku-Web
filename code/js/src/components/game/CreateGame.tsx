@@ -160,6 +160,7 @@ export function CreateGame() {
         const lobbyRes = await LobbyService.joinByMatchMake(ruleInput);
 
         if (lobbyRes instanceof Success) {
+          console.log(lobbyRes.value.properties)
           if (lobbyRes.value.properties?.isGame) {
             navigate("/game", { state: lobbyRes.value.properties?.id})
           }else {

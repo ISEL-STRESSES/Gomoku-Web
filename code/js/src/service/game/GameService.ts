@@ -39,7 +39,7 @@ export namespace GameService {
    */
   export async function makePlay(gameId: number, playData: PlayPositionInputModel): Promise<Either<Error | Problem, GameOutput>> {
     const url = `/game/${gameId}/play`;
-    return fetchFunction(url, "POST", JSON.stringify(playData));
+    return fetchFunction(url, "POST", JSON.stringify(playData), true);
   }
 
   /**
