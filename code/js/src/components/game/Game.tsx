@@ -5,7 +5,7 @@ import { Success } from "../../utils/Either";
 import { GameOutputModel } from "../../service/game/models/GameOutput";
 import { Problem } from "../../service/media/Problem";
 import { useLocation } from "react-router-dom";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Dialog, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import Box from "@mui/material/Box";
 import { tileSize } from "./shared/Tile";
 import { useInterval } from "./utils/useInterval";
@@ -186,7 +186,7 @@ export function Game() {
                               width: tileSize,
                               height: tileSize,
                               backgroundColor: piece.color,
-                              //backgroundImage: `../../../public/images/${piece.color.toLowerCase()}.png`,
+                              //backgroundImage: `url(../../../public/images/${piece.color.toLowerCase()}.png)`,
                               //backgroundSize: "contain",
                               //backgroundRepeat: "no-repeat",
                               //backgroundPosition: "center",
@@ -207,16 +207,23 @@ export function Game() {
     switch (state.type) {
       case 'loading':
         return (
-          <div id="loading">
+          <div className="loading">
             <CircularProgress />
           </div>
         );
 
       case 'error':
         return (
-          <div id="error">
-            {state.message}
-          </div>
+          <>
+            <Dialog open={true} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+              <DialogTitle id="alert-dialog-title">Error</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  {state.message}
+                </DialogContentText>
+              </DialogContent>
+            </Dialog>
+          </>
         );
 
       case 'success':

@@ -22,9 +22,9 @@ interface PageContentProps {
 export default function PageContent({title, error, children}: PageContentProps) {
     return (
         <Container maxWidth="xs">
-            <h1>{title}</h1>
+            <h1 id="PageContentTitle">{title}</h1>
             <Box sx={{
-                marginTop: 8,
+                marginTop: 12,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',

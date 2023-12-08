@@ -64,4 +64,15 @@ export namespace LobbyService {
     const url = `/lobby/start`;
     return fetchFunction(url, "POST", JSON.stringify(rule), true);
   }
+
+  /**
+   * Leave a lobby by its ID.
+   *
+   * @param lobby the data representing the lobby
+   * @return the API result of the leave lobby by ID request
+   */
+  export async function leaveLobby(lobby: PostLobbyIdInputModel): Promise<Either<Error | Problem, LobbyOutput>> {
+    const url = `/lobby/leave`;
+    return fetchFunction(url, "POST", JSON.stringify(lobby), true);
+  }
 }

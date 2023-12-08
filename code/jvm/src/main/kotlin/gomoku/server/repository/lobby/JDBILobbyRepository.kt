@@ -25,7 +25,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             on users.id = lobby.user_id
             join rules
             on lobby.rules_id = rules.id 
-            where lobby.rules_id = :ruleId
+            where lobby.rules_id = :ruleId and lobby.started = false
             """.trimIndent()
         )
             .bind("ruleId", ruleId)

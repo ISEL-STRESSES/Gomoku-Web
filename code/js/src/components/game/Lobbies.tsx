@@ -101,16 +101,21 @@ export function Lobbies() {
         <Typography variant="h5" component="h2" gutterBottom>
           Choose which lobby you want to join.
         </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: 'flex', gap: 10 }}>
           {lobbies.map((lobby) => (
             <Box key={lobby.properties?.id} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <div>{lobby.properties?.rule.boardSize}</div>
               <div>{lobby.properties?.rule.type}</div>
               <Button variant="contained" color="inherit" onClick={() => handleLobbyClick(lobby.properties?.id)}>
-                Button
+                Play
               </Button>
             </Box>
           ))}
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2, marginTop: 2 }}>
+          <Button variant="contained" color="inherit" onClick={() => navigate("/gameplay-menu")}>
+            Back
+          </Button>
         </Box>
       </PageContent>
     );
@@ -119,7 +124,7 @@ export function Lobbies() {
   switch (state.type) {
     case 'loading':
       return (
-        <div id="loading">
+        <div className="loading">
           <CircularProgress />
         </div>
       );

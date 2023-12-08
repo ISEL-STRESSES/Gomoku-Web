@@ -88,7 +88,7 @@ export function Ranking() {
   switch (state.type) {
     case 'loading':
       return (
-        <div id="loading">
+        <div className="loading">
           <CircularProgress />
         </div>
       );

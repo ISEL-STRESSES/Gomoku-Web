@@ -4,7 +4,6 @@ import { Navigate } from 'react-router-dom';
 import { UserService } from '../../../service/user/UserService';
 import { Failure, Success } from '../../../utils/Either';
 import { Problem } from '../../../service/media/Problem';
-import './Logout.css';
 import { useSetUser } from "../Authn";
 import { getUserName } from "../../../utils/cookieUtils";
 
@@ -33,13 +32,13 @@ export function Logout() {
   }
 
   return (
-    <div className="logout-container">
+    <div className="loading">
       {errorMessage ? (
         <div className="error-message">
           {errorMessage}
         </div>
       ) : (
-        <div className="logout-message">
+        <div className="loading-message">
           Logging out...
         </div>
       )}
