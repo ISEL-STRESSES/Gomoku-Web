@@ -2,6 +2,7 @@ package gomoku.server.domain.game.rules
 
 import gomoku.server.domain.game.IsValidMoveResult
 import gomoku.server.domain.game.game.CellColor
+import gomoku.server.domain.game.game.Turn
 import gomoku.server.domain.game.game.move.Move
 import gomoku.server.domain.game.game.move.MoveContainer
 import gomoku.server.domain.game.game.move.Position
@@ -26,7 +27,7 @@ sealed class Rules {
      * @param turn color of the player trying to play
      * @return the move result
      */
-    abstract fun isValidMove(moveContainer: MoveContainer, move: Move, turn: CellColor): IsValidMoveResult
+    abstract fun isValidMove(moveContainer: MoveContainer, move: Move, turn: Turn): IsValidMoveResult
 
     /**
      * Returns the possible moves based on the rules of the game

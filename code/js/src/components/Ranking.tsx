@@ -7,9 +7,10 @@ import { GameService } from "../service/game/GameService";
 import { RuleOutputModel } from "../service/game/models/RuleOutput";
 import { GetUserRuleStatsOutputModel } from "../service/user/models/GetUserRuleStatsOutput";
 import { EmbeddedSubEntity } from "../service/media/siren/SubEntity";
-import { CircularProgress, Alert } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { Problem } from '../service/media/Problem';
 import { Link } from "../service/media/siren/Link";
+import { AlertDialogWithRedirect } from "./shared/AlertDialog";
 
 type RankingState =
   | { type: 'loading' }
@@ -85,6 +86,10 @@ export function Ranking() {
     };
   }, [ruleId]);
 
+  const handleCloseAlert = () => {
+    navigate('/');
+  };
+
   switch (state.type) {
     case 'loading':
       return (
@@ -94,7 +99,9 @@ export function Ranking() {
       );
 
     case 'error':
-      return <Alert severity="error">{state.message}</Alert>;
+      return (
+        <AlertDialogWithRedirect alert={state.message} redirect={handleCloseAlert}/>
+      )
 
     case 'success':
       return (

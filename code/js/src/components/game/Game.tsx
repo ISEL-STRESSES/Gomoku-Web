@@ -4,27 +4,32 @@ import { GameService } from "../../service/game/GameService";
 import { Success } from "../../utils/Either";
 import { GameOutputModel } from "../../service/game/models/GameOutput";
 import { Problem } from "../../service/media/Problem";
-import { useLocation } from "react-router-dom";
-import { CircularProgress, Dialog, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
 import Box from "@mui/material/Box";
 import { tileSize } from "./shared/Tile";
 import { useInterval } from "./utils/useInterval";
-import { PlayPositionInputModel } from "../../service/game/models/PlayPositionInputModel";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import BoardView from "./shared/BoardView";
+import { UserService } from "../../service/user/UserService";
+import { useCurrentUser } from "../authentication/Authn";
+import Button from "@mui/material/Button";
+import { AlertDialog, AlertDialogWithRedirect } from "../shared/AlertDialog";
 
-const POLLING_DELAY = 1000;
+const POLLING_DELAY = 2000;
 
 type GameState =
   | { type: 'loading' }
-  | { type: 'success'; game: GameOutputModel}
+  | { type: 'success'; game: GameOutputModel; turn: boolean; error?: string}
   | { type: 'error'; message: string };
 
 export function Game() {
 
     const [state, setState] = useState<GameState>({ type: 'loading' });
+    const navigate = useNavigate();
     const location = useLocation();
+    const currentUser = useCurrentUser();
 
     const handleError = (error: any) => {
       if (error instanceof Error) {
@@ -37,20 +42,34 @@ export function Game() {
     };
 
     useEffect(() => {
-      const fetchGetGame = async () => {
+      const fetchGetGame = async (gameId: number) => {
         try {
-          setState({ type: 'loading' })
-          const gameRes = await GameService.getGameById(location.state);
-          if (gameRes instanceof Success) {
-            if (gameRes.value.properties) {
-              setState({
-                type: 'success',
-                game: gameRes.value.properties
-              });
+          const gameRes = await GameService.getGameById(gameId);
+          const turn = await GameService.getTurn(gameId);
+          if (gameRes instanceof Success && turn instanceof Success) {
+            if (gameRes.value.properties && turn.value.properties) {
+              const userTurn = await UserService.getUser(turn.value.properties.turn);
+              if (userTurn instanceof Success) {
+                if (userTurn.value.properties) {
+                  if (userTurn.value.properties.username === currentUser)
+                    setState({
+                      type: 'success',
+                      game: gameRes.value.properties,
+                      turn: true
+                    });
+                  else
+                    setState({
+                      type: 'success',
+                      game: gameRes.value.properties,
+                      turn: false
+                    });
+                }else{
+                  setState({ type: 'error', message: 'No game found', });
+                }
+              }
             }else{
               setState({ type: 'error', message: 'No game found' });
             }
-
           } else {
             let errorMessage = 'Error fetching data';
             errorMessage = handleError(gameRes.value);
@@ -63,7 +82,7 @@ export function Game() {
         }
       };
 
-      fetchGetGame();
+      fetchGetGame(location.state as number)
 
       return () => {
         // Cleanup if necessary
@@ -74,37 +93,48 @@ export function Game() {
       if (state.type !== 'success')
         return false
 
-      const fetchGetGame = async () => {
-        try {
-          const res = await GameService.getGameById(state.game.id);
+      if (state.turn)
+        return false
 
-          if (res instanceof Success) {
-            if (res.value.properties) {
-              setState({
-                type: 'success',
-                game: res.value.properties
-              });
+      const fetchGetGame = async (gameId: number) => {
+        try {
+          const gameRes = await GameService.getGameById(gameId);
+          if (gameRes instanceof Success) {
+            if (gameRes.value.properties) {
+              const userTurn = await UserService.getUser(gameRes.value.properties.turn.user);
+              if (userTurn instanceof Success) {
+                if (userTurn.value.properties) {
+                  if (userTurn.value.properties.username === currentUser)
+                    setState({
+                      type: 'success',
+                      game: gameRes.value.properties,
+                      turn: true
+                    });
+                }else{
+                  setState({ type: 'error', message: 'No game found', });
+                }
+              }
             }else{
-              setState({ type: 'error', message: 'No game found' });
+              setState({ type: 'error', message: 'No game found or unauthorized' });
             }
-          } else {
+          }else {
             let errorMessage = 'Error fetching data';
-            errorMessage = handleError(res.value);
+            errorMessage = handleError(gameRes.value);
             setState({ type: 'error', message: errorMessage });
           }
         } catch (error) {
-          console.error('Error fetching lobby:', error);
+          console.error('Error fetching ranking and rules:', error);
           const errorMessage = handleError(error);
           setState({ type: 'error', message: errorMessage });
         }
       };
 
-      fetchGetGame();
+      await fetchGetGame(state.game.id);
 
       return false
     }
 
-    useInterval(checkGameUpdates, POLLING_DELAY, [state.type === 'success'])
+    useInterval(checkGameUpdates, POLLING_DELAY, [state.type === 'success' && !state.turn])
 
     /**
      * Handles tile click.
@@ -118,17 +148,13 @@ export function Game() {
 
       const fetchMakePlay = async () => {
         try {
-          const playPositionInput: PlayPositionInputModel = {
-              x: col,
-              y: row
-          };
-          const res = await GameService.makePlay(state.game.id, playPositionInput);
-
+          const res = await GameService.makePlay(state.game.id, { x: col, y: row });
           if (res instanceof Success) {
             if (res.value.properties) {
               setState({
                 type: 'success',
-                game: res.value.properties
+                game: res.value.properties,
+                turn: false
               });
             }else{
               setState({ type: 'error', message: 'No game found' });
@@ -145,12 +171,12 @@ export function Game() {
         }
       };
 
-      fetchMakePlay();
+      await fetchMakePlay();
 
       return false
     }
 
-    function GameDisplay({ game }: { game: GameOutputModel }) {
+    function GameDisplay({ game, enable, error }: { game: GameOutputModel, enable: boolean, error?: string }) {
       return (
         <Container maxWidth="lg">
           <Box sx={{
@@ -170,7 +196,10 @@ export function Game() {
                 flexDirection: 'column'
               }}>
                 <Typography variant="h5" sx={{textAlign: "center", mb: "5px"}}>My Board</Typography>
-                <BoardView board={game.moves} enabled={true} onTileClicked={handleTileClick}>
+                <Typography variant="h6" sx={{textAlign: "center", mb: "5px"}}>
+                  {enable ? "Your turn" : "Opponents turn"}
+                </Typography>
+                <BoardView board={game.moves} enabled={enable} onTileClicked={handleTileClick}>
                   {
                     game.moves.orderOfMoves.map((piece, index) => {
                       return (
@@ -197,11 +226,19 @@ export function Game() {
                     })
                   }
                 </BoardView>
+                <Button variant="contained" color="inherit" onClick={() => console.log("TODO")}>
+                  Forfeit
+                </Button>
+                {error ? <AlertDialog alert={error}/> : null}
               </Box>
             </Box>
           </Box>
         </Container>
       );
+    }
+
+    const handleCloseAlert = () => {
+      navigate('/gameplay-menu')
     }
 
     switch (state.type) {
@@ -214,21 +251,12 @@ export function Game() {
 
       case 'error':
         return (
-          <>
-            <Dialog open={true} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-              <DialogTitle id="alert-dialog-title">Error</DialogTitle>
-              <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                  {state.message}
-                </DialogContentText>
-              </DialogContent>
-            </Dialog>
-          </>
+          <AlertDialogWithRedirect alert={state.message} redirect={handleCloseAlert}/>
         );
 
       case 'success':
         return (
-          <GameDisplay game={state.game}/>
+          <GameDisplay game={state.game} enable={state.turn} error={state.error} />
         );
     }
 }

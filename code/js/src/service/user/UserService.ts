@@ -18,7 +18,7 @@ export namespace UserService {
    */
   export async function getUser(userID: number): Promise<Either<Error | Problem, GetUserOutput>> {
     const url = `/users/${userID}`;
-    return fetchFunction(url, "GET", null);
+    return fetchFunction(url, "GET", null, true);
   }
 
   /**

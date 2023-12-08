@@ -179,8 +179,8 @@ class GameService(private val transactionManager: TransactionManager) {
                 return@run failure(CurrentTurnPlayerError.PlayerNotInGame)
             }
             when (currentColor) {
-                CellColor.BLACK -> success(CurrentTurnPlayerOutput(players.first))
-                CellColor.WHITE -> success(CurrentTurnPlayerOutput(players.second))
+                CellColor.BLACK -> success(CurrentTurnPlayerOutput(players.first, gameId))
+                CellColor.WHITE -> success(CurrentTurnPlayerOutput(players.second, gameId))
             }
         }
     }

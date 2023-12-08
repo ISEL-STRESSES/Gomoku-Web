@@ -18,6 +18,8 @@ enum class CellColor {
     }
 }
 
+data class Turn(val color: CellColor, val user: Int)
+
 /**
  * Helper function to convert an index to a color, depending on it's an odd or even number
  * Current structure of the move list makes it so that pair indexes are black and odd indexes are white
@@ -32,3 +34,5 @@ fun Int.toColor(): CellColor {
         CellColor.WHITE
     }
 }
+
+fun CellColor.toTurn(black: Int, white: Int) = Turn(this, if (this == CellColor.BLACK) black else white)

@@ -15,8 +15,9 @@ import { SirenEntity } from "../../service/media/siren/SirenEntity";
 import { LobbyOutputModel, PostLobbyIdInputModel, PostRuleIdInputModel } from "../../service/lobby/models/LobbyOutput";
 import { LobbyService } from "../../service/lobby/LobbyService";
 import { useInterval } from "./utils/useInterval";
+import { AlertDialogWithRedirect } from "../shared/AlertDialog";
 
-const POLLING_DELAY = 5000;
+const POLLING_DELAY = 4000;
 
 type CreateGameState =
   | { type: 'loading' }
@@ -257,6 +258,10 @@ export function CreateGame() {
     );
   }
 
+  const handleCloseAlert = () => {
+    navigate('/gameplay-menu');
+  }
+
   switch (state.type) {
     case 'loading':
       return (
@@ -267,9 +272,7 @@ export function CreateGame() {
 
     case 'error':
       return (
-        <div id="error">
-          {state.message}
-        </div>
+        <AlertDialogWithRedirect alert ={state.message} redirect={handleCloseAlert}/>
       );
 
     case 'leaving':

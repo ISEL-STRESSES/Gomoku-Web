@@ -11,7 +11,9 @@ interface LobbyRepository {
      * Gets all lobbies
      * @return The list of lobbies
      */
-    fun getLobbies(): List<Lobby>
+    fun getLobbies(userId: Int): List<Lobby>
+
+    fun getLobbiesByRuleId(userId: Int, ruleId: Int): List<Lobby>
 
     /**
      * Gets a lobby by its id

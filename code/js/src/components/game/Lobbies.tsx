@@ -2,10 +2,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { Success } from "../../utils/Either";
 import { EmbeddedSubEntity } from "../../service/media/siren/SubEntity";
-import {
-  GetLobbyModel,
-  PostLobbyIdInputModel
-} from "../../service/lobby/models/LobbyOutput";
+import { GetLobbyModel, PostLobbyIdInputModel } from "../../service/lobby/models/LobbyOutput";
 import { LobbyService } from "../../service/lobby/LobbyService";
 import { Problem } from "../../service/media/Problem";
 import PageContent from "../shared/PageContent";
@@ -14,6 +11,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { AlertDialogWithRedirect } from "../shared/AlertDialog";
 
 type CreateGameState =
   | { type: 'loading' }
@@ -121,6 +119,10 @@ export function Lobbies() {
     );
   }
 
+  const handleCloseAlert = () => {
+    navigate('/gameplay-menu');
+  };
+
   switch (state.type) {
     case 'loading':
       return (
@@ -131,9 +133,7 @@ export function Lobbies() {
 
     case 'error':
       return (
-        <div id="error">
-          {state.message}
-        </div>
+        <AlertDialogWithRedirect alert={state.message} redirect={handleCloseAlert}/>
       );
 
     case 'success':

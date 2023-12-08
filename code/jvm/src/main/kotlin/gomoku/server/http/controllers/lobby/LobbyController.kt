@@ -71,7 +71,7 @@ class LobbyController(private val lobbyService: LobbyService) {
      */
     @GetMapping(URIs.Lobby.GET_LOBBIES)
     fun getLobbies(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val lobbies = lobbyService.getLobbies()
+        val lobbies = lobbyService.getLobbies(authenticatedUser.user.uuid)
         return GetLobbies.siren(GetLobbiesOutput(lobbies)).response(200)
     }
 

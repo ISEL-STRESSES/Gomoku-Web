@@ -1,7 +1,7 @@
 import * as React from "react"
 import Container from "@mui/material/Container"
 import Box from "@mui/material/Box"
-import ErrorAlert from "./ErrorAlert";
+import { AlertDialog } from "./AlertDialog";
 
 /**
  * Properties of the PageContent component.
@@ -29,8 +29,10 @@ export default function PageContent({title, error, children}: PageContentProps) 
                 flexDirection: 'column',
                 alignItems: 'center',
             }}>
-                <ErrorAlert error={error ?? null}/>
-                {children}
+              {
+                error ? <AlertDialog alert={error}/> : null
+              }
+              {children}
             </Box>
         </Container>
     )

@@ -5,5 +5,10 @@ package gomoku.server.http.controllers.game.models
  * @property turn id of the player turn.
  */
 data class CurrentTurnPlayerOutput(
+    val turn: Int,
+    val gameId: Int
+)
+
+data class TurnOutput(
     val turn: Int
 )

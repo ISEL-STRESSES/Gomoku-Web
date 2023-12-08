@@ -44,7 +44,7 @@ function BoardView({board, enabled, onTileClicked, children}: BoardViewProps, re
                                     tileIndex == 0
                                         ? <Box sx={{width: tileSize, height: tileSize}}/>
                                         : (
-                                            tileIndex <= board.boardSize
+                                            tileIndex <= board.boardSize - 1
                                                 ? <Box sx={{width: tileSize, height: tileSize}}>
                                                     {String.fromCharCode(64 + tileIndex)}
                                                 </Box>
@@ -54,7 +54,7 @@ function BoardView({board, enabled, onTileClicked, children}: BoardViewProps, re
                                                             {row}
                                                         </Box>
                                                         : <Tile onClick={() => {
-                                                            if (onTileClicked)
+                                                            if (onTileClicked && enabled)
                                                                 onTileClicked(col, row)
                                                         }}/>
                                                 )

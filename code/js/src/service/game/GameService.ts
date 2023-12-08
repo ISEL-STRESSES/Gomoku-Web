@@ -71,7 +71,7 @@ export namespace GameService {
    */
   export async function getTurn(gameId: number): Promise<Either<Error | Problem, GetTurnOutput>> {
     const url = `/game/${gameId}/turn`;
-    return fetchFunction(url, "GET", null);
+    return fetchFunction(url, "GET", null, true);
   }
 
   /**

@@ -20,7 +20,7 @@ export interface GameOutputModel {
   rule: RuleOutputModel;
   moves: MovesOutputModel;
   gameOutcome: string | null;
-  turn: string | null;
+  turn: TurnOutput
   type: string;
 }
 
@@ -33,6 +33,11 @@ export interface GameOutputModel {
 export interface MovesOutputModel {
   boardSize: number;
   orderOfMoves: MoveOutputModel[];
+}
+
+export interface TurnOutput {
+  color: string;
+  user: number;
 }
 
 /**

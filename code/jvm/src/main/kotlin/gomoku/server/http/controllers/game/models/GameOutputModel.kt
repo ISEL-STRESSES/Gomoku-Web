@@ -1,9 +1,9 @@
 package gomoku.server.http.controllers.game.models
 
-import gomoku.server.domain.game.game.CellColor
 import gomoku.server.domain.game.game.FinishedGame
 import gomoku.server.domain.game.game.Game
 import gomoku.server.domain.game.game.OngoingGame
+import gomoku.server.domain.game.game.Turn
 
 /**
  * Represents the output model of a game to be sent from the API
@@ -23,7 +23,7 @@ data class GameOutputModel(
     val rule: RuleOutputModel,
     val moves: MoveContainerOutputModel,
     val gameOutcome: String?,
-    val turn: CellColor?,
+    val turn: Turn?,
     val type: GameType
 ) {
 

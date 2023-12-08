@@ -26,7 +26,7 @@ class LobbyService(private val transactionManager: TransactionManager) {
      */
     fun startMatchmakingProcess(ruleId: Int, userId: Int): MatchmakingResult {
         return transactionManager.run {
-            val lobby = it.lobbyRepository.getLobbyByRuleId(ruleId)
+            val lobby = it.lobbyRepository.getLobbiesByRuleId(userId, ruleId).firstOrNull()
 
             if (lobby != null) {
                 if (lobby.userId == userId) {
@@ -103,9 +103,9 @@ class LobbyService(private val transactionManager: TransactionManager) {
      * Gets all the lobbies.
      * @return List of lobbies.
      */
-    fun getLobbies(): List<Lobby> =
+    fun getLobbies(userId: Int): List<Lobby> =
         transactionManager.run {
-            it.lobbyRepository.getLobbies()
+            it.lobbyRepository.getLobbies(userId)
         }
 
     /**

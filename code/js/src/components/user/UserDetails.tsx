@@ -1,14 +1,15 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from "react-router-dom";
 import { UserService } from '../../service/user/UserService';
 import { GameService } from '../../service/game/GameService';
 import { Failure, Success } from '../../utils/Either';
 import { GetUserStatsOutputModel, RuleStatsModel } from '../../service/user/models/GetUserStatsOutput';
 import { RuleOutputModel } from '../../service/game/models/RuleOutput';
 import { EmbeddedSubEntity } from '../../service/media/siren/SubEntity';
-import { Alert, CircularProgress } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { Problem } from '../../service/media/Problem';
+import { AlertDialogWithRedirect } from "../shared/AlertDialog";
 
 type UserDetailsState =
   | { type: 'loading' }
@@ -23,6 +24,7 @@ type UserDetailsState =
 export const UserDetails: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const [state, setState] = useState<UserDetailsState>({ type: 'loading' });
+  const navigate = useNavigate();
 
   const handleError = (error: any) => {
     if (error instanceof Error) {
@@ -81,12 +83,18 @@ export const UserDetails: React.FC = () => {
     fetchUserDetails();
   }, [userId]);
 
+  const handleCloseAlert = () => {
+    navigate('/ranking')
+  }
+
   switch (state.type) {
     case 'loading':
       return <CircularProgress />;
 
     case 'error':
-      return <Alert severity='error' className='error-message'>{state.message}</Alert>;
+      return (
+          <AlertDialogWithRedirect alert={state.message} redirect={handleCloseAlert}/>
+      )
 
     case 'success':
       return (

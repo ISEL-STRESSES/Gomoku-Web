@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import gomoku.server.domain.game.IsValidMoveResult
 import gomoku.server.domain.game.errors.MoveError
 import gomoku.server.domain.game.game.CellColor
+import gomoku.server.domain.game.game.Turn
 import gomoku.server.domain.game.game.move.Move
 import gomoku.server.domain.game.game.move.MoveContainer
 import gomoku.server.domain.game.game.move.Position
@@ -31,24 +32,24 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
      * @return the move result.
      */
     @JsonIgnore
-    override fun isValidMove(moveContainer: MoveContainer, move: Move, turn: CellColor): IsValidMoveResult {
+    override fun isValidMove(moveContainer: MoveContainer, move: Move, turn: Turn): IsValidMoveResult {
         val center = Position(boardSize.maxIndex / 2, boardSize.maxIndex / 2)
 
         when (moveContainer.getMoves().size) {
             0 -> {
-                if (turn != CellColor.BLACK || turn != move.cellColor || move.position != center) {
+                if (turn.color != CellColor.BLACK || turn.color != move.cellColor || move.position != center) {
                     return failure(MoveError.InvalidPosition)
                 }
             }
 
             1 -> { // White's first move anywhere besides the center
-                if (turn != CellColor.WHITE || turn != move.cellColor) {
+                if (turn.color != CellColor.WHITE || turn.color != move.cellColor) {
                     return failure(MoveError.InvalidTurn)
                 }
             }
 
             2 -> {
-                if (turn != CellColor.BLACK || turn != move.cellColor) return failure(MoveError.InvalidTurn)
+                if (turn.color != CellColor.BLACK || turn.color != move.cellColor) return failure(MoveError.InvalidTurn)
                 val blackFirstMove = moveContainer.getMoves()[0].position
                 if (!isTwoSquaresAway(blackFirstMove, move.position)) {
                     return failure(MoveError.InvalidPosition)
@@ -56,7 +57,7 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
             }
 
             else -> {
-                if (turn != move.cellColor) return failure(MoveError.InvalidTurn)
+                if (turn.color != move.cellColor) return failure(MoveError.InvalidTurn)
             }
         }
         if (moveContainer.hasMove(move.position)) return failure(MoveError.AlreadyOccupied)

@@ -32,19 +32,36 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             .mapTo<Lobby>()
             .singleOrNull()
 
+    override fun getLobbiesByRuleId(userId: Int, ruleId: Int): List<Lobby> =
+        handle.createQuery(
+            """
+            SELECT lobby.id, lobby.started, lobby.game_id,rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, users.id as user_id
+            FROM lobby join users 
+            on users.id = lobby.user_id
+            join rules
+            on lobby.rules_id = rules.id 
+            where lobby.rules_id = :ruleId and lobby.started = false and lobby.user_id != :userId
+            """.trimIndent()
+        )
+            .bind("ruleId", ruleId)
+            .bind("userId", userId)
+            .mapTo<Lobby>()
+            .list()
+
     /**
      * Gets all lobbies
      * @return The list of lobbies
      */
-    override fun getLobbies(): List<Lobby> =
+    override fun getLobbies(userId: Int): List<Lobby> =
         handle.createQuery(
             """
             SELECT lobby.id, lobby.started, lobby.game_id, rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id
             FROM lobby join rules 
             on lobby.rules_id = rules.id
-            where lobby.started = false
+            where lobby.started = false and lobby.user_id != :userId
             """.trimIndent()
         )
+            .bind("userId", userId)
             .mapTo<Lobby>()
             .list()
 

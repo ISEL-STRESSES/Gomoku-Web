@@ -31,7 +31,7 @@ class OngoingGame(
     moves: MoveContainer
 ) : Game(id, playerBlack, playerWhite, rules, moves) {
 
-    val turn = (moves.getMoves().size).toColor()
+    val turn = (moves.getMoves().size).toColor().toTurn(playerBlack, playerWhite)
 }
 
 /**
