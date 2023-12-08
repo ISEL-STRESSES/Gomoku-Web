@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import MenuButton from "./shared/MenuButton";
 import { LoginRounded, PlayArrowRounded } from "@mui/icons-material";
+import Logo from "../assets/logo.png";
 
 export function Home() {
   const currentUser = useCurrentUser()
@@ -21,7 +22,7 @@ export function Home() {
           This is a simple game of gomoku where you can play against other players online.
         </Typography>
 
-        <img src="/images/logo.png" alt="logo" width="300" height="300"/>
+        <img src={Logo} alt="logo" width="300" height="300"/>
 
         <Box sx={{mt: 1}}>
           <Typography variant="h6" gutterBottom>

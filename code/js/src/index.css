@@ -231,6 +231,9 @@ label {
 }
 
 #homePage {
+    background-image: url("assets/background.png");
+    background-size: cover;
+    background-position: center;
     margin-top: 10px;
     padding: 20px;
     text-align: center;
