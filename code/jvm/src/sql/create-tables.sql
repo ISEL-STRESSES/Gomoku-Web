@@ -1,9 +1,9 @@
 BEGIN TRANSACTION;
 
 -- drop all tables
+drop table if exists lobby;
 drop table if exists matches;
 drop table if exists user_stats;
-drop table if exists lobby;
 drop table if exists rules;
 drop table if exists tokens;
 drop table if exists users;

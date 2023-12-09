@@ -7,7 +7,7 @@ import { Problem } from "../../service/media/Problem";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 import Box from "@mui/material/Box";
-import { tileSize } from "./shared/Tile";
+import { tileSize, pieceSize } from "./shared/Tile";
 import { useInterval } from "./utils/useInterval";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -16,6 +16,8 @@ import { UserService } from "../../service/user/UserService";
 import { useCurrentUser } from "../authentication/Authn";
 import Button from "@mui/material/Button";
 import { AlertDialog, AlertDialogWithRedirect } from "../shared/AlertDialog";
+import White from "../../assets/white.png";
+import Black from "../../assets/black.png";
 
 const POLLING_DELAY = 2000;
 
@@ -212,18 +214,21 @@ export function Game() {
                           key={piece.color + index}
                           sx={{
                             position: 'absolute',
-                            top: (piece.position.y) * tileSize,
-                            left: (piece.position.x) * tileSize,
+                            left: piece.position.x * tileSize,
+                            top: piece.position.y * tileSize,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: tileSize,
+                            height: tileSize,
                           }}>
                           <Box
                             sx={{
-                              width: tileSize,
-                              height: tileSize,
-                              backgroundColor: piece.color,
-                              //backgroundImage: `url(../../../public/images/${piece.color.toLowerCase()}.png)`,
-                              //backgroundSize: "contain",
-                              //backgroundRepeat: "no-repeat",
-                              //backgroundPosition: "center",
+                              width: pieceSize,
+                              height: pieceSize,
+                              backgroundImage: piece.color === "WHITE" ? `url(${White})` : `url(${Black})`,
+                              backgroundSize: "contain",
+                              backgroundRepeat: "no-repeat",
                             }}
                           />
                         </Box>

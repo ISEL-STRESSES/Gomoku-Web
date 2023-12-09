@@ -12,7 +12,7 @@ export function Logout() {
   const [errorMessage, setErrorMessage] = useState('');
   const setUser = useSetUser()
 
-  useEffect(() => {
+  useEffect(() => { //TODO: Take this fetch out of mount
     UserService.logout()
       .then(res => {
         if (res instanceof Success) {
