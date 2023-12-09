@@ -20,10 +20,13 @@ interface MenuButtonProps {
 export default function MenuButton({title, icon, onClick}: MenuButtonProps) {
     return (
         <Button
-            fullWidth
             size="large"
             variant="contained"
-            sx={{mt: 3, mb: 2}}
+            sx={{
+                width: 'auto',
+                maxWidth: '30%',
+                mt: 3, mb: 2
+        }}
             startIcon={icon}
             color="inherit"
             onClick={onClick}
