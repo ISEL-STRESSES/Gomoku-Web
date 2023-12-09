@@ -1,6 +1,7 @@
 import { Link, Outlet } from "react-router-dom";
 import { useCurrentUser } from "../authentication/Authn";
 import * as React from "react";
+import UserLogo from "../../assets/user.png";
 
 export function NavBar() {
   return (
@@ -37,7 +38,7 @@ function Nav() {
         <li><Link to="/">Home</Link></li>
         <li><Link to="/about">About</Link></li>
         <li><Link to="/ranking">Ranking</Link></li>
-        <li><Link to="/me"><img id="user-image" src='/code/js/src/assets/user.png' alt="user"></img></Link></li>
+        <li><Link to="/me"><img id="user-image" src={UserLogo} alt="user"></img></Link></li>
         <li><Link to="/logout">Logout</Link></li>
       </ol>
     ));

@@ -1,5 +1,6 @@
 import { SirenEntity } from '../../media/siren/SirenEntity';
 import { RuleOutputModel } from './RuleOutput';
+import { SizeOutputModel } from "../../lobby/models/LobbyOutput";
 
 /**
  * The Game Output.
@@ -63,3 +64,5 @@ export interface PositionOutputModel {
 }
 
 export type GameOutput = SirenEntity<GameOutputModel>;
+
+export type FinishedGamesOutput = SirenEntity<SizeOutputModel, GameOutputModel>;

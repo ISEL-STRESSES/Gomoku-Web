@@ -22,6 +22,7 @@ const POLLING_DELAY = 2000;
 type GameState =
   | { type: 'loading' }
   | { type: 'success'; game: GameOutputModel; turn: boolean; error?: string}
+  | { type: 'finished'; winner: string }
   | { type: 'error'; message: string };
 
 export function Game() {
@@ -101,6 +102,10 @@ export function Game() {
           const gameRes = await GameService.getGameById(gameId);
           if (gameRes instanceof Success) {
             if (gameRes.value.properties) {
+              if (gameRes.value.properties.gameOutcome !== null) {
+                setState({ type: 'finished', winner: gameRes.value.properties.gameOutcome });
+                return
+              }
               const userTurn = await UserService.getUser(gameRes.value.properties.turn.user);
               if (userTurn instanceof Success) {
                 if (userTurn.value.properties) {
@@ -236,6 +241,39 @@ export function Game() {
         </Container>
       );
     }
+    
+    function GameFinishedDisplay({ winner }: { winner: string }) {
+      return (
+        <Container maxWidth="lg">
+          <Box sx={{
+            display: "flex",
+            flexDirection: "column",
+          }}>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              marginTop: '15px',
+              justifyContent: "space-around",
+              flexWrap: "wrap"
+            }}>
+              <Box sx={{
+                display: 'flex',
+                alignSelf: 'flex-start',
+                flexDirection: 'column'
+              }}>
+                <Typography variant="h5" sx={{textAlign: "center", mb: "5px"}}>Game Finished</Typography>
+                <Typography variant="h6" sx={{textAlign: "center", mb: "5px"}}>
+                  {winner}
+                </Typography>
+                <Button variant="contained" color="inherit" onClick={() => navigate('/')}>
+                  Return to lobby
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Container>
+      );
+    }
 
     const handleCloseAlert = () => {
       navigate('/gameplay-menu')
@@ -257,6 +295,11 @@ export function Game() {
       case 'success':
         return (
           <GameDisplay game={state.game} enable={state.turn} error={state.error} />
+        );
+
+      case 'finished':
+        return (
+          <GameFinishedDisplay winner={state.winner} />
         );
     }
 }
