@@ -267,10 +267,12 @@ export function Game() {
                   })
                 }
               </BoardView>
-              <Button variant='contained' color='inherit' onClick={() => setState({ type: 'confirm', game: game, turn: enable })} disabled={!enable}>
-                Forfeit
-              </Button>
-              {error ? <AlertDialog alert={error} /> : null}
+              <Box sx={{ display: 'flex', gap: 2, marginTop: 2, justifyContent: 'space-around' }}>
+                <Button id='forfeit-button' variant='contained' color='inherit' onClick={() => setState({ type: 'confirm', game: game, turn: enable })} disabled={!enable}>
+                  Forfeit
+                </Button>
+                {error ? <AlertDialog alert={error} /> : null}
+              </Box>
             </Box>
           </Box>
         </Box>

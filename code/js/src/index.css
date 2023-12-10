@@ -274,12 +274,17 @@ label {
 
 .buttons-container {
     display: flex;
-    justify-content: space-around; /* Adjust as needed, e.g., space-between */
+    justify-content: space-evenly;
     margin-top: 10px; /* Add spacing between the table and buttons */
 }
 
 .buttons-container button {
+    width: auto;
     padding: 5px 10px; /* Add padding to buttons for better appearance */
+}
+
+#forfeit-button {
+    width: auto;
 }
 
 .list-container {
