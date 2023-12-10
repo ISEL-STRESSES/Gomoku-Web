@@ -4,9 +4,10 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { UserService } from '../../service/user/UserService';
 import { Failure, Success } from '../../utils/Either';
 import { Problem } from '../../service/media/Problem';
-import { Alert, Stack } from '@mui/material';
+import { Alert, IconButton, InputAdornment, Stack, TextField } from '@mui/material';
 import { useSetUser } from "./Authn";
 import { getUserName } from "../../utils/cookieUtils";
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 type State =
   | { tag: 'editing'; error?: string; inputs: { username: string; password: string } }
@@ -18,6 +19,7 @@ type Action =
   | { type: 'submit' }
   | { type: 'error'; message: string }
   | { type: 'success' };
+
 
 function logUnexpectedAction(state: State, action: Action) {
   console.log(`Unexpected action '${action.type} on state '${state.tag}'`);
@@ -55,15 +57,25 @@ export function Login() {
   console.log('Login');
   const [state, dispatch] = React.useReducer(reduce, { tag: 'editing', inputs: { username: '', password: '' } });
   const [isSignUp, setSignUp] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const location = useLocation();
   const setUser = useSetUser();
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
 
   if (state.tag === 'redirect') {
     return <Navigate to={location.state?.source?.pathname || '/me'} replace={true} />;
   }
 
-  function handleChange(ev: React.FormEvent<HTMLInputElement>) {
-    dispatch({ type: 'edit', inputName: ev.currentTarget.name, inputValue: ev.currentTarget.value });
+  function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    const inputName = event.target.name as 'username' | 'password';
+    dispatch({ type: 'edit', inputName, inputValue: event.target.value });
   }
 
   function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
@@ -101,7 +113,7 @@ export function Login() {
         <fieldset disabled={state.tag !== 'editing'} id='authFieldSet'>
           <div>
             <label htmlFor='input'>Username</label>
-            <input
+            <TextField
               id='autbBtnUser'
               className='input'
               type='text'
@@ -112,15 +124,29 @@ export function Login() {
             />
           </div>
           <div>
-            <label htmlFor='input'>Password</label>
-            <input
+            <label htmlFor='inputPassword'>Password</label>
+            <TextField
               id='autbBtnPass'
               className='input'
-              type='password'
+              type={showPassword ? 'text' : 'password'}
               name='password'
               value={password}
               onChange={handleChange}
               required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
           </div>
           <div>
@@ -142,5 +168,4 @@ export function Login() {
       </form>
     </div>
   );
-
 }

@@ -30,6 +30,6 @@ export function useInterval(
         }
         const id = setTimeout(tick, delay);
         return () => clearTimeout(id);
-    }, [delay, ...dependencies]);
+    }, [delay, dependencies]);
 }
 
