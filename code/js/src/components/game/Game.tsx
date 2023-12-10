@@ -10,7 +10,7 @@ import { pieceSize, tileSize } from './shared/Tile';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import BoardView from './shared/BoardView';
-import { UserService } from '../../service/user/UserService';
+import { UserService } from "../../service/user/UserService";
 import { useCurrentUser } from '../authentication/Authn';
 import Button from '@mui/material/Button';
 import { AlertDialog, AlertDialogWithRedirect } from '../shared/AlertDialog';
@@ -19,13 +19,14 @@ import Black from '../../assets/black.png';
 import Loading from '../shared/Loading';
 import { useInterval } from './utils/useInterval';
 import { ConfirmationDialog } from '../shared/ConfirmationDialog';
+import { RuleStatsModel } from "../../service/user/models/GetUserStatsOutput";
 
 const POLLING_DELAY = 2000;
 
 type GameState =
   | { type: 'loading' }
   | { type: 'success'; game: GameOutputModel; turn: boolean; error?: string }
-  | { type: 'finished'; winner: string }
+  | { type: 'finished'; winner: string; stats: RuleStatsModel }
   | { type: 'error'; message: string }
   | { type: 'confirm'; game: GameOutputModel; turn: boolean };
 
@@ -101,8 +102,8 @@ export function Game() {
         const gameRes = await GameService.getGameById(gameId);
         if (gameRes instanceof Success) {
           if (gameRes.value.properties) {
-            if (gameRes.value.properties.gameOutcome !== null) {
-              setState({ type: 'finished', winner: gameRes.value.properties.gameOutcome });
+            if (gameRes.value.properties.gameOutcome !== null ) {
+              await handleFinishGame(gameRes.value.properties);
               return;
             }
             const userTurn = await UserService.getUser(gameRes.value.properties.turn.user);
@@ -138,6 +139,37 @@ export function Game() {
   }
 
   useInterval(checkGameUpdates, POLLING_DELAY, [state.type === 'success' && !state.turn]);
+
+  const handleFinishGame = async (game: GameOutputModel) => {
+    try {
+      if (game.gameOutcome === null) {
+        setState({ type: 'error', message: 'Game didnt finished yet' });
+        return;
+      }
+      const myUser = await UserService.getMe();
+      if (myUser instanceof Success) {
+        const myStatsForRule = myUser.value.getEmbeddedSubEntities().find((userStats) => userStats.properties?.ruleId === game.rule.ruleId);
+        if (!myStatsForRule?.properties) {
+          setState({ type: 'error', message: 'No stats found' });
+          return;
+        }
+        if (myUser.value.properties) {
+          if ((game.gameOutcome === 'BLACK_WON' && game.playerBlack === myUser.value.properties.userId) || (game.gameOutcome === 'WHITE_WON' && game.playerWhite === myUser.value.properties.userId)) {
+            setState({ type: 'finished', winner: "You Won!", stats: myStatsForRule.properties })
+          } else {
+            setState({ type: 'finished', winner: "You Lost!", stats: myStatsForRule.properties })
+          }
+        }
+      } else {
+        const errorMessage = handleError(myUser.value);
+        setState({ type: 'error', message: errorMessage });
+      }
+    } catch (error) {
+      console.error('Error fetching ranking and rules:', error);
+      const errorMessage = handleError(error);
+      setState({ type: 'error', message: errorMessage });
+    }
+  }
 
   /**
    * Handles tile click.
@@ -187,7 +219,7 @@ export function Game() {
         if (res instanceof Success) {
           if (res.value.properties) {
             if (res.value.properties.gameOutcome !== null) {
-              setState({ type: 'finished', winner: res.value.properties.gameOutcome });
+              await handleFinishGame(res.value.properties);
               return;
             }
           } else {
@@ -281,7 +313,7 @@ export function Game() {
       ;
   }
 
-  function GameFinishedDisplay({ winner }: { winner: string }) {
+  function GameFinishedDisplay({ winner, stats }: { winner: string, stats: RuleStatsModel }) {
     return (
       <Container maxWidth='lg'>
         <Box sx={{
@@ -303,6 +335,9 @@ export function Game() {
               <Typography variant='h5' sx={{ textAlign: 'center', mb: '5px' }}>Game Finished</Typography>
               <Typography variant='h6' sx={{ textAlign: 'center', mb: '5px' }}>
                 {winner}
+              </Typography>
+              <Typography variant='h6' sx={{ textAlign: 'center', mb: '5px' }}>
+                Rank: {stats.rank},  Elo: {stats.elo},  GamesPlayed: {stats.gamesPlayed}
               </Typography>
               <Button variant='contained' color='inherit' onClick={() => navigate('/')}>
                 Return to lobby
@@ -334,7 +369,7 @@ export function Game() {
 
     case 'finished':
       return (
-        <GameFinishedDisplay winner={state.winner} />
+        <GameFinishedDisplay winner={state.winner} stats={state.stats} />
       );
     case 'confirm':
       return (<ConfirmationDialog
