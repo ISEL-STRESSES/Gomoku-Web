@@ -13,6 +13,7 @@ export function useInterval(
   dependencies: any[] = []
 ) {
     const savedCallback = useRef<() => Promise<boolean> | boolean | void>();
+    const intervalId = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         savedCallback.current = callback;
@@ -22,14 +23,19 @@ export function useInterval(
         async function tick() {
             if (savedCallback.current) {
                 const shouldStop = await savedCallback.current();
-
                 if (!shouldStop) {
-                    setTimeout(tick, delay);
+                    intervalId.current = setTimeout(tick, delay);
                 }
             }
         }
-        const id = setTimeout(tick, delay);
-        return () => clearTimeout(id);
+
+        intervalId.current = setTimeout(tick, delay);
+
+        return () => {
+            if (intervalId.current) {
+                clearTimeout(intervalId.current);
+            }
+        };
     }, [delay, dependencies]);
 }
 

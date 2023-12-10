@@ -29,6 +29,7 @@ type CreateGameState =
 export function CreateGame() {
 
   const [state, setState] = useState<CreateGameState>({ type: 'loading' });
+  const [isPolling, setPolling] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const handleError = (error: any) => {
@@ -66,7 +67,7 @@ export function CreateGame() {
     fetchRules();
   }, []);
 
-  useInterval(checkIfOpponentJoined, POLLING_DELAY, [state.type === 'success-lobby'])
+  useInterval(checkIfOpponentJoined, POLLING_DELAY, [state, isPolling])
 
   /**
    * Checks if the opponent has joined the game.
@@ -74,19 +75,26 @@ export function CreateGame() {
    * @returns true if the opponent has joined, false otherwise
    */
   async function checkIfOpponentJoined() {
+    if (isPolling) {
+      return false;
+    }
+
+    setPolling(true);
+
     if (state.type !== 'success-lobby')
-      return false
+      return true;
 
     const fetchGetLobby = async () => {
       try {
         if (state.lobby.properties === undefined) {
           setState({ type: 'error', message: 'Lobby is undefined' });
-          return false;
+          return true;
         }
         const res = await LobbyService.getLobbyById(state.lobby.properties.id);
 
         if (res instanceof Success) {
           if (res.value.properties?.state) {
+            setState({ type: 'leaving' })
             navigate("/game", { state: res.value.properties?.gameId})
             return true;
           }else {
@@ -96,11 +104,15 @@ export function CreateGame() {
         } else {
           const errorMessage = handleError(res.value);
           setState({ type: 'error', message: errorMessage });
+          return true;
         }
       } catch (error) {
         console.error('Error fetching lobby:', error);
         const errorMessage = handleError(error);
         setState({ type: 'error', message: errorMessage });
+        return true;
+      }finally {
+        setPolling(false);
       }
     };
 
@@ -185,6 +197,7 @@ export function CreateGame() {
         if (lobbyRes instanceof Success) {
           console.log(lobbyRes.value.properties)
           if (lobbyRes.value.properties?.isGame) {
+            setState({ type: 'leaving' })
             navigate("/game", { state: lobbyRes.value.properties?.id})
           }else {
             setState({

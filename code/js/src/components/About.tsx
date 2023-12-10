@@ -37,7 +37,7 @@ const versionNr: string = "1.0.0"
 
 function AuthorList() {
   return (
-    <Box>
+    <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
       {authors.map((author, index) => showAuthor(author, index))}
     </Box>
   );
@@ -45,13 +45,13 @@ function AuthorList() {
 
 const showAuthor = (author: Author, index: number | null | undefined) => {
   return (
-    <Box key={index} sx={{ textAlign: 'center', my: 2 }}>
+    <Box key={index} sx={{ textAlign: 'center', m: 2, width: 200 }}>
       <img
         src={author.github + '.png'}
         alt={author.name}
-        style={{ width: 100, height: 100, borderRadius: 50 }}
+        style={{ width: 150, height: 150, borderRadius: 75 }}
       />
-      <h2>{author.name}</h2>
+      <h2 style={{ fontSize: '1.5rem' }}>{author.name}</h2>
       <IconButton aria-label="email" href={`mailto:${author.email}`}>
         <EmailIcon />
       </IconButton>
@@ -61,6 +61,7 @@ const showAuthor = (author: Author, index: number | null | undefined) => {
     </Box>
   );
 };
+
 
 export  function About() {
   return (
