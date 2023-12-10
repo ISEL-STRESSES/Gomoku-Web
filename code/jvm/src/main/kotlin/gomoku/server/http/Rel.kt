@@ -9,7 +9,7 @@ object Rel {
 
     val SELF = LinkRelation("self")
     val NEXT = LinkRelation("next")
-    val PREV = LinkRelation("previous")
+    val PREV = LinkRelation("prev")
     val LAST = LinkRelation("last")
     val FIRST = LinkRelation("first")
 

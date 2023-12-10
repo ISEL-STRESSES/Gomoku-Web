@@ -102,31 +102,48 @@ object GetRanking {
             )
             link(URIs.HOME, Rel.HOME)
 
-            if (currentOffset + currentLimit < totalPages * currentLimit) { // If we are not on the last page
-                link(
-                    "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=0",
-                    Rel.FIRST
-                )
-                link(
-                    "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${currentOffset + currentLimit}",
-                    Rel.NEXT
-                )
-                link(
-                    "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${(totalPages - 1) * currentLimit}",
-                    Rel.LAST
-                )
+            if (totalPages > 1) {
+                if (currentOffset > 0) {
+                    link(
+                        "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${currentOffset - currentLimit}",
+                        Rel.PREV
+                    )
+                    link(
+                        "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=0",
+                        Rel.FIRST
+                    )
+                }
+                if (currentOffset < (totalPages - 1) * currentLimit) {
+                    link(
+                        "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${currentOffset + currentLimit}",
+                        Rel.NEXT
+                    )
+                    link(
+                        "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${(totalPages - 1) * currentLimit}",
+                        Rel.LAST
+                    )
+                }
+
+                if (currentOffset in 1 until (totalPages - 1) * currentLimit) {
+                    link(
+                        "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${currentOffset - currentLimit}",
+                        Rel.PREV
+                    )
+                    link(
+                        "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${currentOffset + currentLimit}",
+                        Rel.NEXT
+                    )
+                    link(
+                        "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=0",
+                        Rel.FIRST
+                    )
+                    link(
+                        "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${(totalPages - 1) * currentLimit}",
+                        Rel.LAST
+                    )
+                }
             }
 
-            if (currentOffset > 0) { // If we are not on the first page
-                link(
-                    "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=${if (currentOffset - currentLimit < 0) 0 else currentOffset - currentLimit}",
-                    Rel.PREV
-                )
-                link(
-                    "${URIs.Users.ROOT}/ranking/${body.ruleId}?username=${body.search}&limit=$currentLimit&offset=0",
-                    Rel.FIRST
-                )
-            }
         }
 }
 
