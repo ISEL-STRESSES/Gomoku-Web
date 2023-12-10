@@ -12,7 +12,7 @@ import BoardView, { pieceSize, tileSize } from './shared/BoardView';
 import { UserService } from '../../service/user/UserService';
 import { useCurrentUser } from '../authentication/Authn';
 import Button from '@mui/material/Button';
-import { AlertDialog, AlertDialogWithRedirect } from '../shared/AlertDialog';
+import { AlertDialogWithRedirect } from '../shared/AlertDialog';
 import White from '../../assets/white.png';
 import Black from '../../assets/black.png';
 import Loading from '../shared/Loading';
@@ -191,14 +191,14 @@ export function Game() {
               turn: false,
             });
           } else {
-            setState({ type: 'error', message: 'No game found' });
+            const errorMessage = handleError(res.value);
+            setState(prevState => ({ ...prevState, error: errorMessage }));
           }
         } else {
           const errorMessage = handleError(res.value);
-          setState({ type: 'error', message: errorMessage });
+          setState(prevState => ({ ...prevState, error: errorMessage }));
         }
       } catch (error) {
-        console.error('Error fetching lobby:', error);
         const errorMessage = handleError(error);
         setState({ type: 'error', message: errorMessage });
       }
@@ -302,7 +302,9 @@ export function Game() {
                 <Button id='forfeit-button' variant='contained' color='inherit' onClick={() => setState({ type: 'confirm', game: game, turn: enable })} disabled={!enable}>
                   Forfeit
                 </Button>
-                {error ? <AlertDialog alert={error} /> : null}
+              </Box>
+              <Box sx={{ display: 'flex', gap: 2, marginTop: 2, justifyContent: 'space-around' }}>
+                {error ? <Typography variant='h6' sx={{ textAlign: 'center', mb: '5px' }}>{error}</Typography> : null}
               </Box>
             </Box>
           </Box>
