@@ -36,7 +36,7 @@ export function Home() {
         </Typography>
         <Box mt={5} sx={{ height: '2vh' }}>
           <Typography variant='h5' gutterBottom color={'white'}>
-            This online.
+            This is a simple game of gomoku where you can play against other players online.
           </Typography>
 
           <Typography variant='h5' gutterBottom color={'white'}>
