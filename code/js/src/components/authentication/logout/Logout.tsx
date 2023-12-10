@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { UserService } from '../../../service/user/UserService';
 import { Failure, Success } from '../../../utils/Either';
 import { Problem } from '../../../service/media/Problem';
 import { useSetUser, useCurrentUser } from "../Authn";
 import { getUserName } from '../../../utils/cookieUtils';
+import { ConfirmationDialog } from '../../shared/ConfirmationDialog';
 
 type LogoutState =
   | { type: 'confirm' }
@@ -17,7 +18,6 @@ export function Logout() {
   const [state, setState] = useState<LogoutState>({ type: 'confirm' });
   const currentUser = useCurrentUser();
   const setUser = useSetUser();
-  const navigate = useNavigate();
 
   const handleLogout = () => {
     setState({ type: 'loading' });
@@ -36,8 +36,7 @@ export function Logout() {
   };
 
   if (!currentUser && state.type !== 'success') {
-    // Redirect if not logged in
-    return <Navigate to="/" replace={true} />;
+    return <Navigate to="/login" replace={true} />;
   }
 
   if (state.type === 'success') {
@@ -47,11 +46,12 @@ export function Logout() {
   switch (state.type) {
     case 'confirm':
       return (
-        <div>
-          <p>Are you sure you want to log out, {currentUser}?</p>
-          <button onClick={handleLogout}>Confirm Logout</button>
-          <button onClick={() => navigate(-1)}>Go Back</button>
-        </div>
+        <ConfirmationDialog
+          message={`Are you sure you want to log out, ${currentUser}?`}
+          onConfirm={handleLogout}
+          confirmButtonText="Confirm Logout"
+          cancelButtonText="Cancel"
+        />
       );
 
     case 'loading':

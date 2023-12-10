@@ -7,17 +7,17 @@ import { useEffect, useState } from "react";
 import { GameService } from "../../service/game/GameService";
 import { Success } from "../../utils/Either";
 import { Problem } from "../../service/media/Problem";
-import { CircularProgress } from "@mui/material";
 import PageContent from "../shared/PageContent";
 import Typography from "@mui/material/Typography";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SirenEntity } from "../../service/media/siren/SirenEntity";
 import { LobbyOutputModel, PostLobbyIdInputModel, PostRuleIdInputModel } from "../../service/lobby/models/LobbyOutput";
 import { LobbyService } from "../../service/lobby/LobbyService";
-import { useInterval } from "./utils/useInterval";
 import { AlertDialogWithRedirect } from "../shared/AlertDialog";
+import Loading from '../shared/Loading';
+import { useInterval } from "./utils/useInterval";
 
-const POLLING_DELAY = 4000;
+const POLLING_DELAY = 2000;
 
 type CreateGameState =
   | { type: 'loading' }
@@ -53,8 +53,7 @@ export function CreateGame() {
             rules: rulesRes.value.getEmbeddedSubEntities()
           });
         } else {
-          let errorMessage = 'Error fetching data';
-          errorMessage = handleError(rulesRes.value);
+          const errorMessage = handleError(rulesRes.value);
           setState({ type: 'error', message: errorMessage });
         }
       } catch (error) {
@@ -65,10 +64,6 @@ export function CreateGame() {
     };
 
     fetchRules();
-
-    return () => {
-      // Cleanup if necessary
-    };
   }, []);
 
   useInterval(checkIfOpponentJoined, POLLING_DELAY, [state.type === 'success-lobby'])
@@ -99,8 +94,7 @@ export function CreateGame() {
             return false
           }
         } else {
-          let errorMessage = 'Error fetching data';
-          errorMessage = handleError(res.value);
+          const errorMessage = handleError(res.value);
           setState({ type: 'error', message: errorMessage });
         }
       } catch (error) {
@@ -110,8 +104,7 @@ export function CreateGame() {
       }
     };
 
-    fetchGetLobby();
-
+    await fetchGetLobby();
     return false
   }
 
@@ -134,8 +127,7 @@ export function CreateGame() {
             lobby: lobbyRes.value
           });
         } else {
-          let errorMessage = 'Error fetching data';
-          errorMessage = handleError(lobbyRes.value);
+          const errorMessage = handleError(lobbyRes.value);
           setState({ type: 'error', message: errorMessage });
         }
       } catch (error) {
@@ -164,8 +156,7 @@ export function CreateGame() {
         if (lobbyRes instanceof Success) {
           navigate("/gameplay-menu");
         } else {
-          let errorMessage = 'Error fetching data';
-          errorMessage = handleError(lobbyRes.value);
+          const errorMessage = handleError(lobbyRes.value);
           setState({ type: 'error', message: errorMessage });
         }
       } catch (error) {
@@ -202,8 +193,7 @@ export function CreateGame() {
             });
           }
         } else {
-          let errorMessage = 'Error fetching data';
-          errorMessage = handleError(lobbyRes.value);
+          const errorMessage = handleError(lobbyRes.value);
           setState({ type: 'error', message: errorMessage });
         }
       } catch (error) {
@@ -264,11 +254,7 @@ export function CreateGame() {
 
   switch (state.type) {
     case 'loading':
-      return (
-        <div className="loading">
-          <CircularProgress />
-        </div>
-      );
+      return <Loading />;
 
     case 'error':
       return (

@@ -7,9 +7,9 @@ import { Failure, Success } from '../../utils/Either';
 import { GetUserStatsOutputModel, RuleStatsModel } from '../../service/user/models/GetUserStatsOutput';
 import { RuleOutputModel } from '../../service/game/models/RuleOutput';
 import { EmbeddedSubEntity } from '../../service/media/siren/SubEntity';
-import { CircularProgress } from '@mui/material';
 import { Problem } from '../../service/media/Problem';
 import { AlertDialogWithRedirect } from "../shared/AlertDialog";
+import Loading from '../shared/Loading';
 
 type UserDetailsState =
   | { type: 'loading' }
@@ -89,7 +89,7 @@ export const UserDetails: React.FC = () => {
 
   switch (state.type) {
     case 'loading':
-      return <CircularProgress />;
+      return <Loading />;
 
     case 'error':
       return (

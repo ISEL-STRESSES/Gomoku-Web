@@ -48,31 +48,23 @@ export default function OngoingGames() {
   };
 
   useEffect(() => {
-    fetchOngoingGames()
-
-    return () => {
-      // navigationState.clearGameLinks()
-    }
-  }, [fetchOngoingGames])
-
-  /**
-   * Fetches the games.
-   */
-  async function fetchOngoingGames() {
-    const ongoingGamesRes = await GameService.getOngoingGames();
-    if (ongoingGamesRes instanceof Success) {
-      const ongoingGames = ongoingGamesRes.value.getEmbeddedSubEntities()
-      if (ongoingGames) {
-        setState({ type: 'success', ongoingGames: ongoingGames });
+    async function fetchOngoingGames() {
+      const ongoingGamesRes = await GameService.getOngoingGames();
+      if (ongoingGamesRes instanceof Success) {
+        const ongoingGames = ongoingGamesRes.value.getEmbeddedSubEntities()
+        if (ongoingGames) {
+          setState({ type: 'success', ongoingGames: ongoingGames });
+        } else {
+          setState({ type: 'success', ongoingGames: [] });
+        }
       } else {
-        setState({ type: 'success', ongoingGames: [] });
+        let errorMessage = 'Error fetching data';
+        errorMessage = handleError(ongoingGamesRes.value);
+        setState({ type: 'error', message: errorMessage });
       }
-    } else {
-      let errorMessage = 'Error fetching data';
-      errorMessage = handleError(ongoingGamesRes.value);
-      setState({ type: 'error', message: errorMessage });
     }
-  }
+    fetchOngoingGames()
+  }, [])
 
   const handleCloseAlert = () => {
     navigate('/')

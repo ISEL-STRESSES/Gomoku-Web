@@ -9,9 +9,9 @@ import PageContent from "../shared/PageContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { AlertDialogWithRedirect } from "../shared/AlertDialog";
+import Loading from "../shared/Loading";
 
 type CreateGameState =
   | { type: 'loading' }
@@ -125,11 +125,7 @@ export function Lobbies() {
 
   switch (state.type) {
     case 'loading':
-      return (
-        <div className="loading">
-          <CircularProgress />
-        </div>
-      );
+      return <Loading />;
 
     case 'error':
       return (

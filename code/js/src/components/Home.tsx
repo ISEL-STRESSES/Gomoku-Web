@@ -22,15 +22,14 @@ export function Home() {
       position: 'absolute',
     }}>
       <PageContent title={' '} alignment={'normal'}>
-        {/* Repositioned with margin and made the text wider and more visible */}
         <Typography
           variant='h3'
           gutterBottom
           color={'white'}
           sx={{
-            maxWidth: '90%', // Maximum width of the text
-            fontWeight: 'bold', // Makes the text bolder
-            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)', // Text shadow for better readability
+            maxWidth: '90%',
+            fontWeight: 'bold',
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
           }}
         >
           Welcome{currentUser ? ', ' + currentUser : ''}!

@@ -4,8 +4,7 @@ import {
   Alert,
   Card,
   CardContent,
-  CardHeader, CircularProgress,
-  Divider,
+  CardHeader, Divider,
   Paper,
   Table,
   TableBody,
@@ -20,6 +19,7 @@ import { Success } from "../../utils/Either";
 import { Problem } from "../../service/media/Problem";
 import { useNavigate } from "react-router-dom";
 import { EmbeddedSubEntity } from "../../service/media/siren/SubEntity";
+import Loading from "../shared/Loading";
 
 type FinishedGamesState =
   | { type: 'loading' }
@@ -76,11 +76,7 @@ export default function GameHistory() {
 
   switch (state.type) {
     case 'loading':
-      return (
-        <div className="loading">
-          <CircularProgress />
-        </div>
-      );
+      return <Loading />;
 
     case 'error':
       return (

@@ -7,10 +7,10 @@ import { GameService } from "../service/game/GameService";
 import { RuleOutputModel } from "../service/game/models/RuleOutput";
 import { GetUserRuleStatsOutputModel } from "../service/user/models/GetUserRuleStatsOutput";
 import { EmbeddedSubEntity } from "../service/media/siren/SubEntity";
-import { CircularProgress } from '@mui/material';
 import { Problem } from '../service/media/Problem';
 import { Link } from "../service/media/siren/Link";
 import { AlertDialogWithRedirect } from "./shared/AlertDialog";
+import Loading from './shared/Loading';
 
 type RankingState =
   | { type: 'loading' }
@@ -92,11 +92,7 @@ export function Ranking() {
 
   switch (state.type) {
     case 'loading':
-      return (
-        <div className="loading">
-          <CircularProgress />
-        </div>
-      );
+      return <Loading />;
 
     case 'error':
       return (

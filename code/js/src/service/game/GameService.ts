@@ -82,7 +82,7 @@ export namespace GameService {
    */
   export async function forfeitGame(gameId: number): Promise<Either<Error | Problem, GameOutput>> {
     const url = `/game/${gameId}/forfeit`;
-    return fetchFunction(url, "POST", null);
+    return fetchFunction(url, "POST", null, true);
   }
 
   export async function getOngoingGames(): Promise<Either<Error | Problem, GamesOutput>> {
