@@ -12,12 +12,11 @@ import BoardView, { pieceSize, tileSize } from './shared/BoardView';
 import { UserService } from '../../service/user/UserService';
 import { useCurrentUser } from '../authentication/Authn';
 import Button from '@mui/material/Button';
-import { AlertDialogWithRedirect } from '../shared/AlertDialog';
+import { AlertDialogWithRedirect, AlertDialogWithYesOrNo } from "../shared/AlertDialog";
 import White from '../../assets/white.png';
 import Black from '../../assets/black.png';
 import Loading from '../shared/Loading';
 import { useInterval } from './utils/useInterval';
-import { ConfirmationDialog } from '../shared/ConfirmationDialog';
 import { RuleStatsModel } from "../../service/user/models/GetUserStatsOutput";
 
 const POLLING_DELAY = 2000;
@@ -373,13 +372,8 @@ export function Game() {
         <GameFinishedDisplay winner={state.winner} stats={state.stats} />
       );
     case 'confirm':
-      return (<ConfirmationDialog
-          message='Are you sure you want to forfeit the game?'
-          onConfirm={handleForfeit}
-          onDecline={handleDeclineForfeit}
-          confirmButtonText='Forfeit'
-          cancelButtonText='Cancel'
-        />
+      return (
+        <AlertDialogWithYesOrNo title={"Forfeit!"} alert={"Are you sure you want to forfeit?"} yes={handleForfeit} no={handleDeclineForfeit}/>
       );
   }
 }

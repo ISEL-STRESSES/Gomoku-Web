@@ -6,7 +6,7 @@ import { Failure, Success } from '../../../utils/Either';
 import { Problem } from '../../../service/media/Problem';
 import { useSetUser, useCurrentUser } from "../Authn";
 import { getUserName } from '../../../utils/cookieUtils';
-import { ConfirmationDialog } from '../../shared/ConfirmationDialog';
+import { AlertDialogWithYesOrNo } from "../../shared/AlertDialog";
 
 type LogoutState =
   | { type: 'confirm' }
@@ -48,13 +48,7 @@ export function Logout() {
   switch (state.type) {
     case 'confirm':
       return (
-        <ConfirmationDialog
-          message={`Are you sure you want to log out, ${currentUser}?`}
-          onConfirm={handleLogout}
-          onDecline={navigateBack}
-          confirmButtonText="Confirm Logout"
-          cancelButtonText="Cancel"
-        />
+        <AlertDialogWithYesOrNo title={"Logout!"} alert={`Are you sure you want to log out, ${currentUser}?`} yes={handleLogout} no={navigateBack}/>
       );
 
     case 'loading':

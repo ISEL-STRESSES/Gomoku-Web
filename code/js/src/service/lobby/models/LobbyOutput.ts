@@ -10,7 +10,7 @@ export interface GetLobbyModel {
   id: number,
   rule: RuleModel,
   userId: number,
-  state: Boolean,
+  state: boolean,
   gameId: number
 }
 

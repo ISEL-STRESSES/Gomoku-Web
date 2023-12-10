@@ -1,7 +1,6 @@
 import * as React from "react"
 import {useEffect, useState} from "react"
 import {
-  Alert,
   Card,
   CardContent,
   CardHeader, Divider,
@@ -20,6 +19,7 @@ import { Problem } from "../../service/media/Problem";
 import { useNavigate } from "react-router-dom";
 import { EmbeddedSubEntity } from "../../service/media/siren/SubEntity";
 import Loading from "../shared/Loading";
+import { AlertDialogWithRedirect } from "../shared/AlertDialog";
 
 type FinishedGamesState =
   | { type: 'loading' }
@@ -79,9 +79,7 @@ export default function GameHistory() {
 
     case 'error':
       return (
-        <Alert severity="error" onClose={handleCloseAlert}>
-          {state.message}
-        </Alert>
+        <AlertDialogWithRedirect alert={state.message} redirect={handleCloseAlert}/>
       );
 
     case 'success':

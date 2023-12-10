@@ -2,7 +2,6 @@ import * as React from "react"
 import {useEffect, useState} from "react"
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import {
-  Alert,
   Button,
   Card,
   CardContent,
@@ -22,6 +21,7 @@ import { GameOutputModel } from "../../service/game/models/GameOutput";
 import { GameService } from "../../service/game/GameService";
 import { Success } from "../../utils/Either";
 import { Problem } from "../../service/media/Problem";
+import { AlertDialogWithRedirect } from "../shared/AlertDialog";
 
 type OngoingGamesState =
   | { type: 'loading' }
@@ -79,9 +79,7 @@ export default function OngoingGames() {
 
     case 'error':
       return (
-        <Alert severity="error" onClose={handleCloseAlert}>
-          {state.message}
-        </Alert>
+        <AlertDialogWithRedirect alert={state.message} redirect={handleCloseAlert}/>
       );
 
     case 'success':

@@ -7,7 +7,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
 export function AlertDialog({alert}: {alert: string}) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
 
   const handleClose = () => {
     setOpen(false);
@@ -39,7 +39,7 @@ export function AlertDialog({alert}: {alert: string}) {
 }
 
 export function AlertDialogWithRedirect({alert, redirect}: {alert: string, redirect: () => void}) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
 
   const handleClose = () => {
     setOpen(false);
@@ -47,7 +47,6 @@ export function AlertDialogWithRedirect({alert, redirect}: {alert: string, redir
   };
 
   return (
-    <React.Fragment>
       <Dialog
         open={open}
         aria-labelledby="alert-dialog-title"
@@ -67,6 +66,45 @@ export function AlertDialogWithRedirect({alert, redirect}: {alert: string, redir
           </Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
+  );
+}
+
+export function AlertDialogWithYesOrNo({title, alert, yes, no}: {title: string, alert: string, yes: () => void, no: () => void}) {
+  const [open, setOpen] = React.useState(true);
+
+  const handleClose = () => {
+    setOpen(false);
+    no();
+  };
+
+  const handleYes = () => {
+    setOpen(false);
+    yes();
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title">
+        {title}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          {alert}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button variant="outlined" onClick={handleClose} autoFocus>
+          No
+        </Button>
+        <Button variant="outlined" color="error" onClick={handleYes}>
+          Yes
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
