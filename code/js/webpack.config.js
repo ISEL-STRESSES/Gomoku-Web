@@ -1,22 +1,22 @@
 const ESLintPlugin = require('eslint-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { resolve } = require('path');
 module.exports = {
   mode: 'development',
   devServer: {
     port: 8000,
     historyApiFallback: true,
-    compress: false,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
-      },
-    },
   },
   resolve: {
-    extensions: ['.js', '.ts', '.tsx', '.css'],
+    extensions: ['.js', '.ts', '.tsx', '.css', '.ico', '.html'],
   },
   plugins: [
     new ESLintPlugin({
       extensions: ['js', 'jsx', 'ts', 'tsx'],
+    }),
+    new HtmlWebpackPlugin({
+      template: './public/index.html', // path to your source index.html
+      favicon: './public/favicon.ico',
     }),
   ],
   module: {
@@ -37,5 +37,9 @@ module.exports = {
         use: ['file-loader?name=[name].[ext]'],
       },
     ],
+  },
+  output: {
+    filename: 'main.js',
+    path: resolve(__dirname, 'dist'), // Output directory
   },
 };

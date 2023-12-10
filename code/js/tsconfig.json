@@ -9,11 +9,5 @@
       "node_modules/@types",
       "src/utils/types"
     ],
-  },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  }
 }
