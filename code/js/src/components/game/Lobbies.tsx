@@ -45,8 +45,7 @@ export function Lobbies() {
             lobbies: lobbiesRes.value.getEmbeddedSubEntities()
           });
         } else {
-          let errorMessage = 'Error fetching data';
-          errorMessage = handleError(lobbiesRes.value);
+          const errorMessage = handleError(lobbiesRes.value);
           setState({ type: 'error', message: errorMessage });
         }
       } catch (error) {
@@ -79,8 +78,7 @@ export function Lobbies() {
         if (res instanceof Success) {
           navigate("/game", { state: res.value.properties?.id });
         } else {
-          let errorMessage = 'Error fetching data';
-          errorMessage = handleError(res.value);
+          const errorMessage = handleError(res.value);
           setState({ type: 'error', message: errorMessage });
         }
       } catch (error) {

@@ -52,8 +52,7 @@ export default function GameHistory() {
             setState({ type: 'success', finishedGames: [] });
           }
         } else {
-          let errorMessage = 'Error fetching data';
-          errorMessage = handleError(gamesRes.value);
+          const errorMessage = handleError(gamesRes.value);
           setState({ type: 'error', message: errorMessage });
         }
       } catch (error) {

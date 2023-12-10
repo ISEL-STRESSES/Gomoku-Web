@@ -58,8 +58,7 @@ export default function OngoingGames() {
           setState({ type: 'success', ongoingGames: [] });
         }
       } else {
-        let errorMessage = 'Error fetching data';
-        errorMessage = handleError(ongoingGamesRes.value);
+        const errorMessage = handleError(ongoingGamesRes.value);
         setState({ type: 'error', message: errorMessage });
       }
     }
