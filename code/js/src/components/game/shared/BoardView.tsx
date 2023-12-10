@@ -5,8 +5,10 @@ import { MovesOutputModel } from "../../../service/game/models/GameOutput";
 import boardCenter from '../../../assets/board-center.png';
 import boardCorner from '../../../assets/board-corner.png';
 import boardLateral from '../../../assets/board-latteral.png';
-import { tileSize } from "./Tile";
 import * as React from 'react';
+
+export const tileSize = 40;
+export const pieceSize = tileSize * 0.75;
 
 interface BoardViewProps {
   board: MovesOutputModel;
