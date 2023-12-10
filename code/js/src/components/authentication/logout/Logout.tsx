@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from "react-router-dom";
 import { UserService } from '../../../service/user/UserService';
 import { Failure, Success } from '../../../utils/Either';
 import { Problem } from '../../../service/media/Problem';
@@ -17,6 +17,8 @@ type LogoutState =
 export function Logout() {
   const [state, setState] = useState<LogoutState>({ type: 'confirm' });
   const currentUser = useCurrentUser();
+  const navigate = useNavigate()
+  const navigateBack = () => {navigate(-1)};
   const setUser = useSetUser();
 
   const handleLogout = () => {
@@ -49,6 +51,7 @@ export function Logout() {
         <ConfirmationDialog
           message={`Are you sure you want to log out, ${currentUser}?`}
           onConfirm={handleLogout}
+          onDecline={navigateBack}
           confirmButtonText="Confirm Logout"
           cancelButtonText="Cancel"
         />

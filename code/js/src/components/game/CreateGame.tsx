@@ -225,7 +225,7 @@ export function CreateGame() {
           ))}
         </Box>
         <Box sx={{ display: 'flex', gap: 2, marginTop: 2 }}>
-          <Button variant="contained" color="inherit" onClick={() => navigate("/gameplay-menu")}>
+          <Button variant="contained" color="inherit" onClick={() => navigate(-1)}>
             Back
           </Button>
         </Box>

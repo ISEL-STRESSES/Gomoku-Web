@@ -10,6 +10,7 @@ import { EmbeddedSubEntity } from '../../service/media/siren/SubEntity';
 import { Problem } from '../../service/media/Problem';
 import { AlertDialogWithRedirect } from "../shared/AlertDialog";
 import Loading from '../shared/Loading';
+import Button from "@mui/material/Button";
 
 type UserDetailsState =
   | { type: 'loading' }
@@ -130,6 +131,9 @@ export const UserDetails: React.FC = () => {
               </tbody>
             </table>
           </div>
+          <Button variant="contained" color="inherit" onClick={() => navigate(-1)}>
+            Back
+          </Button>
         </div>
       );
   }

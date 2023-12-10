@@ -27,7 +27,7 @@ type GameState =
   | { type: 'success'; game: GameOutputModel; turn: boolean; error?: string }
   | { type: 'finished'; winner: string }
   | { type: 'error'; message: string }
-  | { type: 'confirm'; gameId: number };
+  | { type: 'confirm'; game: GameOutputModel; turn: boolean };
 
 export function Game() {
 
@@ -183,7 +183,7 @@ export function Game() {
       return false;
     const fetchForfeit = async () => {
       try {
-        const res = await GameService.forfeitGame(state.gameId);
+        const res = await GameService.forfeitGame(state.game.id);
         if (res instanceof Success) {
           if (res.value.properties) {
             if (res.value.properties.gameOutcome !== null) {
@@ -204,6 +204,13 @@ export function Game() {
       }
     };
     await fetchForfeit();
+    return false;
+  };
+
+  const handleDeclineForfeit = async () => {
+    if (state.type !== 'confirm')
+      return false;
+    setState({ type: 'success', game: state.game, turn: state.turn });
     return false;
   };
 
@@ -260,7 +267,7 @@ export function Game() {
                   })
                 }
               </BoardView>
-              <Button variant='contained' color='inherit' onClick={() => setState({ type: 'confirm', gameId: game.id })} disabled={!enable}>
+              <Button variant='contained' color='inherit' onClick={() => setState({ type: 'confirm', game: game, turn: enable })} disabled={!enable}>
                 Forfeit
               </Button>
               {error ? <AlertDialog alert={error} /> : null}
@@ -331,6 +338,7 @@ export function Game() {
       return (<ConfirmationDialog
           message='Are you sure you want to forfeit the game?'
           onConfirm={handleForfeit}
+          onDecline={handleDeclineForfeit}
           confirmButtonText='Forfeit'
           cancelButtonText='Cancel'
         />

@@ -38,14 +38,14 @@ export namespace UserService {
    * Gets the ranking of the users for a given rule
    *
    * @param ruleID the id of the rule
-   * @param username the username to search
+   * @param query the query to search
    *
    * @return the API result of the get-ranking request
    */
-  export async function getRanking(ruleID: number, username?: string): Promise<Either<Error | Problem, GetUsersRankingOutput>> {
+  export async function getRanking(ruleID: number, query?: string): Promise<Either<Error | Problem, GetUsersRankingOutput>> {
     let url = `/users/ranking/${ruleID}`;
-    if (username) {
-      url += `?username=${username}`;
+    if (query) {
+      url += "?" + query;
     }
     return fetchFunction(url, "GET", null);
   }

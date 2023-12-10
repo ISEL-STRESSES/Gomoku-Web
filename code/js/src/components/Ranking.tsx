@@ -30,11 +30,26 @@ export function Ranking() {
     }
   };
 
-  const handleButtonClick = (rel: string) => {
+  const handleButtonClick = async (rel: string) => {
     if (state.type === 'success') {
       const link = state.rankingLinks?.find((link) => link.rel.at(0) === rel);
       if (link) {
-        console.log(link);
+        const query = link.href.split('?')[1];
+        const rankingRes = await UserService.getRanking(ruleId, query);
+        if (rankingRes instanceof Success) {
+          setState({
+            type: 'success',
+            ranking: rankingRes.value.getEmbeddedSubEntities(),
+            rules: state.rules,
+            rankingLinks: rankingRes.value.links
+          });
+        } else {
+          let errorMessage = 'Error fetching data';
+          if (rankingRes instanceof Failure) {
+            errorMessage = handleError(rankingRes.value);
+          }
+          setState({ type: 'error', message: errorMessage });
+        }
       }
     }
   };
@@ -131,18 +146,10 @@ export function Ranking() {
             </tbody>
           </table>
           <div className="buttons-container">
-            <button onClick={() => handleButtonClick('first')} disabled={!state.rankingLinks?.find((link) => link.rel.at(0) === 'first')}>
-              First
-            </button>
-            <button onClick={() => handleButtonClick('prev')} disabled={!state.rankingLinks?.find((link) => link.rel.at(0) === 'prev')}>
-              Previous
-            </button>
-            <button onClick={() => handleButtonClick('next')} disabled={!state.rankingLinks?.find((link) => link.rel.at(0) === 'next')}>
-              Next
-            </button>
-            <button onClick={() => handleButtonClick('last')} disabled={!state.rankingLinks?.find((link) => link.rel.at(0) === 'last')}>
-              Last
-            </button>
+            {state.rankingLinks?.find((link) => link.rel.at(0) === 'first')? <button onClick={() => handleButtonClick('first')}>First</button> : null}
+            {state.rankingLinks?.find((link) => link.rel.at(0) === 'prev')? <button onClick={() => handleButtonClick('prev')}>Previous</button> : null}
+            {state.rankingLinks?.find((link) => link.rel.at(0) === 'next')? <button onClick={() => handleButtonClick('next')}>Next</button> : null}
+            {state.rankingLinks?.find((link) => link.rel.at(0) === 'last')? <button onClick={() => handleButtonClick('last')}>Last</button> : null}
           </div>
         </div>
       );

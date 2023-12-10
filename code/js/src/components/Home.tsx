@@ -17,8 +17,8 @@ export function Home() {
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center',
-      height: '100vh',
-      width: '100vw',
+      height: '91.5%',
+      width: '100%',
       position: 'absolute',
     }}>
       <PageContent title={' '} alignment={'normal'}>
