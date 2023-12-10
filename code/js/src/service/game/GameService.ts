@@ -3,7 +3,7 @@ import { Either } from '../../utils/Either';
 import { Problem } from '../media/Problem';
 import { GetRulesOutput } from './models/GetRulesOutput';
 import { RuleOutput } from './models/RuleOutput';
-import { FinishedGamesOutput, GameOutput } from "./models/GameOutput";
+import { GamesOutput, GameOutput } from "./models/GameOutput";
 import { PlayPositionInputModel } from "./models/PlayPositionInputModel";
 import { GetTurnOutput } from "./models/GetTurnOutput";
 
@@ -14,7 +14,7 @@ export namespace GameService {
    *
    * @return the API result of the get hub request
    */
-  export async function getHub(): Promise<Either<Error | Problem, FinishedGamesOutput>> { // Replace any with the actual expected output type
+  export async function getHub(): Promise<Either<Error | Problem, GamesOutput>> { // Replace any with the actual expected output type
     const url = `/game/`;
     return fetchFunction(url, "GET", null, true);
   }
@@ -83,5 +83,10 @@ export namespace GameService {
   export async function forfeitGame(gameId: number): Promise<Either<Error | Problem, GameOutput>> {
     const url = `/game/${gameId}/forfeit`;
     return fetchFunction(url, "POST", null);
+  }
+
+  export async function getOngoingGames(): Promise<Either<Error | Problem, GamesOutput>> {
+    const url = "/game/ongoing";
+    return fetchFunction(url, "GET", null, true);
   }
 }

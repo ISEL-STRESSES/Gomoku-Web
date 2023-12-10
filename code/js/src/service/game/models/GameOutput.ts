@@ -65,4 +65,4 @@ export interface PositionOutputModel {
 
 export type GameOutput = SirenEntity<GameOutputModel>;
 
-export type FinishedGamesOutput = SirenEntity<SizeOutputModel, GameOutputModel>;
+export type GamesOutput = SirenEntity<SizeOutputModel, GameOutputModel>;

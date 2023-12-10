@@ -11,6 +11,7 @@ import gomoku.server.http.controllers.media.Problem
 import gomoku.server.http.responses.ForfeitGame
 import gomoku.server.http.responses.GetFinishedGames
 import gomoku.server.http.responses.GetGameById
+import gomoku.server.http.responses.GetOngoingGames
 import gomoku.server.http.responses.GetRuleById
 import gomoku.server.http.responses.GetRules
 import gomoku.server.http.responses.GetTurn
@@ -158,6 +159,16 @@ class GameController(private val gameService: GameService) {
         return when (forfeitResult) {
             is Failure -> forfeitResult.value.resolveProblem()
             is Success -> ForfeitGame.siren(GameOutputModel.fromGame(forfeitResult.value)).response(200)
+        }
+    }
+    @GetMapping(URIs.Game.ONGOING_GAMES)
+    fun ongoingGames(
+        authenticatedUser: AuthenticatedUser
+    ): ResponseEntity<*> {
+        val ongoingGames = gameService.getOngoingGames(authenticatedUser.user.uuid)
+        return when (ongoingGames) {
+            is Failure -> ongoingGames.value.resolveProblem()
+            is Success -> GetOngoingGames.siren(ongoingGames.value.map { GameOutputModel.fromGame(it) }).response(200)
         }
     }
 

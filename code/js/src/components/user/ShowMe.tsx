@@ -5,6 +5,7 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import GameHistory from "./GameHistory";
+import OngoingGames from "./OngoingGames";
 
 export function ShowMe() {
   const currentUser = useCurrentUser()
@@ -30,6 +31,8 @@ export function ShowMe() {
             </Card>
           </Grid>
           <Grid item lg={8} md={6} xs={12}>
+            <OngoingGames/>
+            <br/>
             <GameHistory/>
           </Grid>
         </Grid>

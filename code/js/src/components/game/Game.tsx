@@ -200,7 +200,8 @@ export function Game() {
               <Box sx={{
                 display: 'flex',
                 alignSelf: 'flex-start',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                textAlign: 'center',
               }}>
                 <Typography variant="h5" sx={{textAlign: "center", mb: "5px"}}>My Board</Typography>
                 <Typography variant="h6" sx={{textAlign: "center", mb: "5px"}}>

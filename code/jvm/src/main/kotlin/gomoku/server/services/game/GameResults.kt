@@ -53,3 +53,5 @@ typealias GetUserFinishedGamesResult = Pair<List<FinishedGame>, Int>
 typealias ForfeitGameResult = Either<ForfeitGameError, FinishedGame>
 
 typealias RuleResult = Either<RuleError, Rules>
+
+typealias GetOngoingGamesResult = Either<GetGameError, List<Game>>

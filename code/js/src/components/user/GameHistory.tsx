@@ -92,7 +92,7 @@ export default function GameHistory() {
     case 'success':
       return (
         <Card>
-          <CardHeader subheader="Last 10 games" title="Game History" />
+          <CardHeader title="Game History" />
           <Divider />
           <CardContent>
             <TableContainer component={Paper} sx={{ width: '100%' }}>

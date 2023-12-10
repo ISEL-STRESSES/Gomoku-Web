@@ -265,6 +265,15 @@ class GameService(private val transactionManager: TransactionManager) {
         return success(tr.gameRepository.getGameById(gameId)!!)
     }
 
+    fun getOngoingGames(userId: Int): GetOngoingGamesResult =
+        transactionManager.run {
+            if (!it.usersRepository.isUserStoredById(userId)) {
+                failure(GetGameError.PlayerNotFound)
+            }else{
+                success(it.gameRepository.getUserOngoingGames(userId))
+            }
+        }
+
     /**
      * Resolves a [GetGameError] (getGameAndVerifyPlayer function error) into a [MakeMoveError] (GameService error).
      */

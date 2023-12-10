@@ -41,6 +41,7 @@ object URIs {
     object Game {
         const val ROOT = "$PREFIX/game"
         const val HUB = "/"
+        const val ONGOING_GAMES = "/ongoing"
         const val GET_BY_ID = "/{gameId}"
         const val MAKE_PLAY = "/{gameId}/play"
         const val GAME_RULES = "/rules"

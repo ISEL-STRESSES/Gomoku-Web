@@ -363,3 +363,23 @@ object ForfeitGame {
             link(URIs.HOME, Rel.HOME)
         }
 }
+
+/**
+ * TODO
+ */
+object GetOngoingGames {
+
+    /**
+     * TODO
+     */
+    fun siren(body: List<GameOutputModel>) =
+        siren {
+            clazz(Rel.ONGOING_GAMES.value)
+            property(PropertyDefaultModel(body.size))
+            body.forEach {
+                entity(EntityModel(listOf(Rel.GAME.value), emptyList(), it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Game.ROOT + "/${it.id}"))))
+            }
+            link(URIs.Game.ROOT + URIs.Game.ONGOING_GAMES, Rel.SELF)
+            link(URIs.HOME, Rel.HOME)
+        }
+}

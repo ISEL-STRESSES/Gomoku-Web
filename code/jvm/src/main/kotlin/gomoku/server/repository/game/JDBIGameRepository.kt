@@ -300,4 +300,23 @@ class JDBIGameRepository(private val handle: Handle) : GameRepository {
             .bind("matchId", gameId)
             .mapTo<Int>()
             .singleOrNull()?.toColor()
+
+    /**
+     * Gets the number of ongoing games stored in the database for the user.
+     * @param userId id of the user
+     * @return A list of ongoing games
+     */
+    override fun getUserOngoingGames(userId: Int): List<Game> =
+        handle.createQuery(
+            """
+            select matches.id , matches.player_black, matches.player_white, matches.match_state, matches.match_outcome, matches.moves,
+            rules.id as rules_id,rules.board_size, rules.opening_rule, rules.variant
+            from matches join rules
+            on rules.id = matches.rules_id
+            where (matches.player_black = :userId or matches.player_white = :userId) and matches.match_state = 'ONGOING'
+            """.trimIndent()
+        )
+            .bind("userId", userId)
+            .mapTo<Game>()
+            .list()
 }

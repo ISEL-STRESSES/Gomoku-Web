@@ -30,6 +30,7 @@ object Rel {
     val MAKE_MOVE = LinkRelation("make-move")
     val GET_TURN = LinkRelation("get-turn")
     val FORFEIT_GAME = LinkRelation("forfeit-game")
+    val ONGOING_GAMES = LinkRelation("ongoing-games")
 
     val LEAVE_LOBBY = LinkRelation("leave-lobby")
     val JOIN_LOBBY = LinkRelation("join-lobby")

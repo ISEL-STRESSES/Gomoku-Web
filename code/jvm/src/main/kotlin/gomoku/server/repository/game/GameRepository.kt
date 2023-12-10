@@ -149,4 +149,6 @@ interface GameRepository {
      * the game has already ended or doesn't exist.
      */
     fun getTurn(gameId: Int): CellColor?
+
+    fun getUserOngoingGames(userId: Int): List<Game>
 }
