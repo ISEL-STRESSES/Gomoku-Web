@@ -101,4 +101,9 @@ export namespace UserService {
     const url = `/users/logout`;
     return fetchFunction(url, "POST", null, true);
   }
+
+  export async function getMe(): Promise<Either<Error | Problem, GetUserOutput>> {
+    const url = `/users/me`;
+    return fetchFunction(url, "GET", null, true);
+  }
 }
