@@ -14,6 +14,7 @@ import GameplayMenu from "./components/game/GameplayMenu";
 import { CreateGame } from "./components/game/CreateGame";
 import { Lobbies } from "./components/game/Lobbies";
 import { Game } from "./components/game/Game";
+import NotFoundPage from './components/NotFoundPage';
 
 const router = createBrowserRouter([
   {
@@ -70,6 +71,10 @@ const router = createBrowserRouter([
         'path': '/game',
         'element': <RequireAuth><Game /></RequireAuth>,
         'children': []
+      },
+      {
+        'path': '*',
+        'element': <NotFoundPage />,
       },
     ],
   },
