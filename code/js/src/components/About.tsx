@@ -20,7 +20,7 @@ const authors: Author[] = [
   },
   {
     studentID: 48331,
-    name: "André Matos",
+    name: "Andre Matos",
     email: "A48331@alunos.isel.pt",
     github: "https://github.com/Matos16"
   },

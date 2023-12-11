@@ -65,12 +65,12 @@ const router = createBrowserRouter([
             'path': '/lobby',
             'element': <RequireAuth><Lobbies/></RequireAuth>,
           },
+          {
+            'path': '/game',
+            'element': <RequireAuth><Game /></RequireAuth>,
+            'children': []
+          },
         ]
-      },
-      {
-        'path': '/game',
-        'element': <RequireAuth><Game /></RequireAuth>,
-        'children': []
       },
       {
         'path': '*',
