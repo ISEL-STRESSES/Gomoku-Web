@@ -275,12 +275,12 @@ label {
 .buttons-container {
     display: flex;
     justify-content: space-evenly;
-    margin-top: 10px; /* Add spacing between the table and buttons */
+    margin-top: 6px;
 }
 
 .buttons-container button {
     width: auto;
-    padding: 5px 10px; /* Add padding to buttons for better appearance */
+    padding: 5px 5px;
 }
 
 #forfeit-button {

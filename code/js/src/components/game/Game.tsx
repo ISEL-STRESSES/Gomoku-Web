@@ -49,27 +49,36 @@ export function Game() {
     const fetchGetGame = async (gameId: number) => {
       try {
         const gameRes = await GameService.getGameById(gameId);
-        const turn = await GameService.getTurn(gameId);
-        if (gameRes instanceof Success && turn instanceof Success) {
-          if (gameRes.value.properties && turn.value.properties) {
-            const userTurn = await UserService.getUser(turn.value.properties.turn);
-            if (userTurn instanceof Success) {
-              if (userTurn.value.properties) {
-                if (userTurn.value.properties.username === currentUser)
-                  setState({
-                    type: 'success',
-                    game: gameRes.value.properties,
-                    turn: true,
-                  });
-                else
-                  setState({
-                    type: 'success',
-                    game: gameRes.value.properties,
-                    turn: false,
-                  });
+        if (gameRes instanceof Success && gameRes.value.properties) {
+          const gameData = gameRes.value.properties;
+
+          if (gameData.gameOutcome !== null) {
+            const myUser = await UserService.getMe();
+            if (myUser instanceof Success) {
+              const myStatsForRule = myUser.value.getEmbeddedSubEntities().find((userStats) => userStats.properties?.ruleId === gameData.rule.ruleId);
+              if (myStatsForRule?.properties && myUser.value.properties) {
+                const winner = (gameData.gameOutcome === 'BLACK_WON' && gameData.playerBlack === myUser.value.properties.userId) || (gameData.gameOutcome === 'WHITE_WON' && gameData.playerWhite === myUser.value.properties.userId) ? "You Won!" : "You Lost!";
+                setState({ type: 'finished', winner: winner, stats: myStatsForRule.properties });
               } else {
-                setState({ type: 'error', message: 'No game found' });
+                setState({ type: 'error', message: 'No stats found' });
               }
+            } else {
+              const errorMessage = handleError(myUser.value);
+              setState({ type: 'error', message: errorMessage });
+            }
+            return;
+          }
+          const turn = await GameService.getTurn(gameId);
+          if (turn instanceof Success && turn.value.properties) {
+            const userTurn = await UserService.getUser(turn.value.properties.turn);
+            if (userTurn instanceof Success && userTurn.value.properties) {
+              setState({
+                type: 'success',
+                game: gameData,
+                turn: userTurn.value.properties.username === currentUser,
+              });
+            } else {
+              setState({ type: 'error', message: 'No game found' });
             }
           } else {
             setState({ type: 'error', message: 'No game found' });
@@ -79,13 +88,14 @@ export function Game() {
           setState({ type: 'error', message: errorMessage });
         }
       } catch (error) {
-        console.error('Error fetching ranking and rules:', error);
+        console.error('Error fetching game:', error);
         const errorMessage = handleError(error);
         setState({ type: 'error', message: errorMessage });
       }
     };
 
-    fetchGetGame(location.state as number);
+    const gameId = location.state as number;
+    fetchGetGame(gameId);
   }, [currentUser, location.state]);
 
   async function checkGameUpdates() {
