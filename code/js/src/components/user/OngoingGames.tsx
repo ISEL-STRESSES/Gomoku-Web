@@ -16,16 +16,16 @@ import {
   TableRow
 } from "@mui/material";
 import {useNavigate} from "react-router-dom"
-import { EmbeddedSubEntity } from "../../service/media/siren/SubEntity";
-import { GameOutputModel } from "../../service/game/models/GameOutput";
+import { OngoingOutputModel } from "../../service/game/models/GameOutput";
 import { GameService } from "../../service/game/GameService";
 import { Success } from "../../utils/Either";
 import { Problem } from "../../service/media/Problem";
 import { AlertDialogWithRedirect } from "../shared/AlertDialog";
+import { UserService } from "../../service/user/UserService";
 
 type OngoingGamesState =
   | { type: 'loading' }
-  | { type: 'success'; ongoingGames: EmbeddedSubEntity<GameOutputModel>[]}
+  | { type: 'success'; ongoingGames: OngoingOutputModel[]}
   | { type: 'error'; message: string };
 
 /**
@@ -48,22 +48,78 @@ export default function OngoingGames() {
   };
 
   useEffect(() => {
-    async function fetchOngoingGames() {
-      const ongoingGamesRes = await GameService.getOngoingGames();
-      if (ongoingGamesRes instanceof Success) {
-        const ongoingGames = ongoingGamesRes.value.getEmbeddedSubEntities()
-        if (ongoingGames) {
-          setState({ type: 'success', ongoingGames: ongoingGames });
+    const fetchOngoingGames = async () => {
+      try {
+        const gamesRes = await GameService.getOngoingGames();
+        const me = await UserService.getMe();
+
+        if (gamesRes instanceof Success && me instanceof Success) {
+          const ongoingGames = gamesRes.value.getEmbeddedSubEntities();
+          if (ongoingGames) {
+            const opponentsPromises = ongoingGames.map(async (game) => {
+              const opponentId =
+                game.properties?.playerBlack === me.value.properties?.userId
+                  ? game.properties?.playerWhite
+                  : game.properties?.playerBlack;
+
+              if (
+                opponentId === undefined ||
+                game.properties?.id === undefined ||
+                game.properties?.rule === undefined ||
+                game.properties?.moves === undefined
+              ) {
+                return {
+                  gameId: 0,
+                  oppId: 0,
+                  oppUsername: "Unknown",
+                  rule: game.properties?.rule,
+                  moves: 0,
+                };
+              }
+
+              const oppUsername = await getUserUsername(opponentId);
+
+              return {
+                gameId: game.properties.id,
+                oppId: opponentId,
+                oppUsername: oppUsername,
+                rule: game.properties.rule,
+                moves: game.properties.moves.orderOfMoves.length,
+              };
+            });
+
+            const ongoingGamesOutput = await Promise.all(opponentsPromises);
+            setState({
+              type: "success",
+              ongoingGames: ongoingGamesOutput,
+            });
+          } else {
+            setState({ type: "success", ongoingGames: [] });
+          }
         } else {
-          setState({ type: 'success', ongoingGames: [] });
+          const errorMessage = handleError(gamesRes.value);
+          setState({ type: "error", message: errorMessage });
         }
-      } else {
-        const errorMessage = handleError(ongoingGamesRes.value);
-        setState({ type: 'error', message: errorMessage });
+      } catch (error) {
+        console.error("Error fetching ongoing games:", error);
+        const errorMessage = handleError(error);
+        setState({ type: "error", message: errorMessage });
       }
-    }
-    fetchOngoingGames()
-  }, [])
+    };
+
+    const getUserUsername = async (userId: number) => {
+      const userRes = await UserService.getUser(userId);
+      return userRes instanceof Success
+        ? userRes.value.properties?.username
+        : undefined;
+    };
+
+    fetchOngoingGames();
+
+    return () => {
+      // Clear up
+    };
+  }, []);
 
   const handleCloseAlert = () => {
     navigate('/')
@@ -95,22 +151,32 @@ export default function OngoingGames() {
                 <TableHead>
                   <TableRow>
                     <TableCell>Game</TableCell>
-                    <TableCell>Quantity of moves</TableCell>
+                    <TableCell>Number of moves</TableCell>
+                    <TableCell>Opponent</TableCell>
                     <TableCell>Play</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {
                     state.ongoingGames?.map(game => (
-                      <TableRow key={game.properties?.id} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
+                      <TableRow key={game.gameId} sx={{'&:last-child td, &:last-child th': {border: 0}}}>
                         <TableCell component="th" scope="row">
-                          X{game.properties?.rule.boardSize} {game.properties?.rule.variant} {game.properties?.rule.openingRule}
+                          X{game.rule?.boardSize} {game.rule?.variant} {game.rule?.openingRule}
                         </TableCell>
-                        <TableCell>{game.properties?.moves.orderOfMoves.length}</TableCell>
+                        <TableCell>{game.moves}</TableCell>
                         <TableCell>
                           <Button onClick={
                             () => {
-                              navigate("/game", {state: game.properties?.id})
+                              navigate('/users/' + game.oppId)
+                            }
+                          } sx={{maxWidth: 'fit-content'}}>
+                            {game.oppUsername}
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Button onClick={
+                            () => {
+                              navigate("/game", {state: game.gameId})
                             }
                           }>
                             <PlayArrowIcon/>

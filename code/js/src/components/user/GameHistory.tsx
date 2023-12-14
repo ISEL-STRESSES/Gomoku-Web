@@ -1,6 +1,7 @@
 import * as React from "react"
 import {useEffect, useState} from "react"
 import {
+  Button,
   Card,
   CardContent,
   CardHeader, Divider,
@@ -12,18 +13,18 @@ import {
   TableHead,
   TableRow
 } from "@mui/material";
-import { GameOutputModel } from "../../service/game/models/GameOutput";
+import { FinishedOutputModel } from "../../service/game/models/GameOutput";
 import { GameService } from "../../service/game/GameService";
 import { Success } from "../../utils/Either";
 import { Problem } from "../../service/media/Problem";
 import { useNavigate } from "react-router-dom";
-import { EmbeddedSubEntity } from "../../service/media/siren/SubEntity";
 import Loading from "../shared/Loading";
 import { AlertDialogWithRedirect } from "../shared/AlertDialog";
+import { UserService } from "../../service/user/UserService";
 
 type FinishedGamesState =
   | { type: 'loading' }
-  | { type: 'success'; finishedGames: EmbeddedSubEntity<GameOutputModel>[]}
+  | { type: 'success'; finishedGames: FinishedOutputModel[]}
   | { type: 'error'; message: string };
 export default function GameHistory() {
   
@@ -44,10 +45,48 @@ export default function GameHistory() {
     const fetchGetFinishedGames = async () => {
       try {
         const gamesRes = await GameService.getHub();
-        if (gamesRes instanceof Success) {
-          const finishedGames = gamesRes.value.getEmbeddedSubEntities()
+        const me = await UserService.getMe();
+
+        if (gamesRes instanceof Success && me instanceof Success) {
+          const finishedGames = gamesRes.value.getEmbeddedSubEntities();
           if (finishedGames) {
-            setState({ type: 'success', finishedGames: finishedGames });
+            const opponentsPromises = finishedGames.map(async game => {
+              const opponentId = game.properties?.playerBlack === me.value.properties?.userId
+                ? game.properties?.playerWhite
+                : game.properties?.playerBlack;
+
+              const outcome = game.properties?.gameOutcome === 'DRAW' ?
+                'Draw!'
+                : (game.properties?.gameOutcome === 'BLACK_WON' && opponentId === game.properties?.playerBlack) || (game.properties?.gameOutcome === 'WHITE_WON' && opponentId === game.properties?.playerWhite)
+                  ? 'You lost!'
+                  : 'You won!';
+
+              if (opponentId === undefined || game.properties?.id === undefined || game.properties?.rule === undefined ) {
+                return {
+                  gameId: 0,
+                  oppId: 0,
+                  oppUsername: 'Unknown',
+                  rule: game.properties?.rule,
+                  outcome: outcome,
+                };
+              }
+
+              const oppUsername = await getUserUsername(opponentId);
+
+              return {
+                gameId: game.properties.id,
+                oppId: opponentId,
+                oppUsername: oppUsername,
+                rule: game.properties.rule,
+                outcome: outcome,
+              };
+            });
+
+            const finishedGamesOutput = await Promise.all(opponentsPromises);
+            setState({
+              type: 'success',
+              finishedGames: finishedGamesOutput
+            });
           } else {
             setState({ type: 'success', finishedGames: [] });
           }
@@ -56,10 +95,15 @@ export default function GameHistory() {
           setState({ type: 'error', message: errorMessage });
         }
       } catch (error) {
-        console.error('Error fetching ranking and rules:', error);
+        console.error('Error fetching finished games:', error);
         const errorMessage = handleError(error);
         setState({ type: 'error', message: errorMessage });
       }
+    };
+
+    const getUserUsername = async (userId: number) => {
+      const userRes = await UserService.getUser(userId);
+      return userRes instanceof Success ? userRes.value.properties?.username : undefined;
     };
 
     fetchGetFinishedGames();
@@ -93,16 +137,26 @@ export default function GameHistory() {
                 <TableHead>
                   <TableRow>
                     <TableCell>Game</TableCell>
+                    <TableCell>Opponent</TableCell>
                     <TableCell>Winner</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {state.finishedGames.map(game => (
-                    <TableRow key={game.properties?.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  {state.finishedGames.map((game) => (
+                    <TableRow key={game.gameId} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                       <TableCell component="th" scope="row">
-                        X{game.properties?.rule.boardSize} {game.properties?.rule.variant} {game.properties?.rule.openingRule}
+                        X{game.rule?.boardSize} {game.rule?.variant} {game.rule?.openingRule}
                       </TableCell>
-                      <TableCell>{game.properties?.gameOutcome}</TableCell>
+                      <TableCell>
+                        <Button onClick={
+                          () => {
+                            navigate('/users/' + game.oppId)
+                          }
+                        } sx={{maxWidth: 'fit-content'}}>
+                          {game.oppUsername}
+                        </Button>
+                      </TableCell>
+                      <TableCell>{game.outcome}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

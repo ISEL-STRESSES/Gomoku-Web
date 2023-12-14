@@ -21,8 +21,24 @@ export interface GameOutputModel {
   rule: RuleOutputModel;
   moves: MovesOutputModel;
   gameOutcome: string | null;
-  turn: TurnOutput
+  turn: TurnOutput;
   type: string;
+}
+
+export interface FinishedOutputModel {
+  gameId: number;
+  oppId: number;
+  oppUsername?: string;
+  rule?: RuleOutputModel;
+  outcome: string;
+}
+
+export interface OngoingOutputModel {
+  gameId: number;
+  oppId: number;
+  oppUsername?: string;
+  rule?: RuleOutputModel;
+  moves: number;
 }
 
 /**
