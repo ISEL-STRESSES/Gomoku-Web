@@ -11,8 +11,8 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
-  gomoku-service:
-    container_name: gomoku-service
+  gomoku-service1:
+    container_name: gomoku-service1
     depends_on:
       - gomoku-db
     build:
@@ -21,7 +21,18 @@ services:
     environment:
       - DB_URL=jdbc:postgresql://gomoku-db:5432/postgres?user=postgres&password=postgres
     expose:
-      - "8080"
+      - "8081:8080"
+  gomoku-service2:
+    container_name: gomoku-service2
+    depends_on:
+      - gomoku-db
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile-spring
+    environment:
+      - DB_URL=jdbc:postgresql://gomoku-db:5432/postgres?user=postgres&password=postgres
+    expose:
+      - "8082:8080"
   nginx:
     container_name: nginx
     build:
@@ -32,4 +43,5 @@ services:
     volumes:
       - ./dockerfiles/nginx:/etc/nginx
     depends_on:
-      - gomoku-service
+      - gomoku-service1
+      - gomoku-service2

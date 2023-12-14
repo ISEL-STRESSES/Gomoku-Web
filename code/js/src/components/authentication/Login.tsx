@@ -123,6 +123,7 @@ export function Login() {
               required
             />
           </div>
+          <br/>
           <div>
             <label htmlFor='inputPassword'>Password</label>
             <TextField
@@ -149,6 +150,7 @@ export function Login() {
               }}
             />
           </div>
+          <br/>
           <div>
             <Stack spacing={2} direction='row'>
               <button className='button' type='submit' onClick={() => setSignUp(false)}>

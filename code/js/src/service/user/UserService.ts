@@ -51,17 +51,6 @@ export namespace UserService {
   }
 
   /**
-   * Gets the ranking page requested by the url of the users for a given rule
-   *
-   * @param url url obtained from the link in the ranking siren entity to fetch for the wanted page.
-   *
-   * @return the API result of the get-ranking request
-   */
-  export async function getRankingPage(url: string): Promise<Either<Error | Problem, GetUsersRankingOutput>> {
-    return fetchFunction(url, "GET", null);
-  }
-
-  /**
    * Signs up a user
    *
    * @param username the username of the user
