@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from 'react-router-dom';
 import { UserService } from '../../service/user/UserService';
 import { GameService } from '../../service/game/GameService';
 import { Failure, Success } from '../../utils/Either';
@@ -8,9 +8,22 @@ import { GetUserStatsOutputModel, RuleStatsModel } from '../../service/user/mode
 import { RuleOutputModel } from '../../service/game/models/RuleOutput';
 import { EmbeddedSubEntity } from '../../service/media/siren/SubEntity';
 import { Problem } from '../../service/media/Problem';
-import { AlertDialogWithRedirect } from "../shared/AlertDialog";
+import { AlertDialogWithRedirect } from '../shared/AlertDialog';
 import Loading from '../shared/Loading';
-import Button from "@mui/material/Button";
+import Button from '@mui/material/Button';
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  ThemeProvider,
+  Typography,
+} from '@mui/material';
+import { darkTheme } from '../../index';
 
 type UserDetailsState =
   | { type: 'loading' }
@@ -85,8 +98,8 @@ export const UserDetails: React.FC = () => {
   }, [userId]);
 
   const handleCloseAlert = () => {
-    navigate('/ranking')
-  }
+    navigate('/ranking');
+  };
 
   switch (state.type) {
     case 'loading':
@@ -94,47 +107,46 @@ export const UserDetails: React.FC = () => {
 
     case 'error':
       return (
-          <AlertDialogWithRedirect alert={state.message} redirect={handleCloseAlert}/>
-      )
+        <AlertDialogWithRedirect alert={state.message} redirect={handleCloseAlert} />
+      );
 
     case 'success':
       return (
-        <div>
-          <div className='user-details-header'>
-            <h1>User Details</h1>
-            <h2 className='username'>{state.userDetails.username}</h2>
-          </div>
-          <div className='list-container'>
-            <h2>Stats</h2>
-            <table className='stats-table'>
-              <thead>
-              <tr>
-                <th>Rule Name</th>
-                <th>Rank</th>
-                <th>Games Played</th>
-                <th>Elo</th>
-              </tr>
-              </thead>
-              <tbody>
-              {state.userStatsDetails.map((rule, index) => {
-                const ruleDetails = rule.properties?.ruleId !== undefined ? state.rules.get(rule.properties.ruleId) : null;
-
-                return (
-                  <tr key={index}>
-                    <td>{ruleDetails ? `X${ruleDetails.boardSize} ${ruleDetails.variant} ${ruleDetails.openingRule}` : 'N/A'}</td>
-                    <td>{rule.properties?.rank}</td>
-                    <td>{rule.properties?.gamesPlayed}</td>
-                    <td>{rule.properties?.elo}</td>
-                  </tr>
-                );
-              })}
-              </tbody>
-            </table>
-          </div>
-          <Button variant="contained" color="inherit" onClick={() => navigate(-1)}>
-            Back
-          </Button>
-        </div>
+        <ThemeProvider theme={darkTheme}>
+          <Typography variant='h4' sx={{ mb: 2 }}>
+            User Details: {state.userDetails.username}
+          </Typography>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label='user-stats-table'>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Rule Name</TableCell>
+                  <TableCell>Rank</TableCell>
+                  <TableCell>Games Played</TableCell>
+                  <TableCell>Elo</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {state.userStatsDetails.map((rule, index) => {
+                  const ruleDetails = rule.properties?.ruleId !== undefined ? state.rules.get(rule.properties.ruleId) : null;
+                  return (
+                    <TableRow key={index}>
+                      <TableCell>{ruleDetails ? `X${ruleDetails.boardSize} ${ruleDetails.variant} ${ruleDetails.openingRule}` : 'N/A'}</TableCell>
+                      <TableCell>{rule.properties?.rank}</TableCell>
+                      <TableCell>{rule.properties?.gamesPlayed}</TableCell>
+                      <TableCell>{rule.properties?.elo}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Box sx={{ mt: 2 }}>
+            <Button variant='contained' color='primary' onClick={() => navigate(-1)}>
+              Back
+            </Button>
+          </Box>
+        </ThemeProvider>
       );
   }
 };

@@ -28,13 +28,8 @@ import {
   TextField,
 } from '@mui/material';
 import Button from '@mui/material/Button';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-});
+import { ThemeProvider } from '@mui/material/styles';
+import { darkTheme } from '..';
 
 type RankingState =
   | { type: 'loading' }
