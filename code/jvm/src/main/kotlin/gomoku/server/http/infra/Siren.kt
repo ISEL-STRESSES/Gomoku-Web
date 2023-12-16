@@ -4,7 +4,7 @@ import org.springframework.http.HttpMethod
 import java.net.URI
 
 /**
- * TODO
+ * Builder scope for the Siren hypermedia entities
  */
 open class SirenBuilderScope {
     private val classes = mutableListOf<String>()
@@ -14,28 +14,37 @@ open class SirenBuilderScope {
     private val links = mutableListOf<LinkModel>()
 
     /**
-     * TODO
+     * Adds a class to the entity
+     * @param value The class to be added
      */
     fun clazz(value: String) {
         classes.add(value)
     }
 
     /**
-     * TODO
+     * Adds a property to the entity
+     * @param value The property to be added
      */
     fun property(value: Any) {
         properties = value
     }
 
     /**
-     * TODO
+     * Adds a sub-entity to the entity
+     * @param value The sub-entity to be added
      */
     fun entity(value: EntityModel) {
         entities.add(value)
     }
 
     /**
-     * TODO
+     * Adds an action to the entity
+     * @param name The name of the action
+     * @param title The title of the action
+     * @param method The HTTP method of the action
+     * @param href The URI of the action
+     * @param type The media type of the action
+     * @param fields The fields of the action
      */
     fun action(name: String, title: String, method: HttpMethod, href: URI, type: String, fields: List<Any>) {
         val scope = ActionBuilderScope(name, title, method, href, type, fields)
@@ -43,14 +52,16 @@ open class SirenBuilderScope {
     }
 
     /**
-     * TODO
+     * Adds a link to the entity
+     * @param href The URI of the link
+     * @param rel The relation of the link
      */
     fun link(href: String, rel: LinkRelation) {
         links.add(LinkModel(listOf(rel.value), URI(href).toASCIIString()))
     }
 
     /**
-     * TODO
+     * Builds the entity based on the scope
      */
     fun build() = SirenModel(
         classes,
@@ -62,7 +73,7 @@ open class SirenBuilderScope {
 }
 
 /**
- * TODO
+ * Builder scope for the Siren hypermedia actions
  */
 class ActionBuilderScope(
     private val name: String,
@@ -73,7 +84,7 @@ class ActionBuilderScope(
     private val fields: List<Any>
 ) {
     /**
-     * TODO
+     * Builds the action based on the scope
      */
     fun build() = ActionModel(
         name,
@@ -86,7 +97,8 @@ class ActionBuilderScope(
 }
 
 /**
- * TODO
+ * Creates a Siren hypermedia entity
+ * @param block The builder scope
  */
 fun siren(block: SirenBuilderScope.() -> Unit): SirenModel {
     val scope = SirenBuilderScope()

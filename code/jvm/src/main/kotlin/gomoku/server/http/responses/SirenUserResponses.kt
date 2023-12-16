@@ -18,12 +18,15 @@ import org.springframework.http.HttpMethod
 import java.net.URI
 
 /**
- * TODO
+ * Represents the result of a user creation with
+ * the user's id and token in cookies.
  */
 object SignUpWithCookie {
 
     /**
-     * TODO
+     * Generates a Siren response for the sign-up process.
+     * @param body The response body as a String.
+     * @return Siren response for sign-up.
      */
     fun siren(body: String) =
         siren {
@@ -34,12 +37,15 @@ object SignUpWithCookie {
 }
 
 /**
- * TODO
+ * Represents the result of a user creation without
+ * the user's id and token in cookies.
  */
 object SignUpWithoutCookie {
 
     /**
-     * TODO
+     * Creates a Siren response for sign-up without a cookie.
+     * @param body The UserCreateOutputModel for response.
+     * @return Siren response for sign-up.
      */
     fun siren(body: UserCreateOutputModel) =
         siren {
@@ -50,12 +56,15 @@ object SignUpWithoutCookie {
 }
 
 /**
- * TODO
+ * Represents the result of a user login with
+ * the user's id and token in cookies.
  */
 object LoginWithCookie {
 
     /**
-     * TODO
+     * Generates a Siren response for login with a cookie.
+     * @param body The response body as a String.
+     * @return Siren response for login.
      */
     fun siren(body: String) =
         siren {
@@ -66,12 +75,15 @@ object LoginWithCookie {
 }
 
 /**
- * TODO
+ * Represents the result of a user login without
+ * the user's id and token in cookies.
  */
 object LoginWithoutCookie {
 
     /**
-     * TODO
+     * Creates a Siren response for login without a cookie.
+     * @param body The UserCreateOutputModel for response.
+     * @return Siren response for login.
      */
     fun siren(body: UserCreateOutputModel) =
         siren {
@@ -82,12 +94,17 @@ object LoginWithoutCookie {
 }
 
 /**
- * TODO
+ * Represents the Ranking data for a given rule.
  */
 object GetRanking {
 
     /**
-     * TODO
+     * Builds a Siren response for fetching ranking data.
+     * @param body The GetUsersRankingDataOutputModel for response.
+     * @param totalPages Total number of pages available.
+     * @param currentOffset Current offset for pagination.
+     * @param currentLimit Current limit for pagination.
+     * @return Siren response for ranking data.
      */
     fun siren(body: GetUsersRankingDataOutputModel, totalPages: Int, currentOffset: Int, currentLimit: Int) =
         siren {
@@ -147,12 +164,15 @@ object GetRanking {
 }
 
 /**
- * TODO
+ * Represents the users ranking for a given rule.
  */
 object GetUserRanking {
 
     /**
-     * TODO
+     * Generates a Siren response for a user's ranking.
+     * @param body The UserRuleStatsOutputModel for the user.
+     * @param ruleId The rule ID for the ranking.
+     * @return Siren response for user ranking.
      */
     fun siren(body: UserRuleStatsOutputModel, ruleId: Int) =
         siren {
@@ -164,12 +184,14 @@ object GetUserRanking {
 }
 
 /**
- * TODO
+ * Represents the user statistics.
  */
 object GetUserStats {
 
     /**
-     * TODO
+     * Creates a Siren response for user statistics.
+     * @param body The UserStatsOutputModel for the user.
+     * @return Siren response for user stats.
      */
     fun siren(body: UserStatsOutputModel) =
         siren {
@@ -184,12 +206,13 @@ object GetUserStats {
 }
 
 /**
- * TODO
+ * Represents the result of a user logout.
  */
 object Logout {
 
     /**
-     * TODO
+     * Generates a Siren response for logging out.
+     * @return Siren response for logout.
      */
     fun siren() =
         siren {
@@ -200,12 +223,14 @@ object Logout {
 }
 
 /**
- * TODO
+ * Represents the current user's information.
  */
 object UserMe {
 
     /**
-     * TODO
+     * Builds a Siren response for the current user.
+     * @param body The UserHomeOutputModel for the user.
+     * @return Siren response for user's home data.
      */
     fun siren(body: UserHomeOutputModel) =
         siren {

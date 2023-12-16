@@ -3,7 +3,7 @@ package gomoku.server.http
 import gomoku.server.http.infra.LinkRelation
 
 /**
- * TODO
+ * Link relations used in the API
  */
 object Rel {
 

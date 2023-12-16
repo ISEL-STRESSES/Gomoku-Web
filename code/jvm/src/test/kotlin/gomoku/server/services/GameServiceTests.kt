@@ -340,7 +340,7 @@ class GameServiceTests {
 
     @Test
     fun `getGame should return GameNotFound if the game doesn't exist`() {
-        val gameId = 100
+        val gameId = Int.MAX_VALUE
         val userId = 2
 
         testWithTransactionManagerAndRollback { transactionManager ->

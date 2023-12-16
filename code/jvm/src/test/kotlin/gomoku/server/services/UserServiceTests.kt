@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.random.Random
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -256,8 +257,6 @@ class UserServiceTests {
     fun `revokeToken should do nothing for invalid token`() {
         val invalidToken = "abc"
 
-        userService.revokeToken(invalidToken)
-
-        // TODO(): Add assertions
+        assertFalse(userService.revokeToken(invalidToken))
     }
 }

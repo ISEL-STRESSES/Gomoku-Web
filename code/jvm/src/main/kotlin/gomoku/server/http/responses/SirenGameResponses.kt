@@ -23,12 +23,17 @@ import org.springframework.http.HttpMethod
 import java.net.URI
 
 /**
- * TODO
+ * Represents the retrieval and display of finished games.
  */
 object GetFinishedGames {
 
     /**
-     * TODO
+     * Generates a Siren response for displaying finished games.
+     * @param body The GetFinishedGamesOutputModel containing the finished games.
+     * @param totalPages Total number of pages available for pagination.
+     * @param currentOffset Current page offset in the pagination.
+     * @param currentLimit Maximum number of items per page.
+     * @return Siren response for the finished games list.
      */
     fun siren(body: GetFinishedGamesOutputModel, totalPages: Int, currentOffset: Int, currentLimit: Int) =
         siren {
@@ -65,12 +70,14 @@ object GetFinishedGames {
 }
 
 /**
- * TODO
+ * Represents the retrieval of a specific game by its ID.
  */
 object GetGameById {
 
     /**
-     * TODO
+     * Creates a Siren response for a specific game's details.
+     * @param body The GameOutputModel containing detailed information about the game.
+     * @return Siren response for the specific game.
      */
     fun siren(body: GameOutputModel) =
         siren {
@@ -111,12 +118,14 @@ object GetGameById {
 }
 
 /**
- * TODO
+ * Represents the retrieval of game rules.
  */
 object GetRules {
 
     /**
-     * TODO
+     * Generates a Siren response for listing game rules.
+     * @param body The GetRulesOutputModel containing the list of game rules.
+     * @return Siren response for the rules list.
      */
     fun siren(body: GetRulesOutputModel) =
         siren {
@@ -130,10 +139,15 @@ object GetRules {
         }
 }
 
+/**
+ * Represents the retrieval of a specific rule by its ID.
+ */
 object GetRuleById {
 
     /**
-     * TODO
+     * Creates a Siren response for a specific rule's details.
+     * @param body The RuleOutputModel containing detailed information about the rule.
+     * @return Siren response for the specific rule.
      */
     fun siren(body: RuleOutputModel) =
         siren {
@@ -155,12 +169,14 @@ object GetRuleById {
 }
 
 /**
- * TODO
+ * Represents the matchmaker functionality for game lobby management.
  */
 object Matchmaker {
 
     /**
-     * TODO
+     * Generates a Siren response for the matchmaker output.
+     * @param body The MatchmakerOutputModel containing matchmaker information.
+     * @return Siren response for the matchmaker.
      */
     fun siren(body: MatchmakerOutputModel) =
         siren {
@@ -183,12 +199,14 @@ object Matchmaker {
 }
 
 /**
- * TODO
+ * Represents the functionality for a user to leave a game lobby.
  */
 object LeaveLobby {
 
     /**
-     * TODO
+     * Creates a Siren response for leaving a lobby.
+     * @param body The LeaveLobbyOutput containing information about the lobby left.
+     * @return Siren response for leaving the lobby.
      */
     fun siren(body: LeaveLobbyOutput) =
         siren {
@@ -199,12 +217,14 @@ object LeaveLobby {
 }
 
 /**
- * TODO
+ * Represents the functionality for a user to join a game lobby.
  */
 object JoinLobby {
 
     /**
-     * TODO
+     * Generates a Siren response for joining a lobby.
+     * @param body The Matchmaker object representing the lobby to join.
+     * @return Siren response for joining the lobby.
      */
     fun siren(body: Matchmaker) =
         siren {
@@ -215,12 +235,14 @@ object JoinLobby {
 }
 
 /**
- * TODO
+ * Represents the retrieval of available game lobbies.
  */
 object GetLobbies {
 
     /**
-     * TODO
+     * Creates a Siren response for listing available lobbies.
+     * @param body The GetLobbiesOutput containing the list of available lobbies.
+     * @return Siren response for the lobbies list.
      */
     fun siren(body: GetLobbiesOutput) =
         siren {
@@ -275,12 +297,14 @@ object GetLobbies {
 }
 
 /**
- * TODO
+ * Represents the functionality for creating a game lobby.
  */
 object CreateLobby {
 
     /**
-     * TODO
+     * Generates a Siren response for creating a lobby.
+     * @param body The Matchmaker object representing the new lobby.
+     * @return Siren response for creating the lobby.
      */
     fun siren(body: Matchmaker) =
         siren {
@@ -301,12 +325,14 @@ object CreateLobby {
 }
 
 /**
- * TODO
+ * Represents the retrieval of a specific lobby by its ID.
  */
 object GetLobbyById {
 
     /**
-     * TODO
+     * Creates a Siren response for a specific lobby's details.
+     * @param body The Lobby object containing detailed information about the lobby.
+     * @return Siren response for the specific lobby.
      */
     fun siren(body: Lobby) =
         siren {
@@ -317,12 +343,14 @@ object GetLobbyById {
 }
 
 /**
- * TODO
+ * Represents the functionality for making a move in a game.
  */
 object MakeMove {
 
     /**
-     * TODO
+     * Generates a Siren response for making a move in a game.
+     * @param body The GameOutputModel representing the state of the game after the move.
+     * @return Siren response for the game state post-move.
      */
     fun siren(body: GameOutputModel) =
         siren {
@@ -333,12 +361,14 @@ object MakeMove {
 }
 
 /**
- * TODO
+ * Represents the retrieval of the current turn in a game.
  */
 object GetTurn {
 
     /**
-     * TODO
+     * Creates a Siren response for the current turn in a game.
+     * @param body The CurrentTurnPlayerOutput indicating who has the current turn.
+     * @return Siren response for the current turn.
      */
     fun siren(body: CurrentTurnPlayerOutput) =
         siren {
@@ -349,12 +379,14 @@ object GetTurn {
 }
 
 /**
- * TODO
+ * Represents the functionality for a user to forfeit a game.
  */
 object ForfeitGame {
 
     /**
-     * TODO
+     * Generates a Siren response for forfeiting a game.
+     * @param body The GameOutputModel representing the state of the game after forfeit.
+     * @return Siren response for the game state post-forfeit.
      */
     fun siren(body: GameOutputModel) =
         siren {
@@ -365,12 +397,14 @@ object ForfeitGame {
 }
 
 /**
- * TODO
+ * Represents the retrieval of ongoing games.
  */
 object GetOngoingGames {
 
     /**
-     * TODO
+     * Creates a Siren response for listing ongoing games.
+     * @param body The list of GameOutputModel representing the ongoing games.
+     * @return Siren response for the list of ongoing games.
      */
     fun siren(body: List<GameOutputModel>) =
         siren {
