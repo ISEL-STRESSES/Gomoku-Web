@@ -146,7 +146,7 @@ class JDBIGameRepositoryTests {
         val repo = JDBIGameRepository(handle)
         val uRepo = JDBIUserRepository(handle)
 
-        val gameIdNull = repo.getGameById(31)
+        val gameIdNull = repo.getGameById(31) //TODO: Change this, this is bad because it relies on the database not having a game with id 31, change this and any tests that depend on this.
         assertNull(gameIdNull)
 
         val player1 = uRepo.getUserById(1)

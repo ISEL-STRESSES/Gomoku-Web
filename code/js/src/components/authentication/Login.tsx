@@ -6,7 +6,7 @@ import { Failure, Success } from '../../utils/Either';
 import { Problem } from '../../service/media/Problem';
 import { Alert, IconButton, InputAdornment, Stack, TextField } from '@mui/material';
 import { useSetUser } from "./Authn";
-import { getUserName } from "../../utils/cookieUtils";
+import { getUser } from "../../utils/cookieUtils";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 type State =
@@ -89,7 +89,7 @@ export function Login() {
     authFunction(state.inputs.username, state.inputs.password)
       .then(res => {
         if (res instanceof Success) {
-          setUser(getUserName())
+          setUser(getUser())
           dispatch({ type: 'success' });
         } else if (res instanceof Failure) {
           if (res.value instanceof Error) {

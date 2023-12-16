@@ -4,7 +4,7 @@ import {
   createContext,
   useContext, useEffect,
 } from 'react';
-import { getUserName } from '../../utils/cookieUtils';
+import { getUser } from '../../utils/cookieUtils';
 
 type ContextType = {
   user: string | undefined,
@@ -22,9 +22,9 @@ export function AuthnContainer({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const username = getUserName();
-    if (username) {
-      setUser(username);
+    const user = getUser();
+    if (user) {
+      setUser(user);
     }
     setLoading(false);
   }, []);
