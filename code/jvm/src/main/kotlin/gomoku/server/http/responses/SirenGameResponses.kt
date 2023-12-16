@@ -166,7 +166,7 @@ object Matchmaker {
         siren {
             clazz(Rel.MATCHMAKER.value)
             property(body)
-            if (!body.isGame){
+            if (!body.isGame) {
                 action(
                     "leave-lobby",
                     "Leave Lobby",

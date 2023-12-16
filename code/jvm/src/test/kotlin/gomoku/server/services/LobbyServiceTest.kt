@@ -1,21 +1,37 @@
 package gomoku.server.services
 
+import gomoku.server.TestClock
 import gomoku.server.deleteLobbies
+import gomoku.server.domain.user.Sha256TokenEncoder
+import gomoku.server.domain.user.UsersDomain
+import gomoku.server.domain.user.UsersDomainConfig
 import gomoku.server.failureOrNull
 import gomoku.server.services.errors.lobby.GetLobbyError
 import gomoku.server.services.errors.lobby.JoinLobbyError
 import gomoku.server.services.errors.lobby.LeaveLobbyError
 import gomoku.server.services.game.GameService
 import gomoku.server.services.lobby.LobbyService
+import gomoku.server.services.user.UserService
 import gomoku.server.testWithTransactionManagerAndRollback
 import gomoku.utils.Failure
 import gomoku.utils.Success
 import org.junit.jupiter.api.Test
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import kotlin.math.abs
+import kotlin.random.Random
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.time.Duration
 
 class LobbyServiceTest {
+
+    private val usersDomain = UsersDomain(
+        BCryptPasswordEncoder(),
+        Sha256TokenEncoder(),
+        UsersDomainConfig(10, Duration.INFINITE, Duration.INFINITE, 10)
+    )
+    private val clock = TestClock()
 
     @Test
     fun `leave lobby`() {
@@ -155,21 +171,24 @@ class LobbyServiceTest {
     }
 
     @Test
-    fun `get all available lobbies`() {
+    fun `get all available lobbies from user`() {
         testWithTransactionManagerAndRollback { transactionManager ->
             // before
             deleteLobbies()
 
             // test
             val lobbyService = LobbyService(transactionManager)
+            val userService = UserService(transactionManager, usersDomain, clock)
+            val newUser = userService.createUser(newTestUserName(), "!Kz9iYG$%TcB27f")
+            require(newUser is Success)
 
             val nrOfLobbies = 3
             repeat(nrOfLobbies) {
-                lobbyService.createLobby(it + 1, it + 1)
+                lobbyService.createLobby(it + 1, newUser.value.userId)
             }
 
-            val sut = lobbyService.getLobbies()
-            assertEquals(sut.size, nrOfLobbies)
+            val sut = lobbyService.getLobbiesByUserId(newUser.value.userId)
+            assertEquals(nrOfLobbies, sut.size)
         }
     }
 
@@ -207,5 +226,8 @@ class LobbyServiceTest {
             require(sut is Failure)
             assert(sut.value is GetLobbyError.LobbyNotFound)
         }
+    }
+    companion object {
+        private fun newTestUserName() = "User${abs(Random.nextLong())}"
     }
 }

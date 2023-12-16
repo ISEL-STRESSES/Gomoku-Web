@@ -40,7 +40,7 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             on users.id = lobby.user_id
             join rules
             on lobby.rules_id = rules.id 
-            where lobby.rules_id = :ruleId and lobby.started = false and lobby.user_id != :userId
+            where lobby.rules_id = :ruleId and lobby.started = false
             """.trimIndent()
         )
             .bind("ruleId", ruleId)
@@ -49,16 +49,16 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             .list()
 
     /**
-     * Gets all lobbies
+     * Gets all lobbies that the user is in
      * @return The list of lobbies
      */
-    override fun getLobbies(userId: Int): List<Lobby> =
+    override fun getLobbiesByUserId(userId: Int): List<Lobby> =
         handle.createQuery(
             """
             SELECT lobby.id, lobby.started, lobby.game_id, rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id
             FROM lobby join rules 
             on lobby.rules_id = rules.id
-            where lobby.started = false and lobby.user_id != :userId
+            where lobby.started = false and lobby.user_id = :userId
             """.trimIndent()
         )
             .bind("userId", userId)
@@ -80,24 +80,6 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             """.trimIndent()
         )
             .bind("lobbyId", lobbyId)
-            .mapTo<Lobby>()
-            .singleOrNull()
-
-    /**
-     * Gets a lobby by the id of one of its players
-     * @param userId The id of the player
-     * @return The lobby or null if no lobby with the given id exists
-     */
-    override fun getLobbyByUserId(userId: Int): Lobby? =
-        handle.createQuery(
-            """
-            SELECT lobby.id, lobby.started, lobby.game_id, rules.id as rules_id, rules.board_size, rules.variant, rules.opening_rule, lobby.user_id            
-            FROM lobby join rules 
-            on rules.id = lobby.rules_id
-            where lobby.user_id = :userId
-            """.trimIndent()
-        )
-            .bind("userId", userId)
             .mapTo<Lobby>()
             .singleOrNull()
 

@@ -71,7 +71,7 @@ class LobbyController(private val lobbyService: LobbyService) {
      */
     @GetMapping(URIs.Lobby.GET_LOBBIES)
     fun getLobbies(authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
-        val lobbies = lobbyService.getLobbies(authenticatedUser.user.uuid)
+        val lobbies = lobbyService.getLobbiesByUserId(authenticatedUser.user.uuid)
         return GetLobbies.siren(GetLobbiesOutput(lobbies)).response(200)
     }
 
@@ -132,6 +132,7 @@ class LobbyController(private val lobbyService: LobbyService) {
     private fun MatchmakingError.resolveProblem(): ResponseEntity<*> =
         when (this) {
             MatchmakingError.SamePlayer -> Problem.response(400, Problem.samePlayer)
+            MatchmakingError.LobbyNotFound -> Problem.response(404, Problem.lobbyNotFound)
             MatchmakingError.LeaveLobbyFailed -> Problem.response(500, Problem.leaveLobbyFailed)
             MatchmakingError.LobbySateChangeFailed -> Problem.response(500, Problem.lobbySateChangeFailed)
         }

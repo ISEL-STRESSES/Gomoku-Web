@@ -32,25 +32,24 @@ class AuthenticationInterceptor(
             it.parameterType == AuthenticatedUser::class.java
         }
         ) {
-
             // check authorization in Authorization Header
             val userFromAuthorization = authorizationHeaderProcessor
                 .processAuthorizationHeaderValue(request.getHeader(NAME_AUTHORIZATION_HEADER))
 
-            //check authorization in cookies
+            // check authorization in cookies
             val token = request.cookies?.firstOrNull { it.name == TOKEN_COOKIE }?.value
             val usernameFromCookie = request.cookies?.firstOrNull { it.name == USERNAME_COOKIE }?.value
 
-            if (userFromAuthorization != null && token != null && usernameFromCookie != null){
+            if (userFromAuthorization != null && token != null && usernameFromCookie != null) {
                 throw Exception("Both authorization header and cookies are present")
-            } else if(userFromAuthorization == null && token == null && usernameFromCookie == null){
+            } else if (userFromAuthorization == null && token == null && usernameFromCookie == null) {
                 response.status = 401
                 response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, TOKEN_COOKIE)
                 response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)
                 return false
             }
 
-            //Handle if token is in cookies
+            // Handle if token is in cookies
             if (usernameFromCookie != null && token != null) {
                 val userFromCookie = authorizationHeaderProcessor.userService.getUserByToken(token)
                 val authUserFromCookie = userFromCookie?.let { AuthenticatedUser(it, token) }
@@ -64,7 +63,7 @@ class AuthenticationInterceptor(
                 }
             }
 
-            //Handle if token is in authorization
+            // Handle if token is in authorization
             return if (userFromAuthorization == null) {
                 response.status = 401
                 response.addHeader(NAME_WWW_AUTHENTICATE_HEADER, RequestTokenProcessor.SCHEME)

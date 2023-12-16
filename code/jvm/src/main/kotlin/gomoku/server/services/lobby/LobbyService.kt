@@ -25,23 +25,24 @@ class LobbyService(private val transactionManager: TransactionManager) {
      * @see MatchmakingResult
      */
     fun startMatchmakingProcess(ruleId: Int, userId: Int): MatchmakingResult {
-        return transactionManager.run {
-            val lobby = it.lobbyRepository.getLobbiesByRuleId(userId, ruleId).firstOrNull()
+        return transactionManager.run { transaction ->
+            val lobbies = transaction.lobbyRepository.getLobbiesByRuleId(userId, ruleId)
 
-            if (lobby != null) {
-                if (lobby.userId == userId) {
+            if (lobbies.isNotEmpty()) {
+                if (lobbies.any { it.userId == userId }) {
                     return@run failure(MatchmakingError.SamePlayer)
                 }
+                val lobby = lobbies.firstOrNull() ?: return@run failure(MatchmakingError.LobbyNotFound)
                 val playerBlack = if (Random.nextBoolean()) userId else lobby.userId
                 val playerWhite = if (playerBlack == userId) lobby.userId else userId
-                val gameId = it.gameRepository.createGame(ruleId, playerBlack, playerWhite)
-                val stateChanged = it.lobbyRepository.changeLobbySate(lobby.id, gameId)
+                val gameId = transaction.gameRepository.createGame(ruleId, playerBlack, playerWhite)
+                val stateChanged = transaction.lobbyRepository.changeLobbySate(lobby.id, gameId)
                 if (!stateChanged) {
                     return@run failure(MatchmakingError.LobbySateChangeFailed)
                 }
                 return@run success(Matchmaker(true, gameId))
             } else {
-                return@run success(Matchmaker(false, it.lobbyRepository.createLobby(ruleId, userId)))
+                return@run success(Matchmaker(false, transaction.lobbyRepository.createLobby(ruleId, userId)))
             }
         }
     }
@@ -103,9 +104,9 @@ class LobbyService(private val transactionManager: TransactionManager) {
      * Gets all the lobbies.
      * @return List of lobbies.
      */
-    fun getLobbies(userId: Int): List<Lobby> =
+    fun getLobbiesByUserId(userId: Int): List<Lobby> =
         transactionManager.run {
-            it.lobbyRepository.getLobbies(userId)
+            it.lobbyRepository.getLobbiesByUserId(userId)
         }
 
     /**

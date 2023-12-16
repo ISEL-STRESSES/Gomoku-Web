@@ -20,8 +20,13 @@ private const val sirenMediaType = "application/vnd.siren+json"
  * @return The result of the matchmaking process
  */
 fun startMatchmakingProcess(client: WebTestClient, token: String) =
-    client.post().uri("/game/start/2")
+    client.post().uri("/lobby/start")
         .header("Authorization", "bearer $token")
+        .bodyValue(
+            mapOf(
+                "ruleId" to 1
+            )
+        )
         .exchange()
         .expectStatus().is2xxSuccessful
         .expectBody()
@@ -40,8 +45,14 @@ fun startMatchmakingProcess(client: WebTestClient, token: String) =
  * @return The result of the move
  */
 fun makeMove(client: WebTestClient, gameId: Int, x: Int, y: Int, token: String, headerContentType: String = sirenMediaType): ByteArray =
-    client.post().uri("/game/$gameId/play?x=$x&y=$y")
+    client.post().uri("/game/$gameId/play")
         .header("Authorization", "bearer $token")
+        .bodyValue(
+            mapOf(
+                "x" to x,
+                "y" to y
+            )
+        )
         .exchange()
         .expectHeader().valueEquals("Content-Type", headerContentType)
         .expectBody()
@@ -124,8 +135,13 @@ fun getRules(client: WebTestClient): ByteArray =
  * @return True if the user left the lobby, false otherwise
  */
 fun leaveLobby(client: WebTestClient, lobbyId: Int, userToken: String) =
-    client.post().uri("/lobby/$lobbyId/leave")
+    client.post().uri("/lobby/leave")
         .header("Authorization", "bearer $userToken")
+        .bodyValue(
+            mapOf(
+                "lobbyId" to lobbyId
+            )
+        )
         .exchange()
         .expectStatus().isOk
         .expectBody<Unit>()
@@ -169,7 +185,7 @@ fun getTurnFromGame(client: WebTestClient, gameId: Int, userToken: String) =
 
 fun getPlayerRuleStats(client: WebTestClient, userId: Int): PlayerRuleStatsResponse {
     var playerRuleStatsResponse: PlayerRuleStatsResponse? = null
-    client.get().uri("/users/$userId/ranking/2")
+    client.get().uri("/users/$userId/ranking/1")
         .exchange()
         .expectStatus().isOk
         .expectBody()
@@ -177,17 +193,15 @@ fun getPlayerRuleStats(client: WebTestClient, userId: Int): PlayerRuleStatsRespo
             val json = String(response.responseBody!!)
             val node = ObjectMapper().readTree(json)
             val properties = node.get("properties")
-            val ruleIdR = properties.get("ruleId").asInt()
             val userIdR = properties.get("id").asInt()
             val username = properties.get("username").asText()
             val gamesPlayed = properties.get("gamesPlayed").asInt()
             val elo = properties.get("elo").asInt()
             assertNotNull(userIdR)
             assertNotNull(username)
-            assertNotNull(ruleIdR)
             assertNotNull(gamesPlayed)
             assertNotNull(elo)
-            playerRuleStatsResponse = PlayerRuleStatsResponse(userIdR, username, ruleIdR, gamesPlayed, elo)
+            playerRuleStatsResponse = PlayerRuleStatsResponse(userIdR, username, gamesPlayed, elo)
         }
     requireNotNull(playerRuleStatsResponse)
     return playerRuleStatsResponse!!
@@ -203,8 +217,13 @@ fun forfeitGame(client: WebTestClient, gameId: Int, userToken: String): ByteArra
         .responseBody!!
 
 fun joinLobby(client: WebTestClient, lobbyId: Int, userToken: String) =
-    client.post().uri("/lobby/$lobbyId/join")
+    client.post().uri("/lobby/join")
         .header("Authorization", "bearer $userToken")
+        .bodyValue(
+            mapOf(
+                "lobbyId" to lobbyId
+            )
+        )
         .exchange()
         .expectStatus().isCreated
         .expectBody()
@@ -212,7 +231,7 @@ fun joinLobby(client: WebTestClient, lobbyId: Int, userToken: String) =
         .responseBody!!
 
 fun getLobbies(client: WebTestClient, userToken: String): ByteArray =
-    client.get().uri("/lobbies")
+    client.get().uri("/lobby/")
         .header("Authorization", "bearer $userToken")
         .exchange()
         .expectStatus().isOk
@@ -221,8 +240,13 @@ fun getLobbies(client: WebTestClient, userToken: String): ByteArray =
         .responseBody!!
 
 fun createLobby(client: WebTestClient, ruleId: Int, userToken: String): ByteArray =
-    client.post().uri("/lobby/create/$ruleId")
+    client.post().uri("/lobby/create")
         .header("Authorization", "bearer $userToken")
+        .bodyValue(
+            mapOf(
+                "ruleId" to ruleId
+            )
+        )
         .exchange()
         .expectStatus().isCreated
         .expectBody()

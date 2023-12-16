@@ -137,7 +137,6 @@ class UserController(private val service: UserService) {
         }
     }
 
-
     /**
      * Creates a token for a user given its username and password, for example to login
      * @param userInput The user input
@@ -163,7 +162,6 @@ class UserController(private val service: UserService) {
             }
         }
     }
-
 
     /**
      * Logs out a user given its token
@@ -221,7 +219,6 @@ class UserController(private val service: UserService) {
             UserRankingError.UserStatsNotFound -> Problem.response(404, Problem.userStatsNotFound)
         }
 
-
     companion object {
         const val DEFAULT_OFFSET = 0
         const val DEFAULT_LIMIT = 10
@@ -272,5 +269,4 @@ class UserController(private val service: UserService) {
         response.addCookie(accessTokenCookie)
         response.addCookie(usernameCookie)
     }
-
 }

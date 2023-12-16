@@ -81,23 +81,23 @@ tasks.withType<Test> {
  *      docker exec -ti db-tests psql -d postgres -U postgres -W
  *   and provide it with the same password as define on `tests/Dockerfile-ubuntu-spring-nginx-db-test`
  */
-task<Exec>("dbTestsUp") {
-    commandLine("docker-compose", "up", "-d", "--build", "--force-recreate", "db-tests")
-}
-
-task<Exec>("dbTestsWait") {
-    commandLine("docker", "exec", "db-tests", "/app/bin/wait-for-postgres.sh", "localhost")
-    dependsOn("dbTestsUp")
-}
-
-task<Exec>("dbTestsDown") {
-    commandLine("docker-compose", "down")
-}
-
-tasks.named("check") {
-    dependsOn("dbTestsWait")
-    finalizedBy("dbTestsDown")
-}
+// task<Exec>("dbTestsUp") {
+//    commandLine("docker-compose", "up", "-d", "--build", "--force-recreate", "db-tests")
+// }
+//
+// task<Exec>("dbTestsWait") {
+//    commandLine("docker", "exec", "db-tests", "/app/bin/wait-for-postgres.sh", "localhost")
+//    dependsOn("dbTestsUp")
+// }
+//
+// task<Exec>("dbTestsDown") {
+//    commandLine("docker-compose", "down")
+// }
+//
+// tasks.named("check") {
+//    dependsOn("dbTestsWait")
+//    finalizedBy("dbTestsDown")
+// }
 
 /**
  * Docker related tasks

@@ -199,7 +199,7 @@ class UserTests {
             .header("Authorization", "bearer token-invalid")
             .exchange()
             .expectStatus().isUnauthorized
-            .expectHeader().valueEquals("WWW-Authenticate", "bearer")
+            .expectHeader().valueEquals("WWW-Authenticate", "tokenCookie", "bearer")
 
         // when: revoking the token
         // then: response is a 200
@@ -214,7 +214,7 @@ class UserTests {
             .header("Authorization", "bearer $tokenValue")
             .exchange()
             .expectStatus().isUnauthorized
-            .expectHeader().valueEquals("WWW-Authenticate", "bearer")
+            .expectHeader().valueEquals("WWW-Authenticate", "tokenCookie", "bearer")
     }
 
     @Test
@@ -258,7 +258,7 @@ class UserTests {
 
         // when: searching for the stats of a user
         // then: the response is a 200
-        client.get().uri("/users/stats/$userId")
+        client.get().uri("/users/$userId")
             .exchange()
             .expectStatus().isOk
     }
@@ -293,7 +293,7 @@ class UserTests {
             .exchange()
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("$.properties.ruleId").isEqualTo(ruleId)
+            .jsonPath("$.properties.id").isEqualTo(userId)
             .jsonPath("$.properties.gamesPlayed").isEqualTo(5)
             .jsonPath("$.properties.elo").isEqualTo(1500)
     }
@@ -399,7 +399,7 @@ class UserTests {
         // given: an HTTP client
         val client = WebTestClient.bindToServer().baseUrl("http://localhost:$port/api").build()
 
-        // and: a random user id
+        // and: a user id
         val userId = 1
 
         // when: searching for a user with that user id
@@ -408,7 +408,7 @@ class UserTests {
             .exchange()
             .expectStatus().isOk
             .expectBody()
-            .jsonPath("$.properties.uuid").isEqualTo(userId)
+            .jsonPath("$.properties.userId").isEqualTo(userId)
             .jsonPath("$.properties.username").isEqualTo("user1")
     }
 

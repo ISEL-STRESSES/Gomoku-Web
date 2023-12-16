@@ -8,6 +8,7 @@ import kotlin.math.pow
  * @property uuid The uuid of the user.
  * @property username The username of the user.
  * @property ruleId The id of the rule the user is playing.
+ * @property rank The rank of the user.
  * @property gamesPlayed The number of games played by the user.
  * @property elo The elo of the user.
  */

@@ -1,11 +1,7 @@
 package gomoku.server.services
 
-import gomoku.server.TestClock
 import gomoku.server.deleteLobbies
 import gomoku.server.domain.game.game.FinishedGame
-import gomoku.server.domain.user.Sha256TokenEncoder
-import gomoku.server.domain.user.UsersDomain
-import gomoku.server.domain.user.UsersDomainConfig
 import gomoku.server.failureOrNull
 import gomoku.server.repository.createFinishedGame
 import gomoku.server.services.errors.game.GetGameError
@@ -19,18 +15,9 @@ import gomoku.utils.Failure
 import gomoku.utils.Success
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.test.Test
-import kotlin.time.Duration
 
 class GameServiceTests {
-
-    private val usersDomain = UsersDomain(
-        BCryptPasswordEncoder(),
-        Sha256TokenEncoder(),
-        UsersDomainConfig(10, Duration.INFINITE, Duration.INFINITE, 10)
-    )
-    private val clock = TestClock()
 
 //    @Test
 //    fun `startMatchmakingProcess should start a new lobby if no existing lobbies with the same ruleId exist`() {
@@ -240,7 +227,6 @@ class GameServiceTests {
         val userId = 2
 
         testWithTransactionManagerAndRollback { transactionManager ->
-            val gameService = GameService(transactionManager)
             val lobbyService = LobbyService(transactionManager)
 
             val result = lobbyService.leaveLobby(2, userId)
@@ -255,7 +241,6 @@ class GameServiceTests {
         val userId = 2
 
         testWithTransactionManagerAndRollback { transactionManager ->
-            val gameService = GameService(transactionManager)
             val lobbyService = LobbyService(transactionManager)
             val dummyLobby = transactionManager.run {
                 deleteLobbies(transactionManager)
@@ -368,9 +353,9 @@ class GameServiceTests {
     }
 
     @Test
-    fun `getGame should return PlayerNotFound if the game doesn't exist`() {
+    fun `getGame should return PlayerNotFound if the player doesn't exist`() {
         val gameId = 1
-        val userId = 100
+        val userId = Int.MAX_VALUE
 
         testWithTransactionManagerAndRollback { transactionManager ->
             val gameService = GameService(transactionManager)

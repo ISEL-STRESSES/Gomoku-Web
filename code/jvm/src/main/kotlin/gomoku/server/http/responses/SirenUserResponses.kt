@@ -2,11 +2,11 @@ package gomoku.server.http.responses
 
 import gomoku.server.http.Rel
 import gomoku.server.http.URIs
-import gomoku.server.http.controllers.user.models.userCreate.UserCreateOutputModel
 import gomoku.server.http.controllers.user.models.UserRuleStatsOutputModel
 import gomoku.server.http.controllers.user.models.UserStatsOutputModel
 import gomoku.server.http.controllers.user.models.getHome.UserHomeOutputModel
 import gomoku.server.http.controllers.user.models.getUsersData.GetUsersRankingDataOutputModel
+import gomoku.server.http.controllers.user.models.userCreate.UserCreateOutputModel
 import gomoku.server.http.infra.ActionFieldModel
 import gomoku.server.http.infra.EntityModel
 import gomoku.server.http.infra.LinkModel
@@ -143,7 +143,6 @@ object GetRanking {
                     )
                 }
             }
-
         }
 }
 
@@ -213,7 +212,7 @@ object UserMe {
             clazz(Rel.USER.value)
             property(PropertyUserStatsModel(body.userId, body.username, body.userStats.size))
             body.userStats.forEach {
-                entity(EntityModel(listOf(Rel.USER_RANKING.value), emptyList(),  it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Users.ROOT + "/${body.userId}/ranking/${it.ruleId}"))))
+                entity(EntityModel(listOf(Rel.USER_RANKING.value), emptyList(), it, listOf(LinkModel(listOf(Rel.SELF.value), URIs.Users.ROOT + "/${body.userId}/ranking/${it.ruleId}"))))
             }
             action(
                 "get-lobbies",

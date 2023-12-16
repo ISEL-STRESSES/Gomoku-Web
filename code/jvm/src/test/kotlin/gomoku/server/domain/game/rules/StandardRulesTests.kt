@@ -1,11 +1,14 @@
 package gomoku.server.domain.game.rules
 
 import gomoku.server.domain.game.game.CellColor
+import gomoku.server.domain.game.game.Turn
 import gomoku.server.domain.game.game.move.Move
 import gomoku.server.domain.game.game.move.MoveContainer
 import gomoku.server.domain.game.game.move.Position
 import gomoku.utils.Failure
 import gomoku.utils.Success
+import kotlin.math.abs
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -18,15 +21,17 @@ class StandardRulesTests {
     fun `isValidMove checks for unoccupied spots`() {
         val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(7))
         assertNotNull(result)
-        assertTrue(rule.isValidMove(result, Move(Position(8, 4), CellColor.WHITE), CellColor.WHITE) is Success)
-        assertTrue(rule.isValidMove(result, Move(Position(7, 0), CellColor.WHITE), CellColor.WHITE) is Failure)
+        val randomUserId = abs(Random.nextLong()).toInt()
+        assertTrue(rule.isValidMove(result, Move(Position(8, 4), CellColor.WHITE), Turn(CellColor.WHITE, randomUserId)) is Success)
+        assertTrue(rule.isValidMove(result, Move(Position(7, 0), CellColor.WHITE), Turn(CellColor.WHITE, randomUserId + 1)) is Failure)
     }
 
     @Test
     fun `isValidMove checks for alternating colors`() {
         val result = MoveContainer.buildMoveContainer(rule.boardSize.value, listOf(7))
+        val randomUserId = abs(Random.nextLong()).toInt()
         assertNotNull(result)
-        assertTrue(rule.isValidMove(result, Move(Position(8, 1), CellColor.BLACK), CellColor.WHITE) is Failure)
+        assertTrue(rule.isValidMove(result, Move(Position(8, 1), CellColor.BLACK), Turn(CellColor.WHITE, randomUserId)) is Failure)
     }
 
     @Test

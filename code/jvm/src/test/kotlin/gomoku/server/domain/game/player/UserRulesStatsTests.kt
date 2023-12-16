@@ -8,7 +8,7 @@ import org.junit.jupiter.api.assertThrows
 class UserRulesStatsTests {
     @Test
     fun `PlayerRuleStats initializes with valid values`() {
-        val stats = RankingUserData(1, "", 1, 10, 2000)
+        val stats = RankingUserData(uuid = 1, username = "", ruleId = 1, gamesPlayed = 10, elo = 2000)
 
         assertEquals(1, stats.ruleId)
         assertEquals(10, stats.gamesPlayed)
@@ -18,7 +18,7 @@ class UserRulesStatsTests {
     @Test
     fun `PlayerRuleStats throws exception for negative gamesPlayed`() {
         assertThrows<IllegalArgumentException> {
-            RankingUserData(1, "", 1, -1, 2000)
+            RankingUserData(uuid = 1, username = "", ruleId = 1, gamesPlayed = -1, elo = 2000)
         }
     }
 
@@ -32,7 +32,7 @@ class UserRulesStatsTests {
     @Test
     fun `PlayerRuleStats throws exception for elo greater than 4000`() {
         assertThrows<IllegalArgumentException> {
-            RankingUserData(1, "", 1, 10, 4001)
+            RankingUserData(uuid = 1, username = "", ruleId = 1, gamesPlayed = 10, elo = 4001)
         }
     }
 }

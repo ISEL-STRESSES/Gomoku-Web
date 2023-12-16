@@ -161,6 +161,12 @@ class GameController(private val gameService: GameService) {
             is Success -> ForfeitGame.siren(GameOutputModel.fromGame(forfeitResult.value)).response(200)
         }
     }
+
+    /**
+     * Gets the list of ongoing games
+     * @param authenticatedUser The authenticated user
+     * @return The list of games
+     */
     @GetMapping(URIs.Game.ONGOING_GAMES)
     fun ongoingGames(
         authenticatedUser: AuthenticatedUser
@@ -213,6 +219,11 @@ class GameController(private val gameService: GameService) {
             GetGameError.PlayerNotFound -> Problem.response(404, Problem.userNotFound)
         }
 
+    /**
+     * Translates the errors of a Rule action into a response
+     * @receiver The error
+     * @return The response
+     */
     private fun RuleError.resolveProblem(): ResponseEntity<*> =
         when (this) {
             RuleError.RuleNotFound -> Problem.response(404, Problem.ruleNotFound)

@@ -67,7 +67,7 @@ class GomokuWebApplication {
      */
     @Bean
     fun serverInfo() = ServerInfo(
-        version = "0.1.1",
+        version = "1.0.2",
         authors = listOf(
             Author(
                 studentID = 48335,

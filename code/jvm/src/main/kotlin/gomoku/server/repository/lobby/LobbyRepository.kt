@@ -8,10 +8,10 @@ import gomoku.server.domain.game.Lobby
 interface LobbyRepository {
 
     /**
-     * Gets all lobbies
+     * Gets all lobbies by user id
      * @return The list of lobbies
      */
-    fun getLobbies(userId: Int): List<Lobby>
+    fun getLobbiesByUserId(userId: Int): List<Lobby>
 
     fun getLobbiesByRuleId(userId: Int, ruleId: Int): List<Lobby>
 
@@ -30,13 +30,6 @@ interface LobbyRepository {
     fun getLobbyByRuleId(ruleId: Int): Lobby?
 
     /**
-     * Gets a lobby by the id of one of its players
-     * @param userId The id of the player
-     * @return The lobby or null if no lobby with the given id exists
-     */
-    fun getLobbyByUserId(userId: Int): Lobby?
-
-    /**
      * Creates a lobby with a player
      * @param ruleId the rule id to create a lobby with
      * @param userId The id of the user to join
@@ -50,5 +43,11 @@ interface LobbyRepository {
      */
     fun leaveLobby(lobbyId: Int, userId: Int): Boolean
 
+    /**
+     * Changes the state of a lobby
+     * @param lobbyId The id of the lobby
+     * @param gameId The id of the game
+     * @return True if the state was changed, false otherwise
+     */
     fun changeLobbySate(lobbyId: Int, gameId: Int): Boolean
 }

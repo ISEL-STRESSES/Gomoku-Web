@@ -5,6 +5,9 @@ import gomoku.server.domain.user.RankingUserData
 /**
  * Represents the statistics of a user for a specific rule
  * to be sent from the API
+ * @property id unique identifier of the user
+ * @property rank rank of the user for this rule
+ * @property username username of the user
  * @property gamesPlayed number of games played by the user for this rule
  * @property elo elo of the user for this rule
  */

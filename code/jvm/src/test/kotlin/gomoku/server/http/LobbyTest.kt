@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import gomoku.server.deleteLobbies
 import gomoku.server.http.model.toGameResponse
-import gomoku.server.http.model.toLobbiesResponse
-import gomoku.server.http.model.toRulesResponse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -41,7 +39,7 @@ class LobbyTest {
         val createUserResponse = createUserAndGetId(client, username) // userId is not needed
 
         // and the user already started a matchmaking process
-        val lobby = startMatchmakingProcess(client, createUserResponse.token).parseJson()
+        val lobby = startMatchmakingProcess(client, createUserResponse.token).getProperties()
 
         // when, then: the user tries to leave the matchmaking process is successful
         assertEquals(Unit, leaveLobby(client, lobby.path("id").asInt(), createUserResponse.token))
@@ -64,7 +62,7 @@ class LobbyTest {
         val createUserResponse = createUserAndGetId(client, username) // userId is not needed
 
         // and the user already started a matchmaking process
-        val lobby = startMatchmakingProcess(client, createUserResponse.token).parseJson()
+        val lobby = startMatchmakingProcess(client, createUserResponse.token).getProperties()
 
         // and another user
         val anotherUsername = newTestUserName()
@@ -97,7 +95,7 @@ class LobbyTest {
         val createUserResponse = createUserAndGetId(client, username) // userId is not needed
 
         // and the user already started a matchmaking process
-        val lobby = startMatchmakingProcess(client, createUserResponse.token).parseJson()
+        val lobby = startMatchmakingProcess(client, createUserResponse.token).getProperties()
 
         // when, then: the user tries to leave the matchmaking process is successful
         client.post().uri("/lobby/${lobby.path("id").asInt() + 1}/leave")
@@ -126,16 +124,16 @@ class LobbyTest {
         val createUserResponse = createUserAndGetId(client, username) // userId is not needed
 
         // and the user already started a matchmaking process
-        val lobby = startMatchmakingProcess(client, createUserResponse.token).parseJson()
+        val lobby = startMatchmakingProcess(client, createUserResponse.token).getProperties()
 
         // and another user
         val anotherUsername = newTestUserName()
         val anotherCreateUserResponse = createUserAndGetId(client, anotherUsername) // userId is not needed
 
         // when, then: the user tries to enter the lobby becomes a game
-        val gameId = joinLobby(client, lobby.path("id").asInt(), anotherCreateUserResponse.token).parseJson()
+        val gameId = joinLobby(client, lobby.path("id").asInt(), anotherCreateUserResponse.token).getProperties()
 
-        val gameDetails = getGameDetails(client, gameId.path("id").asInt(), anotherCreateUserResponse.token).parseJson().toGameResponse()
+        val gameDetails = getGameDetails(client, gameId.path("id").asInt(), anotherCreateUserResponse.token).getProperties().toGameResponse()
         assertNotNull(gameDetails.id)
         assertTrue(gameDetails.moves.orderOfMoves.isEmpty())
         assertNull(gameDetails.gameOutcome)
@@ -185,7 +183,7 @@ class LobbyTest {
         val createUserResponse = createUserAndGetId(client, username) // userId is not needed
 
         // and the user already started a matchmaking process
-        val lobby = startMatchmakingProcess(client, createUserResponse.token).parseJson()
+        val lobby = startMatchmakingProcess(client, createUserResponse.token).getProperties()
 
         // when, then: the user tries to leave the matchmaking process is successful
         client.post().uri("/lobby/${lobby.path("id").asInt()}/join")
@@ -198,7 +196,7 @@ class LobbyTest {
     }
 
     @Test
-    fun `get lobbies`() {
+    fun `get lobbies of a user`() {
         // given: an HTTP client
         val client = WebTestClient
             .bindToServer()
@@ -209,23 +207,19 @@ class LobbyTest {
         // and an empty lobby
         deleteLobbies()
 
-        // information to create 3 user
+        // information to create a user
         val username = newTestUserName()
         val createUserResponse = createUserAndGetId(client, username) // userId is not needed
 
-        val username2 = newTestUserName()
-        val createUserResponse2 = createUserAndGetId(client, username2) // userId is not needed
+        val nrOfRules = getRules(client).getProperties().path("size").asInt()
+        require(nrOfRules >= 1)
 
-        val nrOfRules = getRules(client).parseJson().toRulesResponse().rulesList.size
-        require(nrOfRules >= 2)
         // and the user already started a matchmaking process
-
         createLobby(client, 1, createUserResponse.token)
-        createLobby(client, 2, createUserResponse2.token)
 
-        // when, then: the user tries to enter the lobby becomes a game
-        val lobbies = getLobbies(client, createUserResponse.token).parseJson().toLobbiesResponse()
-        assertEquals(2, lobbies.lobbiesList.size)
+        // when, then: the user gets the lobbies he is in and there is only one
+        val lobbiesNr = getLobbies(client, createUserResponse.token).getProperties().path("size").asInt()
+        assertEquals(1, lobbiesNr)
     }
 
     @Test
@@ -246,7 +240,7 @@ class LobbyTest {
 
         // when, then: the user creates several lobbies
 
-        val lobby = createLobby(client, 1, createUserResponse.token).parseJson()
+        val lobby = createLobby(client, 1, createUserResponse.token).getProperties()
         assertContains(Int.MIN_VALUE..Int.MAX_VALUE, lobby.path("id").asInt())
     }
 
@@ -267,9 +261,9 @@ class LobbyTest {
         val createUserResponse = createUserAndGetId(client, username) // userId is not needed
 
         // and the user already started a matchmaking process
-        val matchMake = startMatchmakingProcess(client, createUserResponse.token).parseJson()
+        val matchMake = startMatchmakingProcess(client, createUserResponse.token).getProperties()
 
-        val getLobbyResponse = getLobbyById(client, matchMake.path("id").asInt(), createUserResponse.token).parseJson()
+        val getLobbyResponse = getLobbyById(client, matchMake.path("id").asInt(), createUserResponse.token).getProperties()
 
         // when, then: the user tries to enter the lobby becomes a game
         assertEquals(matchMake.path("id").asInt(), getLobbyResponse.path("id").asInt())
@@ -304,7 +298,7 @@ class LobbyTest {
     companion object {
         private fun newTestUserName() = "User${abs(Random.nextLong())}"
 
-        private fun ByteArray.parseJson(): JsonNode {
+        private fun ByteArray.getProperties(): JsonNode {
             val objectMapper = jacksonObjectMapper()
             val jsonNode = objectMapper.readTree(this)
             return jsonNode.path("properties")

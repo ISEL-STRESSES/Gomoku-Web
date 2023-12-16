@@ -269,7 +269,7 @@ class GameService(private val transactionManager: TransactionManager) {
         transactionManager.run {
             if (!it.usersRepository.isUserStoredById(userId)) {
                 failure(GetGameError.PlayerNotFound)
-            }else{
+            } else {
                 success(it.gameRepository.getUserOngoingGames(userId))
             }
         }
