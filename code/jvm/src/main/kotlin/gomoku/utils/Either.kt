@@ -10,7 +10,6 @@ sealed class Either<out L, out R> {
     data class Right<out R>(val value: R) : Either<Nothing, R>()
 }
 
-// Functions for when using Either to represent success or failure
 /**
  * Creates a [Either.Right] type.
  * @param value The value to be stored in the [Either.Right].

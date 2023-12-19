@@ -2,10 +2,10 @@ package gomoku.server.http.controllers.lobby
 
 import gomoku.server.domain.user.AuthenticatedUser
 import gomoku.server.http.URIs
-import gomoku.server.http.controllers.game.models.LobbyInputModel
 import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
-import gomoku.server.http.controllers.game.models.RuleIdInputModel
 import gomoku.server.http.controllers.lobby.models.GetLobbiesOutput
+import gomoku.server.http.controllers.lobby.models.LobbyIdInputModel
+import gomoku.server.http.controllers.lobby.models.RuleIdInputModel
 import gomoku.server.http.controllers.media.Problem
 import gomoku.server.http.responses.CreateLobby
 import gomoku.server.http.responses.GetLobbies
@@ -30,9 +30,13 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * Controller for lobby-related endpoints
+ */
 @RestController(value = "Lobbies")
 @RequestMapping(URIs.Lobby.ROOT)
 class LobbyController(private val lobbyService: LobbyService) {
+
     /**
      * Leaves a lobby
      * @param lobbyIdModel The id of the lobby
@@ -40,7 +44,7 @@ class LobbyController(private val lobbyService: LobbyService) {
      * @return The result of leaving the lobby
      */
     @PostMapping(URIs.Lobby.LEAVE_LOBBY)
-    fun leaveLobby(@RequestBody lobbyIdModel: LobbyInputModel, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+    fun leaveLobby(@RequestBody lobbyIdModel: LobbyIdInputModel, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val leftLobby = lobbyService.leaveLobby(lobbyIdModel.lobbyId, authenticatedUser.user.uuid)
         return when (leftLobby) {
             is Failure -> leftLobby.value.resolveProblem()
@@ -55,7 +59,7 @@ class LobbyController(private val lobbyService: LobbyService) {
      * @return the result of joining a lobby
      */
     @PostMapping(URIs.Lobby.JOIN_LOBBY)
-    fun joinLobby(@RequestBody lobbyIdModel: LobbyInputModel, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
+    fun joinLobby(@RequestBody lobbyIdModel: LobbyIdInputModel, authenticatedUser: AuthenticatedUser): ResponseEntity<*> {
         val joinedLobby = lobbyService.joinLobby(lobbyIdModel.lobbyId, authenticatedUser.user.uuid)
         return when (joinedLobby) {
             is Failure -> joinedLobby.value.resolveProblem()

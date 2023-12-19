@@ -211,6 +211,13 @@ class JDBIUserRepository(private val handle: Handle) : UserRepository {
             .mapTo<UserStats>()
             .singleOrNull()
 
+    /**
+     * Retrieves the stats of a user for a given rule.
+     * @param userId The id of the user.
+     * @param ruleId The id of the rule.
+     * @return The stats of the user for the given rule,
+     * or null if the user never played on this setting.
+     */
     override fun getUserRanking(userId: Int, ruleId: Int): RankingUserData? =
         handle.createQuery(
             """

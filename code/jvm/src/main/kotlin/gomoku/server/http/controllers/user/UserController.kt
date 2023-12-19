@@ -228,6 +228,13 @@ class UserController(private val service: UserService) {
         }
     }
 
+    /**
+     * Sets the authentication cookies for a user
+     * @param response The response to set the cookies to
+     * @param userToken The user token to set
+     * @param username The username to set
+     * @param userId The user id to set
+     */
     private fun setAuthenticationCookies(
         response: HttpServletResponse,
         userToken: String,
@@ -253,6 +260,10 @@ class UserController(private val service: UserService) {
         response.addCookie(userCookie)
     }
 
+    /**
+     * Clears the authentication cookies
+     * @param response The response to clear the cookies from
+     */
     private fun clearAuthenticationCookies(response: HttpServletResponse) {
         val accessTokenCookie = ResponseCookie.from("tokenCookie", "")
             .httpOnly(true)

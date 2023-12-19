@@ -117,6 +117,11 @@ class JDBIGameRepository(private val handle: Handle) : GameRepository {
             .mapTo<Game>()
             .singleOrNull()
 
+    /**
+     * Gets the finished games of a user.
+     * @param offset the offset of the games list
+     * @param limit the limit
+     */
     override fun getUserFinishedGames(offset: Int, limit: Int, userId: Int): List<FinishedGame> =
         handle.createQuery(
             """

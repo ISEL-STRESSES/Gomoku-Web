@@ -5,8 +5,6 @@ package gomoku.server.services.errors.game
  */
 sealed class GetGameError {
     object PlayerNotFound : GetGameError()
-
     object GameNotFound : GetGameError()
-
     object PlayerNotInGame : GetGameError()
 }

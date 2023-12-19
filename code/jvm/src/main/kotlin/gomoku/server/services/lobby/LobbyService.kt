@@ -14,6 +14,10 @@ import gomoku.utils.success
 import org.springframework.stereotype.Service
 import kotlin.random.Random
 
+/**
+ * Service for lobby-related operations
+ * @param transactionManager The transaction manager
+ */
 @Service
 class LobbyService(private val transactionManager: TransactionManager) {
 

@@ -14,9 +14,10 @@ import gomoku.server.repository.game.GameRepository
 import gomoku.server.repository.game.JDBIGameRepository
 import gomoku.server.repository.user.JDBIUserRepository
 import gomoku.server.testWithHandleAndRollback
-import kotlin.random.Random
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -184,8 +185,8 @@ class JDBIGameRepositoryTests {
 
         val gamePlayers = repo.getGamePlayers(gameId)
         assertNotNull(gamePlayers)
-        assertEquals(1, gamePlayers.first)
-        assertEquals(2, gamePlayers.second)
+        assertContains(listOf(user1, user2), gamePlayers.first)
+        assertContains(listOf(user1, user2), gamePlayers.second)
     }
 
     @Test

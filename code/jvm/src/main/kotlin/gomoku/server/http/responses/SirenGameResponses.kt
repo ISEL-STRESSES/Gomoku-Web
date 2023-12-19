@@ -10,7 +10,7 @@ import gomoku.server.http.controllers.game.models.GetFinishedGamesOutputModel
 import gomoku.server.http.controllers.game.models.GetRulesOutputModel
 import gomoku.server.http.controllers.game.models.MatchmakerOutputModel
 import gomoku.server.http.controllers.game.models.RuleOutputModel
-import gomoku.server.http.controllers.game.models.TurnOutput
+import gomoku.server.http.controllers.game.models.TurnOutputModel
 import gomoku.server.http.controllers.lobby.models.GetLobbiesOutput
 import gomoku.server.http.controllers.lobby.models.LeaveLobbyOutput
 import gomoku.server.http.infra.ActionFieldModel
@@ -373,7 +373,7 @@ object GetTurn {
     fun siren(body: CurrentTurnPlayerOutput) =
         siren {
             clazz(Rel.GET_TURN.value)
-            property(TurnOutput(body.turn))
+            property(TurnOutputModel(body.turn))
             link(URIs.Game.ROOT + "/${body.gameId}/turn", Rel.SELF)
         }
 }

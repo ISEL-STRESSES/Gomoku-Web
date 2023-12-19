@@ -5,7 +5,8 @@ import gomoku.server.domain.game.game.toColor
 
 /**
  * Represents a container for the moves of a game, that doesn't provide data structure information to the outside.
- * Uses a List of [Move] to keep track of the order of moves, and an array of [CellColor] to keep track and do searches on the board.
+ * Uses a List of [Move] to keep track of the order of moves, and an array of [CellColor] to keep track and do searches
+ * on the board.
  * @param boardSize The size of the board.
  * @param orderOfMoves The list of moves in the order they were played.
  * @param board The board as an array of [CellColor].

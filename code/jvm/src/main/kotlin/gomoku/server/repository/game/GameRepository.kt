@@ -62,8 +62,8 @@ interface GameRepository {
     fun getGameById(gameId: Int): Game?
 
     /**
-     * Gets the finished gamees of a user.
-     * @param offset the offset of the gamees list
+     * Gets the finished games of a user.
+     * @param offset the offset of the games list
      * @param limit the limit
      */
     fun getUserFinishedGames(offset: Int, limit: Int, userId: Int): List<FinishedGame>
@@ -150,5 +150,10 @@ interface GameRepository {
      */
     fun getTurn(gameId: Int): CellColor?
 
+    /**
+     * Gets the number of ongoing games stored in the database for the user.
+     * @param userId id of the user
+     * @return A list of ongoing games
+     */
     fun getUserOngoingGames(userId: Int): List<Game>
 }
