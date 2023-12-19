@@ -127,7 +127,7 @@ class UserController(private val service: UserService) {
         return when (res) {
             is Success -> {
                 if (userInput.sendTokenViaCookie) {
-                    setAuthenticationCookies(response, res.value.token, res.value.username, res.value.userId)
+                    setAuthenticationCookies(response, res.value.token, userInput.username)
                     SignUpWithCookie.siren("User created.").responseRedirect(201, URIs.Users.ROOT + URIs.Users.HOME)
                 } else {
                     SignUpWithoutCookie.siren(res.value).responseRedirect(201, URIs.Users.ROOT + URIs.Users.HOME)
@@ -138,7 +138,7 @@ class UserController(private val service: UserService) {
     }
 
     /**
-     * Creates a token for a user given its username and password, for example, to log in
+     * Creates a token for a user given its username and password, for example to login
      * @param userInput The user input
      * @return The created token or if not a [Problem]
      */
@@ -151,7 +151,7 @@ class UserController(private val service: UserService) {
         return when (res) {
             is Success -> {
                 if (userInput.sendTokenViaCookie) {
-                    setAuthenticationCookies(response, res.value.token, res.value.username, res.value.userId)
+                    setAuthenticationCookies(response, res.value.token, userInput.username)
                     LoginWithCookie.siren("User logged in.").responseRedirect(200, URIs.Users.ROOT + URIs.Users.HOME)
                 } else {
                     LoginWithoutCookie.siren(res.value).responseRedirect(200, URIs.Users.ROOT + URIs.Users.HOME)
@@ -228,18 +228,10 @@ class UserController(private val service: UserService) {
         }
     }
 
-    /**
-     * Sets the authentication cookies for a user
-     * @param response The response to set the cookies to
-     * @param userToken The user token to set
-     * @param username The username to set
-     * @param userId The user id to set
-     */
     private fun setAuthenticationCookies(
         response: HttpServletResponse,
         userToken: String,
-        username: String,
-        userId: Int
+        username: String
     ) {
         val accessTokenCookie = ResponseCookie.from("tokenCookie", userToken)
             .httpOnly(true)
@@ -248,8 +240,7 @@ class UserController(private val service: UserService) {
             .sameSite("Strict")
             .build()
 
-        val userCookieValue = "$userId:$username"
-        val userCookie = ResponseCookie.from("userCookie", userCookieValue)
+        val usernameCookie = ResponseCookie.from("usernameCookie", username)
             .httpOnly(false)
             .path("/")
             .maxAge(usersDomainConfig.tokenTtl.toLong(DurationUnit.SECONDS))
@@ -257,13 +248,9 @@ class UserController(private val service: UserService) {
             .build()
 
         response.addCookie(accessTokenCookie)
-        response.addCookie(userCookie)
+        response.addCookie(usernameCookie)
     }
 
-    /**
-     * Clears the authentication cookies
-     * @param response The response to clear the cookies from
-     */
     private fun clearAuthenticationCookies(response: HttpServletResponse) {
         val accessTokenCookie = ResponseCookie.from("tokenCookie", "")
             .httpOnly(true)
@@ -272,7 +259,7 @@ class UserController(private val service: UserService) {
             .sameSite("Strict")
             .build()
 
-        val userCookie = ResponseCookie.from("userCookie", "")
+        val usernameCookie = ResponseCookie.from("usernameCookie", "")
             .httpOnly(false)
             .path("/")
             .maxAge(0)
@@ -280,6 +267,6 @@ class UserController(private val service: UserService) {
             .build()
 
         response.addCookie(accessTokenCookie)
-        response.addCookie(userCookie)
+        response.addCookie(usernameCookie)
     }
 }
