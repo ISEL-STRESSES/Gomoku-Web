@@ -15,8 +15,6 @@ interface Transaction {
 
     val lobbyRepository: LobbyRepository
 
-    // other repository types
-
     /**
      * Rolls back the transaction
      */

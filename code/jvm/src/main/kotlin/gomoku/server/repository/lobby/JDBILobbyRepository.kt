@@ -32,6 +32,12 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             .mapTo<Lobby>()
             .singleOrNull()
 
+    /**
+     * Gets all lobbies by rule id
+     * @param ruleId The id of the rule
+     * @param userId The id of the user
+     * @return The list of lobbies
+     */
     override fun getLobbiesByRuleId(userId: Int, ruleId: Int): List<Lobby> =
         handle.createQuery(
             """
@@ -49,7 +55,8 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             .list()
 
     /**
-     * Gets all lobbies that the user is in
+     * Gets all lobbies by user id
+     * @param userId The id of the user
      * @return The list of lobbies
      */
     override fun getLobbiesByUserId(userId: Int): List<Lobby> =
@@ -105,7 +112,9 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
 
     /**
      * Removes a player from a lobby (Waiting Room)
+     * @param lobbyId The id of the lobby to remove the user from
      * @param userId The id of the user to remove
+     * @return True if the user was removed, false otherwise
      */
     override fun leaveLobby(lobbyId: Int, userId: Int): Boolean {
         return handle.createUpdate(
@@ -118,6 +127,12 @@ class JDBILobbyRepository(private val handle: Handle) : LobbyRepository {
             .execute() > 0
     }
 
+    /**
+     * Changes the state of a lobby
+     * @param lobbyId The id of the lobby
+     * @param gameId The id of the game
+     * @return True if the state was changed, false otherwise
+     */
     override fun changeLobbySate(lobbyId: Int, gameId: Int): Boolean {
         return handle.createUpdate(
             """

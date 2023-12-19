@@ -10,12 +10,13 @@ import org.springframework.http.HttpMethod
 import java.net.URI
 
 /**
- * TODO
+ * Siren entity for the home request
  */
 object SirenHomeResponses {
 
     /**
-     * TODO
+     * The built Siren entity with all the actions and links form the home request
+     * @param body The body of the entity
      */
     fun siren(body: ServerInfo) =
         siren {

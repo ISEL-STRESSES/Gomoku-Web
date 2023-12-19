@@ -9,8 +9,6 @@ plugins {
     id("org.jetbrains.kotlin.plugin.noarg") version kotlinVersion
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
-    kotlin("kapt") version kotlinVersion
-    idea
 }
 
 group = "gomoku"
@@ -27,14 +25,6 @@ noArg {
 
 repositories {
     mavenCentral()
-}
-
-idea {
-    module {
-        val kaptMain = file("build/generated/source/kapt/main")
-        sourceDirs.plusAssign(kaptMain)
-        generatedSourceDirs.plusAssign(kaptMain)
-    }
 }
 
 dependencies {

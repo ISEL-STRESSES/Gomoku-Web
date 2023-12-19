@@ -5,4 +5,4 @@ package gomoku.server.domain.game.exceptions
  * @param msg the detail message
  * @see Exception
  */
-class PositionAlreadyOccupiedException(msg: String = "") : Exception()
+class PositionAlreadyOccupiedException(msg: String = "") : Exception(msg)

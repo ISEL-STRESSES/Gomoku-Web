@@ -157,6 +157,11 @@ class GameService(private val transactionManager: TransactionManager) {
             it.gameRepository.getAllRules()
         }
 
+    /**
+     * Gets a rule by its id.
+     * @param ruleId id of the rule
+     * @return the rule with the given id, or null if the rule doesn't exist
+     */
     fun getRule(ruleId: Int): RuleResult =
         transactionManager.run {
             val rule = it.gameRepository.getRuleById(ruleId) ?: return@run failure(RuleError.RuleNotFound)
@@ -265,6 +270,11 @@ class GameService(private val transactionManager: TransactionManager) {
         return success(tr.gameRepository.getGameById(gameId)!!)
     }
 
+    /**
+     * Gets the ongoing games of a user.
+     * @param userId The id of the user.
+     * @return The list of [OngoingGame].
+     */
     fun getOngoingGames(userId: Int): GetOngoingGamesResult =
         transactionManager.run {
             if (!it.usersRepository.isUserStoredById(userId)) {

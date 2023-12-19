@@ -8,7 +8,3 @@ data class CurrentTurnPlayerOutput(
     val turn: Int,
     val gameId: Int
 )
-
-data class TurnOutput(
-    val turn: Int
-)

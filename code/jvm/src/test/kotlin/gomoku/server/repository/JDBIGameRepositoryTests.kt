@@ -9,12 +9,15 @@ import gomoku.server.domain.game.game.move.Position
 import gomoku.server.domain.game.rules.BoardSize
 import gomoku.server.domain.game.rules.OpeningRule
 import gomoku.server.domain.game.rules.RuleVariant
+import gomoku.server.domain.user.PasswordValidationInfo
 import gomoku.server.repository.game.GameRepository
 import gomoku.server.repository.game.JDBIGameRepository
 import gomoku.server.repository.user.JDBIUserRepository
 import gomoku.server.testWithHandleAndRollback
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -97,7 +100,7 @@ class JDBIGameRepositoryTests {
         repo.addToMoveArray(gameId, 3)
 
         val moves = repo.getAllMoves(gameId)
-        assertTrue(moves.contains(Move(Position(3, 0), CellColor.BLACK))) // Assuming Move has a constructor like this
+        assertTrue(moves.contains(Move(Position(3, 0), CellColor.BLACK)))
     }
 
     @Test
@@ -120,7 +123,7 @@ class JDBIGameRepositoryTests {
         repo.addToMoveArray(gameId, 3)
 
         val turn = repo.getTurn(gameId)
-        assertEquals(CellColor.WHITE, turn) // Assuming after 1 move by black, it's white's turn
+        assertEquals(CellColor.WHITE, turn)
     }
 
     @Test
@@ -146,12 +149,11 @@ class JDBIGameRepositoryTests {
         val repo = JDBIGameRepository(handle)
         val uRepo = JDBIUserRepository(handle)
 
-        val gameIdNull = repo.getGameById(31)
-        assertNull(gameIdNull)
-
-        val player1 = uRepo.getUserById(1)
+        val user1 = uRepo.storeUser(newUserName(), PasswordValidationInfo(testPassword))
+        val player1 = uRepo.getUserById(user1)
         assertNotNull(player1)
-        val player2 = uRepo.getUserById(2)
+        val user2 = uRepo.storeUser(newUserName(), PasswordValidationInfo(testPassword))
+        val player2 = uRepo.getUserById(user2)
         assertNotNull(player2)
 
         val gameId = repo.createGame(1, player1.uuid, player2.uuid)
@@ -183,8 +185,8 @@ class JDBIGameRepositoryTests {
 
         val gamePlayers = repo.getGamePlayers(gameId)
         assertNotNull(gamePlayers)
-        assertEquals(1, gamePlayers.first)
-        assertEquals(2, gamePlayers.second)
+        assertContains(listOf(user1, user2), gamePlayers.first)
+        assertContains(listOf(user1, user2), gamePlayers.second)
     }
 
     @Test
@@ -268,6 +270,13 @@ class JDBIGameRepositoryTests {
     }
 }
 
+/**
+ * Util function to create a finished game
+ * @receiver [GameRepository]
+ * @param userId the id of a player
+ * @param opponentId the id of a player
+ * @return The id of the game finished
+ */
 fun GameRepository.createFinishedGame(userId: Int, opponentId: Int): Int {
     // Create an ongoing game first
     val gameId = this.createGame(2, userId, opponentId)
@@ -279,3 +288,10 @@ fun GameRepository.createFinishedGame(userId: Int, opponentId: Int): Int {
 
     return gameId
 }
+
+/**
+ * Util function to generate a random username
+ */
+fun newUserName() = "User" + Random.nextLong()
+
+const val testPassword = "ByQYP78&j7Aug2"

@@ -16,27 +16,27 @@ and gameplay.
         - [Get Home](#get-home)
     - [Users](#users)
         - [Create a New User](#create-a-new-user)
-        - [Logs a User In](#logs-a-user-in)
-        - [Logs a User Out](#logs-a-user-out)
-        - [Creates a token for a user](#creates-a-token-for-a-user)
-        - [Gets a user home page](#gets-a-user-home-page)
-        - [Gets the ranking of the users for a given rule](#gets-the-ranking-of-the-users-for-a-given-rule)
-        - [Gets the ranking of a user for a given rule](#gets-the-ranking-of-a-user-for-a-given-rule)
-        - [Gets All stats of a user](#gets-all-stats-of-a-user)
-        - [Gets the user with the given id](#gets-the-user-with-the-given-id)
+        - [Logs a User In](#log-a-user-in)
+        - [Logout a User](#logout-a-user)
+        - [Create a token for a user](#create-a-token-for-a-user)
+        - [Get a user home page](#get-a-user-home-page)
+        - [Get the ranking of the users for a given rule](#get-the-ranking-of-the-users-for-a-given-rule)
+        - [Get the ranking of a user for a given rule](#get-the-ranking-of-a-user-for-a-given-rule)
+        - [Get All stats of a user](#get-all-stats-of-a-user)
+        - [Get the user with the given id](#get-the-user-with-the-given-id)
     - [Games](#games)
         - [Get the Finished games](#get-finished-games)
         - [Get the available rules](#get-game-rules)
         - [Get the details of a game](#get-game-details)
         - [Makes a move in a game](#make-a-move)
         - [Gets the player id of the current turn](#get-current-turn-player-id)
-        - [Starts the matchmaking process](#start-matchmaking-process)
+        - [Starts the matchmaking process](#start-the-matchmaking-process)
         - [Forfeit a game](#forfeit-a-game)
     - [Lobbies](#lobbies)
       - [Get all lobbies](#get-all-lobbies)
       - [Create a lobby](#create-a-lobby)
       - [Join a lobby](#join-a-lobby)
-      - [Leave a lobby](#leave-a-lobby)
+      - [Leave the lobby](#leave-a-lobby)
       - [Get the details of a lobby](#get-the-details-of-a-lobby)
 - [Types](#types)
     - [Parameters](#parameters)
@@ -94,9 +94,10 @@ and gameplay.
 
 For the purpose of the URLs in this document, the base URL is `https://localhost:8080/api/`.
 
-The Siren media type is used to represent the resources. It is media type following a hypermedia specification for
-representing entities. It is a JSON-based format that is
-optimized for HTTP. Siren is designed to be simple, extendable, and consistent.
+The Siren media type is used to represent the resources.
+It is a media type following a hypermedia specification for representing entities.
+It is a JSON-based format.
+Optimized for HTTP. Siren is designed to be simple, extendable, and consistent.
 The Internet Media Type for Siren is `application/vnd.siren+json`.
 
 As for the Errors the media type is `application/problem+json` and it follows the
@@ -111,7 +112,7 @@ There is the relation of `self` (current page), `prev` and `next` (previous and 
 ## Authentication
 
 There are requests that need authentication and to those requests you need to add the header `Authorization` with a
-Bearer Token.
+Bearer Token or cookies.
 
 ## Endpoints
 
@@ -119,7 +120,7 @@ Bearer Token.
 
 #### Get Home
 
-Retrieves basic information or status of the Gomoku API.
+Retrieve basic information or status of the Gomoku API.
 
 - **URL:** `/api/`
 - **Method:** `GET`
@@ -140,7 +141,7 @@ Retrieves basic information or status of the Gomoku API.
 
 #### Create a new user
 
-Creates a new user.
+Create a new user.
 
 - **URL:** `/api/users/create`
 - **Method:** `POST`
@@ -166,9 +167,9 @@ Creates a new user.
     curl -X POST -d "username=foo&password=bar" https://localhost:8080/api/users/create
     ```
 
-#### Logs a User in
+#### Log a User in
 
-Logs a user in.
+Log a user in.
 
 - **URL:** `/api/users/token`
 - **Method:** `POST`
@@ -186,9 +187,9 @@ Logs a user in.
             - [User or Password Invalid](#user-or-password-invalid)
             - [Internal Server Error](#internal-server-error)
 
-#### Logs a User out
+#### Logout a User
 
-Logs a user out. **Requires authentication**
+Log a user out. **Requires authentication**
 
 - **URL:** `/api/users/logout`
 - **Method:** `POST`
@@ -207,9 +208,9 @@ Logs a user out. **Requires authentication**
     curl -X POST https://localhost:8080/api/users/logout
     ```
 
-#### Gets a User Home Page
+#### Get a User Home Page
 
-Retrieves user-specific home page. **Requires authentication**
+Retrieve user-specific home page. **Requires authentication**
 
 - **URL:** `/api/users/me`
 - **Method:** `GET`
@@ -227,9 +228,9 @@ Retrieves user-specific home page. **Requires authentication**
     curl https://localhost:8080/api/users/me
     ```
 
-#### Gets the ranking of the users for a given rule
+#### Get the ranking of the users for a given rule
 
-Gets the ranking of the users for a given rule.
+Get the ranking of the users for a given rule.
 
 - **URL:** `/api/users/ranking/{ruleId}`
 - **Method:** `GET`
@@ -254,9 +255,9 @@ Gets the ranking of the users for a given rule.
     curl https://localhost:8080/api/users/ranking/1?username=foo
     ```
 
-#### Gets the ranking of a user for a given rule
+#### Get the ranking of a user for a given rule
 
-Gets the ranking of a user for a given rule.
+Get the ranking of a user for a given rule.
 
 - **URL:** `/api/users/ranking/{rukeId}/{userId}`
 - **Method:** `GET`
@@ -280,9 +281,9 @@ Gets the ranking of a user for a given rule.
     curl https://localhost:8080/api/users/ranking/2/1
     ```
 
-#### Gets all stats of a user
+#### Get all stats of a user
 
-Gets the whole stats of a user. **Requires authentication** (dunno)
+Get the whole stats of a user. **Requires authentication** (dunno)
 
 - **URL:** `/api/users/stats/{userId}`
 - **Method:** `GET`
@@ -304,9 +305,9 @@ Gets the whole stats of a user. **Requires authentication** (dunno)
     curl https://localhost:8080/api/users/stats/1
     ```
 
-#### Creates a token for a user
+#### Create a token for a user
 
-Creates a token for a user.
+Create a token for a user.
 
 - **URL:** `/api/users/token`
 - **Method:** `POST`
@@ -328,9 +329,9 @@ Creates a token for a user.
     curl -X POST -d "username=foo&password=bar" https://localhost:8080/api/users/token
     ```
 
-#### Gets the user with the given id
+#### Get the user with the given id
 
-Gets the user with the given id.
+Get the user with the given id.
 
 - **URL:** `/api/users/{userId}`
 - **Method:** `GET`
@@ -355,7 +356,7 @@ Gets the user with the given id.
 
 #### Get Finished Games
 
-Retrieves a list of finished games.
+Retrieve a list of finished games.
 
 - **URL:** `/api/game/`
 - **Method:** `GET`
@@ -394,7 +395,7 @@ Retrieves available game rules.
 
 #### Get Game Details
 
-Retrieves the details of a game. **Requires authentication**
+Retrieve the details of a game. **Requires authentication**
 - **URL:** `/api/game/{id}`
 - **Method:** `GET`
 - **Path Params:**
@@ -478,7 +479,7 @@ Retrieves the player id of the current turn. **Requires authentication**
     curl https://localhost:8080/api/game/1/turn
     ```
 
-#### Start Matchmaking Process
+#### Start the Matchmaking Process
 
 Starts the matchmaking process. **Requires authentication**
 
@@ -554,7 +555,7 @@ Retrieves all lobbies. **Requires authentication**
 
 #### Create a Lobby
 
-Creates a lobby. **Requires authentication**
+Create a lobby. **Requires authentication**
 
 - **URL:** `/api/lobby/create/{ruleId}`
 - **Method:** `POST`
@@ -577,7 +578,7 @@ Creates a lobby. **Requires authentication**
 
 #### Join a Lobby
 
-Joins a lobby. **Requires authentication**
+Join a player in a lobby. **Requires authentication**
 
 - **URL:** `/api/lobby/{lobbyId}/join`
 - **Method:** `POST`
@@ -628,7 +629,7 @@ Leaves a lobby. **Requires authentication**
 
 #### Get the Details of a Lobby
 
-Retrieves the details of a lobby. **Requires authentication**
+Retrieve the details of a lobby. **Requires authentication**
 
 - **URL:** `/api/lobby/{lobbyId}`
 - **Method:** `GET`
@@ -665,10 +666,9 @@ The username is a string with a length between 3 and 50 characters, consisting s
 
 #### Position
 
-The Position has two parts, the row(x) and the column(y), both are positive integers.
-The row has to be between 1 and the board size and the column has to be between 1 and the board size.
-The board size is defined by the rule.
-`[x,y]`
+The Position has two parts, the row(x) and the column(y); both are positive integers.
+The row has to be between 1 and the board size, and the column has to be between one and the board size.
+The rule defines the board size.
 
 #### RuleId
 
@@ -708,44 +708,130 @@ The application home page has the server info and the authors' info with their s
 
 ```vnd.siren+json
 {
-  "class": [
-    "home"
-  ],
-  "properties": {
-    "version": "0.0.1",
-    "authors": [
-      {
-        "studentID": 0,
-        "name": "John Doe",
-        "email": "foo@somedomain.something",
-        "socials": [
-          {
-            "name": "something",
-            "url": "https://somewebsite.something"
-          }
+    "class":[
+        "home"
+    ],
+    "properties":{
+        "version":"1.0.2",
+        "authors":[
+            {
+                "studentID":48335,
+                "name":"Rodrigo Correia",
+                "email":"A48335@alunos.isel.pt",
+                "socials":[
+                    {
+                        "name":"GitHub",
+                        "url":"https://github.com/RodrigoHCorreia"
+                    }
+                ]
+            },
+            {
+                "studentID":48331,
+                "name":"André Matos",
+                "email":"A48331@alunos.isel.pt",
+                "socials":[
+                    {
+                        "name":"GitHub",
+                        "url":"https://github.com/Matos16"
+                    }
+                ]
+            },
+            {
+                "studentID":48253,
+                "name":"Carlos Pereira",
+                "email":"A48253@alunos.isel.pt",
+                "socials":[
+                    {
+                        "name":"GitHub",
+                        "url":"https://github.com/Sideghost"
+                    }
+                ]
+            }
         ]
-      }
-    ]
-  },
-  "links": [
-    {
-      "rel": [
-        "self"
-      ],
-      "href": "/api/"
-    }
-  ],
-  "actions": [
-     {
-        "name": "signup",
-        "href": "/api/users/create",
-        "method": "POST"
-     },
-     {
-        "name": "login",
-        "href": "/api/users/token",
-        "method": "POST"
-     }
+    },
+    "entities":[],
+    "actions":[
+        {
+            "name":"signup",
+            "title":"Sign up",
+            "method":"POST",
+            "href":"/api/users/create",
+            "type":"application/vnd.siren+json",
+            "fields":[
+                {
+                    "name":"username",
+                    "type":"text",
+                    "value":null
+                },
+                {
+                    "name":"password",
+                    "type":"password",
+                    "value":null
+                }
+            ]
+        },
+        {
+            "name":"login",
+            "title":"Login",
+            "method":"POST",
+            "href":"/api/users/token",
+            "type":"application/vnd.siren+json",
+            "fields":[
+                {
+                    "name":"username",
+                    "type":"text",
+                    "value":null
+                },
+                {
+                    "name":"password",
+                    "type":"password",
+                    "value":null
+                }
+            ]
+        },
+        {
+            "name":"logout",
+            "title":"Logout",
+            "method":"POST",
+            "href":"/api/users/logout",
+            "type":"application/vnd.siren+json",
+            "fields":[]
+        },
+        {
+            "name":"search-ranking",
+            "title":"Search ranking",
+            "method":"GET",
+            "href":"/api/users/ranking/1?limit=10",
+            "type":"application/vnd.siren+json",
+            "fields":[
+                {
+                    "name":"ruleId",
+                    "type":"number",
+                    "value":"1"
+                },
+                {
+                    "name":"search",
+                    "type":"text",
+                    "value":null
+                },
+                {
+                    "name":"limit",
+                    "type":"number",
+                    "value":"10"
+                },
+                {
+                    "name":"offset",
+                    "type":"number",
+                    "value":null
+                }
+            ]
+        }
+    ],
+    "links":[
+        {
+            "rel":["self"],
+            "href":"/api/"
+        }
     ]
 }
 ```
@@ -1291,7 +1377,7 @@ The application home page has the server info and the authors' info with their s
 
 #### Bad Request
 
-This error happens when for example you try to create a user and the username or password is invalid.
+This error happens when, for example, you try to create a user and the username or password is invalid.
 
 - **Sample Error Response:**
 

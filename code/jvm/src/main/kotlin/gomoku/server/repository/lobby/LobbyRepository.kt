@@ -9,10 +9,17 @@ interface LobbyRepository {
 
     /**
      * Gets all lobbies by user id
+     * @param userId The id of the user
      * @return The list of lobbies
      */
     fun getLobbiesByUserId(userId: Int): List<Lobby>
 
+    /**
+     * Gets all lobbies by rule id
+     * @param ruleId The id of the rule
+     * @param userId The id of the user
+     * @return The list of lobbies
+     */
     fun getLobbiesByRuleId(userId: Int, ruleId: Int): List<Lobby>
 
     /**
@@ -39,7 +46,9 @@ interface LobbyRepository {
 
     /**
      * Removes a player from a lobby (Waiting Room)
+     * @param lobbyId The id of the lobby to remove the user from
      * @param userId The id of the user to remove
+     * @return True if the user was removed, false otherwise
      */
     fun leaveLobby(lobbyId: Int, userId: Int): Boolean
 

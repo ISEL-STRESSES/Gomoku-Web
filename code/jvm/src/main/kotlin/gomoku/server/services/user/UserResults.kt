@@ -9,7 +9,6 @@ import gomoku.utils.Either
 
 /**
  * Result for user creation
- * TODO check the result cause on layer services and output models
  * @see UserCreationError
  */
 typealias UserCreationResult = Either<UserCreationError, UserCreateOutputModel>

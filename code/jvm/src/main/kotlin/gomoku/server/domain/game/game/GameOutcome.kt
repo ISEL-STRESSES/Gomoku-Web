@@ -14,18 +14,6 @@ enum class GameOutcome(val winnerColor: CellColor? = null) {
 }
 
 /**
- * Converts a string to a [GameOutcome]
- * @receiver the string to convert
- * @return the [GameOutcome]
- */
-fun String.toGameOutcome() = when (this.uppercase()) {
-    "BLACK_WON" -> GameOutcome.BLACK_WON
-    "WHITE_WON" -> GameOutcome.WHITE_WON
-    "DRAW" -> GameOutcome.DRAW
-    else -> throw IllegalArgumentException("Invalid game outcome: $this")
-}
-
-/**
  * Converts a color to a [GameOutcome]
  * @receiver the color to convert
  * @return the [GameOutcome]

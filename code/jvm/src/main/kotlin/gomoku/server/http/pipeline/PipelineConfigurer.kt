@@ -18,7 +18,7 @@ class PipelineConfigurer(
 ) : WebMvcConfigurer {
 
     /**
-     * TODO
+     * Overrides the addInterceptors method to add the authentication interceptor.
      */
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authenticationInterceptor)
@@ -26,7 +26,7 @@ class PipelineConfigurer(
     }
 
     /**
-     * TODO
+     * Overrides the addArgumentResolvers method to add the authenticated user argument resolver.
      */
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(authenticatedUserArgumentResolver)
