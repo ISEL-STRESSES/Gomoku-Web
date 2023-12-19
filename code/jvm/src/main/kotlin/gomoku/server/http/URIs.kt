@@ -56,6 +56,9 @@ object URIs {
         fun play(gameId: Int) = UriTemplate(ROOT + MAKE_PLAY).expand(gameId)
     }
 
+    /**
+     * Contains the URIs for the lobby endpoints
+     */
     object Lobby {
         const val ROOT = "$PREFIX/lobby"
         const val GET_LOBBIES = "/"
