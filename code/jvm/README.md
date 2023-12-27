@@ -80,8 +80,8 @@ depending on the success or failure of the request.
 This layer is organized in the following packages:
 
 - [/controllers](src/main/kotlin/gomoku/server/http/controllers) - Contains the controllers for the API;
-- [/infra](src/main/kotlin/gomoku/server/http/infra) - Contains the infrastructure classes for the responses and the 
-siren specification;
+- [/infra](src/main/kotlin/gomoku/server/http/infra) - Contains the infrastructure classes for the responses and the
+  siren specification;
 - [/pipeline](src/main/kotlin/gomoku/server/http/pipeline) - Contains the authentication pipeline for the controllers;
 - [/responses](src/main/kotlin/gomoku/server/http/responses) - Contains the response templates for the controllers;
 
@@ -140,7 +140,7 @@ This layer is organized in the following packages:
 The [`AuthenticationInterceptor`](src/main/kotlin/gomoku/server/http/pipeline/AuthenticationInterceptor.kt)
 class implements the `HandlerInterceptor` interface, and is responsible for intercepting the requests and checking if
 the user is authenticated, in other words, if the endpoint has a parameter type `AuthenticateUser`, with in turn checks
-based on the `Authorization` header if the user is authenticated or not, or by checking if the user is authenticated 
+based on the `Authorization` header if the user is authenticated or not, or by checking if the user is authenticated
 based on cookies.
 
 ## [Error Handling](#error-handling)
@@ -168,7 +168,7 @@ To run the application, you need to have the following installed:
 - Gradle
 - Java 17
 
-With the Gradle wrapper, you can build the application with the following command on the [jvm folder]():
+With the Gradle wrapper, you can build the application with the following command on the [jvm folder](./):
 
 ```shell
 ./gradlew build

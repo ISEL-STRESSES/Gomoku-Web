@@ -16,33 +16,31 @@ and gameplay.
         - [Get Home](#get-home)
     - [Users](#users)
         - [Create a New User](#create-a-new-user)
-        - [Logs a User In](#logs-a-user-in)
-        - [Logs a User Out](#logs-a-user-out)
-        - [Creates a token for a user](#creates-a-token-for-a-user)
-        - [Gets a user home page](#gets-a-user-home-page)
-        - [Gets the ranking of the users for a given rule](#gets-the-ranking-of-the-users-for-a-given-rule)
-        - [Gets the ranking of a user for a given rule](#gets-the-ranking-of-a-user-for-a-given-rule)
-        - [Gets All stats of a user](#gets-all-stats-of-a-user)
-        - [Gets the user with the given id](#gets-the-user-with-the-given-id)
+        - [Logs a User In](#log-a-user-in)
+        - [Logout a User](#logout-a-user)
+        - [Create a token for a user](#create-a-token-for-a-user)
+        - [Get a user home page](#get-a-user-home-page)
+        - [Get the ranking of the users for a given rule](#get-the-ranking-of-the-users-for-a-given-rule)
+        - [Get the ranking of a user for a given rule](#get-the-ranking-of-a-user-for-a-given-rule)
+        - [Get the user with the given id](#get-the-user-with-the-given-id)
     - [Games](#games)
         - [Get the Finished games](#get-finished-games)
         - [Get the available rules](#get-game-rules)
         - [Get the details of a game](#get-game-details)
         - [Makes a move in a game](#make-a-move)
         - [Gets the player id of the current turn](#get-current-turn-player-id)
-        - [Starts the matchmaking process](#start-matchmaking-process)
+        - [Starts the matchmaking process](#start-the-matchmaking-process)
         - [Forfeit a game](#forfeit-a-game)
     - [Lobbies](#lobbies)
       - [Get all lobbies](#get-all-lobbies)
       - [Create a lobby](#create-a-lobby)
       - [Join a lobby](#join-a-lobby)
-      - [Leave a lobby](#leave-a-lobby)
+      - [Leave the lobby](#leave-a-lobby)
       - [Get the details of a lobby](#get-the-details-of-a-lobby)
 - [Types](#types)
     - [Parameters](#parameters)
-        - [Password](#password)
         - [Username](#username)
-        - [Position](#position)
+        - [Play Position Input](#play-position-input)
         - [RuleId](#ruleid)
         - [UserId](#userid)
         - [LobbyId](#lobbyid)
@@ -94,9 +92,10 @@ and gameplay.
 
 For the purpose of the URLs in this document, the base URL is `https://localhost:8080/api/`.
 
-The Siren media type is used to represent the resources. It is media type following a hypermedia specification for
-representing entities. It is a JSON-based format that is
-optimized for HTTP. Siren is designed to be simple, extendable, and consistent.
+The Siren media type is used to represent the resources.
+It is a media type following a hypermedia specification for representing entities.
+It is a JSON-based format.
+Optimized for HTTP. Siren is designed to be simple, extendable, and consistent.
 The Internet Media Type for Siren is `application/vnd.siren+json`.
 
 As for the Errors the media type is `application/problem+json` and it follows the
@@ -111,7 +110,7 @@ There is the relation of `self` (current page), `prev` and `next` (previous and 
 ## Authentication
 
 There are requests that need authentication and to those requests you need to add the header `Authorization` with a
-Bearer Token.
+Bearer Token or cookies.
 
 ## Endpoints
 
@@ -119,7 +118,7 @@ Bearer Token.
 
 #### Get Home
 
-Retrieves basic information or status of the Gomoku API.
+Retrieve basic information or status of the Gomoku API.
 
 - **URL:** `/api/`
 - **Method:** `GET`
@@ -140,14 +139,13 @@ Retrieves basic information or status of the Gomoku API.
 
 #### Create a new user
 
-Creates a new user.
+Create a new user.
 
 - **URL:** `/api/users/create`
 - **Method:** `POST`
 - **Payload Params:**
     - **Required:**
-        - [Username](#username)
-        - [Password](#password)
+        - [User Create Input Model](#user-create-input-model)
 - **Success Response:**
     - **Content:**
         - `application/vnd.siren+json`
@@ -166,16 +164,15 @@ Creates a new user.
     curl -X POST -d "username=foo&password=bar" https://localhost:8080/api/users/create
     ```
 
-#### Logs a User in
+#### Log a User in
 
-Logs a user in.
+Log a user in.
 
 - **URL:** `/api/users/token`
 - **Method:** `POST`
 - **Payload Params:**
     - **Required:**
-        - [Username](#username)
-        - [Password](#password)
+        - [User Create Input Model](#user-create-input-model)
 - **Success Response:**
 - **Content:**
     - `application/vnd.siren+json`
@@ -186,9 +183,9 @@ Logs a user in.
             - [User or Password Invalid](#user-or-password-invalid)
             - [Internal Server Error](#internal-server-error)
 
-#### Logs a User out
+#### Logout a User
 
-Logs a user out. **Requires authentication**
+Log a user out. **Requires authentication**
 
 - **URL:** `/api/users/logout`
 - **Method:** `POST`
@@ -207,9 +204,9 @@ Logs a user out. **Requires authentication**
     curl -X POST https://localhost:8080/api/users/logout
     ```
 
-#### Gets a User Home Page
+#### Get a User Home Page
 
-Retrieves user-specific home page. **Requires authentication**
+Retrieve user-specific home page. **Requires authentication**
 
 - **URL:** `/api/users/me`
 - **Method:** `GET`
@@ -227,15 +224,16 @@ Retrieves user-specific home page. **Requires authentication**
     curl https://localhost:8080/api/users/me
     ```
 
-#### Gets the ranking of the users for a given rule
+#### Get the ranking of the users for a given rule
 
-Gets the ranking of the users for a given rule.
+Get the ranking of the users for a given rule.
 
-- **URL:** `/api/users/ranking/{ruleId}`
+- **URL:** `/api/users/ranking/{ruleId}?username={username}&offset={offset}&limit={limit}`
 - **Method:** `GET`
 - **Path Params:**
     - **Required:**
         - [RuleId](#ruleid)
+- **Query Params:**
     - **Optional:**
         - [Username](#username)
         - [Offset](#offset)
@@ -254,11 +252,11 @@ Gets the ranking of the users for a given rule.
     curl https://localhost:8080/api/users/ranking/1?username=foo
     ```
 
-#### Gets the ranking of a user for a given rule
+#### Get the ranking of a user for a given rule
 
-Gets the ranking of a user for a given rule.
+Get the ranking of a user for a given rule.
 
-- **URL:** `/api/users/ranking/{rukeId}/{userId}`
+- **URL:** `/api/users/{userId}/ranking/{ruleId}`
 - **Method:** `GET`
 - **Path Params:**
     - **Required:**
@@ -280,40 +278,15 @@ Gets the ranking of a user for a given rule.
     curl https://localhost:8080/api/users/ranking/2/1
     ```
 
-#### Gets all stats of a user
+#### Create a token for a user
 
-Gets the whole stats of a user. **Requires authentication** (dunno)
-
-- **URL:** `/api/users/stats/{userId}`
-- **Method:** `GET`
-- **Path Params:**
-    - **Required:**
-        - [UserId](#userid)
-- **Success Response:**
-- **Content:**
-    - `application/vnd.siren+json`
-        - [User Stats](#user-stats)
-- **Error Responses:**
-    - **Content:**
-        - `application/problem+json`
-            - [Unauthorized](#unauthorized)
-            - [User Not Found](#user-not-found)
-            - [Internal Server Error](#internal-server-error)
-- **Sample Call:**
-    ```bash
-    curl https://localhost:8080/api/users/stats/1
-    ```
-
-#### Creates a token for a user
-
-Creates a token for a user.
+Create a token for a user.
 
 - **URL:** `/api/users/token`
 - **Method:** `POST`
 - **Payload Params:**
     - **Required:**
-        - [Username](#username)
-        - [Password](#password)
+        - [User Create Input Model](#user-create-input-model)
 - **Success Response:**
     - **Content:**
         - `application/vnd.siren+json`
@@ -328,9 +301,9 @@ Creates a token for a user.
     curl -X POST -d "username=foo&password=bar" https://localhost:8080/api/users/token
     ```
 
-#### Gets the user with the given id
+#### Get the user with the given id
 
-Gets the user with the given id.
+Get the user with the given id.
 
 - **URL:** `/api/users/{userId}`
 - **Method:** `GET`
@@ -355,10 +328,14 @@ Gets the user with the given id.
 
 #### Get Finished Games
 
-Retrieves a list of finished games.
+Retrieve a list of finished games.
 
-- **URL:** `/api/game/`
+- **URL:** `/api/game/?offset={offset}&limit={limit}`
 - **Method:** `GET`
+- **Query Params:**
+    - **Optional:**
+        - [Offset](#offset)
+        - [Limit](#limit)
 - **Success Response:**
     - **Content:**
         - `application/vnd.siren+json`
@@ -392,10 +369,33 @@ Retrieves available game rules.
     curl https://localhost:8080/api/game/rules
     ```
 
+#### Get Game Rule Details
+
+Retrieve the details of a game rule.
+
+- **URL:** `/api/game/rules/{ruleId}`
+- **Method:** `GET`
+- **Path Params:**
+    - **Required:**
+        - [RuleId](#ruleid)
+- **Success Response:**
+    - **Content:**
+        - `application/vnd.siren+json`
+            - [Game Rule Details](#game-rule-details)
+- **Error Responses:**
+    - **Content:**
+        - `application/problem+json`
+            - [Rule Not Found](#rule-not-found)
+            - [Internal Server Error](#internal-server-error)
+- **Sample Call:**
+    ```bash
+    curl https://localhost:8080/api/game/rules/1
+    ```
+
 #### Get Game Details
 
-Retrieves the details of a game. **Requires authentication**
-- **URL:** `/api/game/{id}`
+Retrieve the details of a game. **Requires authentication**
+- **URL:** `/api/game/{gameId}`
 - **Method:** `GET`
 - **Path Params:**
     - **Required:**
@@ -421,14 +421,14 @@ Retrieves the details of a game. **Requires authentication**
 
 Makes a move in a game. **Requires authentication**
 
-- **URL:** `/api/game/{id}/play`
+- **URL:** `/api/game/{gameId}/play`
 - **Method:** `POST`
 - **Path Params:**
     - **Required:**
         - [GameId](#gameid)
-- **Query Params:**
+- **Payload Params:**
     - **Required:**
-        - [Position](#position)
+        - [Play Position Input](#play-position-input)
 - **Success Response:**
     - **Content:**
         - `application/vnd.siren+json`
@@ -456,7 +456,7 @@ Makes a move in a game. **Requires authentication**
 
 Retrieves the player id of the current turn. **Requires authentication**
 
-- **URL:** `/api/game/{id}/turn`
+- **URL:** `/api/game/{gameId}/turn`
 - **Method:** `GET`
 - **Path Params:**
     - **Required:**
@@ -478,29 +478,27 @@ Retrieves the player id of the current turn. **Requires authentication**
     curl https://localhost:8080/api/game/1/turn
     ```
 
-#### Start Matchmaking Process
+#### Get Ongoing Games
 
-Starts the matchmaking process. **Requires authentication**
+Retrieve a list of ongoing games. **Requires authentication**
 
-- **URL:** `/api/game/start/{ruleId}`
-- **Method:** `POST`
-- **Path Params:**
-    - **Required:**
-        - [RuleId](#ruleid)
+- **URL:** `/api/game/ongoing`
+- **Method:** `GET`
 - **Success Response:**
     - **Content:**
         - `application/vnd.siren+json`
-            - [Lobby Details](#lobby-details)
+            - [Ongoing Games](#ongoing-games)
 - **Error Responses:**
     - **Content:**
         - `application/problem+json`
-            - [Same Player](#same-player)
             - [Unauthorized](#unauthorized)
-            - [Leave Lobby Failed](#leave-lobby-failed)
+            - [Player Not in Game](#player-not-in-game)
+            - [Game Not Found](#game-not-found)
+            - [Player Not Found](#user-not-found)
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
     ```bash
-    curl -X POST https://localhost:8080/api/game/start/1
+    curl https://localhost:8080/api/game/ongoing
     ```
 
 #### Forfeit a Game
@@ -532,11 +530,36 @@ Forfeit a game. **Requires authentication**
 
 ### Lobbies
 
+#### Start the Matchmaking Process
+
+Starts the matchmaking process. **Requires authentication**
+
+- **URL:** `/api/lobby/start`
+- **Method:** `POST`
+- **Payload Params:**
+    - **Required:**
+        - [Rule Id Input Model](#rule-id-input-model)
+- **Success Response:**
+    - **Content:**
+        - `application/vnd.siren+json`
+            - [Lobby Details](#lobby-details)
+- **Error Responses:**
+    - **Content:**
+        - `application/problem+json`
+            - [Same Player](#same-player)
+            - [Unauthorized](#unauthorized)
+            - [Leave Lobby Failed](#leave-lobby-failed)
+            - [Internal Server Error](#internal-server-error)
+- **Sample Call:**
+    ```bash
+    curl -X POST https://localhost:8080/api/game/start/1
+    ```
+
 #### Get All Lobbies
 
-Retrieves all lobbies. **Requires authentication**
+Retrieves all lobbies from the authenticated user. **Requires authentication**
 
-- **URL:** `/api/lobby/lobbies`
+- **URL:** `/api/lobby/`
 - **Method:** `GET`
 - **Success Response:**
     - **Content:**
@@ -549,18 +572,18 @@ Retrieves all lobbies. **Requires authentication**
             - [Internal Server Error](#internal-server-error)
 - **Sample Call:**
     ```bash
-    curl https://localhost:8080/api/lobby/lobbies
+    curl https://localhost:8080/api/lobby/
     ```
 
 #### Create a Lobby
 
-Creates a lobby. **Requires authentication**
+Create a lobby. **Requires authentication**
 
-- **URL:** `/api/lobby/create/{ruleId}`
+- **URL:** `/api/lobby/create/`
 - **Method:** `POST`
-- **Path Params:**
+- **Payload Params:**
     - **Required:**
-        - [RuleId](#ruleid)
+        - [Rule Id Input Model](#rule-id-input-model)
 - **Success Response:**
     - **Content:**
         - `application/vnd.siren+json`
@@ -577,13 +600,13 @@ Creates a lobby. **Requires authentication**
 
 #### Join a Lobby
 
-Joins a lobby. **Requires authentication**
+Join a player in a lobby. **Requires authentication**
 
-- **URL:** `/api/lobby/{lobbyId}/join`
+- **URL:** `/api/lobby/join`
 - **Method:** `POST`
-- **Path Params:**
+- **Payload Params:**
     - **Required:**
-        - [LobbyId](#lobbyid)
+        - [Lobby Id Input Model](#lobby-id-input-model)
 - **Success Response:**
     - **Content:**
         - `application/vnd.siren+json`
@@ -604,11 +627,11 @@ Joins a lobby. **Requires authentication**
 
 Leaves a lobby. **Requires authentication**
 
-- **URL:** `/api/lobby/{lobbyId}/leave`
+- **URL:** `/api/lobby/leave`
 - **Method:** `POST`
-- **Path Params:**
+- **PayLoad Params:**
     - **Required:**
-        - [LobbyId](#lobbyid)
+        - [Lobby Id Input Model](#lobby-id-input-model)
 - **Success Response:**
     - **Content:**
         - `application/vnd.siren+json`
@@ -628,7 +651,7 @@ Leaves a lobby. **Requires authentication**
 
 #### Get the Details of a Lobby
 
-Retrieves the details of a lobby. **Requires authentication**
+Retrieve the details of a lobby. **Requires authentication**
 
 - **URL:** `/api/lobby/{lobbyId}`
 - **Method:** `GET`
@@ -652,23 +675,55 @@ Retrieves the details of a lobby. **Requires authentication**
 
 ## Types
 
+### Payload
+
+#### User Create Input Model
+
+A json object with the following properties:
+````json
+{
+    "username": "string",
+    "password": "string",
+    "sendTokenViaCookie": "Boolean"
+}
+````
+
+#### Rule Id Input Model
+
+A json object with the following properties:
+````json
+{
+    "ruleId": "number"
+}
+````
+
+#### Lobby Id Input Model
+
+A json object with the following properties:
+````json
+{
+    "lobbyId": "number"
+}
+````
+
 ### Parameters
-
-#### Password
-
-The password is a string with a length between 6 and 30 characters
-It has to contain at least one lowercase letter, one uppercase letter, one digit and one special character.
 
 #### Username
 
 The username is a string with a length between 3 and 50 characters, consisting solely of non-whitespace characters.
 
-#### Position
+#### Play Position Input
 
-The Position has two parts, the row(x) and the column(y), both are positive integers.
-The row has to be between 1 and the board size and the column has to be between 1 and the board size.
-The board size is defined by the rule.
-`[x,y]`
+The Position has two parts, the row(x) and the column(y); both are positive integers.
+The row has to be between 1 and the board size, and the column has to be between one and the board size.
+The rule defines the board size.
+
+````json
+{
+    "x": "number",
+    "y": "number"
+}
+````
 
 #### RuleId
 
@@ -708,44 +763,130 @@ The application home page has the server info and the authors' info with their s
 
 ```vnd.siren+json
 {
-  "class": [
-    "home"
-  ],
-  "properties": {
-    "version": "0.0.1",
-    "authors": [
-      {
-        "studentID": 0,
-        "name": "John Doe",
-        "email": "foo@somedomain.something",
-        "socials": [
-          {
-            "name": "something",
-            "url": "https://somewebsite.something"
-          }
+    "class":[
+        "home"
+    ],
+    "properties":{
+        "version":"1.0.2",
+        "authors":[
+            {
+                "studentID":48335,
+                "name":"Rodrigo Correia",
+                "email":"A48335@alunos.isel.pt",
+                "socials":[
+                    {
+                        "name":"GitHub",
+                        "url":"https://github.com/RodrigoHCorreia"
+                    }
+                ]
+            },
+            {
+                "studentID":48331,
+                "name":"André Matos",
+                "email":"A48331@alunos.isel.pt",
+                "socials":[
+                    {
+                        "name":"GitHub",
+                        "url":"https://github.com/Matos16"
+                    }
+                ]
+            },
+            {
+                "studentID":48253,
+                "name":"Carlos Pereira",
+                "email":"A48253@alunos.isel.pt",
+                "socials":[
+                    {
+                        "name":"GitHub",
+                        "url":"https://github.com/Sideghost"
+                    }
+                ]
+            }
         ]
-      }
-    ]
-  },
-  "links": [
-    {
-      "rel": [
-        "self"
-      ],
-      "href": "/api/"
-    }
-  ],
-  "actions": [
-     {
-        "name": "signup",
-        "href": "/api/users/create",
-        "method": "POST"
-     },
-     {
-        "name": "login",
-        "href": "/api/users/token",
-        "method": "POST"
-     }
+    },
+    "entities":[],
+    "actions":[
+        {
+            "name":"signup",
+            "title":"Sign up",
+            "method":"POST",
+            "href":"/api/users/create",
+            "type":"application/vnd.siren+json",
+            "fields":[
+                {
+                    "name":"username",
+                    "type":"text",
+                    "value":null
+                },
+                {
+                    "name":"password",
+                    "type":"password",
+                    "value":null
+                }
+            ]
+        },
+        {
+            "name":"login",
+            "title":"Login",
+            "method":"POST",
+            "href":"/api/users/token",
+            "type":"application/vnd.siren+json",
+            "fields":[
+                {
+                    "name":"username",
+                    "type":"text",
+                    "value":null
+                },
+                {
+                    "name":"password",
+                    "type":"password",
+                    "value":null
+                }
+            ]
+        },
+        {
+            "name":"logout",
+            "title":"Logout",
+            "method":"POST",
+            "href":"/api/users/logout",
+            "type":"application/vnd.siren+json",
+            "fields":[]
+        },
+        {
+            "name":"search-ranking",
+            "title":"Search ranking",
+            "method":"GET",
+            "href":"/api/users/ranking/1?limit=10",
+            "type":"application/vnd.siren+json",
+            "fields":[
+                {
+                    "name":"ruleId",
+                    "type":"number",
+                    "value":"1"
+                },
+                {
+                    "name":"search",
+                    "type":"text",
+                    "value":null
+                },
+                {
+                    "name":"limit",
+                    "type":"number",
+                    "value":"10"
+                },
+                {
+                    "name":"offset",
+                    "type":"number",
+                    "value":null
+                }
+            ]
+        }
+    ],
+    "links":[
+        {
+            "rel":["self"],
+            "href":"/api/"
+        }
     ]
 }
 ```
@@ -1291,7 +1432,7 @@ The application home page has the server info and the authors' info with their s
 
 #### Bad Request
 
-This error happens when for example you try to create a user and the username or password is invalid.
+This error happens when, for example, you try to create a user and the username or password is invalid.
 
 - **Sample Error Response:**
 

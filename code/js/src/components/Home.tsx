@@ -54,8 +54,6 @@ export function Home() {
 
           />
         </Box>
-
-
       </PageContent>
     </Paper>
   );

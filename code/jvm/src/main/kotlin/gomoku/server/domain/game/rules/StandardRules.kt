@@ -1,6 +1,5 @@
 package gomoku.server.domain.game.rules
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import gomoku.server.domain.game.IsValidMoveResult
 import gomoku.server.domain.game.errors.MoveError
 import gomoku.server.domain.game.game.CellColor
@@ -16,13 +15,10 @@ import gomoku.utils.success
  * @constructor creates a default rule with board size 15, standard variant and free opening rule
  */
 data class StandardRules(override val ruleId: Int, override val boardSize: BoardSize) : Rules() {
-    @JsonIgnore
+
     override val variant: RuleVariant = RuleVariant.STANDARD
 
-    @JsonIgnore
     override val openingRule: OpeningRule = OpeningRule.FREE
-
-    val type = "StandardRules"
 
     /**
      * Checks if a move is valid based on the rules of the game
@@ -31,7 +27,7 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
      * @param turn color of the player trying to play
      * @return the move result
      */
-    @JsonIgnore
+
     override fun isValidMove(moveContainer: MoveContainer, move: Move, turn: Turn): IsValidMoveResult {
         if (turn.color != move.cellColor) return failure(MoveError.InvalidTurn)
         if (moveContainer.hasMove(move.position)) return failure(MoveError.AlreadyOccupied)
@@ -46,7 +42,6 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
      * @param turn color of the player trying to play
      * @return the possible moves possible in the set of rules
      */
-    @JsonIgnore
     override fun possiblePositions(
         moveContainer: MoveContainer,
         cellColor: CellColor,
@@ -61,7 +56,6 @@ data class StandardRules(override val ruleId: Int, override val boardSize: Board
      * @param move move to check if it was a winning move
      * @return true if the move is a winning move, false otherwise
      */
-    @JsonIgnore
     override fun isWinningMove(moveContainer: MoveContainer, move: Move): Boolean {
         val directions = listOf(
             Pair(0, 1), // Horizontal
