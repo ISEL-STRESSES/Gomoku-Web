@@ -14,7 +14,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class PipelineConfigurer(
     val authenticationInterceptor: AuthenticationInterceptor,
-    val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver
+    val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver,
+    val loggerInterceptor: LoggerInterceptor
 ) : WebMvcConfigurer {
 
     /**
@@ -22,7 +23,7 @@ class PipelineConfigurer(
      */
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authenticationInterceptor)
-        // registry.addInterceptor(pathAuthenticationInterceptor)
+        registry.addInterceptor(loggerInterceptor)
     }
 
     /**

@@ -1,6 +1,5 @@
 package gomoku.server.domain.game.rules
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import gomoku.server.domain.game.IsValidMoveResult
 import gomoku.server.domain.game.errors.MoveError
 import gomoku.server.domain.game.game.CellColor
@@ -16,13 +15,9 @@ import kotlin.math.abs
  * Represents the Pro rule set variation.
  */
 data class ProOpeningRules(override val ruleId: Int, override val boardSize: BoardSize) : Rules() {
-    @JsonIgnore
     override val variant: RuleVariant = RuleVariant.STANDARD
 
-    @JsonIgnore
     override val openingRule: OpeningRule = OpeningRule.PRO
-
-    val type = "ProOpeningRules"
 
     /**
      * Checks if a move is valid, according to the Pro rule set.
@@ -31,7 +26,6 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
      * @param turn The color of the player who made the move
      * @return the move result.
      */
-    @JsonIgnore
     override fun isValidMove(moveContainer: MoveContainer, move: Move, turn: Turn): IsValidMoveResult {
         val center = Position(boardSize.maxIndex / 2, boardSize.maxIndex / 2)
 
@@ -83,7 +77,6 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
      * @param cellColor The color of the player
      * @return a list with the possible moves.
      */
-    @JsonIgnore
     override fun possiblePositions(
         moveContainer: MoveContainer,
         cellColor: CellColor,
@@ -111,7 +104,6 @@ data class ProOpeningRules(override val ruleId: Int, override val boardSize: Boa
      * @param move The move to check
      * @return true if the move is a winning move, false otherwise
      */
-    @JsonIgnore
     override fun isWinningMove(moveContainer: MoveContainer, move: Move): Boolean {
         return StandardRules(0, boardSize).isWinningMove(moveContainer, move)
     }

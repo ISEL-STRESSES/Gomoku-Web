@@ -168,7 +168,7 @@ To run the application, you need to have the following installed:
 - Gradle
 - Java 17
 
-With the Gradle wrapper, you can build the application with the following command on the [jvm folder]():
+With the Gradle wrapper, you can build the application with the following command on the [jvm folder](./):
 
 ```shell
 ./gradlew build
