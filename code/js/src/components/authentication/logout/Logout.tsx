@@ -5,7 +5,7 @@ import { UserService } from '../../../service/user/UserService';
 import { Failure, Success } from '../../../utils/Either';
 import { Problem } from '../../../service/media/Problem';
 import { useSetUser, useCurrentUser } from "../Authn";
-import { getUser } from '../../../utils/cookieUtils';
+import { getUserName } from '../../../utils/cookieUtils';
 import { AlertDialogWithYesOrNo } from "../../shared/AlertDialog";
 
 type LogoutState =
@@ -26,7 +26,7 @@ export function Logout() {
     UserService.logout()
       .then(res => {
         if (res instanceof Success) {
-          setUser(getUser()); // set user to undefined
+          setUser(getUserName()); // set user to undefined
           setState({ type: 'success' });
         } else if (res instanceof Failure) {
           const message = res.value instanceof Problem ?

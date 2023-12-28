@@ -5,6 +5,6 @@ function getCookie(cookieName: string) {
     return requestedPair ? requestedPair.substring(requestedPair.indexOf('=') + 1) : undefined;
 }
 
-export function getUser() {
-    return getCookie("userCookie");
+export function getUserName() {
+    return getCookie("usernameCookie");
 }
