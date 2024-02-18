@@ -1,10 +1,14 @@
-# DAW project
+# DAW project (Gomoku)
 
-Please edit this document with an introduction to your project, including links to all the existing documentation.
+## Description
 
-In addition, please add a [`.mailmap`](https://git-scm.com/docs/gitmailmap) file, mapping the emails used in the commits to your ISEL email and student number
-Example:
+This project is a web application that allows you to play Gomoku (五子棋).
 
-```
-12345 <a12345@alunos.isel.pt> <mygithubuser@whatever.com>
-```
+## Phases
+
+The development of this project will be divided into 2 phases:
+
+* **Phase 1**: Development of the Web API for the Gomoku game.
+  * The backend documentation can be found [here](code/jvm/README.md).
+* **Phase 2**: Development of the frontend for the Gomoku game.
+  * The frontend documentation can be found [here](code/js/README.md).
